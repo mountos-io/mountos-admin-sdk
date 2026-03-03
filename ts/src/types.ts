@@ -1,0 +1,189 @@
+// Client configuration
+export interface Config {
+  baseUrl: string
+  privateKey: string
+}
+
+// Response envelope
+export interface StandardResponse<T = unknown> {
+  status: 'success' | 'failure'
+  message: string
+  data?: T
+  errorCode?: number
+}
+
+// Pagination
+export interface PaginationMeta {
+  page: number
+  limit: number
+  total: number
+  totalPages: number
+}
+
+export interface PaginatedResponse<T> {
+  items: T[]
+  pagination: PaginationMeta
+}
+
+export interface CursorPaginatedResponse<T> {
+  items: T[]
+  nextCursor: number | null
+}
+
+export interface ListOptions {
+  page?: number
+  limit?: number
+}
+
+// Accounts
+export interface CreateAccountRequest {
+  name: string
+  description?: string
+  vendorInfo?: Record<string, unknown>
+}
+
+export interface EditAccountRequest {
+  name: string
+  description?: string
+  vendorInfo?: Record<string, unknown>
+}
+
+export interface Account {
+  id: number
+  name: string
+  description: string
+  vendorInfo?: Record<string, unknown>
+  isActive: boolean
+  locked: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+// Users
+export interface AddUserRequest {
+  accountId: number
+  username: string
+  email: string
+  name?: string
+  vendorInfo?: Record<string, unknown>
+}
+
+export interface EditUserRequest {
+  username: string
+  email: string
+  name?: string
+  vendorInfo?: Record<string, unknown>
+}
+
+export interface User {
+  id: number
+  accountId: number
+  username: string
+  email: string
+  name: string
+}
+
+export interface UserListOptions extends ListOptions {
+  accountId: number
+}
+
+// Regions
+export interface CreateRegionRequest {
+  accountId: number
+  name: string
+  dns: string
+}
+
+export interface EditRegionRequest {
+  accountId: number
+  name: string
+  dns: string
+}
+
+export interface Region {
+  id: number
+  accountId: number
+  name: string
+  dns: string
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+// Storages
+export interface CreateStorageRequest {
+  accountId: number
+  regionId: number
+  name: string
+  description?: string
+  storageType: 'object' | 'block'
+  providerType: string
+  endpoint: string
+  region?: string
+  bucket?: string
+  base?: string
+  blockRegion?: string
+  blockType?: 'standard' | 'passthrough'
+  blockSize?: number
+  accessKey?: string
+  secretKey?: string
+}
+
+export interface EditStorageRequest {
+  name: string
+  description?: string
+  endpoint?: string
+  accessKey?: string
+  secretKey?: string
+}
+
+export interface Storage {
+  id: string
+  shardId: number
+  accountId: number
+  regionId: number
+  name: string
+  description?: string
+  storageType: string
+  providerType: string
+  blockType?: string
+  endpoint: string
+  region?: string
+  bucket?: string
+  base?: string
+  blockRegion?: string
+  blockSize?: number
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface StorageListOptions extends ListOptions {
+  accountId: number
+}
+
+// Volumes
+export interface UpdateVolumeQuotaRequest {
+  quotaLimit: number
+}
+
+// Audit Logs
+export interface AuditLog {
+  id: number
+  title: string
+  description?: string
+  subject?: string
+  success: boolean
+  data?: unknown
+  createdBy?: string
+  accountId?: string
+  createdAt?: string
+  updatedAt?: string
+}
+
+export interface AuditLogListOptions {
+  accountId?: number
+  cursor?: number
+  limit?: number
+  subject?: string
+}
