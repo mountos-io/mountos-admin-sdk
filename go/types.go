@@ -105,20 +105,17 @@ type UserListOptions struct {
 type CreateRegionRequest struct {
 	AccountID int64  `json:"accountId"`
 	Name      string `json:"name"`
-	DNS       string `json:"dns"`
 }
 
 type EditRegionRequest struct {
 	AccountID int64  `json:"accountId"`
 	Name      string `json:"name"`
-	DNS       string `json:"dns"`
 }
 
 type Region struct {
 	ID        int64  `json:"id"`
 	AccountID int64  `json:"accountId"`
 	Name      string `json:"name"`
-	DNS       string `json:"dns"`
 	IsActive  bool   `json:"isActive"`
 	CreatedAt string `json:"createdAt"`
 	UpdatedAt string `json:"updatedAt"`
@@ -210,4 +207,32 @@ type AuditLogListOptions struct {
 	Cursor    int64
 	Limit     int
 	Subject   string
+}
+
+// Service Nodes
+
+type ServiceNode struct {
+	ID            int64          `json:"id"`
+	RegionID      int64          `json:"regionId"`
+	ServiceType   string         `json:"serviceType"`
+	NodeID        string         `json:"nodeId"`
+	AdvertiseAddr string         `json:"advertiseAddr"`
+	HTTPAddr      string         `json:"httpAddr,omitempty"`
+	Metadata      map[string]any `json:"metadata,omitempty"`
+	Status        string         `json:"status"`
+	LastHeartbeat string         `json:"lastHeartbeat,omitempty"`
+	IsActive      bool           `json:"isActive"`
+}
+
+// Discovery
+
+type DiscoverMetaResponse struct {
+	Region    string             `json:"region"`
+	Endpoints []DiscoverEndpoint `json:"endpoints"`
+}
+
+type DiscoverEndpoint struct {
+	NodeID string `json:"nodeId"`
+	Addr   string `json:"addr"`
+	Status string `json:"status"`
 }

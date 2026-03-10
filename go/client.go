@@ -17,12 +17,14 @@ type Client struct {
 	http    *http.Client
 	auth    *tokenCache
 
-	Accounts  *AccountsService
-	Users     *UsersService
-	Regions   *RegionsService
-	Storages  *StoragesService
-	Volumes   *VolumesService
-	AuditLogs *AuditLogsService
+	Accounts     *AccountsService
+	Users        *UsersService
+	Regions      *RegionsService
+	Storages     *StoragesService
+	Volumes      *VolumesService
+	AuditLogs    *AuditLogsService
+	ServiceNodes *ServiceNodesService
+	Discover     *DiscoverService
 }
 
 // NewClient creates a new SDK client.
@@ -43,6 +45,8 @@ func NewClient(cfg Config) (*Client, error) {
 	c.Storages = &StoragesService{c: c}
 	c.Volumes = &VolumesService{c: c}
 	c.AuditLogs = &AuditLogsService{c: c}
+	c.ServiceNodes = &ServiceNodesService{c: c}
+	c.Discover = &DiscoverService{c: c}
 	return c, nil
 }
 
@@ -104,6 +108,10 @@ func (c *Client) post(ctx context.Context, path string, body any) (json.RawMessa
 
 func (c *Client) put(ctx context.Context, path string, body any) (json.RawMessage, error) {
 	return c.do(ctx, http.MethodPut, path, body)
+}
+
+func (c *Client) delete(ctx context.Context, path string) (json.RawMessage, error) {
+	return c.do(ctx, http.MethodDelete, path, nil)
 }
 
 func decodeJSON[T any](data json.RawMessage) (*T, error) {
