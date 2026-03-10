@@ -91,20 +91,17 @@ export interface UserListOptions extends ListOptions {
 export interface CreateRegionRequest {
   accountId: number
   name: string
-  dns: string
 }
 
 export interface EditRegionRequest {
   accountId: number
   name: string
-  dns: string
 }
 
 export interface Region {
   id: number
   accountId: number
   name: string
-  dns: string
   isActive: boolean
   createdAt: string
   updatedAt: string
@@ -186,4 +183,30 @@ export interface AuditLogListOptions {
   cursor?: number
   limit?: number
   subject?: string
+}
+
+// Service Nodes
+export interface ServiceNode {
+  id: number
+  regionId: number
+  serviceType: string
+  nodeId: string
+  advertiseAddr: string
+  httpAddr?: string
+  metadata?: Record<string, unknown>
+  status: string
+  lastHeartbeat?: string
+  isActive: boolean
+}
+
+// Discovery
+export interface DiscoverMetaResponse {
+  region: string
+  endpoints: DiscoverEndpoint[]
+}
+
+export interface DiscoverEndpoint {
+  nodeId: string
+  addr: string
+  status: string
 }

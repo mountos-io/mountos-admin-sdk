@@ -9,6 +9,8 @@ import type {
   Storage, CreateStorageRequest, EditStorageRequest, StorageListOptions,
   UpdateVolumeQuotaRequest,
   AuditLog, AuditLogListOptions,
+  ServiceNode,
+  DiscoverMetaResponse,
 } from './types.js'
 
 function queryString(params: Record<string, string | number | undefined>): string {
@@ -27,6 +29,8 @@ export class MountOSAdmin {
   private _storages?: StoragesResource
   private _volumes?: VolumesResource
   private _auditLogs?: AuditLogsResource
+  private _serviceNodes?: ServiceNodesResource
+  private _discover?: DiscoverResource
 
   constructor(config: Config) {
     this.baseUrl = config.baseUrl.replace(/\/+$/, '')
@@ -55,6 +59,14 @@ export class MountOSAdmin {
 
   get auditLogs(): AuditLogsResource {
     return (this._auditLogs ??= new AuditLogsResource(this))
+  }
+
+  get serviceNodes(): ServiceNodesResource {
+    return (this._serviceNodes ??= new ServiceNodesResource(this))
+  }
+
+  get discover(): DiscoverResource {
+    return (this._discover ??= new DiscoverResource(this))
   }
 
   async request<T>(method: string, path: string, body?: unknown): Promise<T> {
@@ -223,5 +235,33 @@ class AuditLogsResource {
       limit: opts?.limit,
       subject: opts?.subject,
     })}`)
+  }
+}
+
+class ServiceNodesResource {
+  constructor(private client: MountOSAdmin) {}
+
+  list(regionId: number): Promise<ServiceNode[]> {
+    return this.client.request('GET', `/api/v1/regions/${regionId}/nodes`)
+  }
+
+  drain(regionId: number, nodeId: string): Promise<void> {
+    return this.client.request('POST', `/api/v1/regions/${regionId}/nodes/${encodeURIComponent(nodeId)}/drain`)
+  }
+
+  activate(regionId: number, nodeId: string): Promise<void> {
+    return this.client.request('POST', `/api/v1/regions/${regionId}/nodes/${encodeURIComponent(nodeId)}/activate`)
+  }
+
+  remove(regionId: number, nodeId: string): Promise<void> {
+    return this.client.request('DELETE', `/api/v1/regions/${regionId}/nodes/${encodeURIComponent(nodeId)}`)
+  }
+}
+
+class DiscoverResource {
+  constructor(private client: MountOSAdmin) {}
+
+  meta(accessKeyId: string): Promise<DiscoverMetaResponse> {
+    return this.client.request('GET', `/api/v1/discover/meta${queryString({ access_key_id: accessKeyId })}`)
   }
 }

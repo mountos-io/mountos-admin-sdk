@@ -23,4 +23,7 @@ export type {
   UpdateVolumeQuotaRequest,
   AuditLog,
   AuditLogListOptions,
+  ServiceNode,
+  DiscoverMetaResponse,
+  DiscoverEndpoint,
 } from './types.js'
