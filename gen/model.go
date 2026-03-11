@@ -26,9 +26,10 @@ type ErrorCodeDef struct {
 }
 
 type Resource struct {
-	Name      string     `yaml:"name"`
-	Path      string     `yaml:"path"`
-	Endpoints []Endpoint `yaml:"endpoints"`
+	Name           string            `yaml:"name"`
+	Path           string            `yaml:"path"`
+	PathParamTypes map[string]string `yaml:"pathParamTypes,omitempty"`
+	Endpoints      []Endpoint        `yaml:"endpoints"`
 }
 
 type Endpoint struct {

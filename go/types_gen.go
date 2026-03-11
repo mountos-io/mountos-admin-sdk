@@ -38,11 +38,11 @@ type CursorPaginatedResponse[T any] struct {
 
 // IDResponse returned by create/edit/toggle endpoints.
 type IDResponse struct {
-	ID string `json:"id"`
+	ID int64 `json:"id"`
 }
 
 type Account struct {
-	ID          string         `json:"id"`
+	ID          int64          `json:"id"`
 	Name        string         `json:"name"`
 	Description string         `json:"description"`
 	VendorInfo  map[string]any `json:"vendorInfo,omitempty"`
@@ -53,7 +53,7 @@ type Account struct {
 }
 
 type User struct {
-	ID        string `json:"id"`
+	ID        int64  `json:"id"`
 	AccountID int64  `json:"accountId"`
 	Username  string `json:"username"`
 	Email     string `json:"email"`
@@ -61,8 +61,8 @@ type User struct {
 }
 
 type Region struct {
-	ID        string `json:"id"`
-	ShardID   int64  `json:"shardId"`
+	ID        int64  `json:"id"`
+	ExportID  string `json:"exportId"`
 	AccountID int64  `json:"accountId"`
 	Name      string `json:"name"`
 	IsActive  bool   `json:"isActive"`
@@ -71,8 +71,7 @@ type Region struct {
 }
 
 type Storage struct {
-	ID           string `json:"id"`
-	ShardID      int64  `json:"shardId"`
+	ID           int64  `json:"id"`
 	AccountID    int64  `json:"accountId"`
 	RegionID     int64  `json:"regionId"`
 	Name         string `json:"name"`
@@ -92,20 +91,20 @@ type Storage struct {
 }
 
 type AuditLog struct {
-	ID          string          `json:"id"`
+	ID          int64           `json:"id"`
 	Title       string          `json:"title"`
 	Description string          `json:"description,omitempty"`
 	Subject     string          `json:"subject,omitempty"`
 	Success     bool            `json:"success"`
 	Data        json.RawMessage `json:"data,omitempty"`
 	CreatedBy   string          `json:"createdBy,omitempty"`
-	AccountID   string          `json:"accountId,omitempty"`
+	AccountID   int64           `json:"accountId,omitempty"`
 	CreatedAt   string          `json:"createdAt,omitempty"`
 	UpdatedAt   string          `json:"updatedAt,omitempty"`
 }
 
 type ServiceNode struct {
-	ID            string         `json:"id"`
+	ID            int64          `json:"id"`
 	RegionID      int64          `json:"regionId"`
 	ServiceType   string         `json:"serviceType"`
 	NodeID        string         `json:"nodeId"`
@@ -196,11 +195,6 @@ type CreateStorageRequest struct {
 	BlockSize    int32  `json:"blockSize,omitempty"`
 	AccessKey    string `json:"accessKey,omitempty"`
 	SecretKey    string `json:"secretKey,omitempty"`
-}
-
-type CreateStorageResponse struct {
-	ID      string `json:"id"`
-	ShardID int64  `json:"shardId"`
 }
 
 type EditStorageRequest struct {

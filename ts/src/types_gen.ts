@@ -35,7 +35,7 @@ export interface ListOptions {
 }
 
 export interface Account {
-  id: string
+  id: number
   name: string
   description: string
   vendorInfo?: Record<string, unknown>
@@ -46,7 +46,7 @@ export interface Account {
 }
 
 export interface User {
-  id: string
+  id: number
   accountId: number
   username: string
   email: string
@@ -54,8 +54,8 @@ export interface User {
 }
 
 export interface Region {
-  id: string
-  shardId: number
+  id: number
+  exportId: string
   accountId: number
   name: string
   isActive: boolean
@@ -64,8 +64,7 @@ export interface Region {
 }
 
 export interface Storage {
-  id: string
-  shardId: number
+  id: number
   accountId: number
   regionId: number
   name: string
@@ -85,20 +84,20 @@ export interface Storage {
 }
 
 export interface AuditLog {
-  id: string
+  id: number
   title: string
   description?: string
   subject?: string
   success: boolean
   data?: unknown
   createdBy?: string
-  accountId?: string
+  accountId?: number
   createdAt?: string
   updatedAt?: string
 }
 
 export interface ServiceNode {
-  id: string
+  id: number
   regionId: number
   serviceType: string
   nodeId: string

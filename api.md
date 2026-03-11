@@ -48,7 +48,7 @@ Request:
   "vendorInfo"?: object
 }
 ```
-Response data: `{ "id": string }`
+Response data: `{ "id": int64 }`
 
 ### GET /api/v1/accounts/list
 Query: `page=int(default 1)`, `limit=int(default 10)`
@@ -68,28 +68,28 @@ Request:
   "vendorInfo"?: object
 }
 ```
-Response data: `{ "id": string }`
+Response data: `{ "id": int64 }`
 
 ### POST /api/v1/accounts/:accountId/lock
 Param: `accountId`
-Response data: `{ "id": string }`
+Response data: `{ "id": int64 }`
 
 ### POST /api/v1/accounts/:accountId/unlock
 Param: `accountId`
-Response data: `{ "id": string }`
+Response data: `{ "id": int64 }`
 
 ### POST /api/v1/accounts/:accountId/activate
 Param: `accountId`
-Response data: `{ "id": string }`
+Response data: `{ "id": int64 }`
 
 ### POST /api/v1/accounts/:accountId/deactivate
 Param: `accountId`
-Response data: `{ "id": string }`
+Response data: `{ "id": int64 }`
 
 ### Account Type
 ```
 {
-  "id": string,
+  "id": int64,
   "name": string,
   "description": string,
   "vendorInfo"?: object,
@@ -115,7 +115,7 @@ Request:
   "vendorInfo"?: object
 }
 ```
-Response data: `{ "id": string }`
+Response data: `{ "id": int64 }`
 
 ### GET /api/v1/users/list
 Query: `accountId=int64(required)`, `page=int(default 1)`, `limit=int(default 10)`
@@ -136,20 +136,20 @@ Request:
   "vendorInfo"?: object
 }
 ```
-Response data: `{ "id": string }`
+Response data: `{ "id": int64 }`
 
 ### POST /api/v1/users/:userId/activate
 Param: `userId`
-Response data: `{ "id": string }`
+Response data: `{ "id": int64 }`
 
 ### POST /api/v1/users/:userId/deactivate
 Param: `userId`
-Response data: `{ "id": string }`
+Response data: `{ "id": int64 }`
 
 ### User Type
 ```
 {
-  "id": string,
+  "id": int64,
   "accountId": int64,
   "username": string,
   "email": string,
@@ -169,7 +169,7 @@ Request:
   "name": string(required)
 }
 ```
-Response data: `{ "id": string }`
+Response data: `{ "id": int64 }`
 
 ### GET /api/v1/regions/list
 Query: `page=int(default 1)`, `limit=int(default 10)`
@@ -188,21 +188,21 @@ Request:
   "name": string(required)
 }
 ```
-Response data: `{ "id": string }`
+Response data: `{ "id": int64 }`
 
 ### POST /api/v1/regions/:regionId/activate
 Param: `regionId`
-Response data: `{ "id": string }`
+Response data: `{ "id": int64 }`
 
 ### POST /api/v1/regions/:regionId/deactivate
 Param: `regionId`
-Response data: `{ "id": string }`
+Response data: `{ "id": int64 }`
 
 ### Region Type
 ```
 {
-  "id": string,
-  "shardId": int64,
+  "id": int64,
+  "exportId": string,
   "accountId": int64,
   "name": string,
   "isActive": bool,
@@ -236,7 +236,7 @@ Request:
   "secretKey"?: string
 }
 ```
-Response data: `{ "id": string, "shardId": int64 }`
+Response data: `{ "id": int64 }`
 
 ### GET /api/v1/storages/list
 Query: `accountId=int64(required)`, `page=int(default 1)`, `limit=int(default 10)`
@@ -258,21 +258,20 @@ Request:
   "secretKey"?: string
 }
 ```
-Response data: `{ "id": string }`
+Response data: `{ "id": int64 }`
 
 ### POST /api/v1/storages/:storageId/activate
 Param: `storageId`
-Response data: `{ "id": string }`
+Response data: `{ "id": int64 }`
 
 ### POST /api/v1/storages/:storageId/deactivate
 Param: `storageId`
-Response data: `{ "id": string }`
+Response data: `{ "id": int64 }`
 
 ### Storage Type
 ```
 {
-  "id": string,
-  "shardId": int64,
+  "id": int64,
   "accountId": int64,
   "regionId": int64,
   "name": string,
@@ -304,7 +303,7 @@ Request:
   "quotaLimit": int64(required)
 }
 ```
-Response data: `{ "id": string }`
+Response data: `{ "id": int64 }`
 
 ---
 
@@ -317,14 +316,14 @@ Response data: `{ "items": AuditLog[], "nextCursor": int64|null }`
 ### AuditLog Type
 ```
 {
-  "id": string,
+  "id": int64,
   "title": string,
   "description"?: string,
   "subject"?: string,
   "success": bool,
   "data"?: object,
   "createdBy"?: string,
-  "accountId"?: string,
+  "accountId"?: int64,
   "createdAt"?: RFC3339,
   "updatedAt"?: RFC3339
 }
@@ -353,7 +352,7 @@ Param: `nodeId`
 ### ServiceNode Type
 ```
 {
-  "id": string,
+  "id": int64,
   "regionId": int64,
   "serviceType": string,
   "nodeId": string,

@@ -35,48 +35,48 @@ func (s *AccountsService) List(ctx context.Context, opts *ListOptions) (*Paginat
 	return decodeJSON[PaginatedResponse[Account]](data)
 }
 
-func (s *AccountsService) Get(ctx context.Context, accountID string) (*Account, error) {
-	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/accounts/%s", accountID))
+func (s *AccountsService) Get(ctx context.Context, accountID int64) (*Account, error) {
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/accounts/%s", strconv.FormatInt(accountID, 10)))
 	if err != nil {
 		return nil, err
 	}
 	return decodeJSON[Account](data)
 }
 
-func (s *AccountsService) Edit(ctx context.Context, accountID string, req *EditAccountRequest) (*IDResponse, error) {
-	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/accounts/%s/edit", accountID), req)
+func (s *AccountsService) Edit(ctx context.Context, accountID int64, req *EditAccountRequest) (*IDResponse, error) {
+	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/accounts/%s/edit", strconv.FormatInt(accountID, 10)), req)
 	if err != nil {
 		return nil, err
 	}
 	return decodeJSON[IDResponse](data)
 }
 
-func (s *AccountsService) Lock(ctx context.Context, accountID string) (*IDResponse, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/accounts/%s/lock", accountID), nil)
+func (s *AccountsService) Lock(ctx context.Context, accountID int64) (*IDResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/accounts/%s/lock", strconv.FormatInt(accountID, 10)), nil)
 	if err != nil {
 		return nil, err
 	}
 	return decodeJSON[IDResponse](data)
 }
 
-func (s *AccountsService) Unlock(ctx context.Context, accountID string) (*IDResponse, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/accounts/%s/unlock", accountID), nil)
+func (s *AccountsService) Unlock(ctx context.Context, accountID int64) (*IDResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/accounts/%s/unlock", strconv.FormatInt(accountID, 10)), nil)
 	if err != nil {
 		return nil, err
 	}
 	return decodeJSON[IDResponse](data)
 }
 
-func (s *AccountsService) Activate(ctx context.Context, accountID string) (*IDResponse, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/accounts/%s/activate", accountID), nil)
+func (s *AccountsService) Activate(ctx context.Context, accountID int64) (*IDResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/accounts/%s/activate", strconv.FormatInt(accountID, 10)), nil)
 	if err != nil {
 		return nil, err
 	}
 	return decodeJSON[IDResponse](data)
 }
 
-func (s *AccountsService) Deactivate(ctx context.Context, accountID string) (*IDResponse, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/accounts/%s/deactivate", accountID), nil)
+func (s *AccountsService) Deactivate(ctx context.Context, accountID int64) (*IDResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/accounts/%s/deactivate", strconv.FormatInt(accountID, 10)), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -106,32 +106,32 @@ func (s *UsersService) List(ctx context.Context, opts *UserListOptions) (*Pagina
 	return decodeJSON[PaginatedResponse[User]](data)
 }
 
-func (s *UsersService) Get(ctx context.Context, userID string) (*User, error) {
-	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/users/%s", userID))
+func (s *UsersService) Get(ctx context.Context, userID int64) (*User, error) {
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/users/%s", strconv.FormatInt(userID, 10)))
 	if err != nil {
 		return nil, err
 	}
 	return decodeJSON[User](data)
 }
 
-func (s *UsersService) Edit(ctx context.Context, userID string, req *EditUserRequest) (*IDResponse, error) {
-	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/users/%s/edit", userID), req)
+func (s *UsersService) Edit(ctx context.Context, userID int64, req *EditUserRequest) (*IDResponse, error) {
+	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/users/%s/edit", strconv.FormatInt(userID, 10)), req)
 	if err != nil {
 		return nil, err
 	}
 	return decodeJSON[IDResponse](data)
 }
 
-func (s *UsersService) Activate(ctx context.Context, userID string) (*IDResponse, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/users/%s/activate", userID), nil)
+func (s *UsersService) Activate(ctx context.Context, userID int64) (*IDResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/users/%s/activate", strconv.FormatInt(userID, 10)), nil)
 	if err != nil {
 		return nil, err
 	}
 	return decodeJSON[IDResponse](data)
 }
 
-func (s *UsersService) Deactivate(ctx context.Context, userID string) (*IDResponse, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/users/%s/deactivate", userID), nil)
+func (s *UsersService) Deactivate(ctx context.Context, userID int64) (*IDResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/users/%s/deactivate", strconv.FormatInt(userID, 10)), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -164,32 +164,32 @@ func (s *RegionsService) List(ctx context.Context, opts *ListOptions) (*Paginate
 	return decodeJSON[PaginatedResponse[Region]](data)
 }
 
-func (s *RegionsService) Get(ctx context.Context, regionID string) (*Region, error) {
-	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/regions/%s", regionID))
+func (s *RegionsService) Get(ctx context.Context, regionID int64) (*Region, error) {
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/regions/%s", strconv.FormatInt(regionID, 10)))
 	if err != nil {
 		return nil, err
 	}
 	return decodeJSON[Region](data)
 }
 
-func (s *RegionsService) Edit(ctx context.Context, regionID string, req *EditRegionRequest) (*IDResponse, error) {
-	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/regions/%s/edit", regionID), req)
+func (s *RegionsService) Edit(ctx context.Context, regionID int64, req *EditRegionRequest) (*IDResponse, error) {
+	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/regions/%s/edit", strconv.FormatInt(regionID, 10)), req)
 	if err != nil {
 		return nil, err
 	}
 	return decodeJSON[IDResponse](data)
 }
 
-func (s *RegionsService) Activate(ctx context.Context, regionID string) (*IDResponse, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%s/activate", regionID), nil)
+func (s *RegionsService) Activate(ctx context.Context, regionID int64) (*IDResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%s/activate", strconv.FormatInt(regionID, 10)), nil)
 	if err != nil {
 		return nil, err
 	}
 	return decodeJSON[IDResponse](data)
 }
 
-func (s *RegionsService) Deactivate(ctx context.Context, regionID string) (*IDResponse, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%s/deactivate", regionID), nil)
+func (s *RegionsService) Deactivate(ctx context.Context, regionID int64) (*IDResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%s/deactivate", strconv.FormatInt(regionID, 10)), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -198,12 +198,12 @@ func (s *RegionsService) Deactivate(ctx context.Context, regionID string) (*IDRe
 
 type StoragesService struct{ c *Client }
 
-func (s *StoragesService) Create(ctx context.Context, req *CreateStorageRequest) (*CreateStorageResponse, error) {
+func (s *StoragesService) Create(ctx context.Context, req *CreateStorageRequest) (*IDResponse, error) {
 	data, err := s.c.post(ctx, "/api/v1/storages/create", req)
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[CreateStorageResponse](data)
+	return decodeJSON[IDResponse](data)
 }
 
 func (s *StoragesService) List(ctx context.Context, opts *StorageListOptions) (*PaginatedResponse[Storage], error) {
@@ -219,32 +219,32 @@ func (s *StoragesService) List(ctx context.Context, opts *StorageListOptions) (*
 	return decodeJSON[PaginatedResponse[Storage]](data)
 }
 
-func (s *StoragesService) Get(ctx context.Context, storageID string) (*Storage, error) {
-	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/storages/%s", storageID))
+func (s *StoragesService) Get(ctx context.Context, storageID int64) (*Storage, error) {
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/storages/%s", strconv.FormatInt(storageID, 10)))
 	if err != nil {
 		return nil, err
 	}
 	return decodeJSON[Storage](data)
 }
 
-func (s *StoragesService) Edit(ctx context.Context, storageID string, req *EditStorageRequest) (*IDResponse, error) {
-	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/storages/%s/edit", storageID), req)
+func (s *StoragesService) Edit(ctx context.Context, storageID int64, req *EditStorageRequest) (*IDResponse, error) {
+	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/storages/%s/edit", strconv.FormatInt(storageID, 10)), req)
 	if err != nil {
 		return nil, err
 	}
 	return decodeJSON[IDResponse](data)
 }
 
-func (s *StoragesService) Activate(ctx context.Context, storageID string) (*IDResponse, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/activate", storageID), nil)
+func (s *StoragesService) Activate(ctx context.Context, storageID int64) (*IDResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/activate", strconv.FormatInt(storageID, 10)), nil)
 	if err != nil {
 		return nil, err
 	}
 	return decodeJSON[IDResponse](data)
 }
 
-func (s *StoragesService) Deactivate(ctx context.Context, storageID string) (*IDResponse, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/deactivate", storageID), nil)
+func (s *StoragesService) Deactivate(ctx context.Context, storageID int64) (*IDResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/deactivate", strconv.FormatInt(storageID, 10)), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -253,8 +253,8 @@ func (s *StoragesService) Deactivate(ctx context.Context, storageID string) (*ID
 
 type VolumesService struct{ c *Client }
 
-func (s *VolumesService) UpdateQuota(ctx context.Context, volumeID string, req *UpdateVolumeQuotaRequest) (*IDResponse, error) {
-	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/volumes/%s/quota", volumeID), req)
+func (s *VolumesService) UpdateQuota(ctx context.Context, volumeID int64, req *UpdateVolumeQuotaRequest) (*IDResponse, error) {
+	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/volumes/%s/quota", strconv.FormatInt(volumeID, 10)), req)
 	if err != nil {
 		return nil, err
 	}
@@ -292,8 +292,8 @@ func (s *AuditLogsService) List(ctx context.Context, opts *AuditLogListOptions) 
 
 type ServiceNodesService struct{ c *Client }
 
-func (s *ServiceNodesService) List(ctx context.Context, regionID string) ([]ServiceNode, error) {
-	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/regions/%s/nodes", regionID))
+func (s *ServiceNodesService) List(ctx context.Context, regionID int64) ([]ServiceNode, error) {
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/regions/%s/nodes", strconv.FormatInt(regionID, 10)))
 	if err != nil {
 		return nil, err
 	}
@@ -304,18 +304,18 @@ func (s *ServiceNodesService) List(ctx context.Context, regionID string) ([]Serv
 	return *result, nil
 }
 
-func (s *ServiceNodesService) Drain(ctx context.Context, regionID string, nodeID string) error {
-	_, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%s/nodes/%s/drain", regionID, url.PathEscape(nodeID)), nil)
+func (s *ServiceNodesService) Drain(ctx context.Context, regionID int64, nodeID string) error {
+	_, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%s/nodes/%s/drain", strconv.FormatInt(regionID, 10), url.PathEscape(nodeID)), nil)
 	return err
 }
 
-func (s *ServiceNodesService) Activate(ctx context.Context, regionID string, nodeID string) error {
-	_, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%s/nodes/%s/activate", regionID, url.PathEscape(nodeID)), nil)
+func (s *ServiceNodesService) Activate(ctx context.Context, regionID int64, nodeID string) error {
+	_, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%s/nodes/%s/activate", strconv.FormatInt(regionID, 10), url.PathEscape(nodeID)), nil)
 	return err
 }
 
-func (s *ServiceNodesService) Remove(ctx context.Context, regionID string, nodeID string) error {
-	_, err := s.c.delete(ctx, fmt.Sprintf("/api/v1/regions/%s/nodes/%s", regionID, url.PathEscape(nodeID)))
+func (s *ServiceNodesService) Remove(ctx context.Context, regionID int64, nodeID string) error {
+	_, err := s.c.delete(ctx, fmt.Sprintf("/api/v1/regions/%s/nodes/%s", strconv.FormatInt(regionID, 10), url.PathEscape(nodeID)))
 	return err
 }
 

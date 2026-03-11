@@ -99,13 +99,13 @@ func singularize(s string) string {
 	return s
 }
 
-// responseIsIDOnly checks if response is just {id: string}
+// responseIsIDOnly checks if response is just {id: int64}
 func responseIsIDOnly(resp []string) bool {
 	if len(resp) != 1 {
 		return false
 	}
 	f := parseField(resp[0])
-	return f.Name == "id" && f.Type == "string"
+	return f.Name == "id" && f.Type == "int64"
 }
 
 // customResponseTypeName builds e.g. "CreateStorageResponse"
@@ -196,7 +196,7 @@ func generateGoTypes(spec *Spec, outDir string) {
 	// IDResponse
 	w.WriteString("// IDResponse returned by create/edit/toggle endpoints.\n")
 	w.WriteString("type IDResponse struct {\n")
-	w.WriteString("\tID string `json:\"id\"`\n")
+	w.WriteString("\tID int64 `json:\"id\"`\n")
 	w.WriteString("}\n")
 
 	// Collect type order from resources (types referenced first come first)
@@ -395,8 +395,15 @@ func generateGoResources(spec *Spec, outDir string) {
 			if len(allParams) > 0 {
 				imports.add("fmt")
 				for _, p := range allParams {
-					if strings.TrimPrefix(p, ":") == "nodeId" {
-						imports.add("net/url")
+					raw := strings.TrimPrefix(p, ":")
+					t := paramGoType(raw, res.PathParamTypes)
+					switch t {
+					case "string":
+						if raw == "nodeId" {
+							imports.add("net/url")
+						}
+					case "int64":
+						imports.add("strconv")
 					}
 				}
 			}
@@ -453,35 +460,45 @@ func writeGoMethod(w *strings.Builder, spec *Spec, res Resource, ep Endpoint, sv
 		fullPath = "/"
 	}
 
+	pt := res.PathParamTypes
+
 	// Determine return type and method signature
 	switch {
 	case ep.ResponseArray:
-		writeGoArrayMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name)
+		writeGoArrayMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name, pt)
 	case ep.Pagination == "page":
-		writeGoPageListMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name)
+		writeGoPageListMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name, pt)
 	case ep.Pagination == "cursor":
-		writeGoCursorListMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name)
+		writeGoCursorListMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name, pt)
 	case len(ep.Query) > 0 && ep.Pagination == "":
-		writeGoQueryMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name)
+		writeGoQueryMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name, pt)
 	case len(ep.Request) > 0 && len(ep.Response) > 0:
-		writeGoBodyResponseMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name)
+		writeGoBodyResponseMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name, pt)
 	case len(ep.Request) > 0 && ep.ResponseType != "":
-		writeGoBodyResponseTypeMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name)
+		writeGoBodyResponseTypeMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name, pt)
 	case len(ep.Request) > 0:
-		writeGoBodyVoidMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name)
+		writeGoBodyVoidMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name, pt)
 	case ep.ResponseType != "":
-		writeGoGetMethod(w, svcType, methodName, ep, fullPath, allPathParams)
+		writeGoGetMethod(w, svcType, methodName, ep, fullPath, allPathParams, pt)
 	case len(ep.Response) > 0:
-		writeGoToggleMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name)
+		writeGoToggleMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name, pt)
 	default:
-		writeGoVoidMethod(w, svcType, methodName, ep, fullPath, allPathParams)
+		writeGoVoidMethod(w, svcType, methodName, ep, fullPath, allPathParams, pt)
 	}
 }
 
-func goMethodParams(allPathParams []string) string {
+func paramGoType(paramRaw string, paramTypes map[string]string) string {
+	if t, ok := paramTypes[paramRaw]; ok {
+		return goType(t)
+	}
+	return "int64"
+}
+
+func goMethodParams(allPathParams []string, paramTypes map[string]string) string {
 	var params []string
 	for _, p := range allPathParams {
-		params = append(params, goParamName(p)+" string")
+		raw := strings.TrimPrefix(p, ":")
+		params = append(params, goParamName(p)+" "+paramGoType(raw, paramTypes))
 	}
 	return strings.Join(params, ", ")
 }
@@ -496,14 +513,22 @@ func goFmtPath(fullPath string) string {
 	return result
 }
 
-func goFmtArgs(allPathParams []string) string {
+func goFmtArgs(allPathParams []string, paramTypes map[string]string) string {
 	var args []string
 	for _, p := range allPathParams {
 		name := goParamName(p)
 		raw := strings.TrimPrefix(p, ":")
-		if raw == "nodeId" {
-			args = append(args, "url.PathEscape("+name+")")
-		} else {
+		t := paramGoType(raw, paramTypes)
+		switch t {
+		case "string":
+			if raw == "nodeId" {
+				args = append(args, "url.PathEscape("+name+")")
+			} else {
+				args = append(args, name)
+			}
+		case "int64":
+			args = append(args, "strconv.FormatInt("+name+", 10)")
+		default:
 			args = append(args, name)
 		}
 	}
@@ -525,15 +550,15 @@ func goHTTPMethod(method string) string {
 	}
 }
 
-func goPathExpr(fullPath string, allPathParams []string) string {
+func goPathExpr(fullPath string, allPathParams []string, paramTypes map[string]string) string {
 	if len(allPathParams) == 0 {
 		return fmt.Sprintf("%q", fullPath)
 	}
-	return fmt.Sprintf("fmt.Sprintf(%q, %s)", goFmtPath(fullPath), goFmtArgs(allPathParams))
+	return fmt.Sprintf("fmt.Sprintf(%q, %s)", goFmtPath(fullPath), goFmtArgs(allPathParams, paramTypes))
 }
 
 // POST/DELETE with request body, has response fields
-func writeGoBodyResponseMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string) {
+func writeGoBodyResponseMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string, pt map[string]string) {
 	reqType := requestTypeName(resName, ep.Action)
 	var respType string
 	if responseIsIDOnly(ep.Response) {
@@ -542,14 +567,14 @@ func writeGoBodyResponseMethod(w *strings.Builder, svcType, methodName string, e
 		respType = customResponseTypeName(resName, ep.Action)
 	}
 
-	pathParams := goMethodParams(allPathParams)
+	pathParams := goMethodParams(allPathParams, pt)
 	sig := "ctx context.Context"
 	if pathParams != "" {
 		sig += ", " + pathParams
 	}
 	sig += ", req *" + reqType
 
-	pathExpr := goPathExpr(fullPath, allPathParams)
+	pathExpr := goPathExpr(fullPath, allPathParams, pt)
 	httpMethod := goHTTPMethod(ep.Method)
 
 	fmt.Fprintf(w, "func (s *%s) %s(%s) (*%s, error) {\n", svcType, methodName, sig, respType)
@@ -563,16 +588,16 @@ func writeGoBodyResponseMethod(w *strings.Builder, svcType, methodName string, e
 	w.WriteString("}\n")
 }
 
-func writeGoBodyResponseTypeMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string) {
+func writeGoBodyResponseTypeMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string, pt map[string]string) {
 	reqType := requestTypeName(resName, ep.Action)
-	pathParams := goMethodParams(allPathParams)
+	pathParams := goMethodParams(allPathParams, pt)
 	sig := "ctx context.Context"
 	if pathParams != "" {
 		sig += ", " + pathParams
 	}
 	sig += ", req *" + reqType
 
-	pathExpr := goPathExpr(fullPath, allPathParams)
+	pathExpr := goPathExpr(fullPath, allPathParams, pt)
 	httpMethod := goHTTPMethod(ep.Method)
 
 	fmt.Fprintf(w, "func (s *%s) %s(%s) (*%s, error) {\n", svcType, methodName, sig, ep.ResponseType)
@@ -586,16 +611,16 @@ func writeGoBodyResponseTypeMethod(w *strings.Builder, svcType, methodName strin
 	w.WriteString("}\n")
 }
 
-func writeGoBodyVoidMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string) {
+func writeGoBodyVoidMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string, pt map[string]string) {
 	reqType := requestTypeName(resName, ep.Action)
-	pathParams := goMethodParams(allPathParams)
+	pathParams := goMethodParams(allPathParams, pt)
 	sig := "ctx context.Context"
 	if pathParams != "" {
 		sig += ", " + pathParams
 	}
 	sig += ", req *" + reqType
 
-	pathExpr := goPathExpr(fullPath, allPathParams)
+	pathExpr := goPathExpr(fullPath, allPathParams, pt)
 	httpMethod := goHTTPMethod(ep.Method)
 
 	fmt.Fprintf(w, "func (s *%s) %s(%s) error {\n", svcType, methodName, sig)
@@ -605,13 +630,13 @@ func writeGoBodyVoidMethod(w *strings.Builder, svcType, methodName string, ep En
 }
 
 // GET with path param returning responseType
-func writeGoGetMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string) {
-	pathParams := goMethodParams(allPathParams)
+func writeGoGetMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, pt map[string]string) {
+	pathParams := goMethodParams(allPathParams, pt)
 	sig := "ctx context.Context"
 	if pathParams != "" {
 		sig += ", " + pathParams
 	}
-	pathExpr := goPathExpr(fullPath, allPathParams)
+	pathExpr := goPathExpr(fullPath, allPathParams, pt)
 
 	fmt.Fprintf(w, "func (s *%s) %s(%s) (*%s, error) {\n", svcType, methodName, sig, ep.ResponseType)
 	fmt.Fprintf(w, "\tdata, err := s.c.get(ctx, %s)\n", pathExpr)
@@ -621,13 +646,13 @@ func writeGoGetMethod(w *strings.Builder, svcType, methodName string, ep Endpoin
 }
 
 // POST/DELETE with path param, no request body, has response fields
-func writeGoToggleMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string) {
-	pathParams := goMethodParams(allPathParams)
+func writeGoToggleMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string, pt map[string]string) {
+	pathParams := goMethodParams(allPathParams, pt)
 	sig := "ctx context.Context"
 	if pathParams != "" {
 		sig += ", " + pathParams
 	}
-	pathExpr := goPathExpr(fullPath, allPathParams)
+	pathExpr := goPathExpr(fullPath, allPathParams, pt)
 	httpMethod := goHTTPMethod(ep.Method)
 
 	var respType string
@@ -652,13 +677,13 @@ func writeGoToggleMethod(w *strings.Builder, svcType, methodName string, ep Endp
 }
 
 // POST/DELETE with no request, no response → void
-func writeGoVoidMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string) {
-	pathParams := goMethodParams(allPathParams)
+func writeGoVoidMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, pt map[string]string) {
+	pathParams := goMethodParams(allPathParams, pt)
 	sig := "ctx context.Context"
 	if pathParams != "" {
 		sig += ", " + pathParams
 	}
-	pathExpr := goPathExpr(fullPath, allPathParams)
+	pathExpr := goPathExpr(fullPath, allPathParams, pt)
 	httpMethod := goHTTPMethod(ep.Method)
 
 	fmt.Fprintf(w, "func (s *%s) %s(%s) error {\n", svcType, methodName, sig)
@@ -672,13 +697,13 @@ func writeGoVoidMethod(w *strings.Builder, svcType, methodName string, ep Endpoi
 }
 
 // GET returning array
-func writeGoArrayMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string) {
-	pathParams := goMethodParams(allPathParams)
+func writeGoArrayMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string, pt map[string]string) {
+	pathParams := goMethodParams(allPathParams, pt)
 	sig := "ctx context.Context"
 	if pathParams != "" {
 		sig += ", " + pathParams
 	}
-	pathExpr := goPathExpr(fullPath, allPathParams)
+	pathExpr := goPathExpr(fullPath, allPathParams, pt)
 
 	fmt.Fprintf(w, "func (s *%s) %s(%s) ([]%s, error) {\n", svcType, methodName, sig, ep.ResponseType)
 	fmt.Fprintf(w, "\tdata, err := s.c.get(ctx, %s)\n", pathExpr)
@@ -690,9 +715,9 @@ func writeGoArrayMethod(w *strings.Builder, svcType, methodName string, ep Endpo
 }
 
 // GET with page pagination
-func writeGoPageListMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string) {
+func writeGoPageListMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string, pt map[string]string) {
 	hasCustomOpts := hasRequiredQueryParam(ep.Query)
-	pathParams := goMethodParams(allPathParams)
+	pathParams := goMethodParams(allPathParams, pt)
 	sig := "ctx context.Context"
 	if pathParams != "" {
 		sig += ", " + pathParams
@@ -706,7 +731,7 @@ func writeGoPageListMethod(w *strings.Builder, svcType, methodName string, ep En
 	}
 
 	sig += ", opts *" + optsType
-	pathExpr := goPathExpr(fullPath, allPathParams)
+	pathExpr := goPathExpr(fullPath, allPathParams, pt)
 
 	fmt.Fprintf(w, "func (s *%s) %s(%s) (*PaginatedResponse[%s], error) {\n", svcType, methodName, sig, ep.ResponseType)
 	w.WriteString("\tq := url.Values{}\n")
@@ -757,9 +782,9 @@ func writeGoPageListMethod(w *strings.Builder, svcType, methodName string, ep En
 }
 
 // GET with cursor pagination
-func writeGoCursorListMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string) {
+func writeGoCursorListMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string, pt map[string]string) {
 	optsType := listOptionsTypeName(resName)
-	pathParams := goMethodParams(allPathParams)
+	pathParams := goMethodParams(allPathParams, pt)
 	sig := "ctx context.Context"
 	if pathParams != "" {
 		sig += ", " + pathParams
@@ -798,7 +823,7 @@ func writeGoCursorListMethod(w *strings.Builder, svcType, methodName string, ep 
 	}
 
 	w.WriteString("\t}\n")
-	pathExpr := goPathExpr(fullPath, allPathParams)
+	pathExpr := goPathExpr(fullPath, allPathParams, pt)
 	fmt.Fprintf(w, "\tpath := %s\n", pathExpr)
 	w.WriteString("\tif qs := q.Encode(); qs != \"\" {\n")
 	w.WriteString("\t\tpath += \"?\" + qs\n")
@@ -810,8 +835,8 @@ func writeGoCursorListMethod(w *strings.Builder, svcType, methodName string, ep 
 }
 
 // GET with query params (non-paginated, like Discover.Meta)
-func writeGoQueryMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string) {
-	pathParams := goMethodParams(allPathParams)
+func writeGoQueryMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string, pt map[string]string) {
+	pathParams := goMethodParams(allPathParams, pt)
 	sig := "ctx context.Context"
 	if pathParams != "" {
 		sig += ", " + pathParams

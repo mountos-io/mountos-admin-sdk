@@ -31,7 +31,7 @@ errorCodes:
 
 types:
   Account:
-    - "id: string"
+    - "id: int64"
     - "name: string"
     - "description: string"
     - "vendorInfo: object?"
@@ -41,15 +41,15 @@ types:
     - "updatedAt: datetime"
 
   User:
-    - "id: string"
+    - "id: int64"
     - "accountId: int64"
     - "username: string"
     - "email: string"
     - "name: string"
 
   Region:
-    - "id: string"
-    - "shardId: int64"
+    - "id: int64"
+    - "exportId: string"
     - "accountId: int64"
     - "name: string"
     - "isActive: bool"
@@ -57,8 +57,7 @@ types:
     - "updatedAt: datetime"
 
   Storage:
-    - "id: string"
-    - "shardId: int64"
+    - "id: int64"
     - "accountId: int64"
     - "regionId: int64"
     - "name: string"
@@ -77,19 +76,19 @@ types:
     - "updatedAt: datetime"
 
   AuditLog:
-    - "id: string"
+    - "id: int64"
     - "title: string"
     - "description: string?"
     - "subject: string?"
     - "success: bool"
     - "data: json?"
     - "createdBy: string?"
-    - "accountId: string?"
+    - "accountId: int64?"
     - "createdAt: datetime?"
     - "updatedAt: datetime?"
 
   ServiceNode:
-    - "id: string"
+    - "id: int64"
     - "regionId: int64"
     - "serviceType: string"
     - "nodeId: string"
@@ -122,7 +121,7 @@ resources:
           - "description: string"
           - "vendorInfo: object"
         response:
-          - "id: string"
+          - "id: int64"
 
       - action: list
         method: GET
@@ -146,31 +145,31 @@ resources:
           - "description: string"
           - "vendorInfo: object"
         response:
-          - "id: string"
+          - "id: int64"
 
       - action: lock
         method: POST
         path: /:accountId/lock
         response:
-          - "id: string"
+          - "id: int64"
 
       - action: unlock
         method: POST
         path: /:accountId/unlock
         response:
-          - "id: string"
+          - "id: int64"
 
       - action: activate
         method: POST
         path: /:accountId/activate
         response:
-          - "id: string"
+          - "id: int64"
 
       - action: deactivate
         method: POST
         path: /:accountId/deactivate
         response:
-          - "id: string"
+          - "id: int64"
 
   - name: Users
     path: /users
@@ -185,7 +184,7 @@ resources:
           - "name: string"
           - "vendorInfo: object"
         response:
-          - "id: string"
+          - "id: int64"
 
       - action: list
         method: GET
@@ -211,19 +210,19 @@ resources:
           - "name: string"
           - "vendorInfo: object"
         response:
-          - "id: string"
+          - "id: int64"
 
       - action: activate
         method: POST
         path: /:userId/activate
         response:
-          - "id: string"
+          - "id: int64"
 
       - action: deactivate
         method: POST
         path: /:userId/deactivate
         response:
-          - "id: string"
+          - "id: int64"
 
   - name: Regions
     path: /regions
@@ -235,7 +234,7 @@ resources:
           - "accountId: int64!"
           - "name: string!"
         response:
-          - "id: string"
+          - "id: int64"
 
       - action: list
         method: GET
@@ -258,19 +257,19 @@ resources:
           - "accountId: int64!"
           - "name: string!"
         response:
-          - "id: string"
+          - "id: int64"
 
       - action: activate
         method: POST
         path: /:regionId/activate
         response:
-          - "id: string"
+          - "id: int64"
 
       - action: deactivate
         method: POST
         path: /:regionId/deactivate
         response:
-          - "id: string"
+          - "id: int64"
 
   - name: Storages
     path: /storages
@@ -295,8 +294,7 @@ resources:
           - "accessKey: string"
           - "secretKey: string"
         response:
-          - "id: string"
-          - "shardId: int64"
+          - "id: int64"
 
       - action: list
         method: GET
@@ -323,19 +321,19 @@ resources:
           - "accessKey: string"
           - "secretKey: string"
         response:
-          - "id: string"
+          - "id: int64"
 
       - action: activate
         method: POST
         path: /:storageId/activate
         response:
-          - "id: string"
+          - "id: int64"
 
       - action: deactivate
         method: POST
         path: /:storageId/deactivate
         response:
-          - "id: string"
+          - "id: int64"
 
   - name: Volumes
     path: /volumes
@@ -346,7 +344,7 @@ resources:
         request:
           - "quotaLimit: int64!"
         response:
-          - "id: string"
+          - "id: int64"
 
   - name: AuditLogs
     path: /audit-logs
@@ -364,6 +362,8 @@ resources:
 
   - name: ServiceNodes
     path: /regions/:regionId/nodes
+    pathParamTypes:
+      nodeId: string
     endpoints:
       - action: list
         method: GET
