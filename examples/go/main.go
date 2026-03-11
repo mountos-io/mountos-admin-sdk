@@ -75,22 +75,22 @@ func main() {
   })
 
   // --- Regions ---
-  region, err := client.Regions.Create(ctx, &sdk.CreateRegionRequest{
+  regionResp, err := client.Regions.Create(ctx, &sdk.CreateRegionRequest{
     AccountID: acct.ID,
     Name:      "us-east-1",
   })
   if err != nil {
     log.Fatal("create region:", err)
   }
-  fmt.Println("Created region ID:", region.ID)
+  fmt.Println("Created region ID:", regionResp.ID)
 
-  regionDetail, _ := client.Regions.Get(ctx, region.ID)
-  fmt.Printf("Region: %s (exportId=%s)\n", regionDetail.Name, regionDetail.ExportID)
+  region, _ := client.Regions.Get(ctx, regionResp.ID)
+  fmt.Printf("Region: %s (exportId=%s)\n", region.Name, region.ExportID)
 
   // --- Storages ---
   storage, err := client.Storages.Create(ctx, &sdk.CreateStorageRequest{
     AccountID:    acct.ID,
-    RegionID:     region.ID,
+    RegionID:     regionResp.ID,
     Name:         "prod-s3-bucket",
     StorageType:  "object",
     ProviderType: "s3",
@@ -134,7 +134,7 @@ func main() {
   }
 
   // --- Service Nodes ---
-  nodes, err := client.ServiceNodes.List(ctx, region.ID)
+  nodes, err := client.ServiceNodes.List(ctx, regionResp.ID)
   if err != nil {
     fmt.Println("List nodes:", err)
   } else {

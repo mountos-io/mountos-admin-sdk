@@ -61,14 +61,14 @@ func main() {
   })
 
   // Regions
-  region, _ := client.Regions.Create(ctx, &sdk.CreateRegionRequest{
+  regionResp, _ := client.Regions.Create(ctx, &sdk.CreateRegionRequest{
     AccountID: acct.ID, Name: "us-east",
   })
-  fmt.Println("Region export ID:", region)
+  fmt.Println("Region ID:", regionResp.ID)
 
   // Storages
   storage, _ := client.Storages.Create(ctx, &sdk.CreateStorageRequest{
-    AccountID: acct.ID, RegionID: region.ID,
+    AccountID: acct.ID, RegionID: regionResp.ID,
     Name: "prod-s3", StorageType: "object",
     ProviderType: "s3", Endpoint: "https://s3.example.com",
   })
