@@ -31,6 +31,7 @@ export class MountOSAdmin {
   private _auditLogs?: AuditLogsResource
   private _serviceNodes?: ServiceNodesResource
   private _discover?: DiscoverResource
+  private _cache?: CacheResource
 
   constructor(config: Config) {
     this.baseUrl = config.baseUrl.replace(/\/+$/, '')
@@ -67,6 +68,10 @@ export class MountOSAdmin {
 
   get discover(): DiscoverResource {
     return (this._discover ??= new DiscoverResource(this))
+  }
+
+  get cache(): CacheResource {
+    return (this._cache ??= new CacheResource(this))
   }
 
   async request<T>(method: string, path: string, body?: unknown): Promise<T> {
@@ -255,6 +260,14 @@ class ServiceNodesResource {
 
   remove(regionId: string, nodeId: string): Promise<void> {
     return this.client.request('DELETE', `/api/v1/regions/${regionId}/nodes/${encodeURIComponent(nodeId)}`)
+  }
+}
+
+class CacheResource {
+  constructor(private client: MountOSAdmin) {}
+
+  refresh(): Promise<void> {
+    return this.client.request('POST', '/api/v1/cache/refresh')
   }
 }
 

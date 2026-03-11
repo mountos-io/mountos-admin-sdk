@@ -2,7 +2,9 @@ package sdk
 
 import (
 	"crypto/ed25519"
+	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"strconv"
 	"sync"
@@ -19,6 +21,7 @@ type tokenCache struct {
 	token  string
 	expiry int64
 	key    ed25519.PrivateKey
+	kfp    string
 }
 
 func newTokenCache(privateKeyBase64 string) (*tokenCache, error) {
@@ -29,7 +32,9 @@ func newTokenCache(privateKeyBase64 string) (*tokenCache, error) {
 	if len(raw) != ed25519.PrivateKeySize {
 		return nil, fmt.Errorf("mountos: private key must be %d bytes, got %d", ed25519.PrivateKeySize, len(raw))
 	}
-	return &tokenCache{key: ed25519.PrivateKey(raw)}, nil
+	k := ed25519.PrivateKey(raw)
+	h := sha256.Sum256([]byte(k.Public().(ed25519.PublicKey)))
+	return &tokenCache{key: k, kfp: hex.EncodeToString(h[:16])}, nil
 }
 
 func (tc *tokenCache) getToken() (string, error) {
@@ -46,8 +51,8 @@ func (tc *tokenCache) getToken() (string, error) {
 
 	header := `{"alg":"EdDSA","typ":"JWT"}`
 	payload := fmt.Sprintf(
-		`{"sub":"vendor","aud":["mountos/appserv"],"iat":%d,"nbf":%d,"exp":%d,"jti":"%s","scope":"service"}`,
-		now, now, exp, jti,
+		`{"sub":"vendor","aud":["mountos/appserv"],"iat":%d,"nbf":%d,"exp":%d,"jti":"%s","scope":"service","kfp":"%s"}`,
+		now, now, exp, jti, tc.kfp,
 	)
 
 	signingInput := base64URLEncode([]byte(header)) + "." + base64URLEncode([]byte(payload))

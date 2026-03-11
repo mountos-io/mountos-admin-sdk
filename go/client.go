@@ -25,6 +25,7 @@ type Client struct {
 	AuditLogs    *AuditLogsService
 	ServiceNodes *ServiceNodesService
 	Discover     *DiscoverService
+	Cache        *CacheService
 }
 
 // NewClient creates a new SDK client.
@@ -47,6 +48,7 @@ func NewClient(cfg Config) (*Client, error) {
 	c.AuditLogs = &AuditLogsService{c: c}
 	c.ServiceNodes = &ServiceNodesService{c: c}
 	c.Discover = &DiscoverService{c: c}
+	c.Cache = &CacheService{c: c}
 	return c, nil
 }
 
