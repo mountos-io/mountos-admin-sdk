@@ -5,5 +5,8 @@ ts/dist/
 # Go
 go/bin/
 
+# Generator binary
+gen/gen
+
 # OS
 .DS_Store

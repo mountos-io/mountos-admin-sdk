@@ -1,6 +1,11 @@
-.PHONY: all check build install clean ts-install ts-check ts-build go-check go-build
+.PHONY: all gen check build install clean ts-install ts-check ts-build go-check go-build
 
-all: check build
+all: gen check build
+
+# ── Generator ───────────────────────────────────────────────
+
+gen:
+	cd gen && go run . --spec ../api.yaml --go-out ../go --ts-out ../ts/src --doc-out ..
 
 # ── TypeScript ──────────────────────────────────────────────
 

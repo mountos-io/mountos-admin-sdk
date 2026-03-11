@@ -1,29 +1,3 @@
-export { MountOSAdmin } from './client.js'
+export { MountOSAdmin } from './client_gen.js'
 export { MountOSError } from './errors.js'
-export type {
-  Config,
-  ListOptions,
-  PaginationMeta,
-  PaginatedResponse,
-  CursorPaginatedResponse,
-  Account,
-  CreateAccountRequest,
-  EditAccountRequest,
-  User,
-  AddUserRequest,
-  EditUserRequest,
-  UserListOptions,
-  Region,
-  CreateRegionRequest,
-  EditRegionRequest,
-  Storage,
-  CreateStorageRequest,
-  EditStorageRequest,
-  StorageListOptions,
-  UpdateVolumeQuotaRequest,
-  AuditLog,
-  AuditLogListOptions,
-  ServiceNode,
-  DiscoverMetaResponse,
-  DiscoverEndpoint,
-} from './types.js'
+export type * from './types_gen.js'

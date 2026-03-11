@@ -16,10 +16,18 @@ function ed25519PemFromRaw(raw64: Uint8Array): string {
   return `-----BEGIN PRIVATE KEY-----\n${b64}\n-----END PRIVATE KEY-----`
 }
 
+// keyFingerprint computes hex(sha256(pubkey)[:16]) matching the server-side KeyFingerprint().
+async function keyFingerprint(raw: Uint8Array): Promise<string> {
+  const pub = raw.subarray(32, 64)
+  const hash = new Uint8Array(await crypto.subtle.digest('SHA-256', pub as ArrayBufferView<ArrayBuffer>))
+  return Array.from(hash.subarray(0, 16), b => b.toString(16).padStart(2, '0')).join('')
+}
+
 export class TokenSigner {
   private token?: string
   private expiry = 0
   private key?: CryptoKey
+  private kfp?: string
   private readonly privateKeyBase64: string
 
   constructor(privateKeyBase64: string) {
@@ -36,17 +44,18 @@ export class TokenSigner {
       const raw = Uint8Array.from(atob(this.privateKeyBase64), c => c.charCodeAt(0))
       const pem = ed25519PemFromRaw(raw)
       this.key = await importPKCS8(pem, 'EdDSA')
+      this.kfp = await keyFingerprint(raw)
     }
 
     const exp = now + TOKEN_TTL
-    const token = await new SignJWT({ scope: 'service' })
+    const token = await new SignJWT({ scope: 'service', kfp: this.kfp })
       .setProtectedHeader({ alg: 'EdDSA', typ: 'JWT' })
       .setSubject('vendor')
       .setAudience('mountos/appserv')
       .setIssuedAt(now)
       .setNotBefore(now)
       .setExpirationTime(exp)
-      .setJti(`${Date.now() * 1_000_000}`)
+      .setJti(crypto.randomUUID())
       .sign(this.key)
 
     this.token = token

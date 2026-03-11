@@ -25,15 +25,15 @@ Cursor-paginated responses nest in `data`:
 | Code  | Name                   |
 |-------|------------------------|
 | 10001 | AUTHENTICATION_REQUIRED |
-| 10002 | INVALID_SESSION         |
-| 10003 | INVALID_CREDENTIALS     |
-| 10004 | SESSION_EXPIRED         |
-| 10200 | INVALID_REQUEST_FORMAT  |
-| 10201 | VALIDATION_FAILED       |
-| 10202 | MISSING_PARAMETER       |
-| 10900 | INTERNAL_ERROR          |
-| 10901 | SERVICE_UNAVAILABLE     |
-| 10902 | DATABASE_ERROR          |
+| 10002 | INVALID_SESSION        |
+| 10003 | INVALID_CREDENTIALS    |
+| 10004 | SESSION_EXPIRED        |
+| 10200 | INVALID_REQUEST_FORMAT |
+| 10201 | VALIDATION_FAILED      |
+| 10202 | MISSING_PARAMETER      |
+| 10900 | INTERNAL_ERROR         |
+| 10901 | SERVICE_UNAVAILABLE    |
+| 10902 | DATABASE_ERROR         |
 
 ---
 
@@ -42,48 +42,61 @@ Cursor-paginated responses nest in `data`:
 ### POST /api/v1/accounts/create
 Request:
 ```
-{ "name": string(required,1-255), "description"?: string(max 1000), "vendorInfo"?: object }
+{
+  "name": string(required),
+  "description"?: string,
+  "vendorInfo"?: object
+}
 ```
-Response data: `{ "id": int64 }`
+Response data: `{ "id": string }`
 
 ### GET /api/v1/accounts/list
-Query: `page=int(default 1)`, `limit=int(default 10, max 100)`
+Query: `page=int(default 1)`, `limit=int(default 10)`
 Response data: `{ "items": Account[], "pagination": PaginationMeta }`
 
 ### GET /api/v1/accounts/:accountId
-Param: `accountId` (int64)
+Param: `accountId`
 Response data: `Account`
 
 ### PUT /api/v1/accounts/:accountId/edit
-Param: `accountId` (int64)
+Param: `accountId`
 Request:
 ```
-{ "name": string(required,1-255), "description"?: string(max 1000), "vendorInfo"?: object }
+{
+  "name": string(required),
+  "description"?: string,
+  "vendorInfo"?: object
+}
 ```
-Response data: `{ "id": int64 }`
+Response data: `{ "id": string }`
 
 ### POST /api/v1/accounts/:accountId/lock
-Param: `accountId` (int64)
-Response data: `{ "id": int64 }`
+Param: `accountId`
+Response data: `{ "id": string }`
 
 ### POST /api/v1/accounts/:accountId/unlock
-Param: `accountId` (int64)
-Response data: `{ "id": int64 }`
+Param: `accountId`
+Response data: `{ "id": string }`
 
 ### POST /api/v1/accounts/:accountId/activate
-Param: `accountId` (int64)
-Response data: `{ "id": int64 }`
+Param: `accountId`
+Response data: `{ "id": string }`
 
 ### POST /api/v1/accounts/:accountId/deactivate
-Param: `accountId` (int64)
-Response data: `{ "id": int64 }`
+Param: `accountId`
+Response data: `{ "id": string }`
 
 ### Account Type
 ```
 {
-  "id": int64, "name": string, "description": string,
-  "vendorInfo"?: object, "isActive": bool, "locked": bool,
-  "createdAt": RFC3339, "updatedAt": RFC3339
+  "id": string,
+  "name": string,
+  "description": string,
+  "vendorInfo"?: object,
+  "isActive": bool,
+  "locked": bool,
+  "createdAt": RFC3339,
+  "updatedAt": RFC3339
 }
 ```
 
@@ -95,45 +108,52 @@ Response data: `{ "id": int64 }`
 Request:
 ```
 {
-  "accountId": int64(required), "username": string(required,1-255),
-  "email": string(required,email,max 255), "name"?: string(max 255),
+  "accountId": int64(required),
+  "username": string(required),
+  "email": string(required),
+  "name"?: string,
   "vendorInfo"?: object
 }
 ```
-Response data: `{ "id": int64 }`
+Response data: `{ "id": string }`
 
 ### GET /api/v1/users/list
-Query: `accountId=int64(required)`, `page=int(default 1)`, `limit=int(default 10, max 100)`
+Query: `accountId=int64(required)`, `page=int(default 1)`, `limit=int(default 10)`
 Response data: `{ "items": User[], "pagination": PaginationMeta }`
 
 ### GET /api/v1/users/:userId
-Param: `userId` (int64)
+Param: `userId`
 Response data: `User`
 
 ### PUT /api/v1/users/:userId/edit
-Param: `userId` (int64)
+Param: `userId`
 Request:
 ```
 {
-  "username": string(required,1-255), "email": string(required,email,max 255),
-  "name"?: string(max 255), "vendorInfo"?: object
+  "username": string(required),
+  "email": string(required),
+  "name"?: string,
+  "vendorInfo"?: object
 }
 ```
-Response data: `{ "id": int64 }`
+Response data: `{ "id": string }`
 
 ### POST /api/v1/users/:userId/activate
-Param: `userId` (int64)
-Response data: `{ "id": int64 }`
+Param: `userId`
+Response data: `{ "id": string }`
 
 ### POST /api/v1/users/:userId/deactivate
-Param: `userId` (int64)
-Response data: `{ "id": int64 }`
+Param: `userId`
+Response data: `{ "id": string }`
 
-### User Type (returned by get/list)
+### User Type
 ```
 {
-  "id": int64, "accountId": int64, "username": string,
-  "email": string, "name": string
+  "id": string,
+  "accountId": int64,
+  "username": string,
+  "email": string,
+  "name": string
 }
 ```
 
@@ -144,39 +164,50 @@ Response data: `{ "id": int64 }`
 ### POST /api/v1/regions/create
 Request:
 ```
-{ "accountId": int64(required), "name": string(required,1-255), "dns": string(required,1-512) }
+{
+  "accountId": int64(required),
+  "name": string(required)
+}
 ```
-Response data: `{ "id": int64 }`
+Response data: `{ "id": string }`
 
 ### GET /api/v1/regions/list
-Query: `page=int(default 1)`, `limit=int(default 10, max 100)`
+Query: `page=int(default 1)`, `limit=int(default 10)`
 Response data: `{ "items": Region[], "pagination": PaginationMeta }`
 
 ### GET /api/v1/regions/:regionId
-Param: `regionId` (int64)
+Param: `regionId`
 Response data: `Region`
 
 ### PUT /api/v1/regions/:regionId/edit
-Param: `regionId` (int64)
+Param: `regionId`
 Request:
 ```
-{ "accountId": int64(required), "name": string(required,1-255), "dns": string(required,1-512) }
+{
+  "accountId": int64(required),
+  "name": string(required)
+}
 ```
-Response data: `{ "id": int64 }`
+Response data: `{ "id": string }`
 
 ### POST /api/v1/regions/:regionId/activate
-Param: `regionId` (int64)
-Response data: `{ "id": int64 }`
+Param: `regionId`
+Response data: `{ "id": string }`
 
 ### POST /api/v1/regions/:regionId/deactivate
-Param: `regionId` (int64)
-Response data: `{ "id": int64 }`
+Param: `regionId`
+Response data: `{ "id": string }`
 
 ### Region Type
 ```
 {
-  "id": int64, "accountId": int64, "name": string, "dns": string,
-  "isActive": bool, "createdAt": RFC3339, "updatedAt": RFC3339
+  "id": string,
+  "shardId": int64,
+  "accountId": int64,
+  "name": string,
+  "isActive": bool,
+  "createdAt": RFC3339,
+  "updatedAt": RFC3339
 }
 ```
 
@@ -188,114 +219,166 @@ Response data: `{ "id": int64 }`
 Request:
 ```
 {
-  "accountId": int64(required), "regionId": int64(required),
-  "name": string(required,1-100), "description"?: string(max 1000),
-  "storageType": "object"|"block"(required), "providerType": string(required,max 50),
-  "endpoint": string(required,max 255), "region"?: string(max 100),
-  "bucket"?: string(max 100), "base"?: string(max 255),
-  "blockRegion"?: string(max 255), "blockType"?: "standard"|"passthrough",
-  "blockSize"?: int32, "accessKey"?: string, "secretKey"?: string
+  "accountId": int64(required),
+  "regionId": int64(required),
+  "name": string(required),
+  "description"?: string,
+  "storageType": string(required),
+  "providerType": string(required),
+  "endpoint": string(required),
+  "region"?: string,
+  "bucket"?: string,
+  "base"?: string,
+  "blockRegion"?: string,
+  "blockType"?: string,
+  "blockSize"?: int32,
+  "accessKey"?: string,
+  "secretKey"?: string
 }
 ```
-Response data: `{ "id": string(UUID), "shardId": int64 }`
+Response data: `{ "id": string, "shardId": int64 }`
 
 ### GET /api/v1/storages/list
-Query: `accountId=int64(required)`, `page=int(default 1)`, `limit=int(default 10, max 100)`
+Query: `accountId=int64(required)`, `page=int(default 1)`, `limit=int(default 10)`
 Response data: `{ "items": Storage[], "pagination": PaginationMeta }`
 
 ### GET /api/v1/storages/:storageId
-Param: `storageId` (UUID string)
+Param: `storageId`
 Response data: `Storage`
 
 ### PUT /api/v1/storages/:storageId/edit
-Param: `storageId` (UUID string)
+Param: `storageId`
 Request:
 ```
 {
-  "name": string(required,1-100), "description"?: string(max 1000),
-  "endpoint"?: string(max 255), "accessKey"?: string, "secretKey"?: string
+  "name": string(required),
+  "description"?: string,
+  "endpoint"?: string,
+  "accessKey"?: string,
+  "secretKey"?: string
 }
 ```
-Response data: `{ "id": string(UUID) }`
+Response data: `{ "id": string }`
 
 ### POST /api/v1/storages/:storageId/activate
-Param: `storageId` (UUID string)
-Response data: `{ "id": string(UUID) }`
+Param: `storageId`
+Response data: `{ "id": string }`
 
 ### POST /api/v1/storages/:storageId/deactivate
-Param: `storageId` (UUID string)
-Response data: `{ "id": string(UUID) }`
+Param: `storageId`
+Response data: `{ "id": string }`
 
 ### Storage Type
 ```
 {
-  "id": string(UUID), "shardId": int64, "accountId": int64, "regionId": int64,
-  "name": string, "description"?: string, "storageType": string,
-  "providerType": string, "blockType"?: string, "endpoint": string,
-  "region"?: string, "bucket"?: string, "base"?: string,
-  "blockRegion"?: string, "blockSize"?: int32,
-  "isActive": bool, "createdAt": RFC3339, "updatedAt": RFC3339
+  "id": string,
+  "shardId": int64,
+  "accountId": int64,
+  "regionId": int64,
+  "name": string,
+  "description"?: string,
+  "storageType": string,
+  "providerType": string,
+  "blockType"?: string,
+  "endpoint": string,
+  "region"?: string,
+  "bucket"?: string,
+  "base"?: string,
+  "blockRegion"?: string,
+  "blockSize"?: int32,
+  "isActive": bool,
+  "createdAt": RFC3339,
+  "updatedAt": RFC3339
 }
 ```
 
 ---
 
-## Volumes (stubs — return 501)
-
-### POST /api/v1/volumes/create
-Status: 501 Not Implemented
-
-### GET /api/v1/volumes/list
-Status: 501 Not Implemented
-
-### GET /api/v1/volumes/:volumeId
-Param: `volumeId` (UUID string)
-Status: 501 Not Implemented
-
-### PUT /api/v1/volumes/:volumeId/edit
-Param: `volumeId` (UUID string)
-Status: 501 Not Implemented
-
-### POST /api/v1/volumes/:volumeId/lock
-Param: `volumeId` (UUID string)
-Status: 501 Not Implemented
-
-### POST /api/v1/volumes/:volumeId/unlock
-Param: `volumeId` (UUID string)
-Status: 501 Not Implemented
-
-### POST /api/v1/volumes/:volumeId/activate
-Param: `volumeId` (UUID string)
-Status: 501 Not Implemented
-
-### POST /api/v1/volumes/:volumeId/deactivate
-Param: `volumeId` (UUID string)
-Status: 501 Not Implemented
+## Volumes
 
 ### PUT /api/v1/volumes/:volumeId/quota
-Param: `volumeId` (UUID string)
+Param: `volumeId`
 Request:
 ```
-{ "quotaLimit": int64(required, >=0) }
+{
+  "quotaLimit": int64(required)
+}
 ```
-Response data: `{ "id": string(UUID) }`
+Response data: `{ "id": string }`
 
 ---
 
-## Audit Logs
+## AuditLogs
 
 ### GET /api/v1/audit-logs/list
-Query: `accountId=int64`, `cursor=int64`, `limit=int(default 20, max 100)`, `subject=string`
+Query: `accountId=int64`, `cursor=int64`, `limit=int(default 20)`, `subject=string`
 Response data: `{ "items": AuditLog[], "nextCursor": int64|null }`
 
 ### AuditLog Type
 ```
 {
-  "id": int64, "title": string, "description"?: string, "subject"?: string,
-  "success": bool, "data"?: object, "createdBy"?: string, "accountId"?: string,
-  "createdAt"?: RFC3339, "updatedAt"?: RFC3339
+  "id": string,
+  "title": string,
+  "description"?: string,
+  "subject"?: string,
+  "success": bool,
+  "data"?: object,
+  "createdBy"?: string,
+  "accountId"?: string,
+  "createdAt"?: RFC3339,
+  "updatedAt"?: RFC3339
 }
 ```
+
+---
+
+## ServiceNodes
+
+### GET /api/v1/regions/:regionId/nodes
+Param: `regionId`
+Response data: `ServiceNode[]`
+
+### POST /api/v1/regions/:regionId/nodes/:nodeId/drain
+Param: `regionId`
+Param: `nodeId`
+
+### POST /api/v1/regions/:regionId/nodes/:nodeId/activate
+Param: `regionId`
+Param: `nodeId`
+
+### DELETE /api/v1/regions/:regionId/nodes/:nodeId
+Param: `regionId`
+Param: `nodeId`
+
+### ServiceNode Type
+```
+{
+  "id": string,
+  "regionId": int64,
+  "serviceType": string,
+  "nodeId": string,
+  "advertiseAddr": string,
+  "httpAddr"?: string,
+  "metadata"?: object,
+  "status": string,
+  "lastHeartbeat"?: string,
+  "isActive": bool
+}
+```
+
+---
+
+## Discover
+
+### GET /api/v1/discover/meta
+Query: `access_key_id=string(required)`
+Response data: `DiscoverMetaResponse`
+
+---
+
+## Cache
+
+### POST /api/v1/cache/refresh
 
 ---
 
@@ -310,7 +393,8 @@ Payload: {
   "nbf": unix_now,
   "exp": unix_now + 3600,
   "jti": "<nanosecond_timestamp_string>",
-  "scope": "service"
+  "scope": "service",
+  "kfp": "<hex(sha256(ed25519_pubkey)[:16])>"
 }
 Signature: ED25519 sign(header.payload, privateKey)
 ```

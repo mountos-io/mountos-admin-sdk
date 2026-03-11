@@ -11,47 +11,6 @@ import (
 	"strconv"
 )
 
-// Client is the mountOS Admin API client.
-type Client struct {
-	baseURL string
-	http    *http.Client
-	auth    *tokenCache
-
-	Accounts     *AccountsService
-	Users        *UsersService
-	Regions      *RegionsService
-	Storages     *StoragesService
-	Volumes      *VolumesService
-	AuditLogs    *AuditLogsService
-	ServiceNodes *ServiceNodesService
-	Discover     *DiscoverService
-	Cache        *CacheService
-}
-
-// NewClient creates a new SDK client.
-func NewClient(cfg Config) (*Client, error) {
-	tc, err := newTokenCache(cfg.PrivateKey)
-	if err != nil {
-		return nil, err
-	}
-
-	c := &Client{
-		baseURL: cfg.BaseURL,
-		http:    http.DefaultClient,
-		auth:    tc,
-	}
-	c.Accounts = &AccountsService{c: c}
-	c.Users = &UsersService{c: c}
-	c.Regions = &RegionsService{c: c}
-	c.Storages = &StoragesService{c: c}
-	c.Volumes = &VolumesService{c: c}
-	c.AuditLogs = &AuditLogsService{c: c}
-	c.ServiceNodes = &ServiceNodesService{c: c}
-	c.Discover = &DiscoverService{c: c}
-	c.Cache = &CacheService{c: c}
-	return c, nil
-}
-
 type envelope struct {
 	Status    string          `json:"status"`
 	Message   string          `json:"message"`
