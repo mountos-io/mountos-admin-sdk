@@ -1,4 +1,4 @@
-# @mountos/admin-sdk
+# @mountos-app/admin-sdk
 
 TypeScript SDK for the mountOS vendor API. ESM-only, Node 18+/Bun/Deno.
 
@@ -11,7 +11,7 @@ This package is not published to npm. Use one of the following methods:
 ```json
 {
   "dependencies": {
-    "@mountos/admin-sdk": "github:mountos-app/mountos-admin-sdk#main"
+    "@mountos-app/admin-sdk": "github:mountos-app/mountos-admin-sdk#main"
   }
 }
 ```
@@ -21,7 +21,7 @@ Note: since the TS package lives under `ts/`, you may need to reference the subd
 ```json
 {
   "dependencies": {
-    "@mountos/admin-sdk": "github:mountos-app/mountos-admin-sdk#main&path:ts"
+    "@mountos-app/admin-sdk": "github:mountos-app/mountos-admin-sdk#main&path:ts"
   }
 }
 ```
@@ -39,67 +39,82 @@ Then reference in your tsconfig paths or use a workspace/symlink pointing to `ve
 If your organization runs a private npm registry (Verdaccio, GitHub Packages, etc.), publish the `ts/` package there and install normally:
 
 ```bash
-npm install @mountos/admin-sdk --registry=https://npm.your-org.com
+npm install @mountos-app/admin-sdk --registry=https://npm.your-org.com
 ```
 
 ## Usage
 
 ```typescript
-import { MountOSAdmin } from '@mountos/admin-sdk'
+import { MountOSAdmin } from "@mountos-app/admin-sdk";
 
 const client = new MountOSAdmin({
-  baseUrl: 'https://appserv.example.com',
-  privateKey: 'base64-encoded-ed25519-private-key',
-})
+  baseUrl: "https://appserv.example.com",
+  privateKey: "base64-encoded-ed25519-private-key",
+});
 
 // Accounts
-const { id } = await client.accounts.create({ name: 'Acme' })
-const { items, pagination } = await client.accounts.list({ page: 1, limit: 10 })
-const account = await client.accounts.get(id)
-await client.accounts.edit(id, { name: 'Acme Corp' })
-await client.accounts.lock(id)
-await client.accounts.unlock(id)
-await client.accounts.activate(id)
-await client.accounts.deactivate(id)
+const { id } = await client.accounts.create({ name: "Acme" });
+const { items, pagination } = await client.accounts.list({
+  page: 1,
+  limit: 10,
+});
+const account = await client.accounts.get(id);
+await client.accounts.edit(id, { name: "Acme Corp" });
+await client.accounts.lock(id);
+await client.accounts.unlock(id);
+await client.accounts.activate(id);
+await client.accounts.deactivate(id);
 
 // Users
-const user = await client.users.add({ accountId: 1, email: 'a@b.com', username: 'alice' })
-const users = await client.users.list({ accountId: 1 })
-await client.users.edit(user.id, { username: 'bob', email: 'b@c.com' })
-await client.users.activate(user.id)
-await client.users.deactivate(user.id)
+const user = await client.users.add({
+  accountId: 1,
+  email: "a@b.com",
+  username: "alice",
+});
+const users = await client.users.list({ accountId: 1 });
+await client.users.edit(user.id, { username: "bob", email: "b@c.com" });
+await client.users.activate(user.id);
+await client.users.deactivate(user.id);
 
 // Regions
-const region = await client.regions.create({ accountId: 1, name: 'us-east' })
-const regions = await client.regions.list()
-await client.regions.edit(region.id, { accountId: 1, name: 'us-west' })
+const region = await client.regions.create({ accountId: 1, name: "us-east" });
+const regions = await client.regions.list();
+await client.regions.edit(region.id, { accountId: 1, name: "us-west" });
 
 // Storages
 const storage = await client.storages.create({
-  accountId: 1, regionId: 1, name: 'prod-s3',
-  storageType: 'object', providerType: 's3', endpoint: 'https://s3.example.com',
-})
-await client.storages.edit(storage.id, { name: 'new-name' })
+  accountId: 1,
+  regionId: 1,
+  name: "prod-s3",
+  storageType: "object",
+  providerType: "s3",
+  endpoint: "https://s3.example.com",
+});
+await client.storages.edit(storage.id, { name: "new-name" });
 
 // Volumes
-await client.volumes.updateQuota(42, { quotaLimit: 1073741824 })
+await client.volumes.updateQuota(42, { quotaLimit: 1073741824 });
 
 // Audit logs (cursor-based)
-const logs = await client.auditLogs.list({ accountId: 1, cursor: 0, limit: 20 })
+const logs = await client.auditLogs.list({
+  accountId: 1,
+  cursor: 0,
+  limit: 20,
+});
 ```
 
 ## Error Handling
 
 ```typescript
-import { MountOSError } from '@mountos/admin-sdk'
+import { MountOSError } from "@mountos-app/admin-sdk";
 
 try {
-  await client.accounts.get(999)
+  await client.accounts.get(999);
 } catch (err) {
   if (err instanceof MountOSError) {
-    console.error(err.message)    // "account not found"
-    console.error(err.status)     // 404
-    console.error(err.errorCode)  // 10900
+    console.error(err.message); // "account not found"
+    console.error(err.status); // 404
+    console.error(err.errorCode); // 10900
   }
 }
 ```
