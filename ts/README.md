@@ -4,8 +4,42 @@ TypeScript SDK for the mountOS vendor API. ESM-only, Node 18+/Bun/Deno.
 
 ## Install
 
+This package is not published to npm. Use one of the following methods:
+
+**GitHub dependency (package.json):**
+
+```json
+{
+  "dependencies": {
+    "@mountos/admin-sdk": "github:mountos-app/mountos-admin-sdk#main"
+  }
+}
+```
+
+Note: since the TS package lives under `ts/`, you may need to reference the subdirectory. With npm/pnpm you can use:
+
+```json
+{
+  "dependencies": {
+    "@mountos/admin-sdk": "github:mountos-app/mountos-admin-sdk#main&path:ts"
+  }
+}
+```
+
+**Git submodule:**
+
 ```bash
-npm install @mountos/admin-sdk
+git submodule add https://github.com/mountos-app/mountos-admin-sdk.git vendor/mountos-admin-sdk
+```
+
+Then reference in your tsconfig paths or use a workspace/symlink pointing to `vendor/mountos-admin-sdk/ts`.
+
+**Private registry:**
+
+If your organization runs a private npm registry (Verdaccio, GitHub Packages, etc.), publish the `ts/` package there and install normally:
+
+```bash
+npm install @mountos/admin-sdk --registry=https://npm.your-org.com
 ```
 
 ## Usage
@@ -36,9 +70,9 @@ await client.users.activate(user.id)
 await client.users.deactivate(user.id)
 
 // Regions
-const region = await client.regions.create({ accountId: 1, name: 'us-east', dns: 'us.example.com' })
+const region = await client.regions.create({ accountId: 1, name: 'us-east' })
 const regions = await client.regions.list()
-await client.regions.edit(region.id, { accountId: 1, name: 'us-west', dns: 'us-w.example.com' })
+await client.regions.edit(region.id, { accountId: 1, name: 'us-west' })
 
 // Storages
 const storage = await client.storages.create({
@@ -48,7 +82,7 @@ const storage = await client.storages.create({
 await client.storages.edit(storage.id, { name: 'new-name' })
 
 // Volumes
-await client.volumes.updateQuota('volume-uuid', { quotaLimit: 1073741824 })
+await client.volumes.updateQuota(42, { quotaLimit: 1073741824 })
 
 // Audit logs (cursor-based)
 const logs = await client.auditLogs.list({ accountId: 1, cursor: 0, limit: 20 })

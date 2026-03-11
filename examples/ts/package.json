@@ -1,0 +1,15 @@
+{
+  "name": "mountos-admin-sdk-example",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "npx tsx main.ts"
+  },
+  "dependencies": {
+    "@mountos/admin-sdk": "file:../../ts"
+  },
+  "devDependencies": {
+    "@types/node": "^25.4.0",
+    "tsx": "^4.0.0"
+  }
+}

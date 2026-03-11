@@ -42,10 +42,13 @@ func main() {
   list, _ := client.Accounts.List(ctx, &sdk.ListOptions{Page: 1, Limit: 10})
   fmt.Println("Total accounts:", list.Pagination.Total)
 
-  acct, _ = client.Accounts.Get(ctx, acct.ID)
-  _ = client.Accounts.Lock(ctx, acct.ID)
-  _ = client.Accounts.Unlock(ctx, acct.ID)
-  _ = client.Accounts.Activate(ctx, acct.ID)
+  account, _ := client.Accounts.Get(ctx, acct.ID)
+  fmt.Println("Account name:", account.Name)
+
+  _, _ = client.Accounts.Edit(ctx, acct.ID, &sdk.EditAccountRequest{Name: "Acme Corp"})
+  _, _ = client.Accounts.Lock(ctx, acct.ID)
+  _, _ = client.Accounts.Unlock(ctx, acct.ID)
+  _, _ = client.Accounts.Activate(ctx, acct.ID)
 
   // Users
   user, _ := client.Users.Add(ctx, &sdk.AddUserRequest{
@@ -59,9 +62,9 @@ func main() {
 
   // Regions
   region, _ := client.Regions.Create(ctx, &sdk.CreateRegionRequest{
-    AccountID: acct.ID, Name: "us-east", DNS: "us.example.com",
+    AccountID: acct.ID, Name: "us-east",
   })
-  _ = region
+  fmt.Println("Region export ID:", region)
 
   // Storages
   storage, _ := client.Storages.Create(ctx, &sdk.CreateStorageRequest{
@@ -72,7 +75,7 @@ func main() {
   _ = storage
 
   // Volumes
-  _ = client.Volumes.UpdateQuota(ctx, "volume-uuid", &sdk.UpdateVolumeQuotaRequest{
+  _, _ = client.Volumes.UpdateQuota(ctx, 42, &sdk.UpdateVolumeQuotaRequest{
     QuotaLimit: 1073741824,
   })
 
@@ -87,7 +90,7 @@ func main() {
 ## Error Handling
 
 ```go
-acct, err := client.Accounts.Get(ctx, 999)
+account, err := client.Accounts.Get(ctx, 999)
 if err != nil {
   var sdkErr *sdk.Error
   if errors.As(err, &sdkErr) {
