@@ -36,11 +36,6 @@ type CursorPaginatedResponse[T any] struct {
 
 // IDResponse returned by create/edit/toggle endpoints.
 type IDResponse struct {
-	ID int64 `json:"id"`
-}
-
-// StringIDResponse returned by storage/volume endpoints.
-type StringIDResponse struct {
 	ID string `json:"id"`
 }
 
@@ -59,7 +54,7 @@ type EditAccountRequest struct {
 }
 
 type Account struct {
-	ID          int64          `json:"id"`
+	ID          string         `json:"id"`
 	Name        string         `json:"name"`
 	Description string         `json:"description"`
 	VendorInfo  map[string]any `json:"vendorInfo,omitempty"`
@@ -87,7 +82,7 @@ type EditUserRequest struct {
 }
 
 type User struct {
-	ID        int64  `json:"id"`
+	ID        string `json:"id"`
 	AccountID int64  `json:"accountId"`
 	Username  string `json:"username"`
 	Email     string `json:"email"`
@@ -113,7 +108,8 @@ type EditRegionRequest struct {
 }
 
 type Region struct {
-	ID        int64  `json:"id"`
+	ID        string `json:"id"`
+	ShardID   int64  `json:"shardId"`
 	AccountID int64  `json:"accountId"`
 	Name      string `json:"name"`
 	IsActive  bool   `json:"isActive"`
@@ -190,7 +186,7 @@ type UpdateVolumeQuotaRequest struct {
 // Audit Logs
 
 type AuditLog struct {
-	ID          int64           `json:"id"`
+	ID          string          `json:"id"`
 	Title       string          `json:"title"`
 	Description string          `json:"description,omitempty"`
 	Subject     string          `json:"subject,omitempty"`
@@ -212,7 +208,7 @@ type AuditLogListOptions struct {
 // Service Nodes
 
 type ServiceNode struct {
-	ID            int64          `json:"id"`
+	ID            string         `json:"id"`
 	RegionID      int64          `json:"regionId"`
 	ServiceType   string         `json:"serviceType"`
 	NodeID        string         `json:"nodeId"`
@@ -227,6 +223,7 @@ type ServiceNode struct {
 // Discovery
 
 type DiscoverMetaResponse struct {
+	RegionID  int64              `json:"regionId"`
 	Region    string             `json:"region"`
 	Endpoints []DiscoverEndpoint `json:"endpoints"`
 }

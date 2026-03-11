@@ -32,38 +32,38 @@ func (s *AccountsService) List(ctx context.Context, opts *ListOptions) (*Paginat
 	return decodeJSON[PaginatedResponse[Account]](data)
 }
 
-func (s *AccountsService) Get(ctx context.Context, accountID int64) (*Account, error) {
-	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/accounts/%d", accountID))
+func (s *AccountsService) Get(ctx context.Context, accountID string) (*Account, error) {
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/accounts/%s", accountID))
 	if err != nil {
 		return nil, err
 	}
 	return decodeJSON[Account](data)
 }
 
-func (s *AccountsService) Edit(ctx context.Context, accountID int64, req *EditAccountRequest) (*IDResponse, error) {
-	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/accounts/%d/edit", accountID), req)
+func (s *AccountsService) Edit(ctx context.Context, accountID string, req *EditAccountRequest) (*IDResponse, error) {
+	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/accounts/%s/edit", accountID), req)
 	if err != nil {
 		return nil, err
 	}
 	return decodeJSON[IDResponse](data)
 }
 
-func (s *AccountsService) Lock(ctx context.Context, accountID int64) error {
-	_, err := s.c.post(ctx, fmt.Sprintf("/api/v1/accounts/%d/lock", accountID), nil)
+func (s *AccountsService) Lock(ctx context.Context, accountID string) error {
+	_, err := s.c.post(ctx, fmt.Sprintf("/api/v1/accounts/%s/lock", accountID), nil)
 	return err
 }
 
-func (s *AccountsService) Unlock(ctx context.Context, accountID int64) error {
-	_, err := s.c.post(ctx, fmt.Sprintf("/api/v1/accounts/%d/unlock", accountID), nil)
+func (s *AccountsService) Unlock(ctx context.Context, accountID string) error {
+	_, err := s.c.post(ctx, fmt.Sprintf("/api/v1/accounts/%s/unlock", accountID), nil)
 	return err
 }
 
-func (s *AccountsService) Activate(ctx context.Context, accountID int64) error {
-	_, err := s.c.post(ctx, fmt.Sprintf("/api/v1/accounts/%d/activate", accountID), nil)
+func (s *AccountsService) Activate(ctx context.Context, accountID string) error {
+	_, err := s.c.post(ctx, fmt.Sprintf("/api/v1/accounts/%s/activate", accountID), nil)
 	return err
 }
 
-func (s *AccountsService) Deactivate(ctx context.Context, accountID int64) error {
-	_, err := s.c.post(ctx, fmt.Sprintf("/api/v1/accounts/%d/deactivate", accountID), nil)
+func (s *AccountsService) Deactivate(ctx context.Context, accountID string) error {
+	_, err := s.c.post(ctx, fmt.Sprintf("/api/v1/accounts/%s/deactivate", accountID), nil)
 	return err
 }

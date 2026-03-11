@@ -49,7 +49,7 @@ export interface EditAccountRequest {
 }
 
 export interface Account {
-  id: number
+  id: string
   name: string
   description: string
   vendorInfo?: Record<string, unknown>
@@ -76,7 +76,7 @@ export interface EditUserRequest {
 }
 
 export interface User {
-  id: number
+  id: string
   accountId: number
   username: string
   email: string
@@ -99,7 +99,8 @@ export interface EditRegionRequest {
 }
 
 export interface Region {
-  id: number
+  id: string
+  shardId: number
   accountId: number
   name: string
   isActive: boolean
@@ -166,7 +167,7 @@ export interface UpdateVolumeQuotaRequest {
 
 // Audit Logs
 export interface AuditLog {
-  id: number
+  id: string
   title: string
   description?: string
   subject?: string
@@ -187,7 +188,7 @@ export interface AuditLogListOptions {
 
 // Service Nodes
 export interface ServiceNode {
-  id: number
+  id: string
   regionId: number
   serviceType: string
   nodeId: string
@@ -201,6 +202,7 @@ export interface ServiceNode {
 
 // Discovery
 export interface DiscoverMetaResponse {
+  regionId: number
   region: string
   endpoints: DiscoverEndpoint[]
 }

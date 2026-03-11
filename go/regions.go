@@ -32,28 +32,28 @@ func (s *RegionsService) List(ctx context.Context, opts *ListOptions) (*Paginate
 	return decodeJSON[PaginatedResponse[Region]](data)
 }
 
-func (s *RegionsService) Get(ctx context.Context, regionID int64) (*Region, error) {
-	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/regions/%d", regionID))
+func (s *RegionsService) Get(ctx context.Context, regionID string) (*Region, error) {
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/regions/%s", regionID))
 	if err != nil {
 		return nil, err
 	}
 	return decodeJSON[Region](data)
 }
 
-func (s *RegionsService) Edit(ctx context.Context, regionID int64, req *EditRegionRequest) (*IDResponse, error) {
-	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/regions/%d/edit", regionID), req)
+func (s *RegionsService) Edit(ctx context.Context, regionID string, req *EditRegionRequest) (*IDResponse, error) {
+	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/regions/%s/edit", regionID), req)
 	if err != nil {
 		return nil, err
 	}
 	return decodeJSON[IDResponse](data)
 }
 
-func (s *RegionsService) Activate(ctx context.Context, regionID int64) error {
-	_, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%d/activate", regionID), nil)
+func (s *RegionsService) Activate(ctx context.Context, regionID string) error {
+	_, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%s/activate", regionID), nil)
 	return err
 }
 
-func (s *RegionsService) Deactivate(ctx context.Context, regionID int64) error {
-	_, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%d/deactivate", regionID), nil)
+func (s *RegionsService) Deactivate(ctx context.Context, regionID string) error {
+	_, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%s/deactivate", regionID), nil)
 	return err
 }

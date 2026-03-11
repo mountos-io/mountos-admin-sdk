@@ -100,7 +100,7 @@ export class MountOSAdmin {
 class AccountsResource {
   constructor(private client: MountOSAdmin) {}
 
-  create(req: CreateAccountRequest): Promise<{ id: number }> {
+  create(req: CreateAccountRequest): Promise<{ id: string }> {
     return this.client.request('POST', '/api/v1/accounts/create', req)
   }
 
@@ -108,27 +108,27 @@ class AccountsResource {
     return this.client.request('GET', `/api/v1/accounts/list${queryString({ page: opts?.page, limit: opts?.limit })}`)
   }
 
-  get(accountId: number): Promise<Account> {
+  get(accountId: string): Promise<Account> {
     return this.client.request('GET', `/api/v1/accounts/${accountId}`)
   }
 
-  edit(accountId: number, req: EditAccountRequest): Promise<{ id: number }> {
+  edit(accountId: string, req: EditAccountRequest): Promise<{ id: string }> {
     return this.client.request('PUT', `/api/v1/accounts/${accountId}/edit`, req)
   }
 
-  lock(accountId: number): Promise<{ id: number }> {
+  lock(accountId: string): Promise<{ id: string }> {
     return this.client.request('POST', `/api/v1/accounts/${accountId}/lock`)
   }
 
-  unlock(accountId: number): Promise<{ id: number }> {
+  unlock(accountId: string): Promise<{ id: string }> {
     return this.client.request('POST', `/api/v1/accounts/${accountId}/unlock`)
   }
 
-  activate(accountId: number): Promise<{ id: number }> {
+  activate(accountId: string): Promise<{ id: string }> {
     return this.client.request('POST', `/api/v1/accounts/${accountId}/activate`)
   }
 
-  deactivate(accountId: number): Promise<{ id: number }> {
+  deactivate(accountId: string): Promise<{ id: string }> {
     return this.client.request('POST', `/api/v1/accounts/${accountId}/deactivate`)
   }
 }
@@ -136,7 +136,7 @@ class AccountsResource {
 class UsersResource {
   constructor(private client: MountOSAdmin) {}
 
-  add(req: AddUserRequest): Promise<{ id: number }> {
+  add(req: AddUserRequest): Promise<{ id: string }> {
     return this.client.request('POST', '/api/v1/users/add', req)
   }
 
@@ -144,19 +144,19 @@ class UsersResource {
     return this.client.request('GET', `/api/v1/users/list${queryString({ accountId: opts.accountId, page: opts.page, limit: opts.limit })}`)
   }
 
-  get(userId: number): Promise<User> {
+  get(userId: string): Promise<User> {
     return this.client.request('GET', `/api/v1/users/${userId}`)
   }
 
-  edit(userId: number, req: EditUserRequest): Promise<{ id: number }> {
+  edit(userId: string, req: EditUserRequest): Promise<{ id: string }> {
     return this.client.request('PUT', `/api/v1/users/${userId}/edit`, req)
   }
 
-  activate(userId: number): Promise<{ id: number }> {
+  activate(userId: string): Promise<{ id: string }> {
     return this.client.request('POST', `/api/v1/users/${userId}/activate`)
   }
 
-  deactivate(userId: number): Promise<{ id: number }> {
+  deactivate(userId: string): Promise<{ id: string }> {
     return this.client.request('POST', `/api/v1/users/${userId}/deactivate`)
   }
 }
@@ -164,7 +164,7 @@ class UsersResource {
 class RegionsResource {
   constructor(private client: MountOSAdmin) {}
 
-  create(req: CreateRegionRequest): Promise<{ id: number }> {
+  create(req: CreateRegionRequest): Promise<{ id: string }> {
     return this.client.request('POST', '/api/v1/regions/create', req)
   }
 
@@ -172,19 +172,19 @@ class RegionsResource {
     return this.client.request('GET', `/api/v1/regions/list${queryString({ page: opts?.page, limit: opts?.limit })}`)
   }
 
-  get(regionId: number): Promise<Region> {
+  get(regionId: string): Promise<Region> {
     return this.client.request('GET', `/api/v1/regions/${regionId}`)
   }
 
-  edit(regionId: number, req: EditRegionRequest): Promise<{ id: number }> {
+  edit(regionId: string, req: EditRegionRequest): Promise<{ id: string }> {
     return this.client.request('PUT', `/api/v1/regions/${regionId}/edit`, req)
   }
 
-  activate(regionId: number): Promise<{ id: number }> {
+  activate(regionId: string): Promise<{ id: string }> {
     return this.client.request('POST', `/api/v1/regions/${regionId}/activate`)
   }
 
-  deactivate(regionId: number): Promise<{ id: number }> {
+  deactivate(regionId: string): Promise<{ id: string }> {
     return this.client.request('POST', `/api/v1/regions/${regionId}/deactivate`)
   }
 }
@@ -241,19 +241,19 @@ class AuditLogsResource {
 class ServiceNodesResource {
   constructor(private client: MountOSAdmin) {}
 
-  list(regionId: number): Promise<ServiceNode[]> {
+  list(regionId: string): Promise<ServiceNode[]> {
     return this.client.request('GET', `/api/v1/regions/${regionId}/nodes`)
   }
 
-  drain(regionId: number, nodeId: string): Promise<void> {
+  drain(regionId: string, nodeId: string): Promise<void> {
     return this.client.request('POST', `/api/v1/regions/${regionId}/nodes/${encodeURIComponent(nodeId)}/drain`)
   }
 
-  activate(regionId: number, nodeId: string): Promise<void> {
+  activate(regionId: string, nodeId: string): Promise<void> {
     return this.client.request('POST', `/api/v1/regions/${regionId}/nodes/${encodeURIComponent(nodeId)}/activate`)
   }
 
-  remove(regionId: number, nodeId: string): Promise<void> {
+  remove(regionId: string, nodeId: string): Promise<void> {
     return this.client.request('DELETE', `/api/v1/regions/${regionId}/nodes/${encodeURIComponent(nodeId)}`)
   }
 }

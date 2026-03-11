@@ -7,10 +7,10 @@ import (
 
 type VolumesService struct{ c *Client }
 
-func (s *VolumesService) UpdateQuota(ctx context.Context, volumeID string, req *UpdateVolumeQuotaRequest) (*StringIDResponse, error) {
+func (s *VolumesService) UpdateQuota(ctx context.Context, volumeID string, req *UpdateVolumeQuotaRequest) (*IDResponse, error) {
 	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/volumes/%s/quota", volumeID), req)
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[StringIDResponse](data)
+	return decodeJSON[IDResponse](data)
 }

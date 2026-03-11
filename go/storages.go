@@ -38,12 +38,12 @@ func (s *StoragesService) Get(ctx context.Context, storageID string) (*Storage, 
 	return decodeJSON[Storage](data)
 }
 
-func (s *StoragesService) Edit(ctx context.Context, storageID string, req *EditStorageRequest) (*StringIDResponse, error) {
+func (s *StoragesService) Edit(ctx context.Context, storageID string, req *EditStorageRequest) (*IDResponse, error) {
 	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/storages/%s/edit", storageID), req)
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[StringIDResponse](data)
+	return decodeJSON[IDResponse](data)
 }
 
 func (s *StoragesService) Activate(ctx context.Context, storageID string) error {
