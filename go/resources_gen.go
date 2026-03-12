@@ -253,12 +253,102 @@ func (s *StoragesService) Deactivate(ctx context.Context, storageID int64) (*IDR
 
 type VolumesService struct{ c *Client }
 
+func (s *VolumesService) Create(ctx context.Context, req *CreateVolumeRequest) (*CreateVolumeResponse, error) {
+	data, err := s.c.post(ctx, "/api/v1/volumes/create", req)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[CreateVolumeResponse](data)
+}
+
+func (s *VolumesService) List(ctx context.Context, opts *VolumeListOptions) (*PaginatedResponse[Volume], error) {
+	q := url.Values{}
+	if opts != nil {
+		q.Set("accountId", strconv.FormatInt(opts.AccountID, 10))
+		addPagination(q, opts.Page, opts.Limit)
+	}
+	data, err := s.c.get(ctx, "/api/v1/volumes/list"+"?"+q.Encode())
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[PaginatedResponse[Volume]](data)
+}
+
+func (s *VolumesService) Get(ctx context.Context, volumeID int64) (*Volume, error) {
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/volumes/%s", strconv.FormatInt(volumeID, 10)))
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[Volume](data)
+}
+
+func (s *VolumesService) Edit(ctx context.Context, volumeID int64, req *EditVolumeRequest) (*IDResponse, error) {
+	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/volumes/%s/edit", strconv.FormatInt(volumeID, 10)), req)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[IDResponse](data)
+}
+
+func (s *VolumesService) Lock(ctx context.Context, volumeID int64) (*IDResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/volumes/%s/lock", strconv.FormatInt(volumeID, 10)), nil)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[IDResponse](data)
+}
+
+func (s *VolumesService) Unlock(ctx context.Context, volumeID int64) (*IDResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/volumes/%s/unlock", strconv.FormatInt(volumeID, 10)), nil)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[IDResponse](data)
+}
+
+func (s *VolumesService) Activate(ctx context.Context, volumeID int64) (*IDResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/volumes/%s/activate", strconv.FormatInt(volumeID, 10)), nil)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[IDResponse](data)
+}
+
+func (s *VolumesService) Deactivate(ctx context.Context, volumeID int64) (*IDResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/volumes/%s/deactivate", strconv.FormatInt(volumeID, 10)), nil)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[IDResponse](data)
+}
+
+func (s *VolumesService) GenerateAPIKeys(ctx context.Context, volumeID int64, req *GenerateVolumeAPIKeysRequest) (*GenerateAPIKeysVolumeResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/volumes/%s/api-keys/generate", strconv.FormatInt(volumeID, 10)), req)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[GenerateAPIKeysVolumeResponse](data)
+}
+
+func (s *VolumesService) RevokeAPIKey(ctx context.Context, volumeID int64, req *RevokeVolumeAPIKeyRequest) error {
+	_, err := s.c.post(ctx, fmt.Sprintf("/api/v1/volumes/%s/api-keys/revoke", strconv.FormatInt(volumeID, 10)), req)
+	return err
+}
+
 func (s *VolumesService) UpdateQuota(ctx context.Context, volumeID int64, req *UpdateVolumeQuotaRequest) (*IDResponse, error) {
 	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/volumes/%s/quota", strconv.FormatInt(volumeID, 10)), req)
 	if err != nil {
 		return nil, err
 	}
 	return decodeJSON[IDResponse](data)
+}
+
+func (s *VolumesService) Stats(ctx context.Context, volumeID int64) (*StatsVolumeResponse, error) {
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/volumes/%s/stats", strconv.FormatInt(volumeID, 10)))
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[StatsVolumeResponse](data)
 }
 
 type AuditLogsService struct{ c *Client }

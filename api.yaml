@@ -75,6 +75,21 @@ types:
     - "createdAt: datetime"
     - "updatedAt: datetime"
 
+  Volume:
+    - "id: int64"
+    - "accountId: int64"
+    - "storageId: int64"
+    - "regionId: int64"
+    - "name: string"
+    - "description: string?"
+    - "encryption: bool"
+    - "quotaLimit: int64"
+    - "quotaUsed: int64"
+    - "locked: bool"
+    - "isActive: bool"
+    - "createdAt: datetime"
+    - "updatedAt: datetime"
+
   AuditLog:
     - "id: int64"
     - "title: string"
@@ -338,6 +353,92 @@ resources:
   - name: Volumes
     path: /volumes
     endpoints:
+      - action: create
+        method: POST
+        path: /create
+        request:
+          - "accountId: int64!"
+          - "storageId: int64!"
+          - "name: string!"
+          - "description: string"
+          - "volumeType: string!"
+          - "encryption: bool"
+          - "encryptionKey: string"
+          - "retentionPeriod: int32"
+          - "gracePeriod: int32"
+          - "gcOnDeactivation: bool"
+          - "quotaLimit: int64"
+        response:
+          - "id: int64"
+          - "encryptionKey: string?"
+
+      - action: list
+        method: GET
+        path: /list
+        pagination: page
+        query:
+          - "accountId: int64!"
+          - "page: int=1"
+          - "limit: int=10"
+        responseType: Volume
+
+      - action: get
+        method: GET
+        path: /:volumeId
+        responseType: Volume
+
+      - action: edit
+        method: PUT
+        path: /:volumeId/edit
+        request:
+          - "name: string!"
+          - "description: string"
+          - "encryption: bool"
+          - "retentionPeriod: int32"
+          - "gracePeriod: int32"
+          - "gcOnDeactivation: bool"
+        response:
+          - "id: int64"
+
+      - action: lock
+        method: POST
+        path: /:volumeId/lock
+        response:
+          - "id: int64"
+
+      - action: unlock
+        method: POST
+        path: /:volumeId/unlock
+        response:
+          - "id: int64"
+
+      - action: activate
+        method: POST
+        path: /:volumeId/activate
+        response:
+          - "id: int64"
+
+      - action: deactivate
+        method: POST
+        path: /:volumeId/deactivate
+        response:
+          - "id: int64"
+
+      - action: generateApiKeys
+        method: POST
+        path: /:volumeId/api-keys/generate
+        request:
+          - "userId: int64!"
+        response:
+          - "apiKey: string"
+          - "apiSecret: string"
+
+      - action: revokeApiKey
+        method: POST
+        path: /:volumeId/api-keys/revoke
+        request:
+          - "apiKey: string!"
+
       - action: updateQuota
         method: PUT
         path: /:volumeId/quota
@@ -345,6 +446,15 @@ resources:
           - "quotaLimit: int64!"
         response:
           - "id: int64"
+
+      - action: stats
+        method: GET
+        path: /:volumeId/stats
+        response:
+          - "volumeId: string"
+          - "diskSize: int64"
+          - "activeSize: int64"
+          - "size: int64"
 
   - name: AuditLogs
     path: /audit-logs

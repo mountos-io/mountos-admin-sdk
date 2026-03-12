@@ -295,6 +295,83 @@ Response data: `{ "id": int64 }`
 
 ## Volumes
 
+### POST /api/v1/volumes/create
+Request:
+```
+{
+  "accountId": int64(required),
+  "storageId": int64(required),
+  "name": string(required),
+  "description"?: string,
+  "volumeType": string(required),
+  "encryption"?: bool,
+  "encryptionKey"?: string,
+  "retentionPeriod"?: int32,
+  "gracePeriod"?: int32,
+  "gcOnDeactivation"?: bool,
+  "quotaLimit"?: int64
+}
+```
+Response data: `{ "id": int64, "encryptionKey": string }`
+
+### GET /api/v1/volumes/list
+Query: `accountId=int64(required)`, `page=int(default 1)`, `limit=int(default 10)`
+Response data: `{ "items": Volume[], "pagination": PaginationMeta }`
+
+### GET /api/v1/volumes/:volumeId
+Param: `volumeId`
+Response data: `Volume`
+
+### PUT /api/v1/volumes/:volumeId/edit
+Param: `volumeId`
+Request:
+```
+{
+  "name": string(required),
+  "description"?: string,
+  "encryption"?: bool,
+  "retentionPeriod"?: int32,
+  "gracePeriod"?: int32,
+  "gcOnDeactivation"?: bool
+}
+```
+Response data: `{ "id": int64 }`
+
+### POST /api/v1/volumes/:volumeId/lock
+Param: `volumeId`
+Response data: `{ "id": int64 }`
+
+### POST /api/v1/volumes/:volumeId/unlock
+Param: `volumeId`
+Response data: `{ "id": int64 }`
+
+### POST /api/v1/volumes/:volumeId/activate
+Param: `volumeId`
+Response data: `{ "id": int64 }`
+
+### POST /api/v1/volumes/:volumeId/deactivate
+Param: `volumeId`
+Response data: `{ "id": int64 }`
+
+### POST /api/v1/volumes/:volumeId/api-keys/generate
+Param: `volumeId`
+Request:
+```
+{
+  "userId": int64(required)
+}
+```
+Response data: `{ "apiKey": string, "apiSecret": string }`
+
+### POST /api/v1/volumes/:volumeId/api-keys/revoke
+Param: `volumeId`
+Request:
+```
+{
+  "apiKey": string(required)
+}
+```
+
 ### PUT /api/v1/volumes/:volumeId/quota
 Param: `volumeId`
 Request:
@@ -304,6 +381,29 @@ Request:
 }
 ```
 Response data: `{ "id": int64 }`
+
+### GET /api/v1/volumes/:volumeId/stats
+Param: `volumeId`
+Response data: `{ "volumeId": string, "diskSize": int64, "activeSize": int64, "size": int64 }`
+
+### Volume Type
+```
+{
+  "id": int64,
+  "accountId": int64,
+  "storageId": int64,
+  "regionId": int64,
+  "name": string,
+  "description"?: string,
+  "encryption": bool,
+  "quotaLimit": int64,
+  "quotaUsed": int64,
+  "locked": bool,
+  "isActive": bool,
+  "createdAt": RFC3339,
+  "updatedAt": RFC3339
+}
+```
 
 ---
 

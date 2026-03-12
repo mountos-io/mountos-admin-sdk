@@ -83,6 +83,22 @@ export interface Storage {
   updatedAt: string
 }
 
+export interface Volume {
+  id: number
+  accountId: number
+  storageId: number
+  regionId: number
+  name: string
+  description?: string
+  encryption: boolean
+  quotaLimit: number
+  quotaUsed: number
+  locked: boolean
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
 export interface AuditLog {
   id: number
   title: string
@@ -202,8 +218,43 @@ export interface StorageListOptions extends ListOptions {
 
 // Volumes
 
+export interface CreateVolumeRequest {
+  accountId: number
+  storageId: number
+  name: string
+  description?: string
+  volumeType: string
+  encryption?: boolean
+  encryptionKey?: string
+  retentionPeriod?: number
+  gracePeriod?: number
+  gcOnDeactivation?: boolean
+  quotaLimit?: number
+}
+
+export interface EditVolumeRequest {
+  name: string
+  description?: string
+  encryption?: boolean
+  retentionPeriod?: number
+  gracePeriod?: number
+  gcOnDeactivation?: boolean
+}
+
+export interface GenerateVolumeAPIKeysRequest {
+  userId: number
+}
+
+export interface RevokeVolumeAPIKeyRequest {
+  apiKey: string
+}
+
 export interface UpdateVolumeQuotaRequest {
   quotaLimit: number
+}
+
+export interface VolumeListOptions extends ListOptions {
+  accountId: number
 }
 
 // AuditLogs

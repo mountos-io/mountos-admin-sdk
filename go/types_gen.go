@@ -90,6 +90,22 @@ type Storage struct {
 	UpdatedAt    string `json:"updatedAt"`
 }
 
+type Volume struct {
+	ID          int64  `json:"id"`
+	AccountID   int64  `json:"accountId"`
+	StorageID   int64  `json:"storageId"`
+	RegionID    int64  `json:"regionId"`
+	Name        string `json:"name"`
+	Description string `json:"description,omitempty"`
+	Encryption  bool   `json:"encryption"`
+	QuotaLimit  int64  `json:"quotaLimit"`
+	QuotaUsed   int64  `json:"quotaUsed"`
+	Locked      bool   `json:"locked"`
+	IsActive    bool   `json:"isActive"`
+	CreatedAt   string `json:"createdAt"`
+	UpdatedAt   string `json:"updatedAt"`
+}
+
 type AuditLog struct {
 	ID          int64           `json:"id"`
 	Title       string          `json:"title"`
@@ -213,8 +229,62 @@ type StorageListOptions struct {
 
 // Volumes
 
+type CreateVolumeRequest struct {
+	AccountID        int64  `json:"accountId"`
+	StorageID        int64  `json:"storageId"`
+	Name             string `json:"name"`
+	Description      string `json:"description,omitempty"`
+	VolumeType       string `json:"volumeType"`
+	Encryption       bool   `json:"encryption,omitempty"`
+	EncryptionKey    string `json:"encryptionKey,omitempty"`
+	RetentionPeriod  int32  `json:"retentionPeriod,omitempty"`
+	GracePeriod      int32  `json:"gracePeriod,omitempty"`
+	GcOnDeactivation bool   `json:"gcOnDeactivation,omitempty"`
+	QuotaLimit       int64  `json:"quotaLimit,omitempty"`
+}
+
+type CreateVolumeResponse struct {
+	ID            int64  `json:"id"`
+	EncryptionKey string `json:"encryptionKey,omitempty"`
+}
+
+type EditVolumeRequest struct {
+	Name             string `json:"name"`
+	Description      string `json:"description,omitempty"`
+	Encryption       bool   `json:"encryption,omitempty"`
+	RetentionPeriod  int32  `json:"retentionPeriod,omitempty"`
+	GracePeriod      int32  `json:"gracePeriod,omitempty"`
+	GcOnDeactivation bool   `json:"gcOnDeactivation,omitempty"`
+}
+
+type GenerateVolumeAPIKeysRequest struct {
+	UserID int64 `json:"userId"`
+}
+
+type GenerateAPIKeysVolumeResponse struct {
+	APIKey    string `json:"apiKey"`
+	APISecret string `json:"apiSecret"`
+}
+
+type RevokeVolumeAPIKeyRequest struct {
+	APIKey string `json:"apiKey"`
+}
+
 type UpdateVolumeQuotaRequest struct {
 	QuotaLimit int64 `json:"quotaLimit"`
+}
+
+type StatsVolumeResponse struct {
+	VolumeID   string `json:"volumeId"`
+	DiskSize   int64  `json:"diskSize"`
+	ActiveSize int64  `json:"activeSize"`
+	Size       int64  `json:"size"`
+}
+
+type VolumeListOptions struct {
+	AccountID int64
+	Page      int
+	Limit     int
 }
 
 // AuditLogs

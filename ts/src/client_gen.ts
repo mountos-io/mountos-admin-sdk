@@ -7,8 +7,10 @@ import type {
   PaginatedResponse, CursorPaginatedResponse,
   CreateAccountRequest, Account, EditAccountRequest, AddUserRequest, User, UserListOptions, 
   EditUserRequest, CreateRegionRequest, Region, EditRegionRequest, CreateStorageRequest, 
-  Storage, StorageListOptions, EditStorageRequest, UpdateVolumeQuotaRequest, AuditLog, 
-  AuditLogListOptions, ServiceNode, DiscoverMetaResponse,
+  Storage, StorageListOptions, EditStorageRequest, CreateVolumeRequest, Volume, 
+  VolumeListOptions, EditVolumeRequest, GenerateVolumeAPIKeysRequest, 
+  RevokeVolumeAPIKeyRequest, UpdateVolumeQuotaRequest, AuditLog, AuditLogListOptions, 
+  ServiceNode, DiscoverMetaResponse,
 } from './types_gen.js'
 
 function queryString(params: Record<string, string | number | undefined>): string {
@@ -223,8 +225,52 @@ class StoragesResource {
 class VolumesResource {
   constructor(private client: MountOSAdmin) {}
 
+  create(req: CreateVolumeRequest): Promise<{ id: number; encryptionKey: string }> {
+    return this.client.request('POST', '/api/v1/volumes/create', req)
+  }
+
+  list(opts: VolumeListOptions): Promise<PaginatedResponse<Volume>> {
+    return this.client.request('GET', `/api/v1/volumes/list${queryString({ accountId: opts.accountId, page: opts.page, limit: opts.limit })}`)
+  }
+
+  get(volumeId: number): Promise<Volume> {
+    return this.client.request('GET', `/api/v1/volumes/${volumeId}`)
+  }
+
+  edit(volumeId: number, req: EditVolumeRequest): Promise<{ id: number }> {
+    return this.client.request('PUT', `/api/v1/volumes/${volumeId}/edit`, req)
+  }
+
+  lock(volumeId: number): Promise<{ id: number }> {
+    return this.client.request('POST', `/api/v1/volumes/${volumeId}/lock`)
+  }
+
+  unlock(volumeId: number): Promise<{ id: number }> {
+    return this.client.request('POST', `/api/v1/volumes/${volumeId}/unlock`)
+  }
+
+  activate(volumeId: number): Promise<{ id: number }> {
+    return this.client.request('POST', `/api/v1/volumes/${volumeId}/activate`)
+  }
+
+  deactivate(volumeId: number): Promise<{ id: number }> {
+    return this.client.request('POST', `/api/v1/volumes/${volumeId}/deactivate`)
+  }
+
+  generateAPIKeys(volumeId: number, req: GenerateVolumeAPIKeysRequest): Promise<{ apiKey: string; apiSecret: string }> {
+    return this.client.request('POST', `/api/v1/volumes/${volumeId}/api-keys/generate`, req)
+  }
+
+  revokeAPIKey(volumeId: number, req: RevokeVolumeAPIKeyRequest): Promise<void> {
+    return this.client.request('POST', `/api/v1/volumes/${volumeId}/api-keys/revoke`, req)
+  }
+
   updateQuota(volumeId: number, req: UpdateVolumeQuotaRequest): Promise<{ id: number }> {
     return this.client.request('PUT', `/api/v1/volumes/${volumeId}/quota`, req)
+  }
+
+  stats(volumeId: number): Promise<{ volumeId: string; diskSize: number; activeSize: number; size: number }> {
+    return this.client.request('GET', `/api/v1/volumes/${volumeId}/stats`)
   }
 }
 
