@@ -10,6 +10,9 @@ help: ## Show available targets
 gen: ## Generate Go + TS SDK from api.yaml
 	cd gen && go run . --spec ../api.yaml --go-out ../go --ts-out ../ts/src --doc-out ..
 
+gen-browser: ## Generate browser client for admin-client
+	cd gen && go run . --spec ../api.yaml --go-out ../go --ts-out ../ts/src --browser-client-out ../../mountos-admin-client/src/lib/core/api --doc-out ..
+
 # ── TypeScript ──────────────────────────────────────────────
 
 ts-install: ## Install TS dependencies

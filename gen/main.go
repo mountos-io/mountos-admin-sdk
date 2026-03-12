@@ -13,12 +13,14 @@ func main() {
 	specPath := flag.String("spec", "api.yaml", "path to API spec")
 	goOut := flag.String("go-out", "go", "Go output directory")
 	tsOut := flag.String("ts-out", "ts/src", "TS output directory")
+	browserOut := flag.String("browser-client-out", "", "Browser client output directory (optional)")
 	docOut := flag.String("doc-out", ".", "api.md output directory")
 	flag.Parse()
 
 	spec := loadSpec(*specPath)
 	generateGo(spec, *goOut)
 	generateTS(spec, *tsOut)
+	generateBrowserClient(spec, *browserOut)
 	generateDoc(spec, *docOut)
 	fmt.Println("generation complete")
 }
