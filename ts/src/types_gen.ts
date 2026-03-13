@@ -38,6 +38,7 @@ export interface Account {
   id: number
   name: string
   description: string
+  iconUrl?: string
   vendorInfo?: Record<string, unknown>
   isActive: boolean
   locked: boolean
@@ -142,12 +143,14 @@ export interface DiscoverEndpoint {
 export interface CreateAccountRequest {
   name: string
   description?: string
+  iconUrl?: string
   vendorInfo?: Record<string, unknown>
 }
 
 export interface EditAccountRequest {
   name: string
   description?: string
+  iconUrl?: string
   vendorInfo?: Record<string, unknown>
 }
 

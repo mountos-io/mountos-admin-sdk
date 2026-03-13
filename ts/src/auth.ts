@@ -1,4 +1,4 @@
-import { SignJWT, importPKCS8 } from 'jose'
+import { SignJWT, importPKCS8, exportJWK } from 'jose'
 
 const TOKEN_TTL = 3600
 const REFRESH_MARGIN = 300
@@ -17,17 +17,23 @@ function encodeBase64(bytes: Uint8Array): string {
   return btoa(bin)
 }
 
-function ed25519Pkcs8PemFromRaw(raw64: Uint8Array): string {
-  if (raw64.length !== 64) {
-    throw new Error(`invalid Ed25519 private key length: expected 64 bytes, got ${raw64.length}`)
-  }
+function decodeBase64Url(b64url: string): Uint8Array {
+  const b64 = b64url.replace(/-/g, '+').replace(/_/g, '/') + '=='.slice(0, (4 - b64url.length % 4) % 4)
+  return decodeBase64(b64)
+}
 
+function ed25519SeedFrom(raw: Uint8Array): Uint8Array {
+  if (raw.length === 32) return raw
+  if (raw.length === 64) return raw.subarray(0, 32)
+  throw new Error(`invalid Ed25519 private key length: expected 32 or 64 bytes, got ${raw.length}`)
+}
+
+function ed25519Pkcs8PemFromSeed(seed: Uint8Array): string {
   const pkcs8Prefix = new Uint8Array([
     0x30, 0x2e, 0x02, 0x01, 0x00, 0x30, 0x05, 0x06,
     0x03, 0x2b, 0x65, 0x70, 0x04, 0x22, 0x04, 0x20,
   ])
 
-  const seed = raw64.subarray(0, 32)
   const der = new Uint8Array(pkcs8Prefix.length + seed.length)
   der.set(pkcs8Prefix)
   der.set(seed, pkcs8Prefix.length)
@@ -38,12 +44,9 @@ function ed25519Pkcs8PemFromRaw(raw64: Uint8Array): string {
   return `-----BEGIN PRIVATE KEY-----\n${wrapped}\n-----END PRIVATE KEY-----`
 }
 
-async function keyFingerprint(raw64: Uint8Array): Promise<string> {
-  if (raw64.length !== 64) {
-    throw new Error(`invalid Ed25519 private key length: expected 64 bytes, got ${raw64.length}`)
-  }
-
-  const pub = raw64.subarray(32, 64)
+async function keyFingerprint(key: CryptoKey): Promise<string> {
+  const jwk = await exportJWK(key)
+  const pub = decodeBase64Url(jwk.x!)
   const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', pub as ArrayBufferView<ArrayBuffer>))
   return Array.from(digest.subarray(0, 16), b => b.toString(16).padStart(2, '0')).join('')
 }
@@ -79,11 +82,11 @@ export class TokenSigner {
 
   private async refreshToken(now: number): Promise<string> {
     if (!this.key || !this.kfp) {
-      const raw = decodeBase64(this.privateKeyBase64)
-      const pem = ed25519Pkcs8PemFromRaw(raw)
+      const seed = ed25519SeedFrom(decodeBase64(this.privateKeyBase64))
+      const pem = ed25519Pkcs8PemFromSeed(seed)
 
       this.key = await importPKCS8(pem, 'EdDSA')
-      this.kfp = await keyFingerprint(raw)
+      this.kfp = await keyFingerprint(this.key)
     }
 
     const exp = now + TOKEN_TTL

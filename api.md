@@ -45,6 +45,7 @@ Request:
 {
   "name": string(required),
   "description"?: string,
+  "iconUrl"?: string,
   "vendorInfo"?: object
 }
 ```
@@ -65,6 +66,7 @@ Request:
 {
   "name": string(required),
   "description"?: string,
+  "iconUrl"?: string,
   "vendorInfo"?: object
 }
 ```
@@ -92,6 +94,7 @@ Response data: `{ "id": int64 }`
   "id": int64,
   "name": string,
   "description": string,
+  "iconUrl"?: string,
   "vendorInfo"?: object,
   "isActive": bool,
   "locked": bool,

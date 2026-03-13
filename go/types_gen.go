@@ -45,6 +45,7 @@ type Account struct {
 	ID          int64          `json:"id"`
 	Name        string         `json:"name"`
 	Description string         `json:"description"`
+	IconURL     string         `json:"iconUrl,omitempty"`
 	VendorInfo  map[string]any `json:"vendorInfo,omitempty"`
 	IsActive    bool           `json:"isActive"`
 	Locked      bool           `json:"locked"`
@@ -149,12 +150,14 @@ type DiscoverEndpoint struct {
 type CreateAccountRequest struct {
 	Name        string         `json:"name"`
 	Description string         `json:"description,omitempty"`
+	IconURL     string         `json:"iconUrl,omitempty"`
 	VendorInfo  map[string]any `json:"vendorInfo,omitempty"`
 }
 
 type EditAccountRequest struct {
 	Name        string         `json:"name"`
 	Description string         `json:"description,omitempty"`
+	IconURL     string         `json:"iconUrl,omitempty"`
 	VendorInfo  map[string]any `json:"vendorInfo,omitempty"`
 }
 

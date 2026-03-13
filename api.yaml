@@ -34,6 +34,7 @@ types:
     - "id: int64"
     - "name: string"
     - "description: string"
+    - "iconUrl: string?"
     - "vendorInfo: object?"
     - "isActive: bool"
     - "locked: bool"
@@ -134,6 +135,7 @@ resources:
         request:
           - "name: string!"
           - "description: string"
+          - "iconUrl: string"
           - "vendorInfo: object"
         response:
           - "id: int64"
@@ -158,6 +160,7 @@ resources:
         request:
           - "name: string!"
           - "description: string"
+          - "iconUrl: string"
           - "vendorInfo: object"
         response:
           - "id: int64"
