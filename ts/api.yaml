@@ -1,0 +1,511 @@
+version: "1"
+basePath: /api/v1
+
+jwt:
+  algorithm: EdDSA
+  subject: vendor
+  audience: mountos/appserv
+  scope: service
+  keyFormat: "raw 64-byte ED25519 private key, base64-encoded (standard encoding)"
+  claims:
+    kfp: "hex(sha256(ed25519_pubkey)[:16])"
+
+errorCodes:
+  - { code: 10001, name: AUTHENTICATION_REQUIRED }
+  - { code: 10002, name: INVALID_SESSION }
+  - { code: 10003, name: INVALID_CREDENTIALS }
+  - { code: 10004, name: SESSION_EXPIRED }
+  - { code: 10200, name: INVALID_REQUEST_FORMAT }
+  - { code: 10201, name: VALIDATION_FAILED }
+  - { code: 10202, name: MISSING_PARAMETER }
+  - { code: 10900, name: INTERNAL_ERROR }
+  - { code: 10901, name: SERVICE_UNAVAILABLE }
+  - { code: 10902, name: DATABASE_ERROR }
+
+# Field notation:
+#   "name: type"   — present (model/response) or optional (request)
+#   "name: type!"  — required (request only)
+#   "name: type?"  — optional/omitempty
+#   "name: type=X" — query param with default value X
+# Types: string, int64, int32, int, bool, datetime, object, json, TypeName[]
+
+types:
+  Account:
+    - "id: int64"
+    - "name: string"
+    - "description: string"
+    - "vendorInfo: object?"
+    - "isActive: bool"
+    - "locked: bool"
+    - "createdAt: datetime"
+    - "updatedAt: datetime"
+
+  User:
+    - "id: int64"
+    - "accountId: int64"
+    - "username: string"
+    - "email: string"
+    - "name: string"
+
+  Region:
+    - "id: int64"
+    - "exportId: string"
+    - "accountId: int64"
+    - "name: string"
+    - "isActive: bool"
+    - "createdAt: datetime"
+    - "updatedAt: datetime"
+
+  Storage:
+    - "id: int64"
+    - "accountId: int64"
+    - "regionId: int64"
+    - "name: string"
+    - "description: string?"
+    - "storageType: string"
+    - "providerType: string"
+    - "blockType: string?"
+    - "endpoint: string"
+    - "region: string?"
+    - "bucket: string?"
+    - "base: string?"
+    - "blockRegion: string?"
+    - "blockSize: int32?"
+    - "isActive: bool"
+    - "createdAt: datetime"
+    - "updatedAt: datetime"
+
+  Volume:
+    - "id: int64"
+    - "accountId: int64"
+    - "storageId: int64"
+    - "regionId: int64"
+    - "name: string"
+    - "description: string?"
+    - "encryption: bool"
+    - "quotaLimit: int64"
+    - "quotaUsed: int64"
+    - "locked: bool"
+    - "isActive: bool"
+    - "createdAt: datetime"
+    - "updatedAt: datetime"
+
+  AuditLog:
+    - "id: int64"
+    - "title: string"
+    - "description: string?"
+    - "subject: string?"
+    - "success: bool"
+    - "data: json?"
+    - "createdBy: string?"
+    - "accountId: int64?"
+    - "createdAt: datetime?"
+    - "updatedAt: datetime?"
+
+  ServiceNode:
+    - "id: int64"
+    - "regionId: int64"
+    - "serviceType: string"
+    - "nodeId: string"
+    - "advertiseAddr: string"
+    - "httpAddr: string?"
+    - "metadata: object?"
+    - "status: string"
+    - "lastHeartbeat: string?"
+    - "isActive: bool"
+
+  DiscoverMetaResponse:
+    - "regionId: int64"
+    - "region: string"
+    - "endpoints: DiscoverEndpoint[]"
+
+  DiscoverEndpoint:
+    - "nodeId: string"
+    - "addr: string"
+    - "status: string"
+
+resources:
+  - name: Accounts
+    path: /accounts
+    endpoints:
+      - action: create
+        method: POST
+        path: /create
+        request:
+          - "name: string!"
+          - "description: string"
+          - "vendorInfo: object"
+        response:
+          - "id: int64"
+
+      - action: list
+        method: GET
+        path: /list
+        pagination: page
+        query:
+          - "page: int=1"
+          - "limit: int=10"
+        responseType: Account
+
+      - action: get
+        method: GET
+        path: /:accountId
+        responseType: Account
+
+      - action: edit
+        method: PUT
+        path: /:accountId/edit
+        request:
+          - "name: string!"
+          - "description: string"
+          - "vendorInfo: object"
+        response:
+          - "id: int64"
+
+      - action: lock
+        method: POST
+        path: /:accountId/lock
+        response:
+          - "id: int64"
+
+      - action: unlock
+        method: POST
+        path: /:accountId/unlock
+        response:
+          - "id: int64"
+
+      - action: activate
+        method: POST
+        path: /:accountId/activate
+        response:
+          - "id: int64"
+
+      - action: deactivate
+        method: POST
+        path: /:accountId/deactivate
+        response:
+          - "id: int64"
+
+  - name: Users
+    path: /users
+    endpoints:
+      - action: add
+        method: POST
+        path: /add
+        request:
+          - "accountId: int64!"
+          - "username: string!"
+          - "email: string!"
+          - "name: string"
+          - "vendorInfo: object"
+        response:
+          - "id: int64"
+
+      - action: list
+        method: GET
+        path: /list
+        pagination: page
+        query:
+          - "accountId: int64!"
+          - "page: int=1"
+          - "limit: int=10"
+        responseType: User
+
+      - action: get
+        method: GET
+        path: /:userId
+        responseType: User
+
+      - action: edit
+        method: PUT
+        path: /:userId/edit
+        request:
+          - "username: string!"
+          - "email: string!"
+          - "name: string"
+          - "vendorInfo: object"
+        response:
+          - "id: int64"
+
+      - action: activate
+        method: POST
+        path: /:userId/activate
+        response:
+          - "id: int64"
+
+      - action: deactivate
+        method: POST
+        path: /:userId/deactivate
+        response:
+          - "id: int64"
+
+  - name: Regions
+    path: /regions
+    endpoints:
+      - action: create
+        method: POST
+        path: /create
+        request:
+          - "accountId: int64!"
+          - "name: string!"
+        response:
+          - "id: int64"
+
+      - action: list
+        method: GET
+        path: /list
+        pagination: page
+        query:
+          - "page: int=1"
+          - "limit: int=10"
+        responseType: Region
+
+      - action: get
+        method: GET
+        path: /:regionId
+        responseType: Region
+
+      - action: edit
+        method: PUT
+        path: /:regionId/edit
+        request:
+          - "accountId: int64!"
+          - "name: string!"
+        response:
+          - "id: int64"
+
+      - action: activate
+        method: POST
+        path: /:regionId/activate
+        response:
+          - "id: int64"
+
+      - action: deactivate
+        method: POST
+        path: /:regionId/deactivate
+        response:
+          - "id: int64"
+
+  - name: Storages
+    path: /storages
+    endpoints:
+      - action: create
+        method: POST
+        path: /create
+        request:
+          - "accountId: int64!"
+          - "regionId: int64!"
+          - "name: string!"
+          - "description: string"
+          - "storageType: string!"
+          - "providerType: string!"
+          - "endpoint: string!"
+          - "region: string"
+          - "bucket: string"
+          - "base: string"
+          - "blockRegion: string"
+          - "blockType: string"
+          - "blockSize: int32"
+          - "accessKey: string"
+          - "secretKey: string"
+        response:
+          - "id: int64"
+
+      - action: list
+        method: GET
+        path: /list
+        pagination: page
+        query:
+          - "accountId: int64!"
+          - "page: int=1"
+          - "limit: int=10"
+        responseType: Storage
+
+      - action: get
+        method: GET
+        path: /:storageId
+        responseType: Storage
+
+      - action: edit
+        method: PUT
+        path: /:storageId/edit
+        request:
+          - "name: string!"
+          - "description: string"
+          - "endpoint: string"
+          - "accessKey: string"
+          - "secretKey: string"
+        response:
+          - "id: int64"
+
+      - action: activate
+        method: POST
+        path: /:storageId/activate
+        response:
+          - "id: int64"
+
+      - action: deactivate
+        method: POST
+        path: /:storageId/deactivate
+        response:
+          - "id: int64"
+
+  - name: Volumes
+    path: /volumes
+    endpoints:
+      - action: create
+        method: POST
+        path: /create
+        request:
+          - "accountId: int64!"
+          - "storageId: int64!"
+          - "name: string!"
+          - "description: string"
+          - "volumeType: string!"
+          - "encryption: bool"
+          - "encryptionKey: string"
+          - "retentionPeriod: int32"
+          - "gracePeriod: int32"
+          - "gcOnDeactivation: bool"
+          - "quotaLimit: int64"
+        response:
+          - "id: int64"
+          - "encryptionKey: string?"
+
+      - action: list
+        method: GET
+        path: /list
+        pagination: page
+        query:
+          - "accountId: int64!"
+          - "page: int=1"
+          - "limit: int=10"
+        responseType: Volume
+
+      - action: get
+        method: GET
+        path: /:volumeId
+        responseType: Volume
+
+      - action: edit
+        method: PUT
+        path: /:volumeId/edit
+        request:
+          - "name: string!"
+          - "description: string"
+          - "encryption: bool"
+          - "retentionPeriod: int32"
+          - "gracePeriod: int32"
+          - "gcOnDeactivation: bool"
+        response:
+          - "id: int64"
+
+      - action: lock
+        method: POST
+        path: /:volumeId/lock
+        response:
+          - "id: int64"
+
+      - action: unlock
+        method: POST
+        path: /:volumeId/unlock
+        response:
+          - "id: int64"
+
+      - action: activate
+        method: POST
+        path: /:volumeId/activate
+        response:
+          - "id: int64"
+
+      - action: deactivate
+        method: POST
+        path: /:volumeId/deactivate
+        response:
+          - "id: int64"
+
+      - action: generateApiKeys
+        method: POST
+        path: /:volumeId/api-keys/generate
+        request:
+          - "userId: int64!"
+        response:
+          - "apiKey: string"
+          - "apiSecret: string"
+
+      - action: revokeApiKey
+        method: POST
+        path: /:volumeId/api-keys/revoke
+        request:
+          - "apiKey: string!"
+
+      - action: updateQuota
+        method: PUT
+        path: /:volumeId/quota
+        request:
+          - "quotaLimit: int64!"
+        response:
+          - "id: int64"
+
+      - action: stats
+        method: GET
+        path: /:volumeId/stats
+        response:
+          - "volumeId: string"
+          - "diskSize: int64"
+          - "activeSize: int64"
+          - "size: int64"
+
+  - name: AuditLogs
+    path: /audit-logs
+    endpoints:
+      - action: list
+        method: GET
+        path: /list
+        pagination: cursor
+        query:
+          - "accountId: int64"
+          - "cursor: int64"
+          - "limit: int=20"
+          - "subject: string"
+        responseType: AuditLog
+
+  - name: ServiceNodes
+    path: /regions/:regionId/nodes
+    pathParamTypes:
+      nodeId: string
+    endpoints:
+      - action: list
+        method: GET
+        path: /
+        responseType: ServiceNode
+        responseArray: true
+
+      - action: drain
+        method: POST
+        path: /:nodeId/drain
+
+      - action: activate
+        method: POST
+        path: /:nodeId/activate
+
+      - action: remove
+        method: DELETE
+        path: /:nodeId
+
+  - name: Discover
+    path: /discover
+    endpoints:
+      - action: meta
+        method: GET
+        path: /meta
+        query:
+          - "access_key_id: string!"
+        responseType: DiscoverMetaResponse
+
+  - name: Cache
+    path: /cache
+    endpoints:
+      - action: refresh
+        method: POST
+        path: /refresh

@@ -12,7 +12,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "api.yaml"
   ],
   "scripts": {
     "build": "tsc",
