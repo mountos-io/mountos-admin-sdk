@@ -23,6 +23,7 @@ ts-build: ts-install ## Build TS
 	cd ts && npx tsc
 
 ts-publish: ts-build ## Publish TS package to npm
+	@npm whoami >/dev/null 2>&1 || npm login
 	cd ts && npm publish --access public
 
 ts-clean: ## Remove TS build artifacts
