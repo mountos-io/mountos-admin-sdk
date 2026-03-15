@@ -2,18 +2,19 @@ package sdk
 
 import (
 	"crypto/ed25519"
+	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
-	"strconv"
 	"sync"
 	"time"
 )
 
 const (
-	tokenTTL      = 3600
-	refreshMargin = 300
+	tokenTTL        = 3600
+	refreshMargin   = 300
+	clockSkewLeeway = 5
 )
 
 type tokenCache struct {
@@ -47,12 +48,12 @@ func (tc *tokenCache) getToken() (string, error) {
 	}
 
 	exp := now + tokenTTL
-	jti := strconv.FormatInt(time.Now().UnixNano(), 10)
+	jti := generateUUID()
 
-	header := `{"alg":"EdDSA","typ":"JWT"}`
+	header := fmt.Sprintf(`{"alg":"EdDSA","typ":"JWT","kid":"%s"}`, tc.kfp)
 	payload := fmt.Sprintf(
-		`{"sub":"vendor","aud":["mountos/appserv"],"iat":%d,"nbf":%d,"exp":%d,"jti":"%s","scope":"service","kfp":"%s"}`,
-		now, now, exp, jti, tc.kfp,
+		`{"sub":"vendor","aud":"mountos/appserv","iat":%d,"nbf":%d,"exp":%d,"jti":"%s","scope":"service","kfp":"%s"}`,
+		now, now-clockSkewLeeway, exp, jti, tc.kfp,
 	)
 
 	signingInput := base64URLEncode([]byte(header)) + "." + base64URLEncode([]byte(payload))
@@ -61,6 +62,14 @@ func (tc *tokenCache) getToken() (string, error) {
 	tc.token = signingInput + "." + base64URLEncode(sig)
 	tc.expiry = exp
 	return tc.token, nil
+}
+
+func generateUUID() string {
+	var b [16]byte
+	_, _ = rand.Read(b[:])
+	b[6] = (b[6] & 0x0f) | 0x40
+	b[8] = (b[8] & 0x3f) | 0x80
+	return fmt.Sprintf("%08x-%04x-%04x-%04x-%012x", b[0:4], b[4:6], b[6:8], b[8:10], b[10:16])
 }
 
 func base64URLEncode(data []byte) string {

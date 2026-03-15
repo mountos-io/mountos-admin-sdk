@@ -95,7 +95,7 @@ export class TokenSigner {
       scope: 'service',
       kfp: this.kfp,
     })
-      .setProtectedHeader({ alg: 'EdDSA', typ: 'JWT' })
+      .setProtectedHeader({ alg: 'EdDSA', typ: 'JWT', kid: this.kfp })
       .setSubject('vendor')
       .setAudience('mountos/appserv')
       .setIssuedAt(now)
