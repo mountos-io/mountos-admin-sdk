@@ -470,6 +470,47 @@ Param: `nodeId`
 
 ---
 
+## ClientSessions
+
+### GET /api/v1/client-sessions/list
+Query: `accountId=int64`, `regionId=int64`, `clientType=string`, `status=int`, `page=int(default 1)`, `limit=int(default 20)`
+Response data: `{ "items": ClientSession[], "pagination": PaginationMeta }`
+
+### GET /api/v1/client-sessions/:sessionId
+Param: `sessionId`
+Response data: `ClientSession`
+
+### GET /api/v1/client-sessions/summary
+Response data: `SessionSummary[]`
+
+### ClientSession Type
+```
+{
+  "id": int64,
+  "accountId": int64,
+  "volumeId": string,
+  "regionId": int64,
+  "userId"?: string,
+  "clientType": string,
+  "osName": string,
+  "osVersion"?: string,
+  "appVersion"?: string,
+  "hostname"?: string,
+  "ipAddr": string,
+  "mountMode"?: string,
+  "mountPath"?: string,
+  "metadata"?: object,
+  "metrics"?: object,
+  "status": string,
+  "lastHeartbeat"?: RFC3339,
+  "connectedAt"?: RFC3339,
+  "disconnectedAt"?: RFC3339,
+  "isActive": bool
+}
+```
+
+---
+
 ## Discover
 
 ### GET /api/v1/discover/meta

@@ -94,9 +94,9 @@ func generateTSTypes(spec *Spec, outDir string) {
 				writeTSInterface(&w, reqName, ep.Request, true)
 			}
 		}
-		// Custom list options for page pagination with required query params
+		// Custom list options for page pagination with extra query params
 		for _, ep := range res.Endpoints {
-			if ep.Pagination == "page" && hasRequiredQueryParam(ep.Query) {
+			if ep.Pagination == "page" && hasExtraQueryParam(ep.Query) {
 				optName := listOptionsTypeName(res.Name)
 				w.WriteString("\n")
 				writeTSListOptions(&w, optName, ep.Query, true)
@@ -137,7 +137,11 @@ func writeTSListOptions(w *strings.Builder, name string, query []string, extends
 			if f.Name == "page" || f.Name == "limit" {
 				continue
 			}
-			fmt.Fprintf(w, "  %s: %s\n", f.Name, tsType(f.Type))
+			optional := ""
+			if !f.Required {
+				optional = "?"
+			}
+			fmt.Fprintf(w, "  %s%s: %s\n", f.Name, optional, tsType(f.Type))
 		}
 	} else {
 		w.WriteString("export interface " + name + " {\n")
@@ -178,7 +182,7 @@ func generateTSClient(spec *Spec, outDir string) {
 			if ep.ResponseType != "" {
 				addImport(ep.ResponseType)
 			}
-			if ep.Pagination == "page" && hasRequiredQueryParam(ep.Query) {
+			if ep.Pagination == "page" && hasExtraQueryParam(ep.Query) {
 				addImport(listOptionsTypeName(res.Name))
 			}
 			if ep.Pagination == "cursor" {
@@ -463,7 +467,7 @@ func writeTSArrayMethod(w *strings.Builder, methodName string, ep Endpoint, full
 
 // GET with page pagination
 func writeTSPageListMethod(w *strings.Builder, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string, pt map[string]string) {
-	hasCustomOpts := hasRequiredQueryParam(ep.Query)
+	hasCustomOpts := hasExtraQueryParam(ep.Query)
 	retType := "PaginatedResponse<" + ep.ResponseType + ">"
 
 	params := tsParams(allPathParams, pt)
@@ -472,7 +476,11 @@ func writeTSPageListMethod(w *strings.Builder, methodName string, ep Endpoint, f
 	var optsOptional string
 	if hasCustomOpts {
 		optsType = listOptionsTypeName(resName)
-		optsOptional = ""
+		if hasRequiredQueryParam(ep.Query) {
+			optsOptional = ""
+		} else {
+			optsOptional = "?"
+		}
 	} else {
 		optsType = "ListOptions"
 		optsOptional = "?"

@@ -115,6 +115,33 @@ types:
     - "lastHeartbeat: string?"
     - "isActive: bool"
 
+  ClientSession:
+    - "id: int64"
+    - "accountId: int64"
+    - "volumeId: string"
+    - "regionId: int64"
+    - "userId: string?"
+    - "clientType: string"
+    - "osName: string"
+    - "osVersion: string?"
+    - "appVersion: string?"
+    - "hostname: string?"
+    - "ipAddr: string"
+    - "mountMode: string?"
+    - "mountPath: string?"
+    - "metadata: json?"
+    - "metrics: json?"
+    - "status: string"
+    - "lastHeartbeat: datetime?"
+    - "connectedAt: datetime?"
+    - "disconnectedAt: datetime?"
+    - "isActive: bool"
+
+  SessionSummary:
+    - "clientType: string"
+    - "status: string"
+    - "count: int64"
+
   DiscoverMetaResponse:
     - "regionId: int64"
     - "region: string"
@@ -495,6 +522,33 @@ resources:
       - action: remove
         method: DELETE
         path: /:nodeId
+
+  - name: ClientSessions
+    path: /client-sessions
+    endpoints:
+      - action: list
+        method: GET
+        path: /list
+        pagination: page
+        query:
+          - "accountId: int64"
+          - "regionId: int64"
+          - "clientType: string"
+          - "status: int"
+          - "page: int=1"
+          - "limit: int=20"
+        responseType: ClientSession
+
+      - action: get
+        method: GET
+        path: /:sessionId
+        responseType: ClientSession
+
+      - action: summary
+        method: GET
+        path: /summary
+        responseType: SessionSummary
+        responseArray: true
 
   - name: Discover
     path: /discover

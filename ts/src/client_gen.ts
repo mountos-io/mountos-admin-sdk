@@ -10,7 +10,8 @@ import type {
   Storage, StorageListOptions, EditStorageRequest, CreateVolumeRequest, Volume, 
   VolumeListOptions, EditVolumeRequest, GenerateVolumeAPIKeysRequest, 
   RevokeVolumeAPIKeyRequest, UpdateVolumeQuotaRequest, AuditLog, AuditLogListOptions, 
-  ServiceNode, DiscoverMetaResponse,
+  ServiceNode, ClientSession, ClientSessionListOptions, SessionSummary, 
+  DiscoverMetaResponse,
 } from './types_gen.js'
 
 function queryString(params: Record<string, string | number | undefined>): string {
@@ -30,6 +31,7 @@ export class MountOSAdmin {
   private _volumes?: VolumesResource
   private _auditLogs?: AuditLogsResource
   private _serviceNodes?: ServiceNodesResource
+  private _clientSessions?: ClientSessionsResource
   private _discover?: DiscoverResource
   private _cache?: CacheResource
 
@@ -64,6 +66,10 @@ export class MountOSAdmin {
 
   get serviceNodes(): ServiceNodesResource {
     return (this._serviceNodes ??= new ServiceNodesResource(this))
+  }
+
+  get clientSessions(): ClientSessionsResource {
+    return (this._clientSessions ??= new ClientSessionsResource(this))
   }
 
   get discover(): DiscoverResource {
@@ -304,6 +310,22 @@ class ServiceNodesResource {
 
   remove(regionId: number, nodeId: string): Promise<void> {
     return this.client.request('DELETE', `/api/v1/regions/${regionId}/nodes/${encodeURIComponent(nodeId)}`)
+  }
+}
+
+class ClientSessionsResource {
+  constructor(private client: MountOSAdmin) {}
+
+  list(opts?: ClientSessionListOptions): Promise<PaginatedResponse<ClientSession>> {
+    return this.client.request('GET', `/api/v1/client-sessions/list${queryString({ accountId: opts?.accountId, regionId: opts?.regionId, clientType: opts?.clientType, status: opts?.status, page: opts?.page, limit: opts?.limit })}`)
+  }
+
+  get(sessionId: number): Promise<ClientSession> {
+    return this.client.request('GET', `/api/v1/client-sessions/${sessionId}`)
+  }
+
+  summary(): Promise<SessionSummary[]> {
+    return this.client.request('GET', '/api/v1/client-sessions/summary')
   }
 }
 

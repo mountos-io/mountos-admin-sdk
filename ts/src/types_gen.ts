@@ -126,6 +126,35 @@ export interface ServiceNode {
   isActive: boolean
 }
 
+export interface ClientSession {
+  id: number
+  accountId: number
+  volumeId: string
+  regionId: number
+  userId?: string
+  clientType: string
+  osName: string
+  osVersion?: string
+  appVersion?: string
+  hostname?: string
+  ipAddr: string
+  mountMode?: string
+  mountPath?: string
+  metadata?: unknown
+  metrics?: unknown
+  status: string
+  lastHeartbeat?: string
+  connectedAt?: string
+  disconnectedAt?: string
+  isActive: boolean
+}
+
+export interface SessionSummary {
+  clientType: string
+  status: string
+  count: number
+}
+
 export interface DiscoverMetaResponse {
   regionId: number
   region: string
@@ -270,6 +299,15 @@ export interface AuditLogListOptions {
 }
 
 // ServiceNodes
+
+// ClientSessions
+
+export interface ClientSessionListOptions extends ListOptions {
+  accountId?: number
+  regionId?: number
+  clientType?: string
+  status?: number
+}
 
 // Discover
 

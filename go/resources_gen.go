@@ -409,6 +409,56 @@ func (s *ServiceNodesService) Remove(ctx context.Context, regionID int64, nodeID
 	return err
 }
 
+type ClientSessionsService struct{ c *Client }
+
+func (s *ClientSessionsService) List(ctx context.Context, opts *ClientSessionListOptions) (*PaginatedResponse[ClientSession], error) {
+	q := url.Values{}
+	if opts != nil {
+		if opts.AccountID != 0 {
+			q.Set("accountId", strconv.FormatInt(opts.AccountID, 10))
+		}
+		if opts.RegionID != 0 {
+			q.Set("regionId", strconv.FormatInt(opts.RegionID, 10))
+		}
+		if opts.ClientType != "" {
+			q.Set("clientType", opts.ClientType)
+		}
+		if opts.Status != 0 {
+			q.Set("status", strconv.Itoa(opts.Status))
+		}
+		addPagination(q, opts.Page, opts.Limit)
+	}
+	path := "/api/v1/client-sessions/list"
+	if qs := q.Encode(); qs != "" {
+		path += "?" + qs
+	}
+	data, err := s.c.get(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[PaginatedResponse[ClientSession]](data)
+}
+
+func (s *ClientSessionsService) Get(ctx context.Context, sessionID int64) (*ClientSession, error) {
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/client-sessions/%s", strconv.FormatInt(sessionID, 10)))
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[ClientSession](data)
+}
+
+func (s *ClientSessionsService) Summary(ctx context.Context) ([]SessionSummary, error) {
+	data, err := s.c.get(ctx, "/api/v1/client-sessions/summary")
+	if err != nil {
+		return nil, err
+	}
+	result, err := decodeJSON[[]SessionSummary](data)
+	if err != nil {
+		return nil, err
+	}
+	return *result, nil
+}
+
 type DiscoverService struct{ c *Client }
 
 func (s *DiscoverService) Meta(ctx context.Context, accessKeyID string) (*DiscoverMetaResponse, error) {

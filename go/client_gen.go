@@ -10,15 +10,16 @@ type Client struct {
 	http    *http.Client
 	auth    *tokenCache
 
-	Accounts     *AccountsService
-	Users        *UsersService
-	Regions      *RegionsService
-	Storages     *StoragesService
-	Volumes      *VolumesService
-	AuditLogs    *AuditLogsService
-	ServiceNodes *ServiceNodesService
-	Discover     *DiscoverService
-	Cache        *CacheService
+	Accounts       *AccountsService
+	Users          *UsersService
+	Regions        *RegionsService
+	Storages       *StoragesService
+	Volumes        *VolumesService
+	AuditLogs      *AuditLogsService
+	ServiceNodes   *ServiceNodesService
+	ClientSessions *ClientSessionsService
+	Discover       *DiscoverService
+	Cache          *CacheService
 }
 
 // NewClient creates a new SDK client.
@@ -40,6 +41,7 @@ func NewClient(cfg Config) (*Client, error) {
 	c.Volumes = &VolumesService{c: c}
 	c.AuditLogs = &AuditLogsService{c: c}
 	c.ServiceNodes = &ServiceNodesService{c: c}
+	c.ClientSessions = &ClientSessionsService{c: c}
 	c.Discover = &DiscoverService{c: c}
 	c.Cache = &CacheService{c: c}
 	return c, nil

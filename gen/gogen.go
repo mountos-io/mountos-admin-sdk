@@ -124,6 +124,17 @@ func hasRequiredQueryParam(query []string) bool {
 	return false
 }
 
+// hasExtraQueryParam checks if query params have any fields beyond page/limit.
+func hasExtraQueryParam(query []string) bool {
+	for _, s := range query {
+		f := parseField(s)
+		if f.Name != "page" && f.Name != "limit" {
+			return true
+		}
+	}
+	return false
+}
+
 // listOptionsTypeName returns the custom list options type name.
 func listOptionsTypeName(resourceName string) string {
 	return singularize(resourceName) + "ListOptions"
@@ -236,7 +247,7 @@ func generateGoTypes(spec *Spec, outDir string) {
 				optName := listOptionsTypeName(res.Name)
 				w.WriteString("\n")
 				writeGoListOptions(&w, optName, ep.Query)
-			} else if ep.Pagination == "page" && hasRequiredQueryParam(ep.Query) {
+			} else if ep.Pagination == "page" && hasExtraQueryParam(ep.Query) {
 				optName := listOptionsTypeName(res.Name)
 				w.WriteString("\n")
 				writeGoListOptions(&w, optName, ep.Query)
@@ -409,7 +420,7 @@ func generateGoResources(spec *Spec, outDir string) {
 			}
 			if ep.Pagination == "page" {
 				imports.add("net/url")
-				if hasRequiredQueryParam(ep.Query) {
+				if hasExtraQueryParam(ep.Query) {
 					imports.add("strconv")
 				}
 			}
@@ -716,7 +727,7 @@ func writeGoArrayMethod(w *strings.Builder, svcType, methodName string, ep Endpo
 
 // GET with page pagination
 func writeGoPageListMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string, pt map[string]string) {
-	hasCustomOpts := hasRequiredQueryParam(ep.Query)
+	hasCustomOpts := hasExtraQueryParam(ep.Query)
 	pathParams := goMethodParams(allPathParams, pt)
 	sig := "ctx context.Context"
 	if pathParams != "" {
@@ -738,14 +749,13 @@ func writeGoPageListMethod(w *strings.Builder, svcType, methodName string, ep En
 	w.WriteString("\tif opts != nil {\n")
 
 	if hasCustomOpts {
-		// Write required query params
 		for _, qs := range ep.Query {
 			f := parseField(qs)
 			if f.Name == "page" || f.Name == "limit" {
 				continue
 			}
+			goName := goFieldName(f.Name)
 			if f.Required {
-				goName := goFieldName(f.Name)
 				switch f.Type {
 				case "int64":
 					fmt.Fprintf(w, "\t\tq.Set(%q, strconv.FormatInt(opts.%s, 10))\n", f.Name, goName)
@@ -758,6 +768,29 @@ func writeGoPageListMethod(w *strings.Builder, svcType, methodName string, ep En
 				default:
 					fmt.Fprintf(w, "\t\tq.Set(%q, opts.%s)\n", f.Name, goName)
 				}
+			} else {
+				switch f.Type {
+				case "int64":
+					fmt.Fprintf(w, "\t\tif opts.%s != 0 {\n", goName)
+					fmt.Fprintf(w, "\t\t\tq.Set(%q, strconv.FormatInt(opts.%s, 10))\n", f.Name, goName)
+					w.WriteString("\t\t}\n")
+				case "int":
+					fmt.Fprintf(w, "\t\tif opts.%s != 0 {\n", goName)
+					fmt.Fprintf(w, "\t\t\tq.Set(%q, strconv.Itoa(opts.%s))\n", f.Name, goName)
+					w.WriteString("\t\t}\n")
+				case "int32":
+					fmt.Fprintf(w, "\t\tif opts.%s != 0 {\n", goName)
+					fmt.Fprintf(w, "\t\t\tq.Set(%q, strconv.FormatInt(int64(opts.%s), 10))\n", f.Name, goName)
+					w.WriteString("\t\t}\n")
+				case "bool":
+					fmt.Fprintf(w, "\t\tif opts.%s {\n", goName)
+					fmt.Fprintf(w, "\t\t\tq.Set(%q, \"true\")\n", f.Name)
+					w.WriteString("\t\t}\n")
+				default:
+					fmt.Fprintf(w, "\t\tif opts.%s != \"\" {\n", goName)
+					fmt.Fprintf(w, "\t\t\tq.Set(%q, opts.%s)\n", f.Name, goName)
+					w.WriteString("\t\t}\n")
+				}
 			}
 		}
 	}
@@ -765,8 +798,7 @@ func writeGoPageListMethod(w *strings.Builder, svcType, methodName string, ep En
 	w.WriteString("\t\taddPagination(q, opts.Page, opts.Limit)\n")
 	w.WriteString("\t}\n")
 
-	if hasCustomOpts {
-		// Required params → always append query string
+	if hasRequiredQueryParam(ep.Query) {
 		fmt.Fprintf(w, "\tdata, err := s.c.get(ctx, %s+\"?\"+q.Encode())\n", pathExpr)
 	} else {
 		w.WriteString(fmt.Sprintf("\tpath := %s\n", pathExpr))

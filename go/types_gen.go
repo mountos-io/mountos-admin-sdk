@@ -133,6 +133,35 @@ type ServiceNode struct {
 	IsActive      bool           `json:"isActive"`
 }
 
+type ClientSession struct {
+	ID             int64           `json:"id"`
+	AccountID      int64           `json:"accountId"`
+	VolumeID       string          `json:"volumeId"`
+	RegionID       int64           `json:"regionId"`
+	UserID         string          `json:"userId,omitempty"`
+	ClientType     string          `json:"clientType"`
+	OsName         string          `json:"osName"`
+	OsVersion      string          `json:"osVersion,omitempty"`
+	AppVersion     string          `json:"appVersion,omitempty"`
+	Hostname       string          `json:"hostname,omitempty"`
+	IPAddr         string          `json:"ipAddr"`
+	MountMode      string          `json:"mountMode,omitempty"`
+	MountPath      string          `json:"mountPath,omitempty"`
+	Metadata       json.RawMessage `json:"metadata,omitempty"`
+	Metrics        json.RawMessage `json:"metrics,omitempty"`
+	Status         string          `json:"status"`
+	LastHeartbeat  string          `json:"lastHeartbeat,omitempty"`
+	ConnectedAt    string          `json:"connectedAt,omitempty"`
+	DisconnectedAt string          `json:"disconnectedAt,omitempty"`
+	IsActive       bool            `json:"isActive"`
+}
+
+type SessionSummary struct {
+	ClientType string `json:"clientType"`
+	Status     string `json:"status"`
+	Count      int64  `json:"count"`
+}
+
 type DiscoverMetaResponse struct {
 	RegionID  int64              `json:"regionId"`
 	Region    string             `json:"region"`
@@ -300,6 +329,17 @@ type AuditLogListOptions struct {
 }
 
 // ServiceNodes
+
+// ClientSessions
+
+type ClientSessionListOptions struct {
+	AccountID  int64
+	RegionID   int64
+	ClientType string
+	Status     int
+	Page       int
+	Limit      int
+}
 
 // Discover
 
