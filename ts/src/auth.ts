@@ -85,7 +85,7 @@ export class TokenSigner {
       const seed = ed25519SeedFrom(decodeBase64(this.privateKeyBase64))
       const pem = ed25519Pkcs8PemFromSeed(seed)
 
-      this.key = await importPKCS8(pem, 'EdDSA')
+      this.key = await importPKCS8(pem, 'EdDSA', { extractable: true })
       this.kfp = await keyFingerprint(this.key)
     }
 
