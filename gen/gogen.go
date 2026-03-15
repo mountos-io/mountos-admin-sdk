@@ -420,8 +420,15 @@ func generateGoResources(spec *Spec, outDir string) {
 			}
 			if ep.Pagination == "page" {
 				imports.add("net/url")
-				if hasExtraQueryParam(ep.Query) {
-					imports.add("strconv")
+				for _, qs := range ep.Query {
+					f := parseField(qs)
+					if f.Name == "page" || f.Name == "limit" {
+						continue
+					}
+					switch f.Type {
+					case "int64", "int32", "int", "bool":
+						imports.add("strconv")
+					}
 				}
 			}
 			if ep.Pagination == "cursor" {
