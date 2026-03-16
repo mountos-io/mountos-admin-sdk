@@ -248,6 +248,14 @@ export interface EditStorageRequest {
   secretKey?: string
 }
 
+export interface TestStorageBucketRequest {
+  endpoint: string
+  region?: string
+  bucket: string
+  accessKey: string
+  secretKey: string
+}
+
 export interface StorageListOptions extends ListOptions {
   accountId: number
 }

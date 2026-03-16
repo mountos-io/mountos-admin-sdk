@@ -7,11 +7,11 @@ import type {
   PaginatedResponse, CursorPaginatedResponse,
   CreateAccountRequest, Account, EditAccountRequest, AddUserRequest, User, UserListOptions, 
   EditUserRequest, CreateRegionRequest, Region, EditRegionRequest, CreateStorageRequest, 
-  Storage, StorageListOptions, EditStorageRequest, CreateVolumeRequest, Volume, 
-  VolumeListOptions, EditVolumeRequest, GenerateVolumeAPIKeysRequest, 
-  RevokeVolumeAPIKeyRequest, UpdateVolumeQuotaRequest, AuditLog, AuditLogListOptions, 
-  ServiceNode, ClientSession, ClientSessionListOptions, SessionSummary, 
-  DiscoverMetaResponse,
+  Storage, StorageListOptions, EditStorageRequest, TestStorageBucketRequest, 
+  CreateVolumeRequest, Volume, VolumeListOptions, EditVolumeRequest, 
+  GenerateVolumeAPIKeysRequest, RevokeVolumeAPIKeyRequest, UpdateVolumeQuotaRequest, 
+  AuditLog, AuditLogListOptions, ServiceNode, ClientSession, ClientSessionListOptions, 
+  SessionSummary, DiscoverMetaResponse,
 } from './types_gen.js'
 
 function queryString(params: Record<string, string | number | undefined>): string {
@@ -225,6 +225,10 @@ class StoragesResource {
 
   deactivate(storageId: number): Promise<{ id: number }> {
     return this.client.request('POST', `/api/v1/storages/${storageId}/deactivate`)
+  }
+
+  testBucket(req: TestStorageBucketRequest): Promise<{ bucketExists: boolean; list: boolean; write: boolean; read: boolean; delete: boolean; multipart: boolean }> {
+    return this.client.request('POST', '/api/v1/storages/test-bucket', req)
   }
 }
 

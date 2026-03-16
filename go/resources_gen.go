@@ -251,6 +251,14 @@ func (s *StoragesService) Deactivate(ctx context.Context, storageID int64) (*IDR
 	return decodeJSON[IDResponse](data)
 }
 
+func (s *StoragesService) TestBucket(ctx context.Context, req *TestStorageBucketRequest) (*TestBucketStorageResponse, error) {
+	data, err := s.c.post(ctx, "/api/v1/storages/test-bucket", req)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[TestBucketStorageResponse](data)
+}
+
 type VolumesService struct{ c *Client }
 
 func (s *VolumesService) Create(ctx context.Context, req *CreateVolumeRequest) (*CreateVolumeResponse, error) {

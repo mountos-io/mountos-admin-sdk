@@ -257,6 +257,23 @@ type EditStorageRequest struct {
 	SecretKey   string `json:"secretKey,omitempty"`
 }
 
+type TestStorageBucketRequest struct {
+	Endpoint  string `json:"endpoint"`
+	Region    string `json:"region,omitempty"`
+	Bucket    string `json:"bucket"`
+	AccessKey string `json:"accessKey"`
+	SecretKey string `json:"secretKey"`
+}
+
+type TestBucketStorageResponse struct {
+	BucketExists bool `json:"bucketExists"`
+	List         bool `json:"list"`
+	Write        bool `json:"write"`
+	Read         bool `json:"read"`
+	Delete       bool `json:"delete"`
+	Multipart    bool `json:"multipart"`
+}
+
 type StorageListOptions struct {
 	AccountID int64
 	Page      int

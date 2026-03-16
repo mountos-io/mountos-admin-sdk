@@ -275,6 +275,19 @@ Response data: `{ "id": int64 }`
 Param: `storageId`
 Response data: `{ "id": int64 }`
 
+### POST /api/v1/storages/test-bucket
+Request:
+```
+{
+  "endpoint": string(required),
+  "region"?: string,
+  "bucket": string(required),
+  "accessKey": string(required),
+  "secretKey": string(required)
+}
+```
+Response data: `{ "bucketExists": bool, "list": bool, "write": bool, "read": bool, "delete": bool, "multipart": bool }`
+
 ### Storage Type
 ```
 {

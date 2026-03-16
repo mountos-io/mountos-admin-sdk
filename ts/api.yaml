@@ -384,6 +384,23 @@ resources:
         response:
           - "id: int64"
 
+      - action: testBucket
+        method: POST
+        path: /test-bucket
+        request:
+          - "endpoint: string!"
+          - "region: string"
+          - "bucket: string!"
+          - "accessKey: string!"
+          - "secretKey: string!"
+        response:
+          - "bucketExists: bool"
+          - "list: bool"
+          - "write: bool"
+          - "read: bool"
+          - "delete: bool"
+          - "multipart: bool"
+
   - name: Volumes
     path: /volumes
     endpoints:
