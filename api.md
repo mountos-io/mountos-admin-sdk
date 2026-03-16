@@ -156,7 +156,8 @@ Response data: `{ "id": int64 }`
   "accountId": int64,
   "username": string,
   "email": string,
-  "name": string
+  "name": string,
+  "isActive": bool
 }
 ```
 

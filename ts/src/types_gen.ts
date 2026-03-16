@@ -52,6 +52,7 @@ export interface User {
   username: string
   email: string
   name: string
+  isActive: boolean
 }
 
 export interface Region {
