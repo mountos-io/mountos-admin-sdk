@@ -66,6 +66,7 @@ type Region struct {
 	ExportID  string `json:"exportId"`
 	AccountID int64  `json:"accountId"`
 	Name      string `json:"name"`
+	DNS       string `json:"dns"`
 	IsActive  bool   `json:"isActive"`
 	CreatedAt string `json:"createdAt"`
 	UpdatedAt string `json:"updatedAt"`
@@ -218,11 +219,13 @@ type UserListOptions struct {
 type CreateRegionRequest struct {
 	AccountID int64  `json:"accountId"`
 	Name      string `json:"name"`
+	DNS       string `json:"dns"`
 }
 
 type EditRegionRequest struct {
 	AccountID int64  `json:"accountId"`
 	Name      string `json:"name"`
+	DNS       string `json:"dns"`
 }
 
 // Storages

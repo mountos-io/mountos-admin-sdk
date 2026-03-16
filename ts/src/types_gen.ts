@@ -59,6 +59,7 @@ export interface Region {
   exportId: string
   accountId: number
   name: string
+  dns: string
   isActive: boolean
   createdAt: string
   updatedAt: string
@@ -209,11 +210,13 @@ export interface UserListOptions extends ListOptions {
 export interface CreateRegionRequest {
   accountId: number
   name: string
+  dns: string
 }
 
 export interface EditRegionRequest {
   accountId: number
   name: string
+  dns: string
 }
 
 // Storages

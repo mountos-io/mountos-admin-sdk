@@ -53,6 +53,7 @@ types:
     - "exportId: string"
     - "accountId: int64"
     - "name: string"
+    - "dns: string"
     - "isActive: bool"
     - "createdAt: datetime"
     - "updatedAt: datetime"
@@ -278,6 +279,7 @@ resources:
         request:
           - "accountId: int64!"
           - "name: string!"
+          - "dns: string!"
         response:
           - "id: int64"
 
@@ -301,6 +303,7 @@ resources:
         request:
           - "accountId: int64!"
           - "name: string!"
+          - "dns: string!"
         response:
           - "id: int64"
 

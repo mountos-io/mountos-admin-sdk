@@ -169,7 +169,8 @@ Request:
 ```
 {
   "accountId": int64(required),
-  "name": string(required)
+  "name": string(required),
+  "dns": string(required)
 }
 ```
 Response data: `{ "id": int64 }`
@@ -188,7 +189,8 @@ Request:
 ```
 {
   "accountId": int64(required),
-  "name": string(required)
+  "name": string(required),
+  "dns": string(required)
 }
 ```
 Response data: `{ "id": int64 }`
@@ -208,6 +210,7 @@ Response data: `{ "id": int64 }`
   "exportId": string,
   "accountId": int64,
   "name": string,
+  "dns": string,
   "isActive": bool,
   "createdAt": RFC3339,
   "updatedAt": RFC3339
