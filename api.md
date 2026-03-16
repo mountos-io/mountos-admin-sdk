@@ -283,7 +283,8 @@ Request:
   "region"?: string,
   "bucket": string(required),
   "accessKey": string(required),
-  "secretKey": string(required)
+  "secretKey": string(required),
+  "providerType"?: string
 }
 ```
 Response data: `{ "bucketExists": bool, "list": bool, "write": bool, "read": bool, "delete": bool, "multipart": bool }`

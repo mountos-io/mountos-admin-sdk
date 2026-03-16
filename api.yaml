@@ -156,6 +156,7 @@ types:
 
   RegionVolumeMetrics:
     - "regionId: int64"
+    - "regionName: string"
     - "volumeCount: int64"
     - "totalQuotaUsed: int64"
     - "totalQuotaLimit: int64"
@@ -409,6 +410,7 @@ resources:
           - "bucket: string!"
           - "accessKey: string!"
           - "secretKey: string!"
+          - "providerType: string"
         response:
           - "bucketExists: bool"
           - "list: bool"

@@ -188,10 +188,11 @@ type DiscoverEndpoint struct {
 }
 
 type RegionVolumeMetrics struct {
-	RegionID        int64 `json:"regionId"`
-	VolumeCount     int64 `json:"volumeCount"`
-	TotalQuotaUsed  int64 `json:"totalQuotaUsed"`
-	TotalQuotaLimit int64 `json:"totalQuotaLimit"`
+	RegionID        int64  `json:"regionId"`
+	RegionName      string `json:"regionName"`
+	VolumeCount     int64  `json:"volumeCount"`
+	TotalQuotaUsed  int64  `json:"totalQuotaUsed"`
+	TotalQuotaLimit int64  `json:"totalQuotaLimit"`
 }
 
 // Accounts
@@ -276,11 +277,12 @@ type EditStorageRequest struct {
 }
 
 type TestStorageBucketRequest struct {
-	Endpoint  string `json:"endpoint"`
-	Region    string `json:"region,omitempty"`
-	Bucket    string `json:"bucket"`
-	AccessKey string `json:"accessKey"`
-	SecretKey string `json:"secretKey"`
+	Endpoint     string `json:"endpoint"`
+	Region       string `json:"region,omitempty"`
+	Bucket       string `json:"bucket"`
+	AccessKey    string `json:"accessKey"`
+	SecretKey    string `json:"secretKey"`
+	ProviderType string `json:"providerType,omitempty"`
 }
 
 type TestBucketStorageResponse struct {

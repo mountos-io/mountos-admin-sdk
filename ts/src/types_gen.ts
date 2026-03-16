@@ -182,6 +182,7 @@ export interface DiscoverEndpoint {
 
 export interface RegionVolumeMetrics {
   regionId: number
+  regionName: string
   volumeCount: number
   totalQuotaUsed: number
   totalQuotaLimit: number
@@ -272,6 +273,7 @@ export interface TestStorageBucketRequest {
   bucket: string
   accessKey: string
   secretKey: string
+  providerType?: string
 }
 
 export interface StorageListOptions extends ListOptions {
