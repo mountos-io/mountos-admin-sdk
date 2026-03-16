@@ -536,6 +536,14 @@ Response data: `DiscoverMetaResponse`
 
 ---
 
+## Dashboard
+
+### GET /api/v1/dashboard/stats
+Query: `accountId=int64(required)`
+Response data: `DashboardStats`
+
+---
+
 ## Cache
 
 ### POST /api/v1/cache/refresh

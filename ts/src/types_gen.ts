@@ -163,10 +163,28 @@ export interface DiscoverMetaResponse {
   endpoints: DiscoverEndpoint[]
 }
 
+export interface DashboardStats {
+  userCount: number
+  volumeCount: number
+  regionCount: number
+  storageCount: number
+  totalQuotaUsed: number
+  totalQuotaLimit: number
+  activeSessionCount: number
+  regionBreakdown: RegionVolumeMetrics[]
+}
+
 export interface DiscoverEndpoint {
   nodeId: string
   addr: string
   status: string
+}
+
+export interface RegionVolumeMetrics {
+  regionId: number
+  volumeCount: number
+  totalQuotaUsed: number
+  totalQuotaLimit: number
 }
 
 // Accounts
@@ -322,5 +340,7 @@ export interface ClientSessionListOptions extends ListOptions {
 }
 
 // Discover
+
+// Dashboard
 
 // Cache

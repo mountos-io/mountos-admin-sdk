@@ -154,6 +154,22 @@ types:
     - "addr: string"
     - "status: string"
 
+  RegionVolumeMetrics:
+    - "regionId: int64"
+    - "volumeCount: int64"
+    - "totalQuotaUsed: int64"
+    - "totalQuotaLimit: int64"
+
+  DashboardStats:
+    - "userCount: int64"
+    - "volumeCount: int64"
+    - "regionCount: int64"
+    - "storageCount: int64"
+    - "totalQuotaUsed: int64"
+    - "totalQuotaLimit: int64"
+    - "activeSessionCount: int64"
+    - "regionBreakdown: RegionVolumeMetrics[]"
+
 resources:
   - name: Accounts
     path: /accounts
@@ -580,6 +596,16 @@ resources:
         query:
           - "access_key_id: string!"
         responseType: DiscoverMetaResponse
+
+  - name: Dashboard
+    path: /dashboard
+    endpoints:
+      - action: stats
+        method: GET
+        path: /stats
+        query:
+          - "accountId: int64!"
+        responseType: DashboardStats
 
   - name: Cache
     path: /cache

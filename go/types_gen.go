@@ -170,10 +170,28 @@ type DiscoverMetaResponse struct {
 	Endpoints []DiscoverEndpoint `json:"endpoints"`
 }
 
+type DashboardStats struct {
+	UserCount          int64                 `json:"userCount"`
+	VolumeCount        int64                 `json:"volumeCount"`
+	RegionCount        int64                 `json:"regionCount"`
+	StorageCount       int64                 `json:"storageCount"`
+	TotalQuotaUsed     int64                 `json:"totalQuotaUsed"`
+	TotalQuotaLimit    int64                 `json:"totalQuotaLimit"`
+	ActiveSessionCount int64                 `json:"activeSessionCount"`
+	RegionBreakdown    []RegionVolumeMetrics `json:"regionBreakdown"`
+}
+
 type DiscoverEndpoint struct {
 	NodeID string `json:"nodeId"`
 	Addr   string `json:"addr"`
 	Status string `json:"status"`
+}
+
+type RegionVolumeMetrics struct {
+	RegionID        int64 `json:"regionId"`
+	VolumeCount     int64 `json:"volumeCount"`
+	TotalQuotaUsed  int64 `json:"totalQuotaUsed"`
+	TotalQuotaLimit int64 `json:"totalQuotaLimit"`
 }
 
 // Accounts
@@ -363,5 +381,7 @@ type ClientSessionListOptions struct {
 }
 
 // Discover
+
+// Dashboard
 
 // Cache

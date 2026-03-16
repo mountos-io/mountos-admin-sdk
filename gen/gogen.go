@@ -437,6 +437,13 @@ func generateGoResources(spec *Spec, outDir string) {
 			}
 			if len(ep.Query) > 0 && ep.Pagination == "" {
 				imports.add("net/url")
+				for _, qs := range ep.Query {
+					f := parseField(qs)
+					switch f.Type {
+					case "int64", "int32", "int", "bool":
+						imports.add("strconv")
+					}
+				}
 			}
 		}
 	}
@@ -904,8 +911,18 @@ func writeGoQueryMethod(w *strings.Builder, svcType, methodName string, ep Endpo
 	for _, qs := range ep.Query {
 		f := parseField(qs)
 		paramName := goParamName(":" + f.Name)
-		// Use the raw JSON name (e.g., "access_key_id") for query param key
-		fmt.Fprintf(w, "\tq.Set(%q, %s)\n", f.Name, paramName)
+		switch f.Type {
+		case "int64":
+			fmt.Fprintf(w, "\tq.Set(%q, strconv.FormatInt(%s, 10))\n", f.Name, paramName)
+		case "int32":
+			fmt.Fprintf(w, "\tq.Set(%q, strconv.FormatInt(int64(%s), 10))\n", f.Name, paramName)
+		case "int":
+			fmt.Fprintf(w, "\tq.Set(%q, strconv.Itoa(%s))\n", f.Name, paramName)
+		case "bool":
+			fmt.Fprintf(w, "\tq.Set(%q, strconv.FormatBool(%s))\n", f.Name, paramName)
+		default:
+			fmt.Fprintf(w, "\tq.Set(%q, %s)\n", f.Name, paramName)
+		}
 	}
 	fmt.Fprintf(w, "\tdata, err := s.c.get(ctx, %q+\"?\"+q.Encode())\n", fullPath)
 	w.WriteString("\tif err != nil {\n\t\treturn nil, err\n\t}\n")

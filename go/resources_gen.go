@@ -479,6 +479,18 @@ func (s *DiscoverService) Meta(ctx context.Context, accessKeyID string) (*Discov
 	return decodeJSON[DiscoverMetaResponse](data)
 }
 
+type DashboardService struct{ c *Client }
+
+func (s *DashboardService) Stats(ctx context.Context, accountID int64) (*DashboardStats, error) {
+	q := url.Values{}
+	q.Set("accountId", strconv.FormatInt(accountID, 10))
+	data, err := s.c.get(ctx, "/api/v1/dashboard/stats"+"?"+q.Encode())
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[DashboardStats](data)
+}
+
 type CacheService struct{ c *Client }
 
 func (s *CacheService) Refresh(ctx context.Context) error {

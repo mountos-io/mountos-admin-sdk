@@ -11,7 +11,7 @@ import type {
   CreateVolumeRequest, Volume, VolumeListOptions, EditVolumeRequest, 
   GenerateVolumeAPIKeysRequest, RevokeVolumeAPIKeyRequest, UpdateVolumeQuotaRequest, 
   AuditLog, AuditLogListOptions, ServiceNode, ClientSession, ClientSessionListOptions, 
-  SessionSummary, DiscoverMetaResponse,
+  SessionSummary, DiscoverMetaResponse, DashboardStats,
 } from './types_gen.js'
 
 function queryString(params: Record<string, string | number | undefined>): string {
@@ -33,6 +33,7 @@ export class MountOSAdmin {
   private _serviceNodes?: ServiceNodesResource
   private _clientSessions?: ClientSessionsResource
   private _discover?: DiscoverResource
+  private _dashboard?: DashboardResource
   private _cache?: CacheResource
 
   constructor(config: Config) {
@@ -74,6 +75,10 @@ export class MountOSAdmin {
 
   get discover(): DiscoverResource {
     return (this._discover ??= new DiscoverResource(this))
+  }
+
+  get dashboard(): DashboardResource {
+    return (this._dashboard ??= new DashboardResource(this))
   }
 
   get cache(): CacheResource {
@@ -338,6 +343,14 @@ class DiscoverResource {
 
   meta(accessKeyId: string): Promise<DiscoverMetaResponse> {
     return this.client.request('GET', `/api/v1/discover/meta${queryString({ access_key_id: accessKeyId })}`)
+  }
+}
+
+class DashboardResource {
+  constructor(private client: MountOSAdmin) {}
+
+  stats(accountId: number): Promise<DashboardStats> {
+    return this.client.request('GET', `/api/v1/dashboard/stats${queryString({ accountId: accountId })}`)
   }
 }
 
