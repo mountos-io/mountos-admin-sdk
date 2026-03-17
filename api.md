@@ -496,7 +496,7 @@ Response data: `string`
 ## ClientSessions
 
 ### GET /api/v1/client-sessions/list
-Query: `accountId=int64`, `regionId=int64`, `clientType=string`, `status=int`, `page=int(default 1)`, `limit=int(default 20)`
+Query: `accountId=int64`, `regionId=int64`, `clientType=string`, `status=string`, `page=int(default 1)`, `limit=int(default 20)`
 Response data: `{ "items": ClientSession[], "pagination": PaginationMeta }`
 
 ### GET /api/v1/client-sessions/:sessionId
@@ -504,6 +504,7 @@ Param: `sessionId`
 Response data: `ClientSession`
 
 ### GET /api/v1/client-sessions/summary
+Query: `accountId=int64`
 Response data: `SessionSummary[]`
 
 ### ClientSession Type

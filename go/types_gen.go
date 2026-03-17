@@ -377,7 +377,7 @@ type ClientSessionListOptions struct {
 	AccountID  int64
 	RegionID   int64
 	ClientType string
-	Status     int
+	Status     string
 	Page       int
 	Limit      int
 }

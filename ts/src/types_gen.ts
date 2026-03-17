@@ -128,9 +128,6 @@ export interface ServiceNode {
   isActive: boolean
 }
 
-export interface string {
-}
-
 export interface ClientSession {
   id: number
   accountId: number
@@ -341,7 +338,7 @@ export interface ClientSessionListOptions extends ListOptions {
   accountId?: number
   regionId?: number
   clientType?: string
-  status?: number
+  status?: string
 }
 
 // Discover

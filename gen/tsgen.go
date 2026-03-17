@@ -11,6 +11,14 @@ func generateTS(spec *Spec, outDir string) {
 	generateTSClient(spec, outDir)
 }
 
+func isPrimitiveType(specType string) bool {
+	switch specType {
+	case "string", "datetime", "int64", "int32", "int", "bool", "object", "json":
+		return true
+	}
+	return false
+}
+
 func tsType(specType string) string {
 	if strings.HasSuffix(specType, "[]") {
 		inner := specType[:len(specType)-2]
@@ -79,7 +87,10 @@ func generateTSTypes(spec *Spec, outDir string) {
 	// Model types
 	typeOrder := orderTypes(spec)
 	for _, typeName := range typeOrder {
-		fields := spec.Types[typeName]
+		fields, ok := spec.Types[typeName]
+		if !ok {
+			continue
+		}
 		w.WriteString("\n")
 		writeTSInterface(&w, typeName, fields, false)
 	}
@@ -168,7 +179,7 @@ func generateTSClient(spec *Spec, outDir string) {
 	var typeImports []string
 	typeSet := make(map[string]bool)
 	addImport := func(name string) {
-		if !typeSet[name] {
+		if !typeSet[name] && !isPrimitiveType(name) {
 			typeSet[name] = true
 			typeImports = append(typeImports, name)
 		}

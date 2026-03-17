@@ -578,7 +578,7 @@ resources:
           - "accountId: int64"
           - "regionId: int64"
           - "clientType: string"
-          - "status: int"
+          - "status: string"
           - "page: int=1"
           - "limit: int=20"
         responseType: ClientSession
@@ -591,6 +591,8 @@ resources:
       - action: summary
         method: GET
         path: /summary
+        query:
+          - "accountId: int64"
         responseType: SessionSummary
         responseArray: true
 

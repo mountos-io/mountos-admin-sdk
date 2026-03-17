@@ -439,8 +439,8 @@ func (s *ClientSessionsService) List(ctx context.Context, opts *ClientSessionLis
 		if opts.ClientType != "" {
 			q.Set("clientType", opts.ClientType)
 		}
-		if opts.Status != 0 {
-			q.Set("status", strconv.Itoa(opts.Status))
+		if opts.Status != "" {
+			q.Set("status", opts.Status)
 		}
 		addPagination(q, opts.Page, opts.Limit)
 	}

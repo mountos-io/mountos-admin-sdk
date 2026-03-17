@@ -10,8 +10,8 @@ import type {
   Storage, StorageListOptions, EditStorageRequest, TestStorageBucketRequest, 
   CreateVolumeRequest, Volume, VolumeListOptions, EditVolumeRequest, 
   GenerateVolumeAPIKeysRequest, RevokeVolumeAPIKeyRequest, UpdateVolumeQuotaRequest, 
-  AuditLog, AuditLogListOptions, ServiceNode, string, ClientSession, 
-  ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, DashboardStats,
+  AuditLog, AuditLogListOptions, ServiceNode, ClientSession, ClientSessionListOptions, 
+  SessionSummary, DiscoverMetaResponse, DashboardStats,
 } from './types_gen.js'
 
 function queryString(params: Record<string, string | number | undefined>): string {
