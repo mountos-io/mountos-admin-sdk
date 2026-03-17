@@ -10,8 +10,8 @@ import type {
   Storage, StorageListOptions, EditStorageRequest, TestStorageBucketRequest, 
   CreateVolumeRequest, Volume, VolumeListOptions, EditVolumeRequest, 
   GenerateVolumeAPIKeysRequest, RevokeVolumeAPIKeyRequest, UpdateVolumeQuotaRequest, 
-  AuditLog, AuditLogListOptions, ServiceNode, ClientSession, ClientSessionListOptions, 
-  SessionSummary, DiscoverMetaResponse, DashboardStats,
+  AuditLog, AuditLogListOptions, ServiceNode, string, ClientSession, 
+  ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, DashboardStats,
 } from './types_gen.js'
 
 function queryString(params: Record<string, string | number | undefined>): string {
@@ -319,6 +319,10 @@ class ServiceNodesResource {
 
   remove(regionId: number, nodeId: string): Promise<void> {
     return this.client.request('DELETE', `/api/v1/regions/${regionId}/nodes/${encodeURIComponent(nodeId)}`)
+  }
+
+  stats(regionId: number, nodeId: string): Promise<string> {
+    return this.client.request('GET', `/api/v1/regions/${regionId}/nodes/${encodeURIComponent(nodeId)}/stats`)
   }
 }
 

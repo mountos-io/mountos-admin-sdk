@@ -417,6 +417,14 @@ func (s *ServiceNodesService) Remove(ctx context.Context, regionID int64, nodeID
 	return err
 }
 
+func (s *ServiceNodesService) Stats(ctx context.Context, regionID int64, nodeID string) (*string, error) {
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/regions/%s/nodes/%s/stats", strconv.FormatInt(regionID, 10), url.PathEscape(nodeID)))
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[string](data)
+}
+
 type ClientSessionsService struct{ c *Client }
 
 func (s *ClientSessionsService) List(ctx context.Context, opts *ClientSessionListOptions) (*PaginatedResponse[ClientSession], error) {

@@ -562,6 +562,11 @@ resources:
         method: DELETE
         path: /:nodeId
 
+      - action: stats
+        method: GET
+        path: /:nodeId/stats
+        responseType: string
+
   - name: ClientSessions
     path: /client-sessions
     endpoints:

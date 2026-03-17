@@ -470,6 +470,11 @@ Param: `nodeId`
 Param: `regionId`
 Param: `nodeId`
 
+### GET /api/v1/regions/:regionId/nodes/:nodeId/stats
+Param: `regionId`
+Param: `nodeId`
+Response data: `string`
+
 ### ServiceNode Type
 ```
 {

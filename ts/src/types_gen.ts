@@ -128,6 +128,9 @@ export interface ServiceNode {
   isActive: boolean
 }
 
+export interface string {
+}
+
 export interface ClientSession {
   id: number
   accountId: number
