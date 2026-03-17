@@ -721,19 +721,53 @@ func writeGoVoidMethod(w *strings.Builder, svcType, methodName string, ep Endpoi
 	w.WriteString("}\n")
 }
 
-// GET returning array
+// GET returning array (with optional query params)
 func writeGoArrayMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string, pt map[string]string) {
 	pathParams := goMethodParams(allPathParams, pt)
 	sig := "ctx context.Context"
 	if pathParams != "" {
 		sig += ", " + pathParams
 	}
-	pathExpr := goPathExpr(fullPath, allPathParams, pt)
 
-	fmt.Fprintf(w, "func (s *%s) %s(%s) ([]%s, error) {\n", svcType, methodName, sig, ep.ResponseType)
-	fmt.Fprintf(w, "\tdata, err := s.c.get(ctx, %s)\n", pathExpr)
+	retType := goType(ep.ResponseType)
+
+	if len(ep.Query) > 0 {
+		for _, qs := range ep.Query {
+			f := parseField(qs)
+			paramName := goParamName(":" + f.Name)
+			sig += ", " + paramName + " " + goType(f.Type)
+		}
+		fmt.Fprintf(w, "func (s *%s) %s(%s) ([]%s, error) {\n", svcType, methodName, sig, retType)
+		w.WriteString("\tq := url.Values{}\n")
+		for _, qs := range ep.Query {
+			f := parseField(qs)
+			paramName := goParamName(":" + f.Name)
+			switch f.Type {
+			case "int64":
+				fmt.Fprintf(w, "\tif %s != 0 {\n\t\tq.Set(%q, strconv.FormatInt(%s, 10))\n\t}\n", paramName, f.Name, paramName)
+			case "int32":
+				fmt.Fprintf(w, "\tif %s != 0 {\n\t\tq.Set(%q, strconv.FormatInt(int64(%s), 10))\n\t}\n", paramName, f.Name, paramName)
+			case "int":
+				fmt.Fprintf(w, "\tif %s != 0 {\n\t\tq.Set(%q, strconv.Itoa(%s))\n\t}\n", paramName, f.Name, paramName)
+			case "bool":
+				fmt.Fprintf(w, "\tif %s {\n\t\tq.Set(%q, strconv.FormatBool(%s))\n\t}\n", paramName, f.Name, paramName)
+			default:
+				fmt.Fprintf(w, "\tif %s != \"\" {\n\t\tq.Set(%q, %s)\n\t}\n", paramName, f.Name, paramName)
+			}
+		}
+		pathExpr := goPathExpr(fullPath, allPathParams, pt)
+		fmt.Fprintf(w, "\tpath := %s\n", pathExpr)
+		w.WriteString("\tif qs := q.Encode(); qs != \"\" {\n")
+		w.WriteString("\t\tpath += \"?\" + qs\n")
+		w.WriteString("\t}\n")
+		w.WriteString("\tdata, err := s.c.get(ctx, path)\n")
+	} else {
+		pathExpr := goPathExpr(fullPath, allPathParams, pt)
+		fmt.Fprintf(w, "func (s *%s) %s(%s) ([]%s, error) {\n", svcType, methodName, sig, retType)
+		fmt.Fprintf(w, "\tdata, err := s.c.get(ctx, %s)\n", pathExpr)
+	}
 	w.WriteString("\tif err != nil {\n\t\treturn nil, err\n\t}\n")
-	fmt.Fprintf(w, "\tresult, err := decodeJSON[[]%s](data)\n", ep.ResponseType)
+	fmt.Fprintf(w, "\tresult, err := decodeJSON[[]%s](data)\n", retType)
 	w.WriteString("\tif err != nil {\n\t\treturn nil, err\n\t}\n")
 	w.WriteString("\treturn *result, nil\n")
 	w.WriteString("}\n")

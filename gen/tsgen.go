@@ -465,14 +465,39 @@ func writeTSVoidMethod(w *strings.Builder, methodName string, ep Endpoint, fullP
 	w.WriteString("  }\n")
 }
 
-// GET returning array
+// GET returning array (with optional query params)
 func writeTSArrayMethod(w *strings.Builder, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string, pt map[string]string) {
-	retType := ep.ResponseType + "[]"
+	retType := tsType(ep.ResponseType) + "[]"
 	params := tsParams(allPathParams, pt)
-	pathExpr := tsPathExpr(fullPath, allPathParams)
 
-	fmt.Fprintf(w, "  %s(%s): Promise<%s> {\n", methodName, params, retType)
-	fmt.Fprintf(w, "    return this.client.request('GET', %s)\n", pathExpr)
+	if len(ep.Query) > 0 {
+		// Add query params as individual optional method params
+		for _, qs := range ep.Query {
+			f := parseField(qs)
+			paramName := tsQueryParamName(f.Name)
+			if params != "" {
+				params += ", "
+			}
+			opt := "?"
+			if f.Required {
+				opt = ""
+			}
+			params += paramName + opt + ": " + tsType(f.Type)
+		}
+		var qsArgs []string
+		for _, qs := range ep.Query {
+			f := parseField(qs)
+			paramName := tsQueryParamName(f.Name)
+			qsArgs = append(qsArgs, f.Name+": "+paramName)
+		}
+		qsCall := "queryString({ " + strings.Join(qsArgs, ", ") + " })"
+		fmt.Fprintf(w, "  %s(%s): Promise<%s> {\n", methodName, params, retType)
+		fmt.Fprintf(w, "    return this.client.request('GET', `%s${%s}`)\n", fullPath, qsCall)
+	} else {
+		pathExpr := tsPathExpr(fullPath, allPathParams)
+		fmt.Fprintf(w, "  %s(%s): Promise<%s> {\n", methodName, params, retType)
+		fmt.Fprintf(w, "    return this.client.request('GET', %s)\n", pathExpr)
+	}
 	w.WriteString("  }\n")
 }
 
