@@ -10,8 +10,8 @@ import type {
   Storage, StorageListOptions, EditStorageRequest, TestStorageBucketRequest, 
   CreateVolumeRequest, Volume, VolumeListOptions, EditVolumeRequest, 
   GenerateVolumeAPIKeysRequest, RevokeVolumeAPIKeyRequest, UpdateVolumeQuotaRequest, 
-  AuditLog, AuditLogListOptions, ServiceNode, ClientSession, ClientSessionListOptions, 
-  SessionSummary, DiscoverMetaResponse, DashboardStats,
+  AuditLog, AuditLogListOptions, ServiceNode, ClientSession, ClientSessionListOptions,
+  SessionSummary, DiscoverMetaResponse, DashboardStats, LicenseDetails,
 } from './types_gen.js'
 
 function queryString(params: Record<string, string | number | undefined>): string {
@@ -35,6 +35,7 @@ export class MountOSAdmin {
   private _discover?: DiscoverResource
   private _dashboard?: DashboardResource
   private _cache?: CacheResource
+  private _license?: LicenseResource
 
   constructor(config: Config) {
     this.baseUrl = config.baseUrl.replace(/\/+$/, '')
@@ -83,6 +84,10 @@ export class MountOSAdmin {
 
   get cache(): CacheResource {
     return (this._cache ??= new CacheResource(this))
+  }
+
+  get license(): LicenseResource {
+    return (this._license ??= new LicenseResource(this))
   }
 
   async request<T>(method: string, path: string, body?: unknown): Promise<T> {
@@ -363,5 +368,13 @@ class CacheResource {
 
   refresh(): Promise<void> {
     return this.client.request('POST', '/api/v1/cache/refresh')
+  }
+}
+
+class LicenseResource {
+  constructor(private client: MountOSAdmin) {}
+
+  get(): Promise<LicenseDetails> {
+    return this.client.request('GET', '/api/v1/license')
   }
 }

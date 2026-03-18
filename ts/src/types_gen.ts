@@ -341,6 +341,29 @@ export interface ClientSessionListOptions extends ListOptions {
   status?: string
 }
 
+// License
+
+export type LicenseStatus = 'valid' | 'expiring' | 'grace' | 'expired'
+export type LicenseType = 'commercial' | 'trial'
+
+export interface LicenseDetails {
+  licenseId: string
+  licensee: string
+  contact: string
+  licenseType: LicenseType
+  issuedAt: string
+  expiresAt: string
+  gracePeriodDays: number
+  maxNodes: number
+  maxVolumes: number
+  maxUsers: number
+  maxStorageBytes: number
+  status: LicenseStatus
+  daysRemaining: number
+  graceEndsAt: string
+  graceDaysLeft: number
+}
+
 // Discover
 
 // Dashboard

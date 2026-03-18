@@ -513,3 +513,13 @@ func (s *CacheService) Refresh(ctx context.Context) error {
 	_, err := s.c.post(ctx, "/api/v1/cache/refresh", nil)
 	return err
 }
+
+type LicenseService struct{ c *Client }
+
+func (s *LicenseService) Get(ctx context.Context) (*LicenseDetails, error) {
+	data, err := s.c.get(ctx, "/api/v1/license")
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[LicenseDetails](data)
+}
