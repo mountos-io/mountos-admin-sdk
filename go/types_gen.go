@@ -131,7 +131,7 @@ type ServiceNode struct {
 	RpcAddr       string         `json:"rpcAddr,omitempty"`
 	Metadata      map[string]any `json:"metadata,omitempty"`
 	Status        string         `json:"status"`
-	LastHeartbeat string         `json:"lastHeartbeat,omitempty"`
+	LastHeartbeat int64          `json:"lastHeartbeat,omitempty"`
 	IsActive      bool           `json:"isActive"`
 }
 

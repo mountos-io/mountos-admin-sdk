@@ -124,7 +124,7 @@ export interface ServiceNode {
   rpcAddr?: string
   metadata?: Record<string, unknown>
   status: string
-  lastHeartbeat?: string
+  lastHeartbeat?: number
   isActive: boolean
 }
 

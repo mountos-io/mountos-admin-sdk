@@ -475,7 +475,7 @@ Response data: `string`
   "rpcAddr"?: string,
   "metadata"?: object,
   "status": string,
-  "lastHeartbeat"?: string,
+  "lastHeartbeat"?: int64,
   "isActive": bool
 }
 ```
