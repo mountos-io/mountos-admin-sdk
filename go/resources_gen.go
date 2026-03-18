@@ -390,8 +390,19 @@ func (s *AuditLogsService) List(ctx context.Context, opts *AuditLogListOptions) 
 
 type ServiceNodesService struct{ c *Client }
 
-func (s *ServiceNodesService) List(ctx context.Context, regionID int64) ([]ServiceNode, error) {
-	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/regions/%s/nodes", strconv.FormatInt(regionID, 10)))
+func (s *ServiceNodesService) List(ctx context.Context, regionID int64, serviceType string, status string) ([]ServiceNode, error) {
+	q := url.Values{}
+	if serviceType != "" {
+		q.Set("serviceType", serviceType)
+	}
+	if status != "" {
+		q.Set("status", status)
+	}
+	path := fmt.Sprintf("/api/v1/regions/%s/nodes", strconv.FormatInt(regionID, 10))
+	if qs := q.Encode(); qs != "" {
+		path += "?" + qs
+	}
+	data, err := s.c.get(ctx, path)
 	if err != nil {
 		return nil, err
 	}
@@ -400,21 +411,6 @@ func (s *ServiceNodesService) List(ctx context.Context, regionID int64) ([]Servi
 		return nil, err
 	}
 	return *result, nil
-}
-
-func (s *ServiceNodesService) Drain(ctx context.Context, regionID int64, nodeID string) error {
-	_, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%s/nodes/%s/drain", strconv.FormatInt(regionID, 10), url.PathEscape(nodeID)), nil)
-	return err
-}
-
-func (s *ServiceNodesService) Activate(ctx context.Context, regionID int64, nodeID string) error {
-	_, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%s/nodes/%s/activate", strconv.FormatInt(regionID, 10), url.PathEscape(nodeID)), nil)
-	return err
-}
-
-func (s *ServiceNodesService) Remove(ctx context.Context, regionID int64, nodeID string) error {
-	_, err := s.c.delete(ctx, fmt.Sprintf("/api/v1/regions/%s/nodes/%s", strconv.FormatInt(regionID, 10), url.PathEscape(nodeID)))
-	return err
 }
 
 func (s *ServiceNodesService) Stats(ctx context.Context, regionID int64, nodeID string) (*string, error) {
@@ -507,13 +503,6 @@ func (s *DashboardService) Stats(ctx context.Context, accountID int64) (*Dashboa
 	return decodeJSON[DashboardStats](data)
 }
 
-type CacheService struct{ c *Client }
-
-func (s *CacheService) Refresh(ctx context.Context) error {
-	_, err := s.c.post(ctx, "/api/v1/cache/refresh", nil)
-	return err
-}
-
 type LicenseService struct{ c *Client }
 
 func (s *LicenseService) Get(ctx context.Context) (*LicenseDetails, error) {
@@ -522,4 +511,11 @@ func (s *LicenseService) Get(ctx context.Context) (*LicenseDetails, error) {
 		return nil, err
 	}
 	return decodeJSON[LicenseDetails](data)
+}
+
+type CacheService struct{ c *Client }
+
+func (s *CacheService) Refresh(ctx context.Context) error {
+	_, err := s.c.post(ctx, "/api/v1/cache/refresh", nil)
+	return err
 }

@@ -456,19 +456,8 @@ Response data: `{ "items": AuditLog[], "nextCursor": int64|null }`
 
 ### GET /api/v1/regions/:regionId/nodes
 Param: `regionId`
+Query: `serviceType=string`, `status=string`
 Response data: `ServiceNode[]`
-
-### POST /api/v1/regions/:regionId/nodes/:nodeId/drain
-Param: `regionId`
-Param: `nodeId`
-
-### POST /api/v1/regions/:regionId/nodes/:nodeId/activate
-Param: `regionId`
-Param: `nodeId`
-
-### DELETE /api/v1/regions/:regionId/nodes/:nodeId
-Param: `regionId`
-Param: `nodeId`
 
 ### GET /api/v1/regions/:regionId/nodes/:nodeId/stats
 Param: `regionId`
@@ -483,7 +472,7 @@ Response data: `string`
   "serviceType": string,
   "nodeId": string,
   "advertiseAddr": string,
-  "httpAddr"?: string,
+  "rpcAddr"?: string,
   "metadata"?: object,
   "status": string,
   "lastHeartbeat"?: string,
@@ -548,6 +537,34 @@ Response data: `DiscoverMetaResponse`
 ### GET /api/v1/dashboard/stats
 Query: `accountId=int64(required)`
 Response data: `DashboardStats`
+
+---
+
+## License
+
+### GET /api/v1/license
+Response data: `LicenseDetails`
+
+### LicenseDetails Type
+```
+{
+  "licenseId": string,
+  "licensee": string,
+  "contact": string,
+  "licenseType": string,
+  "issuedAt": string,
+  "expiresAt": string,
+  "gracePeriodDays": int,
+  "maxNodes": int64,
+  "maxVolumes": int64,
+  "maxUsers": int64,
+  "maxStorageBytes": int64,
+  "status": string,
+  "daysRemaining": int,
+  "graceEndsAt": string,
+  "graceDaysLeft": int
+}
+```
 
 ---
 

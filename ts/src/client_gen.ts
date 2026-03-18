@@ -10,7 +10,7 @@ import type {
   Storage, StorageListOptions, EditStorageRequest, TestStorageBucketRequest, 
   CreateVolumeRequest, Volume, VolumeListOptions, EditVolumeRequest, 
   GenerateVolumeAPIKeysRequest, RevokeVolumeAPIKeyRequest, UpdateVolumeQuotaRequest, 
-  AuditLog, AuditLogListOptions, ServiceNode, ClientSession, ClientSessionListOptions,
+  AuditLog, AuditLogListOptions, ServiceNode, ClientSession, ClientSessionListOptions, 
   SessionSummary, DiscoverMetaResponse, DashboardStats, LicenseDetails,
 } from './types_gen.js'
 
@@ -34,8 +34,8 @@ export class MountOSAdmin {
   private _clientSessions?: ClientSessionsResource
   private _discover?: DiscoverResource
   private _dashboard?: DashboardResource
-  private _cache?: CacheResource
   private _license?: LicenseResource
+  private _cache?: CacheResource
 
   constructor(config: Config) {
     this.baseUrl = config.baseUrl.replace(/\/+$/, '')
@@ -82,12 +82,12 @@ export class MountOSAdmin {
     return (this._dashboard ??= new DashboardResource(this))
   }
 
-  get cache(): CacheResource {
-    return (this._cache ??= new CacheResource(this))
-  }
-
   get license(): LicenseResource {
     return (this._license ??= new LicenseResource(this))
+  }
+
+  get cache(): CacheResource {
+    return (this._cache ??= new CacheResource(this))
   }
 
   async request<T>(method: string, path: string, body?: unknown): Promise<T> {
@@ -310,20 +310,8 @@ class AuditLogsResource {
 class ServiceNodesResource {
   constructor(private client: MountOSAdmin) {}
 
-  list(regionId: number): Promise<ServiceNode[]> {
-    return this.client.request('GET', `/api/v1/regions/${regionId}/nodes`)
-  }
-
-  drain(regionId: number, nodeId: string): Promise<void> {
-    return this.client.request('POST', `/api/v1/regions/${regionId}/nodes/${encodeURIComponent(nodeId)}/drain`)
-  }
-
-  activate(regionId: number, nodeId: string): Promise<void> {
-    return this.client.request('POST', `/api/v1/regions/${regionId}/nodes/${encodeURIComponent(nodeId)}/activate`)
-  }
-
-  remove(regionId: number, nodeId: string): Promise<void> {
-    return this.client.request('DELETE', `/api/v1/regions/${regionId}/nodes/${encodeURIComponent(nodeId)}`)
+  list(regionId: number, serviceType?: string, status?: string): Promise<ServiceNode[]> {
+    return this.client.request('GET', `/api/v1/regions/:regionId/nodes${queryString({ serviceType: serviceType, status: status })}`)
   }
 
   stats(regionId: number, nodeId: string): Promise<string> {
@@ -363,18 +351,18 @@ class DashboardResource {
   }
 }
 
-class CacheResource {
-  constructor(private client: MountOSAdmin) {}
-
-  refresh(): Promise<void> {
-    return this.client.request('POST', '/api/v1/cache/refresh')
-  }
-}
-
 class LicenseResource {
   constructor(private client: MountOSAdmin) {}
 
   get(): Promise<LicenseDetails> {
     return this.client.request('GET', '/api/v1/license')
+  }
+}
+
+class CacheResource {
+  constructor(private client: MountOSAdmin) {}
+
+  refresh(): Promise<void> {
+    return this.client.request('POST', '/api/v1/cache/refresh')
   }
 }

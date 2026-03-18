@@ -121,7 +121,7 @@ export interface ServiceNode {
   serviceType: string
   nodeId: string
   advertiseAddr: string
-  httpAddr?: string
+  rpcAddr?: string
   metadata?: Record<string, unknown>
   status: string
   lastHeartbeat?: string
@@ -172,6 +172,24 @@ export interface DashboardStats {
   totalQuotaLimit: number
   activeSessionCount: number
   regionBreakdown: RegionVolumeMetrics[]
+}
+
+export interface LicenseDetails {
+  licenseId: string
+  licensee: string
+  contact: string
+  licenseType: string
+  issuedAt: string
+  expiresAt: string
+  gracePeriodDays: number
+  maxNodes: number
+  maxVolumes: number
+  maxUsers: number
+  maxStorageBytes: number
+  status: string
+  daysRemaining: number
+  graceEndsAt: string
+  graceDaysLeft: number
 }
 
 export interface DiscoverEndpoint {
@@ -341,31 +359,10 @@ export interface ClientSessionListOptions extends ListOptions {
   status?: string
 }
 
-// License
-
-export type LicenseStatus = 'valid' | 'expiring' | 'grace' | 'expired'
-export type LicenseType = 'commercial' | 'trial'
-
-export interface LicenseDetails {
-  licenseId: string
-  licensee: string
-  contact: string
-  licenseType: LicenseType
-  issuedAt: string
-  expiresAt: string
-  gracePeriodDays: number
-  maxNodes: number
-  maxVolumes: number
-  maxUsers: number
-  maxStorageBytes: number
-  status: LicenseStatus
-  daysRemaining: number
-  graceEndsAt: string
-  graceDaysLeft: number
-}
-
 // Discover
 
 // Dashboard
+
+// License
 
 // Cache

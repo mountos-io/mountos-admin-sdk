@@ -111,7 +111,7 @@ types:
     - "serviceType: string"
     - "nodeId: string"
     - "advertiseAddr: string"
-    - "httpAddr: string?"
+    - "rpcAddr: string?"
     - "metadata: object?"
     - "status: string"
     - "lastHeartbeat: string?"
@@ -170,6 +170,23 @@ types:
     - "totalQuotaLimit: int64"
     - "activeSessionCount: int64"
     - "regionBreakdown: RegionVolumeMetrics[]"
+
+  LicenseDetails:
+    - "licenseId: string"
+    - "licensee: string"
+    - "contact: string"
+    - "licenseType: string"
+    - "issuedAt: string"
+    - "expiresAt: string"
+    - "gracePeriodDays: int"
+    - "maxNodes: int64"
+    - "maxVolumes: int64"
+    - "maxUsers: int64"
+    - "maxStorageBytes: int64"
+    - "status: string"
+    - "daysRemaining: int"
+    - "graceEndsAt: string"
+    - "graceDaysLeft: int"
 
 resources:
   - name: Accounts
@@ -547,20 +564,11 @@ resources:
       - action: list
         method: GET
         path: /
+        query:
+          - "serviceType: string"
+          - "status: string"
         responseType: ServiceNode
         responseArray: true
-
-      - action: drain
-        method: POST
-        path: /:nodeId/drain
-
-      - action: activate
-        method: POST
-        path: /:nodeId/activate
-
-      - action: remove
-        method: DELETE
-        path: /:nodeId
 
       - action: stats
         method: GET
@@ -615,6 +623,14 @@ resources:
         query:
           - "accountId: int64!"
         responseType: DashboardStats
+
+  - name: License
+    path: /license
+    endpoints:
+      - action: get
+        method: GET
+        path: /
+        responseType: LicenseDetails
 
   - name: Cache
     path: /cache

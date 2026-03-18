@@ -128,7 +128,7 @@ type ServiceNode struct {
 	ServiceType   string         `json:"serviceType"`
 	NodeID        string         `json:"nodeId"`
 	AdvertiseAddr string         `json:"advertiseAddr"`
-	HTTPAddr      string         `json:"httpAddr,omitempty"`
+	RpcAddr       string         `json:"rpcAddr,omitempty"`
 	Metadata      map[string]any `json:"metadata,omitempty"`
 	Status        string         `json:"status"`
 	LastHeartbeat string         `json:"lastHeartbeat,omitempty"`
@@ -179,6 +179,24 @@ type DashboardStats struct {
 	TotalQuotaLimit    int64                 `json:"totalQuotaLimit"`
 	ActiveSessionCount int64                 `json:"activeSessionCount"`
 	RegionBreakdown    []RegionVolumeMetrics `json:"regionBreakdown"`
+}
+
+type LicenseDetails struct {
+	LicenseID       string `json:"licenseId"`
+	Licensee        string `json:"licensee"`
+	Contact         string `json:"contact"`
+	LicenseType     string `json:"licenseType"`
+	IssuedAt        string `json:"issuedAt"`
+	ExpiresAt       string `json:"expiresAt"`
+	GracePeriodDays int    `json:"gracePeriodDays"`
+	MaxNodes        int64  `json:"maxNodes"`
+	MaxVolumes      int64  `json:"maxVolumes"`
+	MaxUsers        int64  `json:"maxUsers"`
+	MaxStorageBytes int64  `json:"maxStorageBytes"`
+	Status          string `json:"status"`
+	DaysRemaining   int    `json:"daysRemaining"`
+	GraceEndsAt     string `json:"graceEndsAt"`
+	GraceDaysLeft   int    `json:"graceDaysLeft"`
 }
 
 type DiscoverEndpoint struct {
@@ -382,28 +400,10 @@ type ClientSessionListOptions struct {
 	Limit      int
 }
 
-// License
-
-type LicenseDetails struct {
-	LicenseID       string `json:"licenseId"`
-	Licensee        string `json:"licensee"`
-	Contact         string `json:"contact"`
-	LicenseType     string `json:"licenseType"`
-	IssuedAt        string `json:"issuedAt"`
-	ExpiresAt       string `json:"expiresAt"`
-	GracePeriodDays int    `json:"gracePeriodDays"`
-	MaxNodes        int64  `json:"maxNodes"`
-	MaxVolumes      int64  `json:"maxVolumes"`
-	MaxUsers        int64  `json:"maxUsers"`
-	MaxStorageBytes int64  `json:"maxStorageBytes"`
-	Status          string `json:"status"`
-	DaysRemaining   int    `json:"daysRemaining"`
-	GraceEndsAt     string `json:"graceEndsAt"`
-	GraceDaysLeft   int    `json:"graceDaysLeft"`
-}
-
 // Discover
 
 // Dashboard
+
+// License
 
 // Cache
