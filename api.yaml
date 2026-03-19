@@ -134,9 +134,9 @@ types:
     - "metadata: json?"
     - "metrics: json?"
     - "status: string"
-    - "lastHeartbeat: datetime?"
-    - "connectedAt: datetime?"
-    - "disconnectedAt: datetime?"
+    - "lastHeartbeat: int64?"
+    - "connectedAt: int64?"
+    - "disconnectedAt: int64?"
     - "isActive: bool"
 
   SessionSummary:

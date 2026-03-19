@@ -515,9 +515,9 @@ Response data: `SessionSummary[]`
   "metadata"?: object,
   "metrics"?: object,
   "status": string,
-  "lastHeartbeat"?: RFC3339,
-  "connectedAt"?: RFC3339,
-  "disconnectedAt"?: RFC3339,
+  "lastHeartbeat"?: int64,
+  "connectedAt"?: int64,
+  "disconnectedAt"?: int64,
   "isActive": bool
 }
 ```

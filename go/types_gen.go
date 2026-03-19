@@ -152,9 +152,9 @@ type ClientSession struct {
 	Metadata       json.RawMessage `json:"metadata,omitempty"`
 	Metrics        json.RawMessage `json:"metrics,omitempty"`
 	Status         string          `json:"status"`
-	LastHeartbeat  string          `json:"lastHeartbeat,omitempty"`
-	ConnectedAt    string          `json:"connectedAt,omitempty"`
-	DisconnectedAt string          `json:"disconnectedAt,omitempty"`
+	LastHeartbeat  int64           `json:"lastHeartbeat,omitempty"`
+	ConnectedAt    int64           `json:"connectedAt,omitempty"`
+	DisconnectedAt int64           `json:"disconnectedAt,omitempty"`
 	IsActive       bool            `json:"isActive"`
 }
 

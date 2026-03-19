@@ -145,9 +145,9 @@ export interface ClientSession {
   metadata?: unknown
   metrics?: unknown
   status: string
-  lastHeartbeat?: string
-  connectedAt?: string
-  disconnectedAt?: string
+  lastHeartbeat?: number
+  connectedAt?: number
+  disconnectedAt?: number
   isActive: boolean
 }
 
