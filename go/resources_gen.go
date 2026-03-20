@@ -390,15 +390,48 @@ func (s *AuditLogsService) List(ctx context.Context, opts *AuditLogListOptions) 
 
 type ServiceNodesService struct{ c *Client }
 
-func (s *ServiceNodesService) List(ctx context.Context, regionID int64, serviceType string, status string) ([]ServiceNode, error) {
+func (s *ServiceNodesService) List(ctx context.Context, regionID int64, opts *ServiceNodeListOptions) ([]ServiceNode, error) {
 	q := url.Values{}
-	if serviceType != "" {
-		q.Set("serviceType", serviceType)
-	}
-	if status != "" {
-		q.Set("status", status)
+	if opts != nil {
+		if opts.ServiceType != "" {
+			q.Set("serviceType", opts.ServiceType)
+		}
+		if opts.Status != "" {
+			q.Set("status", opts.Status)
+		}
+		if opts.InactiveHours > 0 {
+			q.Set("inactiveHours", strconv.Itoa(opts.InactiveHours))
+		}
 	}
 	path := fmt.Sprintf("/api/v1/regions/%s/nodes", strconv.FormatInt(regionID, 10))
+	if qs := q.Encode(); qs != "" {
+		path += "?" + qs
+	}
+	data, err := s.c.get(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	result, err := decodeJSON[[]ServiceNode](data)
+	if err != nil {
+		return nil, err
+	}
+	return *result, nil
+}
+
+func (s *ServiceNodesService) ListAll(ctx context.Context, opts *ServiceNodeListOptions) ([]ServiceNode, error) {
+	q := url.Values{}
+	if opts != nil {
+		if opts.ServiceType != "" {
+			q.Set("serviceType", opts.ServiceType)
+		}
+		if opts.Status != "" {
+			q.Set("status", opts.Status)
+		}
+		if opts.InactiveHours > 0 {
+			q.Set("inactiveHours", strconv.Itoa(opts.InactiveHours))
+		}
+	}
+	path := "/api/v1/nodes"
 	if qs := q.Encode(); qs != "" {
 		path += "?" + qs
 	}

@@ -389,6 +389,12 @@ type AuditLogListOptions struct {
 
 // ServiceNodes
 
+type ServiceNodeListOptions struct {
+	ServiceType   string
+	Status        string
+	InactiveHours int
+}
+
 // ClientSessions
 
 type ClientSessionListOptions struct {

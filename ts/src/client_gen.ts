@@ -10,7 +10,7 @@ import type {
   Storage, StorageListOptions, EditStorageRequest, TestStorageBucketRequest, 
   CreateVolumeRequest, Volume, VolumeListOptions, EditVolumeRequest, 
   GenerateVolumeAPIKeysRequest, RevokeVolumeAPIKeyRequest, UpdateVolumeQuotaRequest, 
-  AuditLog, AuditLogListOptions, ServiceNode, ClientSession, ClientSessionListOptions, 
+  AuditLog, AuditLogListOptions, ServiceNode, ServiceNodeListOptions, ClientSession, ClientSessionListOptions,
   SessionSummary, DiscoverMetaResponse, DashboardStats, LicenseDetails,
 } from './types_gen.js'
 
@@ -310,8 +310,12 @@ class AuditLogsResource {
 class ServiceNodesResource {
   constructor(private client: MountOSAdmin) {}
 
-  list(regionId: number, serviceType?: string, status?: string): Promise<ServiceNode[]> {
-    return this.client.request('GET', `/api/v1/regions/:regionId/nodes${queryString({ serviceType: serviceType, status: status })}`)
+  list(regionId: number, opts?: ServiceNodeListOptions): Promise<ServiceNode[]> {
+    return this.client.request('GET', `/api/v1/regions/${regionId}/nodes${queryString({ serviceType: opts?.serviceType, status: opts?.status, inactiveHours: opts?.inactiveHours })}`)
+  }
+
+  listAll(opts?: ServiceNodeListOptions): Promise<ServiceNode[]> {
+    return this.client.request('GET', `/api/v1/nodes${queryString({ serviceType: opts?.serviceType, status: opts?.status, inactiveHours: opts?.inactiveHours })}`)
   }
 
   stats(regionId: number, nodeId: string): Promise<string> {

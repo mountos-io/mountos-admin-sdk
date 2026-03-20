@@ -134,7 +134,7 @@ func main() {
   }
 
   // --- Service Nodes ---
-  nodes, err := client.ServiceNodes.List(ctx, regionResp.ID)
+  nodes, err := client.ServiceNodes.List(ctx, regionResp.ID, nil)
   if err != nil {
     fmt.Println("List nodes:", err)
   } else {
