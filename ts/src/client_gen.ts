@@ -10,7 +10,7 @@ import type {
   Storage, StorageListOptions, EditStorageRequest, TestStorageBucketRequest, 
   CreateVolumeRequest, Volume, VolumeListOptions, EditVolumeRequest, 
   GenerateVolumeAPIKeysRequest, RevokeVolumeAPIKeyRequest, UpdateVolumeQuotaRequest, 
-  AuditLog, AuditLogListOptions, ServiceNode, ServiceNodeListOptions, ClientSession, ClientSessionListOptions,
+  AuditLog, AuditLogListOptions, RegionAuditLogListOptions, ServiceNode, ServiceNodeListOptions, ClientSession, ClientSessionListOptions,
   SessionSummary, DiscoverMetaResponse, DashboardStats, LicenseDetails,
 } from './types_gen.js'
 
@@ -30,6 +30,7 @@ export class MountOSAdmin {
   private _storages?: StoragesResource
   private _volumes?: VolumesResource
   private _auditLogs?: AuditLogsResource
+  private _regionAuditLogs?: RegionAuditLogsResource
   private _serviceNodes?: ServiceNodesResource
   private _clientSessions?: ClientSessionsResource
   private _discover?: DiscoverResource
@@ -64,6 +65,10 @@ export class MountOSAdmin {
 
   get auditLogs(): AuditLogsResource {
     return (this._auditLogs ??= new AuditLogsResource(this))
+  }
+
+  get regionAuditLogs(): RegionAuditLogsResource {
+    return (this._regionAuditLogs ??= new RegionAuditLogsResource(this))
   }
 
   get serviceNodes(): ServiceNodesResource {
@@ -300,6 +305,18 @@ class AuditLogsResource {
   list(opts?: AuditLogListOptions): Promise<CursorPaginatedResponse<AuditLog>> {
     return this.client.request('GET', `/api/v1/audit-logs/list${queryString({
       accountId: opts?.accountId,
+      cursor: opts?.cursor,
+      limit: opts?.limit,
+      subject: opts?.subject,
+    })}`)
+  }
+}
+
+class RegionAuditLogsResource {
+  constructor(private client: MountOSAdmin) {}
+
+  list(regionId: number, opts?: RegionAuditLogListOptions): Promise<CursorPaginatedResponse<AuditLog>> {
+    return this.client.request('GET', `/api/v1/regions/${regionId}/audit-logs/list${queryString({
       cursor: opts?.cursor,
       limit: opts?.limit,
       subject: opts?.subject,

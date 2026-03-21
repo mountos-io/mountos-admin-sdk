@@ -388,6 +388,32 @@ func (s *AuditLogsService) List(ctx context.Context, opts *AuditLogListOptions) 
 	return decodeJSON[CursorPaginatedResponse[AuditLog]](data)
 }
 
+type RegionAuditLogsService struct{ c *Client }
+
+func (s *RegionAuditLogsService) List(ctx context.Context, regionID int64, opts *RegionAuditLogListOptions) (*CursorPaginatedResponse[AuditLog], error) {
+	q := url.Values{}
+	if opts != nil {
+		if opts.Cursor > 0 {
+			q.Set("cursor", strconv.FormatInt(opts.Cursor, 10))
+		}
+		if opts.Limit > 0 {
+			q.Set("limit", strconv.Itoa(opts.Limit))
+		}
+		if opts.Subject != "" {
+			q.Set("subject", opts.Subject)
+		}
+	}
+	path := fmt.Sprintf("/api/v1/regions/%s/audit-logs/list", strconv.FormatInt(regionID, 10))
+	if qs := q.Encode(); qs != "" {
+		path += "?" + qs
+	}
+	data, err := s.c.get(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[CursorPaginatedResponse[AuditLog]](data)
+}
+
 type ServiceNodesService struct{ c *Client }
 
 func (s *ServiceNodesService) List(ctx context.Context, regionID int64, opts *ServiceNodeListOptions) ([]ServiceNode, error) {

@@ -348,6 +348,14 @@ export interface AuditLogListOptions {
   subject?: string
 }
 
+// RegionAuditLogs
+
+export interface RegionAuditLogListOptions {
+  cursor?: number
+  limit?: number
+  subject?: string
+}
+
 // ServiceNodes
 
 export interface ServiceNodeListOptions {

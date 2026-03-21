@@ -387,6 +387,14 @@ type AuditLogListOptions struct {
 	Subject   string
 }
 
+// RegionAuditLogs
+
+type RegionAuditLogListOptions struct {
+	Cursor  int64
+	Limit   int
+	Subject string
+}
+
 // ServiceNodes
 
 type ServiceNodeListOptions struct {

@@ -556,6 +556,19 @@ resources:
           - "subject: string"
         responseType: AuditLog
 
+  - name: RegionAuditLogs
+    path: /regions/:regionId/audit-logs
+    endpoints:
+      - action: list
+        method: GET
+        path: /list
+        pagination: cursor
+        query:
+          - "cursor: int64"
+          - "limit: int=20"
+          - "subject: string"
+        responseType: AuditLog
+
   - name: ServiceNodes
     path: /regions/:regionId/nodes
     pathParamTypes:
