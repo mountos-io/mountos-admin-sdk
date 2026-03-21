@@ -1,4 +1,4 @@
-.PHONY: all gen check build install clean ts-install ts-check ts-build ts-publish go-check go-build bump-minor-version bump-major-version help
+.PHONY: all gen check build install clean ts-install ts-check ts-build ts-publish go-check go-build tag-minor tag-major help
 
 all: gen check build
 
@@ -54,7 +54,7 @@ MAJOR   := $(word 1,$(subst ., ,$(VERSION)))
 MINOR   := $(word 2,$(subst ., ,$(VERSION)))
 PATCH   := $(word 3,$(subst ., ,$(VERSION)))
 
-bump-minor-version: ## Bump minor version, commit and tag
+tag-minor: ## Bump minor version, commit and tag
 	$(eval NEW := $(MAJOR).$(shell echo $$(($(MINOR)+1))).0)
 	@jq '.version = "$(NEW)"' ts/package.json > ts/package.json.tmp && mv ts/package.json.tmp ts/package.json
 	@git add .
@@ -64,7 +64,7 @@ bump-minor-version: ## Bump minor version, commit and tag
 	@git push origin --tags $(shell git branch --show-current)
 	@echo "$(VERSION) → $(NEW)"
 
-bump-major-version: ## Bump major version, commit and tag
+tag-major: ## Bump major version, commit and tag
 	$(eval NEW := $(shell echo $$(($(MAJOR)+1))).0.0)
 	@jq '.version = "$(NEW)"' ts/package.json > ts/package.json.tmp && mv ts/package.json.tmp ts/package.json
 	@git add .
