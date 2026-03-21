@@ -1,4 +1,4 @@
-.PHONY: all gen check build install clean ts-install ts-check ts-build ts-publish go-check go-build tag-minor tag-major help
+.PHONY: all gen check build install clean ts-install ts-check ts-build ts-publish go-check go-build tag tag-minor tag-major help
 
 all: gen check build
 
@@ -53,6 +53,8 @@ VERSION := $(shell jq -r .version ts/package.json)
 MAJOR   := $(word 1,$(subst ., ,$(VERSION)))
 MINOR   := $(word 2,$(subst ., ,$(VERSION)))
 PATCH   := $(word 3,$(subst ., ,$(VERSION)))
+
+tag: tag-minor ## Alias for tag-minor
 
 tag-minor: ## Bump minor version, commit and tag
 	$(eval NEW := $(MAJOR).$(shell echo $$(($(MINOR)+1))).0)
