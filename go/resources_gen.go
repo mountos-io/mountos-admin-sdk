@@ -259,6 +259,14 @@ func (s *StoragesService) TestBucket(ctx context.Context, req *TestStorageBucket
 	return decodeJSON[TestBucketStorageResponse](data)
 }
 
+func (s *StoragesService) TestStorageBucket(ctx context.Context, storageID int64) (*TestStorageBucketStorageResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/test-bucket", strconv.FormatInt(storageID, 10)), nil)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[TestStorageBucketStorageResponse](data)
+}
+
 type VolumesService struct{ c *Client }
 
 func (s *VolumesService) Create(ctx context.Context, req *CreateVolumeRequest) (*CreateVolumeResponse, error) {
@@ -416,48 +424,15 @@ func (s *RegionAuditLogsService) List(ctx context.Context, regionID int64, opts 
 
 type ServiceNodesService struct{ c *Client }
 
-func (s *ServiceNodesService) List(ctx context.Context, regionID int64, opts *ServiceNodeListOptions) ([]ServiceNode, error) {
+func (s *ServiceNodesService) List(ctx context.Context, regionID int64, serviceType string, status string) ([]ServiceNode, error) {
 	q := url.Values{}
-	if opts != nil {
-		if opts.ServiceType != "" {
-			q.Set("serviceType", opts.ServiceType)
-		}
-		if opts.Status != "" {
-			q.Set("status", opts.Status)
-		}
-		if opts.InactiveHours > 0 {
-			q.Set("inactiveHours", strconv.Itoa(opts.InactiveHours))
-		}
+	if serviceType != "" {
+		q.Set("serviceType", serviceType)
+	}
+	if status != "" {
+		q.Set("status", status)
 	}
 	path := fmt.Sprintf("/api/v1/regions/%s/nodes", strconv.FormatInt(regionID, 10))
-	if qs := q.Encode(); qs != "" {
-		path += "?" + qs
-	}
-	data, err := s.c.get(ctx, path)
-	if err != nil {
-		return nil, err
-	}
-	result, err := decodeJSON[[]ServiceNode](data)
-	if err != nil {
-		return nil, err
-	}
-	return *result, nil
-}
-
-func (s *ServiceNodesService) ListAll(ctx context.Context, opts *ServiceNodeListOptions) ([]ServiceNode, error) {
-	q := url.Values{}
-	if opts != nil {
-		if opts.ServiceType != "" {
-			q.Set("serviceType", opts.ServiceType)
-		}
-		if opts.Status != "" {
-			q.Set("status", opts.Status)
-		}
-		if opts.InactiveHours > 0 {
-			q.Set("inactiveHours", strconv.Itoa(opts.InactiveHours))
-		}
-	}
-	path := "/api/v1/nodes"
 	if qs := q.Encode(); qs != "" {
 		path += "?" + qs
 	}

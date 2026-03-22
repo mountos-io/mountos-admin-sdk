@@ -312,6 +312,15 @@ type TestBucketStorageResponse struct {
 	Multipart    bool `json:"multipart"`
 }
 
+type TestStorageBucketStorageResponse struct {
+	BucketExists bool `json:"bucketExists"`
+	List         bool `json:"list"`
+	Write        bool `json:"write"`
+	Read         bool `json:"read"`
+	Delete       bool `json:"delete"`
+	Multipart    bool `json:"multipart"`
+}
+
 type StorageListOptions struct {
 	AccountID int64
 	Page      int
@@ -396,12 +405,6 @@ type RegionAuditLogListOptions struct {
 }
 
 // ServiceNodes
-
-type ServiceNodeListOptions struct {
-	ServiceType   string
-	Status        string
-	InactiveHours int
-}
 
 // ClientSessions
 

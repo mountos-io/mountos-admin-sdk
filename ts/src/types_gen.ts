@@ -358,12 +358,6 @@ export interface RegionAuditLogListOptions {
 
 // ServiceNodes
 
-export interface ServiceNodeListOptions {
-  serviceType?: string
-  status?: string
-  inactiveHours?: number
-}
-
 // ClientSessions
 
 export interface ClientSessionListOptions extends ListOptions {

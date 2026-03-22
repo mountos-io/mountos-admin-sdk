@@ -289,6 +289,10 @@ Request:
 ```
 Response data: `{ "bucketExists": bool, "list": bool, "write": bool, "read": bool, "delete": bool, "multipart": bool }`
 
+### POST /api/v1/storages/:storageId/test-bucket
+Param: `storageId`
+Response data: `{ "bucketExists": bool, "list": bool, "write": bool, "read": bool, "delete": bool, "multipart": bool }`
+
 ### Storage Type
 ```
 {
@@ -432,6 +436,31 @@ Response data: `{ "volumeId": string, "diskSize": int64, "activeSize": int64, "s
 
 ### GET /api/v1/audit-logs/list
 Query: `accountId=int64`, `cursor=int64`, `limit=int(default 20)`, `subject=string`
+Response data: `{ "items": AuditLog[], "nextCursor": int64|null }`
+
+### AuditLog Type
+```
+{
+  "id": int64,
+  "title": string,
+  "description"?: string,
+  "subject"?: string,
+  "success": bool,
+  "data"?: object,
+  "createdBy"?: string,
+  "accountId"?: int64,
+  "createdAt"?: RFC3339,
+  "updatedAt"?: RFC3339
+}
+```
+
+---
+
+## RegionAuditLogs
+
+### GET /api/v1/regions/:regionId/audit-logs/list
+Param: `regionId`
+Query: `cursor=int64`, `limit=int(default 20)`, `subject=string`
 Response data: `{ "items": AuditLog[], "nextCursor": int64|null }`
 
 ### AuditLog Type

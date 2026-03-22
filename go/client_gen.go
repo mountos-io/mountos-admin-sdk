@@ -10,19 +10,19 @@ type Client struct {
 	http    *http.Client
 	auth    *tokenCache
 
-	Accounts       *AccountsService
-	Users          *UsersService
-	Regions        *RegionsService
-	Storages       *StoragesService
-	Volumes        *VolumesService
-	AuditLogs         *AuditLogsService
-	RegionAuditLogs   *RegionAuditLogsService
-	ServiceNodes      *ServiceNodesService
-	ClientSessions *ClientSessionsService
-	Discover       *DiscoverService
-	Dashboard      *DashboardService
-	License        *LicenseService
-	Cache          *CacheService
+	Accounts        *AccountsService
+	Users           *UsersService
+	Regions         *RegionsService
+	Storages        *StoragesService
+	Volumes         *VolumesService
+	AuditLogs       *AuditLogsService
+	RegionAuditLogs *RegionAuditLogsService
+	ServiceNodes    *ServiceNodesService
+	ClientSessions  *ClientSessionsService
+	Discover        *DiscoverService
+	Dashboard       *DashboardService
+	License         *LicenseService
+	Cache           *CacheService
 }
 
 // NewClient creates a new SDK client.

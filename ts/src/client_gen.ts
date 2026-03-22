@@ -10,8 +10,9 @@ import type {
   Storage, StorageListOptions, EditStorageRequest, TestStorageBucketRequest, 
   CreateVolumeRequest, Volume, VolumeListOptions, EditVolumeRequest, 
   GenerateVolumeAPIKeysRequest, RevokeVolumeAPIKeyRequest, UpdateVolumeQuotaRequest, 
-  AuditLog, AuditLogListOptions, RegionAuditLogListOptions, ServiceNode, ServiceNodeListOptions, ClientSession, ClientSessionListOptions,
-  SessionSummary, DiscoverMetaResponse, DashboardStats, LicenseDetails,
+  AuditLog, AuditLogListOptions, RegionAuditLogListOptions, ServiceNode, ClientSession, 
+  ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, DashboardStats, 
+  LicenseDetails,
 } from './types_gen.js'
 
 function queryString(params: Record<string, string | number | undefined>): string {
@@ -245,6 +246,10 @@ class StoragesResource {
   testBucket(req: TestStorageBucketRequest): Promise<{ bucketExists: boolean; list: boolean; write: boolean; read: boolean; delete: boolean; multipart: boolean }> {
     return this.client.request('POST', '/api/v1/storages/test-bucket', req)
   }
+
+  testStorageBucket(storageId: number): Promise<{ bucketExists: boolean; list: boolean; write: boolean; read: boolean; delete: boolean; multipart: boolean }> {
+    return this.client.request('POST', `/api/v1/storages/${storageId}/test-bucket`)
+  }
 }
 
 class VolumesResource {
@@ -327,12 +332,8 @@ class RegionAuditLogsResource {
 class ServiceNodesResource {
   constructor(private client: MountOSAdmin) {}
 
-  list(regionId: number, opts?: ServiceNodeListOptions): Promise<ServiceNode[]> {
-    return this.client.request('GET', `/api/v1/regions/${regionId}/nodes${queryString({ serviceType: opts?.serviceType, status: opts?.status, inactiveHours: opts?.inactiveHours })}`)
-  }
-
-  listAll(opts?: ServiceNodeListOptions): Promise<ServiceNode[]> {
-    return this.client.request('GET', `/api/v1/nodes${queryString({ serviceType: opts?.serviceType, status: opts?.status, inactiveHours: opts?.inactiveHours })}`)
+  list(regionId: number, serviceType?: string, status?: string): Promise<ServiceNode[]> {
+    return this.client.request('GET', `/api/v1/regions/:regionId/nodes${queryString({ serviceType: serviceType, status: status })}`)
   }
 
   stats(regionId: number, nodeId: string): Promise<string> {

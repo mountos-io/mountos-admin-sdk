@@ -436,6 +436,17 @@ resources:
           - "delete: bool"
           - "multipart: bool"
 
+      - action: testStorageBucket
+        method: POST
+        path: /:storageId/test-bucket
+        response:
+          - "bucketExists: bool"
+          - "list: bool"
+          - "write: bool"
+          - "read: bool"
+          - "delete: bool"
+          - "multipart: bool"
+
   - name: Volumes
     path: /volumes
     endpoints:

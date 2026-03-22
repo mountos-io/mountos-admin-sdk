@@ -436,6 +436,17 @@ resources:
           - "delete: bool"
           - "multipart: bool"
 
+      - action: testStorageBucket
+        method: POST
+        path: /:storageId/test-bucket
+        response:
+          - "bucketExists: bool"
+          - "list: bool"
+          - "write: bool"
+          - "read: bool"
+          - "delete: bool"
+          - "multipart: bool"
+
   - name: Volumes
     path: /volumes
     endpoints:
@@ -551,6 +562,19 @@ resources:
         pagination: cursor
         query:
           - "accountId: int64"
+          - "cursor: int64"
+          - "limit: int=20"
+          - "subject: string"
+        responseType: AuditLog
+
+  - name: RegionAuditLogs
+    path: /regions/:regionId/audit-logs
+    endpoints:
+      - action: list
+        method: GET
+        path: /list
+        pagination: cursor
+        query:
           - "cursor: int64"
           - "limit: int=20"
           - "subject: string"
