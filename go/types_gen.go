@@ -330,17 +330,16 @@ type StorageListOptions struct {
 // Volumes
 
 type CreateVolumeRequest struct {
-	AccountID        int64  `json:"accountId"`
-	StorageID        int64  `json:"storageId"`
-	Name             string `json:"name"`
-	Description      string `json:"description,omitempty"`
-	VolumeType       string `json:"volumeType"`
-	Encryption       bool   `json:"encryption,omitempty"`
-	EncryptionKey    string `json:"encryptionKey,omitempty"`
-	RetentionPeriod  int32  `json:"retentionPeriod,omitempty"`
-	GracePeriod      int32  `json:"gracePeriod,omitempty"`
-	GcOnDeactivation bool   `json:"gcOnDeactivation,omitempty"`
-	QuotaLimit       int64  `json:"quotaLimit,omitempty"`
+	AccountID       int64  `json:"accountId"`
+	StorageID       int64  `json:"storageId"`
+	Name            string `json:"name"`
+	Description     string `json:"description,omitempty"`
+	VolumeType      string `json:"volumeType"`
+	Encryption      bool   `json:"encryption,omitempty"`
+	EncryptionKey   string `json:"encryptionKey,omitempty"`
+	RetentionPeriod int32  `json:"retentionPeriod,omitempty"`
+	GracePeriod     int32  `json:"gracePeriod,omitempty"`
+	QuotaLimit      int64  `json:"quotaLimit,omitempty"`
 }
 
 type CreateVolumeResponse struct {
@@ -349,12 +348,11 @@ type CreateVolumeResponse struct {
 }
 
 type EditVolumeRequest struct {
-	Name             string `json:"name"`
-	Description      string `json:"description,omitempty"`
-	Encryption       bool   `json:"encryption,omitempty"`
-	RetentionPeriod  int32  `json:"retentionPeriod,omitempty"`
-	GracePeriod      int32  `json:"gracePeriod,omitempty"`
-	GcOnDeactivation bool   `json:"gcOnDeactivation,omitempty"`
+	Name            string `json:"name"`
+	Description     string `json:"description,omitempty"`
+	Encryption      bool   `json:"encryption,omitempty"`
+	RetentionPeriod int32  `json:"retentionPeriod,omitempty"`
+	GracePeriod     int32  `json:"gracePeriod,omitempty"`
 }
 
 type GenerateVolumeAPIKeysRequest struct {

@@ -310,7 +310,6 @@ export interface CreateVolumeRequest {
   encryptionKey?: string
   retentionPeriod?: number
   gracePeriod?: number
-  gcOnDeactivation?: boolean
   quotaLimit?: number
 }
 
@@ -320,7 +319,6 @@ export interface EditVolumeRequest {
   encryption?: boolean
   retentionPeriod?: number
   gracePeriod?: number
-  gcOnDeactivation?: boolean
 }
 
 export interface GenerateVolumeAPIKeysRequest {

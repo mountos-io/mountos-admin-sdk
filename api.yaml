@@ -463,7 +463,6 @@ resources:
           - "encryptionKey: string"
           - "retentionPeriod: int32"
           - "gracePeriod: int32"
-          - "gcOnDeactivation: bool"
           - "quotaLimit: int64"
         response:
           - "id: int64"
@@ -493,7 +492,6 @@ resources:
           - "encryption: bool"
           - "retentionPeriod: int32"
           - "gracePeriod: int32"
-          - "gcOnDeactivation: bool"
         response:
           - "id: int64"
 

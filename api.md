@@ -333,7 +333,6 @@ Request:
   "encryptionKey"?: string,
   "retentionPeriod"?: int32,
   "gracePeriod"?: int32,
-  "gcOnDeactivation"?: bool,
   "quotaLimit"?: int64
 }
 ```
@@ -356,8 +355,7 @@ Request:
   "description"?: string,
   "encryption"?: bool,
   "retentionPeriod"?: int32,
-  "gracePeriod"?: int32,
-  "gcOnDeactivation"?: bool
+  "gracePeriod"?: int32
 }
 ```
 Response data: `{ "id": int64 }`
