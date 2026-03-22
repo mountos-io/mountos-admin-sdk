@@ -99,6 +99,8 @@ export interface Volume {
   quotaLimit: number
   quotaUsed: number
   locked: boolean
+  retentionPeriod: number
+  gracePeriod: number
   isActive: boolean
   isCleanupMetaEnabled: boolean
   isCleanupStorageEnabled: boolean
@@ -319,9 +321,7 @@ export interface CreateVolumeRequest {
 }
 
 export interface EditVolumeRequest {
-  name: string
   description?: string
-  encryption?: boolean
   retentionPeriod?: number
   gracePeriod?: number
 }

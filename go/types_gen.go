@@ -113,6 +113,8 @@ type Volume struct {
 	QuotaLimit              int64  `json:"quotaLimit"`
 	QuotaUsed               int64  `json:"quotaUsed"`
 	Locked                  bool   `json:"locked"`
+	RetentionPeriod         int32  `json:"retentionPeriod"`
+	GracePeriod             int32  `json:"gracePeriod"`
 	IsActive                bool   `json:"isActive"`
 	IsCleanupMetaEnabled    bool   `json:"isCleanupMetaEnabled"`
 	IsCleanupStorageEnabled bool   `json:"isCleanupStorageEnabled"`
@@ -360,9 +362,7 @@ type CreateVolumeResponse struct {
 }
 
 type EditVolumeRequest struct {
-	Name            string `json:"name"`
 	Description     string `json:"description,omitempty"`
-	Encryption      bool   `json:"encryption,omitempty"`
 	RetentionPeriod int32  `json:"retentionPeriod,omitempty"`
 	GracePeriod     int32  `json:"gracePeriod,omitempty"`
 }

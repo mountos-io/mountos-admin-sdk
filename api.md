@@ -335,9 +335,7 @@ Param: `volumeId`
 Request:
 ```
 {
-  "name": string(required),
   "description"?: string,
-  "encryption"?: bool,
   "retentionPeriod"?: int32,
   "gracePeriod"?: int32
 }
@@ -410,6 +408,8 @@ Response data: `{ "volumeId": string, "diskSize": int64, "activeSize": int64, "s
   "quotaLimit": int64,
   "quotaUsed": int64,
   "locked": bool,
+  "retentionPeriod": int32,
+  "gracePeriod": int32,
   "isActive": bool,
   "isCleanupMetaEnabled": bool,
   "isCleanupStorageEnabled": bool,

@@ -96,6 +96,8 @@ types:
     - "quotaLimit: int64"
     - "quotaUsed: int64"
     - "locked: bool"
+    - "retentionPeriod: int32"
+    - "gracePeriod: int32"
     - "isActive: bool"
     - "isCleanupMetaEnabled: bool"
     - "isCleanupStorageEnabled: bool"
@@ -473,9 +475,7 @@ resources:
         method: PUT
         path: /:volumeId/edit
         request:
-          - "name: string!"
           - "description: string"
-          - "encryption: bool"
           - "retentionPeriod: int32"
           - "gracePeriod: int32"
         response:
