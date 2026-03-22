@@ -313,7 +313,7 @@ class ServiceNodesResource {
   constructor(private client: MountOSAdmin) {}
 
   list(regionId: number, serviceType?: string, status?: string): Promise<ServiceNode[]> {
-    return this.client.request('GET', `/api/v1/regions/:regionId/nodes${queryString({ serviceType: serviceType, status: status })}`)
+    return this.client.request('GET', `/api/v1/regions/${regionId}/nodes${queryString({ serviceType: serviceType, status: status })}`)
   }
 
   stats(regionId: number, nodeId: string): Promise<string> {

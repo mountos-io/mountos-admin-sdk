@@ -505,8 +505,10 @@ func writeTSArrayMethod(w *strings.Builder, methodName string, ep Endpoint, full
 			qsArgs = append(qsArgs, f.Name+": "+paramName)
 		}
 		qsCall := "queryString({ " + strings.Join(qsArgs, ", ") + " })"
+		pathExpr := tsPathExpr(fullPath, allPathParams)
+		pathInner := pathExpr[1 : len(pathExpr)-1]
 		fmt.Fprintf(w, "  %s(%s): Promise<%s> {\n", methodName, params, retType)
-		fmt.Fprintf(w, "    return this.client.request('GET', `%s${%s}`)\n", fullPath, qsCall)
+		fmt.Fprintf(w, "    return this.client.request('GET', `%s${%s}`)\n", pathInner, qsCall)
 	} else {
 		pathExpr := tsPathExpr(fullPath, allPathParams)
 		fmt.Fprintf(w, "  %s(%s): Promise<%s> {\n", methodName, params, retType)
@@ -621,8 +623,12 @@ func writeTSQueryMethod(w *strings.Builder, methodName string, ep Endpoint, full
 	}
 	qsCall := "queryString({ " + strings.Join(qsArgs, ", ") + " })"
 
+	pathExpr := tsPathExpr(fullPath, allPathParams)
+	// Strip outer quotes/backticks — we need raw content for template literal with query string
+	pathInner := pathExpr[1 : len(pathExpr)-1]
+
 	fmt.Fprintf(w, "  %s(%s): Promise<%s> {\n", methodName, params, retType)
-	fmt.Fprintf(w, "    return this.client.request('GET', `%s${%s}`)\n", fullPath, qsCall)
+	fmt.Fprintf(w, "    return this.client.request('GET', `%s${%s}`)\n", pathInner, qsCall)
 	w.WriteString("  }\n")
 }
 
