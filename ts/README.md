@@ -59,7 +59,6 @@ const account = await client.accounts.get(id);
 await client.accounts.edit(id, { name: "Acme Corp" });
 await client.accounts.lock(id);
 await client.accounts.unlock(id);
-await client.accounts.activate(id);
 await client.accounts.deactivate(id);
 
 // Users
@@ -67,7 +66,6 @@ const user = await client.users.add({ accountId: 1, email: "a@b.com", username: 
 const users = await client.users.list({ accountId: 1 });
 const u = await client.users.get(user.id);
 await client.users.edit(user.id, { username: "bob", email: "b@c.com" });
-await client.users.activate(user.id);
 await client.users.deactivate(user.id);
 
 // Regions
@@ -75,7 +73,6 @@ const region = await client.regions.create({ accountId: 1, name: "us-east" });
 const regions = await client.regions.list();
 const r = await client.regions.get(region.id);
 await client.regions.edit(region.id, { accountId: 1, name: "us-west" });
-await client.regions.activate(region.id);
 await client.regions.deactivate(region.id);
 
 // Storages
@@ -86,7 +83,6 @@ const storage = await client.storages.create({
 const storages = await client.storages.list({ accountId: 1 });
 const s = await client.storages.get(storage.id);
 await client.storages.edit(storage.id, { name: "new-name" });
-await client.storages.activate(storage.id);
 await client.storages.deactivate(storage.id);
 
 // Volumes
@@ -96,7 +92,6 @@ const v = await client.volumes.get(vol.id);
 await client.volumes.edit(vol.id, { name: "data-v2" });
 await client.volumes.lock(vol.id);
 await client.volumes.unlock(vol.id);
-await client.volumes.activate(vol.id);
 await client.volumes.deactivate(vol.id);
 await client.volumes.updateQuota(vol.id, { quotaLimit: 1073741824 });
 const keys = await client.volumes.generateAPIKeys(vol.id, { userId: 1 });
@@ -108,9 +103,7 @@ const logs = await client.auditLogs.list({ accountId: 1, cursor: 0, limit: 20 })
 
 // Service nodes
 const nodes = await client.serviceNodes.list(region.id);
-await client.serviceNodes.drain(region.id, "node-1");
-await client.serviceNodes.activate(region.id, "node-1");
-await client.serviceNodes.remove(region.id, "node-1");
+const nodeStats = await client.serviceNodes.stats(region.id, "node-1");
 
 // Discover
 const meta = await client.discover.meta("AKID...");

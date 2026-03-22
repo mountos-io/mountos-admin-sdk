@@ -48,7 +48,7 @@ func main() {
   _, _ = client.Accounts.Edit(ctx, acct.ID, &sdk.EditAccountRequest{Name: "Acme Corp"})
   _, _ = client.Accounts.Lock(ctx, acct.ID)
   _, _ = client.Accounts.Unlock(ctx, acct.ID)
-  _, _ = client.Accounts.Activate(ctx, acct.ID)
+  _, _ = client.Accounts.Deactivate(ctx, acct.ID)
 
   // Users
   user, _ := client.Users.Add(ctx, &sdk.AddUserRequest{
