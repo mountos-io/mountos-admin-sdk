@@ -67,14 +67,6 @@ func (s *AccountsService) Unlock(ctx context.Context, accountID int64) (*IDRespo
 	return decodeJSON[IDResponse](data)
 }
 
-func (s *AccountsService) Activate(ctx context.Context, accountID int64) (*IDResponse, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/accounts/%s/activate", strconv.FormatInt(accountID, 10)), nil)
-	if err != nil {
-		return nil, err
-	}
-	return decodeJSON[IDResponse](data)
-}
-
 func (s *AccountsService) Deactivate(ctx context.Context, accountID int64) (*IDResponse, error) {
 	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/accounts/%s/deactivate", strconv.FormatInt(accountID, 10)), nil)
 	if err != nil {
@@ -116,14 +108,6 @@ func (s *UsersService) Get(ctx context.Context, userID int64) (*User, error) {
 
 func (s *UsersService) Edit(ctx context.Context, userID int64, req *EditUserRequest) (*IDResponse, error) {
 	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/users/%s/edit", strconv.FormatInt(userID, 10)), req)
-	if err != nil {
-		return nil, err
-	}
-	return decodeJSON[IDResponse](data)
-}
-
-func (s *UsersService) Activate(ctx context.Context, userID int64) (*IDResponse, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/users/%s/activate", strconv.FormatInt(userID, 10)), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -180,14 +164,6 @@ func (s *RegionsService) Edit(ctx context.Context, regionID int64, req *EditRegi
 	return decodeJSON[IDResponse](data)
 }
 
-func (s *RegionsService) Activate(ctx context.Context, regionID int64) (*IDResponse, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%s/activate", strconv.FormatInt(regionID, 10)), nil)
-	if err != nil {
-		return nil, err
-	}
-	return decodeJSON[IDResponse](data)
-}
-
 func (s *RegionsService) Deactivate(ctx context.Context, regionID int64) (*IDResponse, error) {
 	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%s/deactivate", strconv.FormatInt(regionID, 10)), nil)
 	if err != nil {
@@ -229,14 +205,6 @@ func (s *StoragesService) Get(ctx context.Context, storageID int64) (*Storage, e
 
 func (s *StoragesService) Edit(ctx context.Context, storageID int64, req *EditStorageRequest) (*IDResponse, error) {
 	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/storages/%s/edit", strconv.FormatInt(storageID, 10)), req)
-	if err != nil {
-		return nil, err
-	}
-	return decodeJSON[IDResponse](data)
-}
-
-func (s *StoragesService) Activate(ctx context.Context, storageID int64) (*IDResponse, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/activate", strconv.FormatInt(storageID, 10)), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -316,14 +284,6 @@ func (s *VolumesService) Lock(ctx context.Context, volumeID int64) (*IDResponse,
 
 func (s *VolumesService) Unlock(ctx context.Context, volumeID int64) (*IDResponse, error) {
 	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/volumes/%s/unlock", strconv.FormatInt(volumeID, 10)), nil)
-	if err != nil {
-		return nil, err
-	}
-	return decodeJSON[IDResponse](data)
-}
-
-func (s *VolumesService) Activate(ctx context.Context, volumeID int64) (*IDResponse, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/volumes/%s/activate", strconv.FormatInt(volumeID, 10)), nil)
 	if err != nil {
 		return nil, err
 	}

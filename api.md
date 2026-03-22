@@ -80,10 +80,6 @@ Response data: `{ "id": int64 }`
 Param: `accountId`
 Response data: `{ "id": int64 }`
 
-### POST /api/v1/accounts/:accountId/activate
-Param: `accountId`
-Response data: `{ "id": int64 }`
-
 ### POST /api/v1/accounts/:accountId/deactivate
 Param: `accountId`
 Response data: `{ "id": int64 }`
@@ -141,10 +137,6 @@ Request:
 ```
 Response data: `{ "id": int64 }`
 
-### POST /api/v1/users/:userId/activate
-Param: `userId`
-Response data: `{ "id": int64 }`
-
 ### POST /api/v1/users/:userId/deactivate
 Param: `userId`
 Response data: `{ "id": int64 }`
@@ -194,10 +186,6 @@ Request:
   "dns": string(required)
 }
 ```
-Response data: `{ "id": int64 }`
-
-### POST /api/v1/regions/:regionId/activate
-Param: `regionId`
 Response data: `{ "id": int64 }`
 
 ### POST /api/v1/regions/:regionId/deactivate
@@ -265,10 +253,6 @@ Request:
   "secretKey"?: string
 }
 ```
-Response data: `{ "id": int64 }`
-
-### POST /api/v1/storages/:storageId/activate
-Param: `storageId`
 Response data: `{ "id": int64 }`
 
 ### POST /api/v1/storages/:storageId/deactivate
@@ -365,10 +349,6 @@ Param: `volumeId`
 Response data: `{ "id": int64 }`
 
 ### POST /api/v1/volumes/:volumeId/unlock
-Param: `volumeId`
-Response data: `{ "id": int64 }`
-
-### POST /api/v1/volumes/:volumeId/activate
 Param: `volumeId`
 Response data: `{ "id": int64 }`
 

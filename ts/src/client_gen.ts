@@ -151,10 +151,6 @@ class AccountsResource {
     return this.client.request('POST', `/api/v1/accounts/${accountId}/unlock`)
   }
 
-  activate(accountId: number): Promise<{ id: number }> {
-    return this.client.request('POST', `/api/v1/accounts/${accountId}/activate`)
-  }
-
   deactivate(accountId: number): Promise<{ id: number }> {
     return this.client.request('POST', `/api/v1/accounts/${accountId}/deactivate`)
   }
@@ -177,10 +173,6 @@ class UsersResource {
 
   edit(userId: number, req: EditUserRequest): Promise<{ id: number }> {
     return this.client.request('PUT', `/api/v1/users/${userId}/edit`, req)
-  }
-
-  activate(userId: number): Promise<{ id: number }> {
-    return this.client.request('POST', `/api/v1/users/${userId}/activate`)
   }
 
   deactivate(userId: number): Promise<{ id: number }> {
@@ -207,10 +199,6 @@ class RegionsResource {
     return this.client.request('PUT', `/api/v1/regions/${regionId}/edit`, req)
   }
 
-  activate(regionId: number): Promise<{ id: number }> {
-    return this.client.request('POST', `/api/v1/regions/${regionId}/activate`)
-  }
-
   deactivate(regionId: number): Promise<{ id: number }> {
     return this.client.request('POST', `/api/v1/regions/${regionId}/deactivate`)
   }
@@ -233,10 +221,6 @@ class StoragesResource {
 
   edit(storageId: number, req: EditStorageRequest): Promise<{ id: number }> {
     return this.client.request('PUT', `/api/v1/storages/${storageId}/edit`, req)
-  }
-
-  activate(storageId: number): Promise<{ id: number }> {
-    return this.client.request('POST', `/api/v1/storages/${storageId}/activate`)
   }
 
   deactivate(storageId: number): Promise<{ id: number }> {
@@ -277,10 +261,6 @@ class VolumesResource {
 
   unlock(volumeId: number): Promise<{ id: number }> {
     return this.client.request('POST', `/api/v1/volumes/${volumeId}/unlock`)
-  }
-
-  activate(volumeId: number): Promise<{ id: number }> {
-    return this.client.request('POST', `/api/v1/volumes/${volumeId}/activate`)
   }
 
   deactivate(volumeId: number): Promise<{ id: number }> {

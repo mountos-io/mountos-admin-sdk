@@ -247,12 +247,6 @@ resources:
         response:
           - "id: int64"
 
-      - action: activate
-        method: POST
-        path: /:accountId/activate
-        response:
-          - "id: int64"
-
       - action: deactivate
         method: POST
         path: /:accountId/deactivate
@@ -300,12 +294,6 @@ resources:
         response:
           - "id: int64"
 
-      - action: activate
-        method: POST
-        path: /:userId/activate
-        response:
-          - "id: int64"
-
       - action: deactivate
         method: POST
         path: /:userId/deactivate
@@ -346,12 +334,6 @@ resources:
           - "accountId: int64!"
           - "name: string!"
           - "dns: string!"
-        response:
-          - "id: int64"
-
-      - action: activate
-        method: POST
-        path: /:regionId/activate
         response:
           - "id: int64"
 
@@ -410,12 +392,6 @@ resources:
           - "endpoint: string"
           - "accessKey: string"
           - "secretKey: string"
-        response:
-          - "id: int64"
-
-      - action: activate
-        method: POST
-        path: /:storageId/activate
         response:
           - "id: int64"
 
@@ -511,12 +487,6 @@ resources:
       - action: unlock
         method: POST
         path: /:volumeId/unlock
-        response:
-          - "id: int64"
-
-      - action: activate
-        method: POST
-        path: /:volumeId/activate
         response:
           - "id: int64"
 
