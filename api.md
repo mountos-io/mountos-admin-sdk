@@ -586,7 +586,7 @@ Response data: `LicenseDetails`
   "maxVolumes": int64,
   "maxUsers": int64,
   "maxStorageBytes": int64,
-  "status": string,
+  "status": LicenseStatus,
   "daysRemaining": int,
   "graceEndsAt": string,
   "graceDaysLeft": int

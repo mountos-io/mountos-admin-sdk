@@ -34,6 +34,8 @@ export interface ListOptions {
   limit?: number
 }
 
+export type LicenseStatus = 'valid' | 'expiring' | 'grace' | 'expired'
+
 export interface Account {
   id: number
   name: string
@@ -186,7 +188,7 @@ export interface LicenseDetails {
   maxVolumes: number
   maxUsers: number
   maxStorageBytes: number
-  status: string
+  status: LicenseStatus
   daysRemaining: number
   graceEndsAt: string
   graceDaysLeft: number

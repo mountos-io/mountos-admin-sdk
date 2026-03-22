@@ -27,7 +27,14 @@ errorCodes:
 #   "name: type!"  — required (request only)
 #   "name: type?"  — optional/omitempty
 #   "name: type=X" — query param with default value X
-# Types: string, int64, int32, int, bool, datetime, object, json, TypeName[]
+# Types: string, int64, int32, int, bool, datetime, object, json, EnumName, TypeName[]
+
+enums:
+  LicenseStatus:
+    - valid
+    - expiring
+    - grace
+    - expired
 
 types:
   Account:
@@ -183,7 +190,7 @@ types:
     - "maxVolumes: int64"
     - "maxUsers: int64"
     - "maxStorageBytes: int64"
-    - "status: string"
+    - "status: LicenseStatus"
     - "daysRemaining: int"
     - "graceEndsAt: string"
     - "graceDaysLeft: int"

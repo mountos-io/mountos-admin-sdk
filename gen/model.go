@@ -7,6 +7,7 @@ type Spec struct {
 	BasePath   string              `yaml:"basePath"`
 	JWT        JWTSpec             `yaml:"jwt"`
 	ErrorCodes []ErrorCodeDef      `yaml:"errorCodes"`
+	Enums      map[string][]string `yaml:"enums"`
 	Types      map[string][]string `yaml:"types"`
 	Resources  []Resource          `yaml:"resources"`
 }

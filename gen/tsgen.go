@@ -84,6 +84,20 @@ func generateTSTypes(spec *Spec, outDir string) {
 	w.WriteString("  limit?: number\n")
 	w.WriteString("}\n")
 
+	// Enum types
+	enumOrder := orderEnums(spec)
+	for _, name := range enumOrder {
+		values := spec.Enums[name]
+		w.WriteString("\nexport type " + name + " = ")
+		for i, v := range values {
+			if i > 0 {
+				w.WriteString(" | ")
+			}
+			w.WriteString("'" + v + "'")
+		}
+		w.WriteString("\n")
+	}
+
 	// Model types
 	typeOrder := orderTypes(spec)
 	for _, typeName := range typeOrder {

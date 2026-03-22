@@ -210,6 +210,18 @@ func generateGoTypes(spec *Spec, outDir string) {
 	w.WriteString("\tID int64 `json:\"id\"`\n")
 	w.WriteString("}\n")
 
+	// Enum types
+	enumOrder := orderEnums(spec)
+	for _, name := range enumOrder {
+		values := spec.Enums[name]
+		w.WriteString(fmt.Sprintf("type %s = string\n\nconst (\n", name))
+		for _, v := range values {
+			constName := name + pascalCase(v)
+			w.WriteString(fmt.Sprintf("\t%s %s = %q\n", constName, name, v))
+		}
+		w.WriteString(")\n\n")
+	}
+
 	// Collect type order from resources (types referenced first come first)
 	// Since map doesn't preserve order, use spec.Resources to determine output order
 	typeOrder := orderTypes(spec)
@@ -256,6 +268,15 @@ func generateGoTypes(spec *Spec, outDir string) {
 	}
 
 	writeFile(filepath.Join(outDir, "types_gen.go"), w.String())
+}
+
+func orderEnums(spec *Spec) []string {
+	var names []string
+	for name := range spec.Enums {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	return names
 }
 
 func orderTypes(spec *Spec) []string {
