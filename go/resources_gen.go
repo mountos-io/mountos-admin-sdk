@@ -290,8 +290,8 @@ func (s *VolumesService) Unlock(ctx context.Context, volumeID int64) (*IDRespons
 	return decodeJSON[IDResponse](data)
 }
 
-func (s *VolumesService) Deactivate(ctx context.Context, volumeID int64) (*IDResponse, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/volumes/%s/deactivate", strconv.FormatInt(volumeID, 10)), nil)
+func (s *VolumesService) Deactivate(ctx context.Context, volumeID int64, req *DeactivateVolumeRequest) (*IDResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/volumes/%s/deactivate", strconv.FormatInt(volumeID, 10)), req)
 	if err != nil {
 		return nil, err
 	}

@@ -9,10 +9,10 @@ import type {
   EditUserRequest, CreateRegionRequest, Region, EditRegionRequest, CreateStorageRequest, 
   Storage, StorageListOptions, EditStorageRequest, TestStorageBucketRequest, 
   CreateVolumeRequest, Volume, VolumeListOptions, EditVolumeRequest, 
-  GenerateVolumeAPIKeysRequest, RevokeVolumeAPIKeyRequest, UpdateVolumeQuotaRequest, 
-  AuditLog, AuditLogListOptions, RegionAuditLogListOptions, ServiceNode, ClientSession, 
-  ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, DashboardStats, 
-  LicenseDetails,
+  DeactivateVolumeRequest, GenerateVolumeAPIKeysRequest, RevokeVolumeAPIKeyRequest, 
+  UpdateVolumeQuotaRequest, AuditLog, AuditLogListOptions, RegionAuditLogListOptions, 
+  ServiceNode, ClientSession, ClientSessionListOptions, SessionSummary, 
+  DiscoverMetaResponse, DashboardStats, LicenseDetails,
 } from './types_gen.js'
 
 function queryString(params: Record<string, string | number | undefined>): string {
@@ -263,8 +263,8 @@ class VolumesResource {
     return this.client.request('POST', `/api/v1/volumes/${volumeId}/unlock`)
   }
 
-  deactivate(volumeId: number): Promise<{ id: number }> {
-    return this.client.request('POST', `/api/v1/volumes/${volumeId}/deactivate`)
+  deactivate(volumeId: number, req: DeactivateVolumeRequest): Promise<{ id: number }> {
+    return this.client.request('POST', `/api/v1/volumes/${volumeId}/deactivate`, req)
   }
 
   generateAPIKeys(volumeId: number, req: GenerateVolumeAPIKeysRequest): Promise<{ apiKey: string; apiSecret: string }> {

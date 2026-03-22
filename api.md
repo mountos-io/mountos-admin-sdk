@@ -354,6 +354,14 @@ Response data: `{ "id": int64 }`
 
 ### POST /api/v1/volumes/:volumeId/deactivate
 Param: `volumeId`
+Request:
+```
+{
+  "isCleanupMetaEnabled"?: bool,
+  "isCleanupStorageEnabled"?: bool,
+  "isCleanupVaultEnabled"?: bool
+}
+```
 Response data: `{ "id": int64 }`
 
 ### POST /api/v1/volumes/:volumeId/api-keys/generate
@@ -403,6 +411,9 @@ Response data: `{ "volumeId": string, "diskSize": int64, "activeSize": int64, "s
   "quotaUsed": int64,
   "locked": bool,
   "isActive": bool,
+  "isCleanupMetaEnabled": bool,
+  "isCleanupStorageEnabled": bool,
+  "isCleanupVaultEnabled": bool,
   "createdAt": RFC3339,
   "updatedAt": RFC3339
 }

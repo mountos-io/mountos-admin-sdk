@@ -97,6 +97,9 @@ types:
     - "quotaUsed: int64"
     - "locked: bool"
     - "isActive: bool"
+    - "isCleanupMetaEnabled: bool"
+    - "isCleanupStorageEnabled: bool"
+    - "isCleanupVaultEnabled: bool"
     - "createdAt: datetime"
     - "updatedAt: datetime"
 
@@ -493,6 +496,10 @@ resources:
       - action: deactivate
         method: POST
         path: /:volumeId/deactivate
+        request:
+          - "isCleanupMetaEnabled: bool"
+          - "isCleanupStorageEnabled: bool"
+          - "isCleanupVaultEnabled: bool"
         response:
           - "id: int64"
 

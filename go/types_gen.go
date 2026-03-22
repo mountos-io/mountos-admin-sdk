@@ -103,19 +103,22 @@ type Storage struct {
 }
 
 type Volume struct {
-	ID          int64  `json:"id"`
-	AccountID   int64  `json:"accountId"`
-	StorageID   int64  `json:"storageId"`
-	RegionID    int64  `json:"regionId"`
-	Name        string `json:"name"`
-	Description string `json:"description,omitempty"`
-	Encryption  bool   `json:"encryption"`
-	QuotaLimit  int64  `json:"quotaLimit"`
-	QuotaUsed   int64  `json:"quotaUsed"`
-	Locked      bool   `json:"locked"`
-	IsActive    bool   `json:"isActive"`
-	CreatedAt   string `json:"createdAt"`
-	UpdatedAt   string `json:"updatedAt"`
+	ID                      int64  `json:"id"`
+	AccountID               int64  `json:"accountId"`
+	StorageID               int64  `json:"storageId"`
+	RegionID                int64  `json:"regionId"`
+	Name                    string `json:"name"`
+	Description             string `json:"description,omitempty"`
+	Encryption              bool   `json:"encryption"`
+	QuotaLimit              int64  `json:"quotaLimit"`
+	QuotaUsed               int64  `json:"quotaUsed"`
+	Locked                  bool   `json:"locked"`
+	IsActive                bool   `json:"isActive"`
+	IsCleanupMetaEnabled    bool   `json:"isCleanupMetaEnabled"`
+	IsCleanupStorageEnabled bool   `json:"isCleanupStorageEnabled"`
+	IsCleanupVaultEnabled   bool   `json:"isCleanupVaultEnabled"`
+	CreatedAt               string `json:"createdAt"`
+	UpdatedAt               string `json:"updatedAt"`
 }
 
 type AuditLog struct {
@@ -362,6 +365,12 @@ type EditVolumeRequest struct {
 	Encryption      bool   `json:"encryption,omitempty"`
 	RetentionPeriod int32  `json:"retentionPeriod,omitempty"`
 	GracePeriod     int32  `json:"gracePeriod,omitempty"`
+}
+
+type DeactivateVolumeRequest struct {
+	IsCleanupMetaEnabled    bool `json:"isCleanupMetaEnabled,omitempty"`
+	IsCleanupStorageEnabled bool `json:"isCleanupStorageEnabled,omitempty"`
+	IsCleanupVaultEnabled   bool `json:"isCleanupVaultEnabled,omitempty"`
 }
 
 type GenerateVolumeAPIKeysRequest struct {

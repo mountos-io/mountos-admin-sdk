@@ -100,6 +100,9 @@ export interface Volume {
   quotaUsed: number
   locked: boolean
   isActive: boolean
+  isCleanupMetaEnabled: boolean
+  isCleanupStorageEnabled: boolean
+  isCleanupVaultEnabled: boolean
   createdAt: string
   updatedAt: string
 }
@@ -321,6 +324,12 @@ export interface EditVolumeRequest {
   encryption?: boolean
   retentionPeriod?: number
   gracePeriod?: number
+}
+
+export interface DeactivateVolumeRequest {
+  isCleanupMetaEnabled?: boolean
+  isCleanupStorageEnabled?: boolean
+  isCleanupVaultEnabled?: boolean
 }
 
 export interface GenerateVolumeAPIKeysRequest {
