@@ -387,6 +387,7 @@ export interface RegionAuditLogListOptions {
 export interface ClientSessionListOptions extends ListOptions {
   accountId?: number
   regionId?: number
+  volumeId?: number
   clientType?: string
   status?: string
 }

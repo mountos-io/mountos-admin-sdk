@@ -471,6 +471,9 @@ func (s *ClientSessionsService) List(ctx context.Context, opts *ClientSessionLis
 		if opts.RegionID != 0 {
 			q.Set("regionId", strconv.FormatInt(opts.RegionID, 10))
 		}
+		if opts.VolumeID != 0 {
+			q.Set("volumeId", strconv.FormatInt(opts.VolumeID, 10))
+		}
 		if opts.ClientType != "" {
 			q.Set("clientType", opts.ClientType)
 		}

@@ -442,6 +442,7 @@ type RegionAuditLogListOptions struct {
 type ClientSessionListOptions struct {
 	AccountID  int64
 	RegionID   int64
+	VolumeID   int64
 	ClientType string
 	Status     string
 	Page       int

@@ -619,6 +619,7 @@ resources:
         query:
           - "accountId: int64"
           - "regionId: int64"
+          - "volumeId: int64"
           - "clientType: string"
           - "status: string"
           - "page: int=1"

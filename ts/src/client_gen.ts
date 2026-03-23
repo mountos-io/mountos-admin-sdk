@@ -343,7 +343,7 @@ class ClientSessionsResource {
   constructor(private client: MountOSAdmin) {}
 
   list(opts?: ClientSessionListOptions): Promise<PaginatedResponse<ClientSession>> {
-    return this.client.request('GET', `/api/v1/client-sessions/list${queryString({ accountId: opts?.accountId, regionId: opts?.regionId, clientType: opts?.clientType, status: opts?.status, page: opts?.page, limit: opts?.limit })}`)
+    return this.client.request('GET', `/api/v1/client-sessions/list${queryString({ accountId: opts?.accountId, regionId: opts?.regionId, volumeId: opts?.volumeId, clientType: opts?.clientType, status: opts?.status, page: opts?.page, limit: opts?.limit })}`)
   }
 
   get(sessionId: number): Promise<ClientSession> {
