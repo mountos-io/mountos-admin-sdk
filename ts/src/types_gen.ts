@@ -42,6 +42,8 @@ export interface Account {
   description: string
   iconUrl?: string
   vendorInfo?: Record<string, unknown>
+  liveVolume: number
+  totalVolume: number
   isActive: boolean
   locked: boolean
   createdAt: string
@@ -63,6 +65,8 @@ export interface Region {
   accountId: number
   name: string
   dns: string
+  liveVolume: number
+  totalVolume: number
   isActive: boolean
   createdAt: string
   updatedAt: string
@@ -97,7 +101,9 @@ export interface Volume {
   description?: string
   encryption: boolean
   quotaLimit: number
-  quotaUsed: number
+  liveVolume: number
+  totalVolume: number
+  pendingVolume: number
   locked: boolean
   retentionPeriod: number
   gracePeriod: number
@@ -176,7 +182,7 @@ export interface DashboardStats {
   volumeCount: number
   regionCount: number
   storageCount: number
-  totalQuotaUsed: number
+  totalVolumeUsed: number
   totalQuotaLimit: number
   activeSessionCount: number
   regionBreakdown: RegionVolumeMetrics[]
@@ -215,7 +221,7 @@ export interface RegionVolumeMetrics {
   regionId: number
   regionName: string
   volumeCount: number
-  totalQuotaUsed: number
+  totalVolumeUsed: number
   totalQuotaLimit: number
 }
 

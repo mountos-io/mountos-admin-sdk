@@ -47,6 +47,8 @@ types:
     - "description: string"
     - "iconUrl: string?"
     - "vendorInfo: object?"
+    - "liveVolume: int64"
+    - "totalVolume: int64"
     - "isActive: bool"
     - "locked: bool"
     - "createdAt: datetime"
@@ -66,6 +68,8 @@ types:
     - "accountId: int64"
     - "name: string"
     - "dns: string"
+    - "liveVolume: int64"
+    - "totalVolume: int64"
     - "isActive: bool"
     - "createdAt: datetime"
     - "updatedAt: datetime"
@@ -98,7 +102,9 @@ types:
     - "description: string?"
     - "encryption: bool"
     - "quotaLimit: int64"
-    - "quotaUsed: int64"
+    - "liveVolume: int64"
+    - "totalVolume: int64"
+    - "pendingVolume: int64"
     - "locked: bool"
     - "retentionPeriod: int32"
     - "gracePeriod: int32"
@@ -175,7 +181,7 @@ types:
     - "regionId: int64"
     - "regionName: string"
     - "volumeCount: int64"
-    - "totalQuotaUsed: int64"
+    - "totalVolumeUsed: int64"
     - "totalQuotaLimit: int64"
 
   DashboardStats:
@@ -183,7 +189,7 @@ types:
     - "volumeCount: int64"
     - "regionCount: int64"
     - "storageCount: int64"
-    - "totalQuotaUsed: int64"
+    - "totalVolumeUsed: int64"
     - "totalQuotaLimit: int64"
     - "activeSessionCount: int64"
     - "regionBreakdown: RegionVolumeMetrics[]"
@@ -545,9 +551,9 @@ resources:
         path: /:volumeId/stats
         response:
           - "volumeId: string"
-          - "diskSize: int64"
-          - "activeSize: int64"
-          - "size: int64"
+          - "liveVolume: int64"
+          - "totalVolume: int64"
+          - "pendingVolume: int64"
 
   - name: AuditLogs
     path: /audit-logs

@@ -56,6 +56,8 @@ type Account struct {
 	Description string         `json:"description"`
 	IconURL     string         `json:"iconUrl,omitempty"`
 	VendorInfo  map[string]any `json:"vendorInfo,omitempty"`
+	LiveVolume  int64          `json:"liveVolume"`
+	TotalVolume int64          `json:"totalVolume"`
 	IsActive    bool           `json:"isActive"`
 	Locked      bool           `json:"locked"`
 	CreatedAt   string         `json:"createdAt"`
@@ -72,14 +74,16 @@ type User struct {
 }
 
 type Region struct {
-	ID        int64  `json:"id"`
-	ExportID  string `json:"exportId"`
-	AccountID int64  `json:"accountId"`
-	Name      string `json:"name"`
-	DNS       string `json:"dns"`
-	IsActive  bool   `json:"isActive"`
-	CreatedAt string `json:"createdAt"`
-	UpdatedAt string `json:"updatedAt"`
+	ID          int64  `json:"id"`
+	ExportID    string `json:"exportId"`
+	AccountID   int64  `json:"accountId"`
+	Name        string `json:"name"`
+	DNS         string `json:"dns"`
+	LiveVolume  int64  `json:"liveVolume"`
+	TotalVolume int64  `json:"totalVolume"`
+	IsActive    bool   `json:"isActive"`
+	CreatedAt   string `json:"createdAt"`
+	UpdatedAt   string `json:"updatedAt"`
 }
 
 type Storage struct {
@@ -111,7 +115,9 @@ type Volume struct {
 	Description             string `json:"description,omitempty"`
 	Encryption              bool   `json:"encryption"`
 	QuotaLimit              int64  `json:"quotaLimit"`
-	QuotaUsed               int64  `json:"quotaUsed"`
+	LiveVolume              int64  `json:"liveVolume"`
+	TotalVolume             int64  `json:"totalVolume"`
+	PendingVolume           int64  `json:"pendingVolume"`
 	Locked                  bool   `json:"locked"`
 	RetentionPeriod         int32  `json:"retentionPeriod"`
 	GracePeriod             int32  `json:"gracePeriod"`
@@ -190,7 +196,7 @@ type DashboardStats struct {
 	VolumeCount        int64                 `json:"volumeCount"`
 	RegionCount        int64                 `json:"regionCount"`
 	StorageCount       int64                 `json:"storageCount"`
-	TotalQuotaUsed     int64                 `json:"totalQuotaUsed"`
+	TotalVolumeUsed    int64                 `json:"totalVolumeUsed"`
 	TotalQuotaLimit    int64                 `json:"totalQuotaLimit"`
 	ActiveSessionCount int64                 `json:"activeSessionCount"`
 	RegionBreakdown    []RegionVolumeMetrics `json:"regionBreakdown"`
@@ -229,7 +235,7 @@ type RegionVolumeMetrics struct {
 	RegionID        int64  `json:"regionId"`
 	RegionName      string `json:"regionName"`
 	VolumeCount     int64  `json:"volumeCount"`
-	TotalQuotaUsed  int64  `json:"totalQuotaUsed"`
+	TotalVolumeUsed int64  `json:"totalVolumeUsed"`
 	TotalQuotaLimit int64  `json:"totalQuotaLimit"`
 }
 
@@ -402,10 +408,10 @@ type UpdateVolumeQuotaRequest struct {
 }
 
 type StatsVolumeResponse struct {
-	VolumeID   string `json:"volumeId"`
-	DiskSize   int64  `json:"diskSize"`
-	ActiveSize int64  `json:"activeSize"`
-	Size       int64  `json:"size"`
+	VolumeID      string `json:"volumeId"`
+	LiveVolume    int64  `json:"liveVolume"`
+	TotalVolume   int64  `json:"totalVolume"`
+	PendingVolume int64  `json:"pendingVolume"`
 }
 
 type VolumeListOptions struct {

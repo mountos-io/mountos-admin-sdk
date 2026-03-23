@@ -92,6 +92,8 @@ Response data: `{ "id": int64 }`
   "description": string,
   "iconUrl"?: string,
   "vendorInfo"?: object,
+  "liveVolume": int64,
+  "totalVolume": int64,
   "isActive": bool,
   "locked": bool,
   "createdAt": RFC3339,
@@ -200,6 +202,8 @@ Response data: `{ "id": int64 }`
   "accountId": int64,
   "name": string,
   "dns": string,
+  "liveVolume": int64,
+  "totalVolume": int64,
   "isActive": bool,
   "createdAt": RFC3339,
   "updatedAt": RFC3339
@@ -402,7 +406,7 @@ Response data: `{ "id": int64 }`
 
 ### GET /api/v1/volumes/:volumeId/stats
 Param: `volumeId`
-Response data: `{ "volumeId": string, "diskSize": int64, "activeSize": int64, "size": int64 }`
+Response data: `{ "volumeId": string, "liveVolume": int64, "totalVolume": int64, "pendingVolume": int64 }`
 
 ### Volume Type
 ```
@@ -415,7 +419,9 @@ Response data: `{ "volumeId": string, "diskSize": int64, "activeSize": int64, "s
   "description"?: string,
   "encryption": bool,
   "quotaLimit": int64,
-  "quotaUsed": int64,
+  "liveVolume": int64,
+  "totalVolume": int64,
+  "pendingVolume": int64,
   "locked": bool,
   "retentionPeriod": int32,
   "gracePeriod": int32,
