@@ -435,6 +435,8 @@ type RegionAuditLogListOptions struct {
 
 // ServiceNodes
 
+// Nodes
+
 // ClientSessions
 
 type ClientSessionListOptions struct {

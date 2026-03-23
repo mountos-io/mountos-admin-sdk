@@ -34,6 +34,7 @@ export class MountOSAdmin {
   private _auditLogs?: AuditLogsResource
   private _regionAuditLogs?: RegionAuditLogsResource
   private _serviceNodes?: ServiceNodesResource
+  private _nodes?: NodesResource
   private _clientSessions?: ClientSessionsResource
   private _discover?: DiscoverResource
   private _dashboard?: DashboardResource
@@ -75,6 +76,10 @@ export class MountOSAdmin {
 
   get serviceNodes(): ServiceNodesResource {
     return (this._serviceNodes ??= new ServiceNodesResource(this))
+  }
+
+  get nodes(): NodesResource {
+    return (this._nodes ??= new NodesResource(this))
   }
 
   get clientSessions(): ClientSessionsResource {
@@ -317,12 +322,20 @@ class RegionAuditLogsResource {
 class ServiceNodesResource {
   constructor(private client: MountOSAdmin) {}
 
-  list(regionId: number, serviceType?: string, status?: string): Promise<ServiceNode[]> {
-    return this.client.request('GET', `/api/v1/regions/${regionId}/nodes${queryString({ serviceType: serviceType, status: status })}`)
+  list(regionId: number, serviceType?: string, status?: string, inactiveHours?: number): Promise<ServiceNode[]> {
+    return this.client.request('GET', `/api/v1/regions/${regionId}/nodes${queryString({ serviceType: serviceType, status: status, inactiveHours: inactiveHours })}`)
   }
 
   stats(regionId: number, nodeId: string): Promise<string> {
     return this.client.request('GET', `/api/v1/regions/${regionId}/nodes/${encodeURIComponent(nodeId)}/stats`)
+  }
+}
+
+class NodesResource {
+  constructor(private client: MountOSAdmin) {}
+
+  listAll(serviceType?: string, status?: string, inactiveHours?: number): Promise<ServiceNode[]> {
+    return this.client.request('GET', `/api/v1/nodes${queryString({ serviceType: serviceType, status: status, inactiveHours: inactiveHours })}`)
   }
 }
 

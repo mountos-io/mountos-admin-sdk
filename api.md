@@ -483,13 +483,37 @@ Response data: `{ "items": AuditLog[], "nextCursor": int64|null }`
 
 ### GET /api/v1/regions/:regionId/nodes
 Param: `regionId`
-Query: `serviceType=string`, `status=string`
+Query: `serviceType=string`, `status=string`, `inactiveHours=int`
 Response data: `ServiceNode[]`
 
 ### GET /api/v1/regions/:regionId/nodes/:nodeId/stats
 Param: `regionId`
 Param: `nodeId`
 Response data: `string`
+
+### ServiceNode Type
+```
+{
+  "id": int64,
+  "regionId": int64,
+  "serviceType": string,
+  "nodeId": string,
+  "advertiseAddr": string,
+  "rpcAddr"?: string,
+  "metadata"?: object,
+  "status": string,
+  "lastHeartbeat"?: int64,
+  "isActive": bool
+}
+```
+
+---
+
+## Nodes
+
+### GET /api/v1/nodes
+Query: `serviceType=string`, `status=string`, `inactiveHours=int`
+Response data: `ServiceNode[]`
 
 ### ServiceNode Type
 ```

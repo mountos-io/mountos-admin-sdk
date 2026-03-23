@@ -18,6 +18,7 @@ type Client struct {
 	AuditLogs       *AuditLogsService
 	RegionAuditLogs *RegionAuditLogsService
 	ServiceNodes    *ServiceNodesService
+	Nodes           *NodesService
 	ClientSessions  *ClientSessionsService
 	Discover        *DiscoverService
 	Dashboard       *DashboardService
@@ -45,6 +46,7 @@ func NewClient(cfg Config) (*Client, error) {
 	c.AuditLogs = &AuditLogsService{c: c}
 	c.RegionAuditLogs = &RegionAuditLogsService{c: c}
 	c.ServiceNodes = &ServiceNodesService{c: c}
+	c.Nodes = &NodesService{c: c}
 	c.ClientSessions = &ClientSessionsService{c: c}
 	c.Discover = &DiscoverService{c: c}
 	c.Dashboard = &DashboardService{c: c}

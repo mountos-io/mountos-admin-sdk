@@ -587,6 +587,7 @@ resources:
         query:
           - "serviceType: string"
           - "status: string"
+          - "inactiveHours: int"
         responseType: ServiceNode
         responseArray: true
 
@@ -594,6 +595,19 @@ resources:
         method: GET
         path: /:nodeId/stats
         responseType: string
+
+  - name: Nodes
+    path: /nodes
+    endpoints:
+      - action: listAll
+        method: GET
+        path: /
+        query:
+          - "serviceType: string"
+          - "status: string"
+          - "inactiveHours: int"
+        responseType: ServiceNode
+        responseArray: true
 
   - name: ClientSessions
     path: /client-sessions

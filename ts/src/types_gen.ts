@@ -380,6 +380,8 @@ export interface RegionAuditLogListOptions {
 
 // ServiceNodes
 
+// Nodes
+
 // ClientSessions
 
 export interface ClientSessionListOptions extends ListOptions {
