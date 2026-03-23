@@ -70,8 +70,8 @@ export interface Region {
 
 export interface Storage {
   id: number
-  accountId: number
-  regionId: number
+  account: Ref
+  regionInfo: Ref
   name: string
   description?: string
   storageType: string
@@ -90,9 +90,9 @@ export interface Storage {
 
 export interface Volume {
   id: number
-  accountId: number
-  storageId: number
-  regionId: number
+  account: Ref
+  storage: Ref
+  region: Ref
   name: string
   description?: string
   encryption: boolean
@@ -137,9 +137,10 @@ export interface ServiceNode {
 
 export interface ClientSession {
   id: number
-  accountId: number
+  account: Ref
+  region: Ref
   volumeId: string
-  regionId: number
+  volumeName?: string
   userId?: string
   clientType: string
   osName: string
@@ -205,6 +206,11 @@ export interface DiscoverEndpoint {
   status: string
 }
 
+export interface Ref {
+  id: number
+  name: string
+}
+
 export interface RegionVolumeMetrics {
   regionId: number
   regionName: string
@@ -248,6 +254,7 @@ export interface EditUserRequest {
 
 export interface UserListOptions extends ListOptions {
   accountId: number
+  search?: string
 }
 
 // Regions
@@ -340,12 +347,18 @@ export interface RevokeVolumeAPIKeyRequest {
   apiKey: string
 }
 
+export interface RevokeVolumeAPIKeysByUserRequest {
+  userId: number
+}
+
 export interface UpdateVolumeQuotaRequest {
   quotaLimit: number
 }
 
 export interface VolumeListOptions extends ListOptions {
   accountId: number
+  regionId?: number
+  storageId?: number
 }
 
 // AuditLogs

@@ -10,9 +10,10 @@ import type {
   Storage, StorageListOptions, EditStorageRequest, TestStorageBucketRequest, 
   CreateVolumeRequest, Volume, VolumeListOptions, EditVolumeRequest, 
   DeactivateVolumeRequest, GenerateVolumeAPIKeysRequest, RevokeVolumeAPIKeyRequest, 
-  UpdateVolumeQuotaRequest, AuditLog, AuditLogListOptions, RegionAuditLogListOptions, 
-  ServiceNode, ClientSession, ClientSessionListOptions, SessionSummary, 
-  DiscoverMetaResponse, DashboardStats, LicenseDetails,
+  RevokeVolumeAPIKeysByUserRequest, UpdateVolumeQuotaRequest, AuditLog, 
+  AuditLogListOptions, RegionAuditLogListOptions, ServiceNode, ClientSession, 
+  ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, DashboardStats, 
+  LicenseDetails,
 } from './types_gen.js'
 
 function queryString(params: Record<string, string | number | undefined>): string {
@@ -164,7 +165,7 @@ class UsersResource {
   }
 
   list(opts: UserListOptions): Promise<PaginatedResponse<User>> {
-    return this.client.request('GET', `/api/v1/users/list${queryString({ accountId: opts.accountId, page: opts.page, limit: opts.limit })}`)
+    return this.client.request('GET', `/api/v1/users/list${queryString({ accountId: opts.accountId, search: opts.search, page: opts.page, limit: opts.limit })}`)
   }
 
   get(userId: number): Promise<User> {
@@ -244,7 +245,7 @@ class VolumesResource {
   }
 
   list(opts: VolumeListOptions): Promise<PaginatedResponse<Volume>> {
-    return this.client.request('GET', `/api/v1/volumes/list${queryString({ accountId: opts.accountId, page: opts.page, limit: opts.limit })}`)
+    return this.client.request('GET', `/api/v1/volumes/list${queryString({ accountId: opts.accountId, regionId: opts.regionId, storageId: opts.storageId, page: opts.page, limit: opts.limit })}`)
   }
 
   get(volumeId: number): Promise<Volume> {
@@ -273,6 +274,10 @@ class VolumesResource {
 
   revokeAPIKey(volumeId: number, req: RevokeVolumeAPIKeyRequest): Promise<void> {
     return this.client.request('POST', `/api/v1/volumes/${volumeId}/api-keys/revoke`, req)
+  }
+
+  revokeAPIKeysByUser(volumeId: number, req: RevokeVolumeAPIKeysByUserRequest): Promise<void> {
+    return this.client.request('POST', `/api/v1/volumes/${volumeId}/api-keys/revoke-by-user`, req)
   }
 
   updateQuota(volumeId: number, req: UpdateVolumeQuotaRequest): Promise<{ id: number }> {

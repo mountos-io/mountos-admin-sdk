@@ -89,6 +89,9 @@ func (s *UsersService) List(ctx context.Context, opts *UserListOptions) (*Pagina
 	q := url.Values{}
 	if opts != nil {
 		q.Set("accountId", strconv.FormatInt(opts.AccountID, 10))
+		if opts.Search != "" {
+			q.Set("search", opts.Search)
+		}
 		addPagination(q, opts.Page, opts.Limit)
 	}
 	data, err := s.c.get(ctx, "/api/v1/users/list"+"?"+q.Encode())
@@ -249,6 +252,12 @@ func (s *VolumesService) List(ctx context.Context, opts *VolumeListOptions) (*Pa
 	q := url.Values{}
 	if opts != nil {
 		q.Set("accountId", strconv.FormatInt(opts.AccountID, 10))
+		if opts.RegionID != 0 {
+			q.Set("regionId", strconv.FormatInt(opts.RegionID, 10))
+		}
+		if opts.StorageID != 0 {
+			q.Set("storageId", strconv.FormatInt(opts.StorageID, 10))
+		}
 		addPagination(q, opts.Page, opts.Limit)
 	}
 	data, err := s.c.get(ctx, "/api/v1/volumes/list"+"?"+q.Encode())
@@ -308,6 +317,11 @@ func (s *VolumesService) GenerateAPIKeys(ctx context.Context, volumeID int64, re
 
 func (s *VolumesService) RevokeAPIKey(ctx context.Context, volumeID int64, req *RevokeVolumeAPIKeyRequest) error {
 	_, err := s.c.post(ctx, fmt.Sprintf("/api/v1/volumes/%s/api-keys/revoke", strconv.FormatInt(volumeID, 10)), req)
+	return err
+}
+
+func (s *VolumesService) RevokeAPIKeysByUser(ctx context.Context, volumeID int64, req *RevokeVolumeAPIKeysByUserRequest) error {
+	_, err := s.c.post(ctx, fmt.Sprintf("/api/v1/volumes/%s/api-keys/revoke-by-user", strconv.FormatInt(volumeID, 10)), req)
 	return err
 }
 

@@ -84,8 +84,8 @@ type Region struct {
 
 type Storage struct {
 	ID           int64  `json:"id"`
-	AccountID    int64  `json:"accountId"`
-	RegionID     int64  `json:"regionId"`
+	Account      Ref    `json:"account"`
+	RegionInfo   Ref    `json:"regionInfo"`
 	Name         string `json:"name"`
 	Description  string `json:"description,omitempty"`
 	StorageType  string `json:"storageType"`
@@ -104,9 +104,9 @@ type Storage struct {
 
 type Volume struct {
 	ID                      int64  `json:"id"`
-	AccountID               int64  `json:"accountId"`
-	StorageID               int64  `json:"storageId"`
-	RegionID                int64  `json:"regionId"`
+	Account                 Ref    `json:"account"`
+	Storage                 Ref    `json:"storage"`
+	Region                  Ref    `json:"region"`
 	Name                    string `json:"name"`
 	Description             string `json:"description,omitempty"`
 	Encryption              bool   `json:"encryption"`
@@ -151,9 +151,10 @@ type ServiceNode struct {
 
 type ClientSession struct {
 	ID             int64           `json:"id"`
-	AccountID      int64           `json:"accountId"`
+	Account        Ref             `json:"account"`
+	Region         Ref             `json:"region"`
 	VolumeID       string          `json:"volumeId"`
-	RegionID       int64           `json:"regionId"`
+	VolumeName     string          `json:"volumeName,omitempty"`
 	UserID         string          `json:"userId,omitempty"`
 	ClientType     string          `json:"clientType"`
 	OsName         string          `json:"osName"`
@@ -219,6 +220,11 @@ type DiscoverEndpoint struct {
 	Status string `json:"status"`
 }
 
+type Ref struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
 type RegionVolumeMetrics struct {
 	RegionID        int64  `json:"regionId"`
 	RegionName      string `json:"regionName"`
@@ -262,6 +268,7 @@ type EditUserRequest struct {
 
 type UserListOptions struct {
 	AccountID int64
+	Search    string
 	Page      int
 	Limit     int
 }
@@ -386,6 +393,10 @@ type RevokeVolumeAPIKeyRequest struct {
 	APIKey string `json:"apiKey"`
 }
 
+type RevokeVolumeAPIKeysByUserRequest struct {
+	UserID int64 `json:"userId"`
+}
+
 type UpdateVolumeQuotaRequest struct {
 	QuotaLimit int64 `json:"quotaLimit"`
 }
@@ -399,6 +410,8 @@ type StatsVolumeResponse struct {
 
 type VolumeListOptions struct {
 	AccountID int64
+	RegionID  int64
+	StorageID int64
 	Page      int
 	Limit     int
 }

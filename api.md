@@ -117,7 +117,7 @@ Request:
 Response data: `{ "id": int64 }`
 
 ### GET /api/v1/users/list
-Query: `accountId=int64(required)`, `page=int(default 1)`, `limit=int(default 10)`
+Query: `accountId=int64(required)`, `search=string`, `page=int(default 1)`, `limit=int(default 10)`
 Response data: `{ "items": User[], "pagination": PaginationMeta }`
 
 ### GET /api/v1/users/:userId
@@ -281,8 +281,8 @@ Response data: `{ "bucketExists": bool, "list": bool, "write": bool, "read": boo
 ```
 {
   "id": int64,
-  "accountId": int64,
-  "regionId": int64,
+  "account": Ref,
+  "regionInfo": Ref,
   "name": string,
   "description"?: string,
   "storageType": string,
@@ -323,7 +323,7 @@ Request:
 Response data: `{ "id": int64, "encryptionKey": string }`
 
 ### GET /api/v1/volumes/list
-Query: `accountId=int64(required)`, `page=int(default 1)`, `limit=int(default 10)`
+Query: `accountId=int64(required)`, `regionId=int64`, `storageId=int64`, `page=int(default 1)`, `limit=int(default 10)`
 Response data: `{ "items": Volume[], "pagination": PaginationMeta }`
 
 ### GET /api/v1/volumes/:volumeId
@@ -381,6 +381,15 @@ Request:
 }
 ```
 
+### POST /api/v1/volumes/:volumeId/api-keys/revoke-by-user
+Param: `volumeId`
+Request:
+```
+{
+  "userId": int64(required)
+}
+```
+
 ### PUT /api/v1/volumes/:volumeId/quota
 Param: `volumeId`
 Request:
@@ -399,9 +408,9 @@ Response data: `{ "volumeId": string, "diskSize": int64, "activeSize": int64, "s
 ```
 {
   "id": int64,
-  "accountId": int64,
-  "storageId": int64,
-  "regionId": int64,
+  "account": Ref,
+  "storage": Ref,
+  "region": Ref,
   "name": string,
   "description"?: string,
   "encryption": bool,
@@ -518,9 +527,10 @@ Response data: `SessionSummary[]`
 ```
 {
   "id": int64,
-  "accountId": int64,
+  "account": Ref,
+  "region": Ref,
   "volumeId": string,
-  "regionId": int64,
+  "volumeName"?: string,
   "userId"?: string,
   "clientType": string,
   "osName": string,

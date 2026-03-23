@@ -37,6 +37,10 @@ enums:
     - expired
 
 types:
+  Ref:
+    - "id: int64"
+    - "name: string"
+
   Account:
     - "id: int64"
     - "name: string"
@@ -68,8 +72,8 @@ types:
 
   Storage:
     - "id: int64"
-    - "accountId: int64"
-    - "regionId: int64"
+    - "account: Ref"
+    - "regionInfo: Ref"
     - "name: string"
     - "description: string?"
     - "storageType: string"
@@ -87,9 +91,9 @@ types:
 
   Volume:
     - "id: int64"
-    - "accountId: int64"
-    - "storageId: int64"
-    - "regionId: int64"
+    - "account: Ref"
+    - "storage: Ref"
+    - "region: Ref"
     - "name: string"
     - "description: string?"
     - "encryption: bool"
@@ -131,9 +135,10 @@ types:
 
   ClientSession:
     - "id: int64"
-    - "accountId: int64"
+    - "account: Ref"
+    - "region: Ref"
     - "volumeId: string"
-    - "regionId: int64"
+    - "volumeName: string?"
     - "userId: string?"
     - "clientType: string"
     - "osName: string"
@@ -279,6 +284,7 @@ resources:
         pagination: page
         query:
           - "accountId: int64!"
+          - "search: string"
           - "page: int=1"
           - "limit: int=10"
         responseType: User
@@ -462,6 +468,8 @@ resources:
         pagination: page
         query:
           - "accountId: int64!"
+          - "regionId: int64"
+          - "storageId: int64"
           - "page: int=1"
           - "limit: int=10"
         responseType: Volume
@@ -517,6 +525,12 @@ resources:
         path: /:volumeId/api-keys/revoke
         request:
           - "apiKey: string!"
+
+      - action: revokeApiKeysByUser
+        method: POST
+        path: /:volumeId/api-keys/revoke-by-user
+        request:
+          - "userId: int64!"
 
       - action: updateQuota
         method: PUT
