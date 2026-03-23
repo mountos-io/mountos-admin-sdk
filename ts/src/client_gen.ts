@@ -350,8 +350,8 @@ class ClientSessionsResource {
     return this.client.request('GET', `/api/v1/client-sessions/${sessionId}`)
   }
 
-  summary(accountId?: number): Promise<SessionSummary[]> {
-    return this.client.request('GET', `/api/v1/client-sessions/summary${queryString({ accountId: accountId })}`)
+  summary(accountId?: number, volumeId?: number): Promise<SessionSummary[]> {
+    return this.client.request('GET', `/api/v1/client-sessions/summary${queryString({ accountId: accountId, volumeId: volumeId })}`)
   }
 }
 

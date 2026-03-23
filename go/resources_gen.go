@@ -501,10 +501,13 @@ func (s *ClientSessionsService) Get(ctx context.Context, sessionID int64) (*Clie
 	return decodeJSON[ClientSession](data)
 }
 
-func (s *ClientSessionsService) Summary(ctx context.Context, accountID int64) ([]SessionSummary, error) {
+func (s *ClientSessionsService) Summary(ctx context.Context, accountID int64, volumeID int64) ([]SessionSummary, error) {
 	q := url.Values{}
 	if accountID != 0 {
 		q.Set("accountId", strconv.FormatInt(accountID, 10))
+	}
+	if volumeID != 0 {
+		q.Set("volumeId", strconv.FormatInt(volumeID, 10))
 	}
 	path := "/api/v1/client-sessions/summary"
 	if qs := q.Encode(); qs != "" {

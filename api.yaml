@@ -636,6 +636,7 @@ resources:
         path: /summary
         query:
           - "accountId: int64"
+          - "volumeId: int64"
         responseType: SessionSummary
         responseArray: true
 
