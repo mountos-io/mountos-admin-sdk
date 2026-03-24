@@ -391,6 +391,10 @@ resources:
         pagination: page
         query:
           - "accountId: int64!"
+          - "search: string"
+          - "regionId: int64"
+          - "storageType: string"
+          - "providerType: string"
           - "page: int=1"
           - "limit: int=10"
         responseType: Storage

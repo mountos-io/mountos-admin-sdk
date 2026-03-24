@@ -238,7 +238,7 @@ Request:
 Response data: `{ "id": int64 }`
 
 ### GET /api/v1/storages/list
-Query: `accountId=int64(required)`, `page=int(default 1)`, `limit=int(default 10)`
+Query: `accountId=int64(required)`, `search=string`, `regionId=int64`, `storageType=string`, `providerType=string`, `page=int(default 1)`, `limit=int(default 10)`
 Response data: `{ "items": Storage[], "pagination": PaginationMeta }`
 
 ### GET /api/v1/storages/:storageId

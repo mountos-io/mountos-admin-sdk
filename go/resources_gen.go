@@ -189,6 +189,18 @@ func (s *StoragesService) List(ctx context.Context, opts *StorageListOptions) (*
 	q := url.Values{}
 	if opts != nil {
 		q.Set("accountId", strconv.FormatInt(opts.AccountID, 10))
+		if opts.Search != "" {
+			q.Set("search", opts.Search)
+		}
+		if opts.RegionID != 0 {
+			q.Set("regionId", strconv.FormatInt(opts.RegionID, 10))
+		}
+		if opts.StorageType != "" {
+			q.Set("storageType", opts.StorageType)
+		}
+		if opts.ProviderType != "" {
+			q.Set("providerType", opts.ProviderType)
+		}
 		addPagination(q, opts.Page, opts.Limit)
 	}
 	data, err := s.c.get(ctx, "/api/v1/storages/list"+"?"+q.Encode())

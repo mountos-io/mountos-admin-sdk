@@ -316,6 +316,10 @@ export interface TestStorageBucketRequest {
 
 export interface StorageListOptions extends ListOptions {
   accountId: number
+  search?: string
+  regionId?: number
+  storageType?: string
+  providerType?: string
 }
 
 // Volumes

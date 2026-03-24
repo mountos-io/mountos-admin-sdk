@@ -218,7 +218,7 @@ class StoragesResource {
   }
 
   list(opts: StorageListOptions): Promise<PaginatedResponse<Storage>> {
-    return this.client.request('GET', `/api/v1/storages/list${queryString({ accountId: opts.accountId, page: opts.page, limit: opts.limit })}`)
+    return this.client.request('GET', `/api/v1/storages/list${queryString({ accountId: opts.accountId, search: opts.search, regionId: opts.regionId, storageType: opts.storageType, providerType: opts.providerType, page: opts.page, limit: opts.limit })}`)
   }
 
   get(storageId: number): Promise<Storage> {

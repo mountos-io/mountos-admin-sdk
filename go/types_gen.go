@@ -349,9 +349,13 @@ type TestStorageBucketStorageResponse struct {
 }
 
 type StorageListOptions struct {
-	AccountID int64
-	Page      int
-	Limit     int
+	AccountID    int64
+	Search       string
+	RegionID     int64
+	StorageType  string
+	ProviderType string
+	Page         int
+	Limit        int
 }
 
 // Volumes
