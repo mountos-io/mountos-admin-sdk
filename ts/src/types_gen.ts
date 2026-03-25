@@ -145,9 +145,8 @@ export interface ClientSession {
   id: number
   account: Ref
   region: Ref
-  volumeId: string
-  volumeName?: string
-  userId?: string
+  volume: Ref
+  user?: Ref
   clientType: string
   osName: string
   osVersion?: string
@@ -400,8 +399,10 @@ export interface ClientSessionListOptions extends ListOptions {
   accountId?: number
   regionId?: number
   volumeId?: number
+  userId?: number
   clientType?: string
   status?: string
+  isActive?: string
 }
 
 // Discover

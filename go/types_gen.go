@@ -159,9 +159,8 @@ type ClientSession struct {
 	ID              int64           `json:"id"`
 	Account         Ref             `json:"account"`
 	Region          Ref             `json:"region"`
-	VolumeID        string          `json:"volumeId"`
-	VolumeName      string          `json:"volumeName,omitempty"`
-	UserID          string          `json:"userId,omitempty"`
+	Volume          Ref             `json:"volume"`
+	User            Ref             `json:"user,omitempty"`
 	ClientType      string          `json:"clientType"`
 	OsName          string          `json:"osName"`
 	OsVersion       string          `json:"osVersion,omitempty"`
@@ -455,8 +454,10 @@ type ClientSessionListOptions struct {
 	AccountID  int64
 	RegionID   int64
 	VolumeID   int64
+	UserID     int64
 	ClientType string
 	Status     string
+	IsActive   string
 	Page       int
 	Limit      int
 }

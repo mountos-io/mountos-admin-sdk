@@ -486,11 +486,17 @@ func (s *ClientSessionsService) List(ctx context.Context, opts *ClientSessionLis
 		if opts.VolumeID != 0 {
 			q.Set("volumeId", strconv.FormatInt(opts.VolumeID, 10))
 		}
+		if opts.UserID != 0 {
+			q.Set("userId", strconv.FormatInt(opts.UserID, 10))
+		}
 		if opts.ClientType != "" {
 			q.Set("clientType", opts.ClientType)
 		}
 		if opts.Status != "" {
 			q.Set("status", opts.Status)
+		}
+		if opts.IsActive != "" {
+			q.Set("isActive", opts.IsActive)
 		}
 		addPagination(q, opts.Page, opts.Limit)
 	}
