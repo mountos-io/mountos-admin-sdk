@@ -156,27 +156,29 @@ type ServiceNode struct {
 }
 
 type ClientSession struct {
-	ID             int64           `json:"id"`
-	Account        Ref             `json:"account"`
-	Region         Ref             `json:"region"`
-	VolumeID       string          `json:"volumeId"`
-	VolumeName     string          `json:"volumeName,omitempty"`
-	UserID         string          `json:"userId,omitempty"`
-	ClientType     string          `json:"clientType"`
-	OsName         string          `json:"osName"`
-	OsVersion      string          `json:"osVersion,omitempty"`
-	AppVersion     string          `json:"appVersion,omitempty"`
-	Hostname       string          `json:"hostname,omitempty"`
-	IPAddr         string          `json:"ipAddr"`
-	MountMode      string          `json:"mountMode,omitempty"`
-	MountPath      string          `json:"mountPath,omitempty"`
-	Metadata       json.RawMessage `json:"metadata,omitempty"`
-	Metrics        json.RawMessage `json:"metrics,omitempty"`
-	Status         string          `json:"status"`
-	LastHeartbeat  int64           `json:"lastHeartbeat,omitempty"`
-	ConnectedAt    int64           `json:"connectedAt,omitempty"`
-	DisconnectedAt int64           `json:"disconnectedAt,omitempty"`
-	IsActive       bool            `json:"isActive"`
+	ID              int64           `json:"id"`
+	Account         Ref             `json:"account"`
+	Region          Ref             `json:"region"`
+	VolumeID        string          `json:"volumeId"`
+	VolumeName      string          `json:"volumeName,omitempty"`
+	UserID          string          `json:"userId,omitempty"`
+	ClientType      string          `json:"clientType"`
+	OsName          string          `json:"osName"`
+	OsVersion       string          `json:"osVersion,omitempty"`
+	AppVersion      string          `json:"appVersion,omitempty"`
+	Hostname        string          `json:"hostname,omitempty"`
+	IPAddr          string          `json:"ipAddr"`
+	MountMode       string          `json:"mountMode,omitempty"`
+	MountPath       string          `json:"mountPath,omitempty"`
+	ForkName        string          `json:"forkName,omitempty"`
+	IsTemporaryFork bool            `json:"isTemporaryFork"`
+	Metadata        json.RawMessage `json:"metadata,omitempty"`
+	Metrics         json.RawMessage `json:"metrics,omitempty"`
+	Status          string          `json:"status"`
+	LastHeartbeat   int64           `json:"lastHeartbeat,omitempty"`
+	ConnectedAt     int64           `json:"connectedAt,omitempty"`
+	DisconnectedAt  int64           `json:"disconnectedAt,omitempty"`
+	IsActive        bool            `json:"isActive"`
 }
 
 type SessionSummary struct {

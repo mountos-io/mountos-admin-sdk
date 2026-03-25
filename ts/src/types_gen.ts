@@ -156,6 +156,8 @@ export interface ClientSession {
   ipAddr: string
   mountMode?: string
   mountPath?: string
+  forkName?: string
+  isTemporaryFork: boolean
   metadata?: unknown
   metrics?: unknown
   status: string

@@ -570,6 +570,8 @@ Response data: `SessionSummary[]`
   "ipAddr": string,
   "mountMode"?: string,
   "mountPath"?: string,
+  "forkName"?: string,
+  "isTemporaryFork": bool,
   "metadata"?: object,
   "metrics"?: object,
   "status": string,

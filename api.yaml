@@ -154,6 +154,8 @@ types:
     - "ipAddr: string"
     - "mountMode: string?"
     - "mountPath: string?"
+    - "forkName: string?"
+    - "isTemporaryFork: bool"
     - "metadata: json?"
     - "metrics: json?"
     - "status: string"
