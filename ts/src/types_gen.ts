@@ -218,6 +218,22 @@ export interface LicenseDetails {
   graceDaysLeft: number
 }
 
+export interface ServiceAlert {
+  id: number
+  alertId: string
+  source: string
+  nodeId: string
+  severity: number
+  category: string
+  title: string
+  description?: string
+  regionId?: number
+  accountId?: number
+  eventTime: string
+  resolvedAt?: string
+  createdAt?: string
+}
+
 export interface DiscoverEndpoint {
   nodeId: string
   addr: string
@@ -421,5 +437,11 @@ export interface ClientSessionListOptions extends ListOptions {
 // Dashboard
 
 // License
+
+// Alerts
+
+export interface AlertListOptions extends ListOptions {
+  active?: boolean
+}
 
 // Cache

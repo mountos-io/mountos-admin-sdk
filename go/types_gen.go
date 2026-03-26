@@ -232,6 +232,22 @@ type LicenseDetails struct {
 	GraceDaysLeft   int           `json:"graceDaysLeft"`
 }
 
+type ServiceAlert struct {
+	ID          int64  `json:"id"`
+	AlertID     string `json:"alertId"`
+	Source      string `json:"source"`
+	NodeID      string `json:"nodeId"`
+	Severity    int    `json:"severity"`
+	Category    string `json:"category"`
+	Title       string `json:"title"`
+	Description string `json:"description,omitempty"`
+	RegionID    int64  `json:"regionId,omitempty"`
+	AccountID   int64  `json:"accountId,omitempty"`
+	EventTime   string `json:"eventTime"`
+	ResolvedAt  string `json:"resolvedAt,omitempty"`
+	CreatedAt   string `json:"createdAt,omitempty"`
+}
+
 type DiscoverEndpoint struct {
 	NodeID string `json:"nodeId"`
 	Addr   string `json:"addr"`
@@ -478,5 +494,13 @@ type ClientSessionListOptions struct {
 // Dashboard
 
 // License
+
+// Alerts
+
+type AlertListOptions struct {
+	Active bool
+	Page   int
+	Limit  int
+}
 
 // Cache

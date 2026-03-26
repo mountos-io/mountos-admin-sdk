@@ -13,10 +13,10 @@ import type {
   RevokeVolumeAPIKeysByUserRequest, UpdateVolumeQuotaRequest, Fork, AuditLog, 
   AuditLogListOptions, RegionAuditLogListOptions, ServiceNode, ClientSession, 
   ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, DashboardStats, 
-  LicenseDetails,
+  LicenseDetails, ServiceAlert, AlertListOptions,
 } from './types_gen.js'
 
-function queryString(params: Record<string, string | number | undefined>): string {
+function queryString(params: Record<string, string | number | boolean | undefined>): string {
   const entries = Object.entries(params).filter(([, v]) => v !== undefined)
   if (entries.length === 0) return ''
   return '?' + entries.map(([k, v]) => `${k}=${encodeURIComponent(v!)}`).join('&')
@@ -39,6 +39,7 @@ export class MountOSAdmin {
   private _discover?: DiscoverResource
   private _dashboard?: DashboardResource
   private _license?: LicenseResource
+  private _alerts?: AlertsResource
   private _cache?: CacheResource
 
   constructor(config: Config) {
@@ -96,6 +97,10 @@ export class MountOSAdmin {
 
   get license(): LicenseResource {
     return (this._license ??= new LicenseResource(this))
+  }
+
+  get alerts(): AlertsResource {
+    return (this._alerts ??= new AlertsResource(this))
   }
 
   get cache(): CacheResource {
@@ -380,6 +385,18 @@ class LicenseResource {
 
   get(): Promise<LicenseDetails> {
     return this.client.request('GET', '/api/v1/license')
+  }
+}
+
+class AlertsResource {
+  constructor(private client: MountOSAdmin) {}
+
+  list(opts?: AlertListOptions): Promise<PaginatedResponse<ServiceAlert>> {
+    return this.client.request('GET', `/api/v1/alerts/list${queryString({ active: opts?.active, page: opts?.page, limit: opts?.limit })}`)
+  }
+
+  resolve(alertId: string): Promise<void> {
+    return this.client.request('POST', `/api/v1/alerts/${alertId}/resolve`)
   }
 }
 

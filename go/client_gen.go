@@ -23,6 +23,7 @@ type Client struct {
 	Discover        *DiscoverService
 	Dashboard       *DashboardService
 	License         *LicenseService
+	Alerts          *AlertsService
 	Cache           *CacheService
 }
 
@@ -51,6 +52,7 @@ func NewClient(cfg Config) (*Client, error) {
 	c.Discover = &DiscoverService{c: c}
 	c.Dashboard = &DashboardService{c: c}
 	c.License = &LicenseService{c: c}
+	c.Alerts = &AlertsService{c: c}
 	c.Cache = &CacheService{c: c}
 	return c, nil
 }

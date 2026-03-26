@@ -631,6 +631,36 @@ Response data: `LicenseDetails`
 
 ---
 
+## Alerts
+
+### GET /api/v1/alerts/list
+Query: `active=bool(default true)`, `page=int(default 1)`, `limit=int(default 20)`
+Response data: `{ "items": ServiceAlert[], "pagination": PaginationMeta }`
+
+### POST /api/v1/alerts/:alertId/resolve
+Param: `alertId`
+
+### ServiceAlert Type
+```
+{
+  "id": int64,
+  "alertId": string,
+  "source": string,
+  "nodeId": string,
+  "severity": int,
+  "category": string,
+  "title": string,
+  "description"?: string,
+  "regionId"?: int64,
+  "accountId"?: int64,
+  "eventTime": RFC3339,
+  "resolvedAt"?: RFC3339,
+  "createdAt"?: RFC3339
+}
+```
+
+---
+
 ## Cache
 
 ### POST /api/v1/cache/refresh

@@ -588,6 +588,32 @@ func (s *LicenseService) Get(ctx context.Context) (*LicenseDetails, error) {
 	return decodeJSON[LicenseDetails](data)
 }
 
+type AlertsService struct{ c *Client }
+
+func (s *AlertsService) List(ctx context.Context, opts *AlertListOptions) (*PaginatedResponse[ServiceAlert], error) {
+	q := url.Values{}
+	if opts != nil {
+		if opts.Active {
+			q.Set("active", "true")
+		}
+		addPagination(q, opts.Page, opts.Limit)
+	}
+	path := "/api/v1/alerts/list"
+	if qs := q.Encode(); qs != "" {
+		path += "?" + qs
+	}
+	data, err := s.c.get(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[PaginatedResponse[ServiceAlert]](data)
+}
+
+func (s *AlertsService) Resolve(ctx context.Context, alertID string) error {
+	_, err := s.c.post(ctx, fmt.Sprintf("/api/v1/alerts/%s/resolve", alertID), nil)
+	return err
+}
+
 type CacheService struct{ c *Client }
 
 func (s *CacheService) Refresh(ctx context.Context) error {

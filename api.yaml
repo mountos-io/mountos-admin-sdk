@@ -137,6 +137,21 @@ types:
     - "createdAt: datetime?"
     - "updatedAt: datetime?"
 
+  ServiceAlert:
+    - "id: int64"
+    - "alertId: string"
+    - "source: string"
+    - "nodeId: string"
+    - "severity: int"
+    - "category: string"
+    - "title: string"
+    - "description: string?"
+    - "regionId: int64?"
+    - "accountId: int64?"
+    - "eventTime: datetime"
+    - "resolvedAt: datetime?"
+    - "createdAt: datetime?"
+
   ServiceNode:
     - "id: int64"
     - "regionId: int64"
@@ -696,6 +711,25 @@ resources:
         method: GET
         path: /
         responseType: LicenseDetails
+
+  - name: Alerts
+    path: /alerts
+    pathParamTypes:
+      alertId: string
+    endpoints:
+      - action: list
+        method: GET
+        path: /list
+        pagination: page
+        query:
+          - "active: bool=true"
+          - "page: int=1"
+          - "limit: int=20"
+        responseType: ServiceAlert
+
+      - action: resolve
+        method: POST
+        path: /:alertId/resolve
 
   - name: Cache
     path: /cache

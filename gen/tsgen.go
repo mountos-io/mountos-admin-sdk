@@ -235,7 +235,7 @@ func generateTSClient(spec *Spec, outDir string) {
 	w.WriteString("} from './types_gen.js'\n\n")
 
 	// queryString helper
-	w.WriteString("function queryString(params: Record<string, string | number | undefined>): string {\n")
+	w.WriteString("function queryString(params: Record<string, string | number | boolean | undefined>): string {\n")
 	w.WriteString("  const entries = Object.entries(params).filter(([, v]) => v !== undefined)\n")
 	w.WriteString("  if (entries.length === 0) return ''\n")
 	w.WriteString("  return '?' + entries.map(([k, v]) => `${k}=${encodeURIComponent(v!)}`).join('&')\n")
