@@ -129,6 +129,17 @@ type Volume struct {
 	UpdatedAt               string `json:"updatedAt"`
 }
 
+type Fork struct {
+	Fid           int32  `json:"fid"`
+	Name          string `json:"name"`
+	ParentFid     int32  `json:"parentFid"`
+	ParentName    string `json:"parentName"`
+	SnapshotTs    int64  `json:"snapshotTs"`
+	CreatedBy     string `json:"createdBy,omitempty"`
+	CreatedAt     int64  `json:"createdAt"`
+	ChildrenCount int32  `json:"childrenCount"`
+}
+
 type AuditLog struct {
 	ID          int64           `json:"id"`
 	Title       string          `json:"title"`

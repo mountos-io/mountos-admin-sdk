@@ -115,6 +115,16 @@ types:
     - "createdAt: datetime"
     - "updatedAt: datetime"
 
+  Fork:
+    - "fid: int32"
+    - "name: string"
+    - "parentFid: int32"
+    - "parentName: string"
+    - "snapshotTs: int64"
+    - "createdBy: string?"
+    - "createdAt: int64"
+    - "childrenCount: int32"
+
   AuditLog:
     - "id: int64"
     - "title: string"
@@ -559,6 +569,12 @@ resources:
           - "liveVolume: int64"
           - "totalVolume: int64"
           - "pendingVolume: int64"
+
+      - action: listForks
+        method: GET
+        path: /:volumeId/forks
+        responseType: Fork
+        responseArray: true
 
   - name: AuditLogs
     path: /audit-logs

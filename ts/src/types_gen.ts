@@ -115,6 +115,17 @@ export interface Volume {
   updatedAt: string
 }
 
+export interface Fork {
+  fid: number
+  name: string
+  parentFid: number
+  parentName: string
+  snapshotTs: number
+  createdBy?: string
+  createdAt: number
+  childrenCount: number
+}
+
 export interface AuditLog {
   id: number
   title: string

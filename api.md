@@ -408,6 +408,10 @@ Response data: `{ "id": int64 }`
 Param: `volumeId`
 Response data: `{ "volumeId": string, "liveVolume": int64, "totalVolume": int64, "pendingVolume": int64 }`
 
+### GET /api/v1/volumes/:volumeId/forks
+Param: `volumeId`
+Response data: `Fork[]`
+
 ### Volume Type
 ```
 {

@@ -10,7 +10,7 @@ import type {
   Storage, StorageListOptions, EditStorageRequest, TestStorageBucketRequest, 
   CreateVolumeRequest, Volume, VolumeListOptions, EditVolumeRequest, 
   DeactivateVolumeRequest, GenerateVolumeAPIKeysRequest, RevokeVolumeAPIKeyRequest, 
-  RevokeVolumeAPIKeysByUserRequest, UpdateVolumeQuotaRequest, AuditLog, 
+  RevokeVolumeAPIKeysByUserRequest, UpdateVolumeQuotaRequest, Fork, AuditLog, 
   AuditLogListOptions, RegionAuditLogListOptions, ServiceNode, ClientSession, 
   ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, DashboardStats, 
   LicenseDetails,
@@ -291,6 +291,10 @@ class VolumesResource {
 
   stats(volumeId: number): Promise<{ volumeId: string; liveVolume: number; totalVolume: number; pendingVolume: number }> {
     return this.client.request('GET', `/api/v1/volumes/${volumeId}/stats`)
+  }
+
+  listForks(volumeId: number): Promise<Fork[]> {
+    return this.client.request('GET', `/api/v1/volumes/${volumeId}/forks`)
   }
 }
 

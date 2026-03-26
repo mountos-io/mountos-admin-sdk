@@ -353,6 +353,18 @@ func (s *VolumesService) Stats(ctx context.Context, volumeID int64) (*StatsVolum
 	return decodeJSON[StatsVolumeResponse](data)
 }
 
+func (s *VolumesService) ListForks(ctx context.Context, volumeID int64) ([]Fork, error) {
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/volumes/%s/forks", strconv.FormatInt(volumeID, 10)))
+	if err != nil {
+		return nil, err
+	}
+	result, err := decodeJSON[[]Fork](data)
+	if err != nil {
+		return nil, err
+	}
+	return *result, nil
+}
+
 type AuditLogsService struct{ c *Client }
 
 func (s *AuditLogsService) List(ctx context.Context, opts *AuditLogListOptions) (*CursorPaginatedResponse[AuditLog], error) {
