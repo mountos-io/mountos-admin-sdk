@@ -13,7 +13,7 @@ import type {
   RevokeVolumeAPIKeysByUserRequest, UpdateVolumeQuotaRequest, Fork, AuditLog, 
   AuditLogListOptions, RegionAuditLogListOptions, ServiceNode, ClientSession, 
   ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, DashboardStats, 
-  LicenseDetails, ServiceAlert, AlertListOptions,
+  LicenseDetails, ServiceAlert, AlertListOptions, AlertCountResponse,
 } from './types_gen.js'
 
 function queryString(params: Record<string, string | number | boolean | undefined>): string {
@@ -392,7 +392,11 @@ class AlertsResource {
   constructor(private client: MountOSAdmin) {}
 
   list(opts?: AlertListOptions): Promise<PaginatedResponse<ServiceAlert>> {
-    return this.client.request('GET', `/api/v1/alerts/list${queryString({ active: opts?.active, page: opts?.page, limit: opts?.limit })}`)
+    return this.client.request('GET', `/api/v1/alerts/list${queryString({ active: opts?.active, accountId: opts?.accountId, regionId: opts?.regionId, severity: opts?.severity, category: opts?.category, since: opts?.since, page: opts?.page, limit: opts?.limit })}`)
+  }
+
+  count(): Promise<AlertCountResponse> {
+    return this.client.request('GET', '/api/v1/alerts/count')
   }
 
   resolve(alertId: string): Promise<void> {

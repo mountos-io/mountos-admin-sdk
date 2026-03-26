@@ -234,6 +234,14 @@ export interface ServiceAlert {
   createdAt?: string
 }
 
+export interface AlertCountResponse {
+  active: number
+  recent: number
+  infoCount: number
+  warningCount: number
+  criticalCount: number
+}
+
 export interface DiscoverEndpoint {
   nodeId: string
   addr: string
@@ -442,6 +450,11 @@ export interface ClientSessionListOptions extends ListOptions {
 
 export interface AlertListOptions extends ListOptions {
   active?: boolean
+  accountId?: number
+  regionId?: number
+  severity?: number
+  category?: string
+  since?: string
 }
 
 // Cache

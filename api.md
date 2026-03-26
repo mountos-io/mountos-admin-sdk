@@ -634,8 +634,11 @@ Response data: `LicenseDetails`
 ## Alerts
 
 ### GET /api/v1/alerts/list
-Query: `active=bool(default true)`, `page=int(default 1)`, `limit=int(default 20)`
+Query: `active=bool(default true)`, `accountId=int64`, `regionId=int64`, `severity=int`, `category=string`, `since=string`, `page=int(default 1)`, `limit=int(default 20)`
 Response data: `{ "items": ServiceAlert[], "pagination": PaginationMeta }`
+
+### GET /api/v1/alerts/count
+Response data: `AlertCountResponse`
 
 ### POST /api/v1/alerts/:alertId/resolve
 Param: `alertId`

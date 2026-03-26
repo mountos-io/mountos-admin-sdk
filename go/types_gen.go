@@ -248,6 +248,14 @@ type ServiceAlert struct {
 	CreatedAt   string `json:"createdAt,omitempty"`
 }
 
+type AlertCountResponse struct {
+	Active        int64 `json:"active"`
+	Recent        int64 `json:"recent"`
+	InfoCount     int64 `json:"infoCount"`
+	WarningCount  int64 `json:"warningCount"`
+	CriticalCount int64 `json:"criticalCount"`
+}
+
 type DiscoverEndpoint struct {
 	NodeID string `json:"nodeId"`
 	Addr   string `json:"addr"`
@@ -498,9 +506,14 @@ type ClientSessionListOptions struct {
 // Alerts
 
 type AlertListOptions struct {
-	Active bool
-	Page   int
-	Limit  int
+	Active    bool
+	AccountID int64
+	RegionID  int64
+	Severity  int
+	Category  string
+	Since     string
+	Page      int
+	Limit     int
 }
 
 // Cache

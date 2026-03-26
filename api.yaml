@@ -152,6 +152,13 @@ types:
     - "resolvedAt: datetime?"
     - "createdAt: datetime?"
 
+  AlertCountResponse:
+    - "active: int64"
+    - "recent: int64"
+    - "infoCount: int64"
+    - "warningCount: int64"
+    - "criticalCount: int64"
+
   ServiceNode:
     - "id: int64"
     - "regionId: int64"
@@ -723,9 +730,19 @@ resources:
         pagination: page
         query:
           - "active: bool=true"
+          - "accountId: int64"
+          - "regionId: int64"
+          - "severity: int"
+          - "category: string"
+          - "since: string"
           - "page: int=1"
           - "limit: int=20"
         responseType: ServiceAlert
+
+      - action: count
+        method: GET
+        path: /count
+        responseType: AlertCountResponse
 
       - action: resolve
         method: POST

@@ -596,6 +596,21 @@ func (s *AlertsService) List(ctx context.Context, opts *AlertListOptions) (*Pagi
 		if opts.Active {
 			q.Set("active", "true")
 		}
+		if opts.AccountID != 0 {
+			q.Set("accountId", strconv.FormatInt(opts.AccountID, 10))
+		}
+		if opts.RegionID != 0 {
+			q.Set("regionId", strconv.FormatInt(opts.RegionID, 10))
+		}
+		if opts.Severity != 0 {
+			q.Set("severity", strconv.Itoa(opts.Severity))
+		}
+		if opts.Category != "" {
+			q.Set("category", opts.Category)
+		}
+		if opts.Since != "" {
+			q.Set("since", opts.Since)
+		}
 		addPagination(q, opts.Page, opts.Limit)
 	}
 	path := "/api/v1/alerts/list"
@@ -607,6 +622,14 @@ func (s *AlertsService) List(ctx context.Context, opts *AlertListOptions) (*Pagi
 		return nil, err
 	}
 	return decodeJSON[PaginatedResponse[ServiceAlert]](data)
+}
+
+func (s *AlertsService) Count(ctx context.Context) (*AlertCountResponse, error) {
+	data, err := s.c.get(ctx, "/api/v1/alerts/count")
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[AlertCountResponse](data)
 }
 
 func (s *AlertsService) Resolve(ctx context.Context, alertID string) error {
