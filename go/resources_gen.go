@@ -192,8 +192,8 @@ func (s *StoragesService) List(ctx context.Context, opts *StorageListOptions) (*
 		if opts.Search != "" {
 			q.Set("search", opts.Search)
 		}
-		if opts.RegionID != 0 {
-			q.Set("regionId", strconv.FormatInt(opts.RegionID, 10))
+		if opts.RegionID != nil {
+			q.Set("regionId", strconv.FormatInt(*opts.RegionID, 10))
 		}
 		if opts.StorageType != "" {
 			q.Set("storageType", opts.StorageType)
@@ -264,11 +264,11 @@ func (s *VolumesService) List(ctx context.Context, opts *VolumeListOptions) (*Pa
 	q := url.Values{}
 	if opts != nil {
 		q.Set("accountId", strconv.FormatInt(opts.AccountID, 10))
-		if opts.RegionID != 0 {
-			q.Set("regionId", strconv.FormatInt(opts.RegionID, 10))
+		if opts.RegionID != nil {
+			q.Set("regionId", strconv.FormatInt(*opts.RegionID, 10))
 		}
-		if opts.StorageID != 0 {
-			q.Set("storageId", strconv.FormatInt(opts.StorageID, 10))
+		if opts.StorageID != nil {
+			q.Set("storageId", strconv.FormatInt(*opts.StorageID, 10))
 		}
 		addPagination(q, opts.Page, opts.Limit)
 	}
@@ -370,8 +370,8 @@ type AuditLogsService struct{ c *Client }
 func (s *AuditLogsService) List(ctx context.Context, opts *AuditLogListOptions) (*CursorPaginatedResponse[AuditLog], error) {
 	q := url.Values{}
 	if opts != nil {
-		if opts.AccountID > 0 {
-			q.Set("accountId", strconv.FormatInt(opts.AccountID, 10))
+		if opts.AccountID != nil {
+			q.Set("accountId", strconv.FormatInt(*opts.AccountID, 10))
 		}
 		if opts.Cursor > 0 {
 			q.Set("cursor", strconv.FormatInt(opts.Cursor, 10))
@@ -489,17 +489,17 @@ type ClientSessionsService struct{ c *Client }
 func (s *ClientSessionsService) List(ctx context.Context, opts *ClientSessionListOptions) (*PaginatedResponse[ClientSession], error) {
 	q := url.Values{}
 	if opts != nil {
-		if opts.AccountID != 0 {
-			q.Set("accountId", strconv.FormatInt(opts.AccountID, 10))
+		if opts.AccountID != nil {
+			q.Set("accountId", strconv.FormatInt(*opts.AccountID, 10))
 		}
-		if opts.RegionID != 0 {
-			q.Set("regionId", strconv.FormatInt(opts.RegionID, 10))
+		if opts.RegionID != nil {
+			q.Set("regionId", strconv.FormatInt(*opts.RegionID, 10))
 		}
-		if opts.VolumeID != 0 {
-			q.Set("volumeId", strconv.FormatInt(opts.VolumeID, 10))
+		if opts.VolumeID != nil {
+			q.Set("volumeId", strconv.FormatInt(*opts.VolumeID, 10))
 		}
-		if opts.UserID != 0 {
-			q.Set("userId", strconv.FormatInt(opts.UserID, 10))
+		if opts.UserID != nil {
+			q.Set("userId", strconv.FormatInt(*opts.UserID, 10))
 		}
 		if opts.ClientType != "" {
 			q.Set("clientType", opts.ClientType)
@@ -593,17 +593,17 @@ type AlertsService struct{ c *Client }
 func (s *AlertsService) List(ctx context.Context, opts *AlertListOptions) (*PaginatedResponse[ServiceAlert], error) {
 	q := url.Values{}
 	if opts != nil {
-		if opts.Active {
-			q.Set("active", "true")
+		if opts.Active != nil {
+			q.Set("active", strconv.FormatBool(*opts.Active))
 		}
-		if opts.AccountID != 0 {
-			q.Set("accountId", strconv.FormatInt(opts.AccountID, 10))
+		if opts.AccountID != nil {
+			q.Set("accountId", strconv.FormatInt(*opts.AccountID, 10))
 		}
-		if opts.RegionID != 0 {
-			q.Set("regionId", strconv.FormatInt(opts.RegionID, 10))
+		if opts.RegionID != nil {
+			q.Set("regionId", strconv.FormatInt(*opts.RegionID, 10))
 		}
-		if opts.Severity != 0 {
-			q.Set("severity", strconv.Itoa(opts.Severity))
+		if opts.Severity != nil {
+			q.Set("severity", strconv.Itoa(*opts.Severity))
 		}
 		if opts.Category != "" {
 			q.Set("category", opts.Category)

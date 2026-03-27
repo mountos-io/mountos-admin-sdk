@@ -387,7 +387,7 @@ type TestStorageBucketStorageResponse struct {
 type StorageListOptions struct {
 	AccountID    int64
 	Search       string
-	RegionID     int64
+	RegionID     *int64
 	StorageType  string
 	ProviderType string
 	Page         int
@@ -456,8 +456,8 @@ type StatsVolumeResponse struct {
 
 type VolumeListOptions struct {
 	AccountID int64
-	RegionID  int64
-	StorageID int64
+	RegionID  *int64
+	StorageID *int64
 	Page      int
 	Limit     int
 }
@@ -465,7 +465,7 @@ type VolumeListOptions struct {
 // AuditLogs
 
 type AuditLogListOptions struct {
-	AccountID int64
+	AccountID *int64
 	Cursor    int64
 	Limit     int
 	Subject   string
@@ -486,10 +486,10 @@ type RegionAuditLogListOptions struct {
 // ClientSessions
 
 type ClientSessionListOptions struct {
-	AccountID  int64
-	RegionID   int64
-	VolumeID   int64
-	UserID     int64
+	AccountID  *int64
+	RegionID   *int64
+	VolumeID   *int64
+	UserID     *int64
 	ClientType string
 	Status     string
 	IsActive   string
@@ -506,10 +506,10 @@ type ClientSessionListOptions struct {
 // Alerts
 
 type AlertListOptions struct {
-	Active    bool
-	AccountID int64
-	RegionID  int64
-	Severity  int
+	Active    *bool
+	AccountID *int64
+	RegionID  *int64
+	Severity  *int
 	Category  string
 	Since     string
 	Page      int

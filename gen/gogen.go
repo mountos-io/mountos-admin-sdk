@@ -337,6 +337,48 @@ func writeGoStruct(w *strings.Builder, name string, fields []string, isRequest b
 	w.WriteString("}\n")
 }
 
+// goOptionalQueryType returns a pointer type for optional bool/int query params
+// so Go callers can distinguish "not set" from "zero value".
+// Page/limit/cursor fields keep value types since they have natural zero-value semantics.
+func goOptionalQueryType(f Field) string {
+	if f.Required || f.Name == "page" || f.Name == "limit" || f.Name == "cursor" {
+		return goType(f.Type)
+	}
+	switch f.Type {
+	case "bool", "int", "int32", "int64":
+		return "*" + goType(f.Type)
+	default:
+		return goType(f.Type)
+	}
+}
+
+// writeGoOptionalQuerySet emits the q.Set call for an optional (non-required, non-pagination) field.
+// Bool and int types use pointer checks (nil), strings use empty-string checks.
+func writeGoOptionalQuerySet(w *strings.Builder, f Field, goName string) {
+	switch f.Type {
+	case "int64":
+		fmt.Fprintf(w, "\t\tif opts.%s != nil {\n", goName)
+		fmt.Fprintf(w, "\t\t\tq.Set(%q, strconv.FormatInt(*opts.%s, 10))\n", f.Name, goName)
+		w.WriteString("\t\t}\n")
+	case "int":
+		fmt.Fprintf(w, "\t\tif opts.%s != nil {\n", goName)
+		fmt.Fprintf(w, "\t\t\tq.Set(%q, strconv.Itoa(*opts.%s))\n", f.Name, goName)
+		w.WriteString("\t\t}\n")
+	case "int32":
+		fmt.Fprintf(w, "\t\tif opts.%s != nil {\n", goName)
+		fmt.Fprintf(w, "\t\t\tq.Set(%q, strconv.FormatInt(int64(*opts.%s), 10))\n", f.Name, goName)
+		w.WriteString("\t\t}\n")
+	case "bool":
+		fmt.Fprintf(w, "\t\tif opts.%s != nil {\n", goName)
+		fmt.Fprintf(w, "\t\t\tq.Set(%q, strconv.FormatBool(*opts.%s))\n", f.Name, goName)
+		w.WriteString("\t\t}\n")
+	default:
+		fmt.Fprintf(w, "\t\tif opts.%s != \"\" {\n", goName)
+		fmt.Fprintf(w, "\t\t\tq.Set(%q, opts.%s)\n", f.Name, goName)
+		w.WriteString("\t\t}\n")
+	}
+}
+
 func writeGoListOptions(w *strings.Builder, name string, query []string) {
 	w.WriteString("type " + name + " struct {\n")
 	type fieldInfo struct {
@@ -349,7 +391,7 @@ func writeGoListOptions(w *strings.Builder, name string, query []string) {
 	for _, s := range query {
 		f := parseField(s)
 		gn := goFieldName(f.Name)
-		gt := goType(f.Type)
+		gt := goOptionalQueryType(f)
 		if len(gn) > maxName {
 			maxName = len(gn)
 		}
@@ -838,28 +880,7 @@ func writeGoPageListMethod(w *strings.Builder, svcType, methodName string, ep En
 					fmt.Fprintf(w, "\t\tq.Set(%q, opts.%s)\n", f.Name, goName)
 				}
 			} else {
-				switch f.Type {
-				case "int64":
-					fmt.Fprintf(w, "\t\tif opts.%s != 0 {\n", goName)
-					fmt.Fprintf(w, "\t\t\tq.Set(%q, strconv.FormatInt(opts.%s, 10))\n", f.Name, goName)
-					w.WriteString("\t\t}\n")
-				case "int":
-					fmt.Fprintf(w, "\t\tif opts.%s != 0 {\n", goName)
-					fmt.Fprintf(w, "\t\t\tq.Set(%q, strconv.Itoa(opts.%s))\n", f.Name, goName)
-					w.WriteString("\t\t}\n")
-				case "int32":
-					fmt.Fprintf(w, "\t\tif opts.%s != 0 {\n", goName)
-					fmt.Fprintf(w, "\t\t\tq.Set(%q, strconv.FormatInt(int64(opts.%s), 10))\n", f.Name, goName)
-					w.WriteString("\t\t}\n")
-				case "bool":
-					fmt.Fprintf(w, "\t\tif opts.%s {\n", goName)
-					fmt.Fprintf(w, "\t\t\tq.Set(%q, \"true\")\n", f.Name)
-					w.WriteString("\t\t}\n")
-				default:
-					fmt.Fprintf(w, "\t\tif opts.%s != \"\" {\n", goName)
-					fmt.Fprintf(w, "\t\t\tq.Set(%q, opts.%s)\n", f.Name, goName)
-					w.WriteString("\t\t}\n")
-				}
+				writeGoOptionalQuerySet(w, f, goName)
 			}
 		}
 	}
@@ -899,27 +920,20 @@ func writeGoCursorListMethod(w *strings.Builder, svcType, methodName string, ep 
 	for _, qs := range ep.Query {
 		f := parseField(qs)
 		goName := goFieldName(f.Name)
-		switch f.Type {
-		case "int64":
-			fmt.Fprintf(w, "\t\tif opts.%s > 0 {\n", goName)
-			fmt.Fprintf(w, "\t\t\tq.Set(%q, strconv.FormatInt(opts.%s, 10))\n", f.Name, goName)
-			w.WriteString("\t\t}\n")
-		case "int":
-			fmt.Fprintf(w, "\t\tif opts.%s > 0 {\n", goName)
-			fmt.Fprintf(w, "\t\t\tq.Set(%q, strconv.Itoa(opts.%s))\n", f.Name, goName)
-			w.WriteString("\t\t}\n")
-		case "int32":
-			fmt.Fprintf(w, "\t\tif opts.%s > 0 {\n", goName)
-			fmt.Fprintf(w, "\t\t\tq.Set(%q, strconv.FormatInt(int64(opts.%s), 10))\n", f.Name, goName)
-			w.WriteString("\t\t}\n")
-		case "bool":
-			fmt.Fprintf(w, "\t\tif opts.%s {\n", goName)
-			fmt.Fprintf(w, "\t\t\tq.Set(%q, \"true\")\n", f.Name)
-			w.WriteString("\t\t}\n")
-		case "string":
-			fmt.Fprintf(w, "\t\tif opts.%s != \"\" {\n", goName)
-			fmt.Fprintf(w, "\t\t\tq.Set(%q, opts.%s)\n", f.Name, goName)
-			w.WriteString("\t\t}\n")
+		isPagination := f.Name == "cursor" || f.Name == "limit"
+		if isPagination {
+			switch f.Type {
+			case "int64":
+				fmt.Fprintf(w, "\t\tif opts.%s > 0 {\n", goName)
+				fmt.Fprintf(w, "\t\t\tq.Set(%q, strconv.FormatInt(opts.%s, 10))\n", f.Name, goName)
+				w.WriteString("\t\t}\n")
+			case "int", "int32":
+				fmt.Fprintf(w, "\t\tif opts.%s > 0 {\n", goName)
+				fmt.Fprintf(w, "\t\t\tq.Set(%q, strconv.Itoa(opts.%s))\n", f.Name, goName)
+				w.WriteString("\t\t}\n")
+			}
+		} else {
+			writeGoOptionalQuerySet(w, f, goName)
 		}
 	}
 
@@ -979,7 +993,8 @@ func writeGoQueryMethod(w *strings.Builder, svcType, methodName string, ep Endpo
 			fmt.Fprintf(w, "\tq.Set(%q, %s)\n", f.Name, paramName)
 		}
 	}
-	fmt.Fprintf(w, "\tdata, err := s.c.get(ctx, %q+\"?\"+q.Encode())\n", fullPath)
+	pathExpr := goPathExpr(fullPath, allPathParams, pt)
+	fmt.Fprintf(w, "\tdata, err := s.c.get(ctx, %s+\"?\"+q.Encode())\n", pathExpr)
 	w.WriteString("\tif err != nil {\n\t\treturn nil, err\n\t}\n")
 	fmt.Fprintf(w, "\treturn decodeJSON[%s](data)\n", retType)
 	w.WriteString("}\n")
