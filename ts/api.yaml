@@ -170,6 +170,8 @@ types:
     - "status: string"
     - "lastHeartbeat: int64?"
     - "isActive: bool"
+    - "memUsage: float?"
+    - "loadAvg: float?"
 
   ClientSession:
     - "id: int64"

@@ -30,6 +30,8 @@ func goType(specType string) string {
 		return "int"
 	case "bool":
 		return "bool"
+	case "float", "float64":
+		return "float64"
 	case "object":
 		return "map[string]any"
 	case "json":

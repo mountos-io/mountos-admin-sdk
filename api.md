@@ -513,7 +513,9 @@ Response data: `string`
   "metadata"?: object,
   "status": string,
   "lastHeartbeat"?: int64,
-  "isActive": bool
+  "isActive": bool,
+  "memUsage"?: float,
+  "loadAvg"?: float
 }
 ```
 
@@ -537,7 +539,9 @@ Response data: `ServiceNode[]`
   "metadata"?: object,
   "status": string,
   "lastHeartbeat"?: int64,
-  "isActive": bool
+  "isActive": bool,
+  "memUsage"?: float,
+  "loadAvg"?: float
 }
 ```
 

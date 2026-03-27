@@ -27,7 +27,7 @@ func tsType(specType string) string {
 	switch specType {
 	case "string", "datetime":
 		return "string"
-	case "int64", "int32", "int":
+	case "int64", "int32", "int", "float", "float64":
 		return "number"
 	case "bool":
 		return "boolean"

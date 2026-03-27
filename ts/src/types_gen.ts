@@ -150,6 +150,8 @@ export interface ServiceNode {
   status: string
   lastHeartbeat?: number
   isActive: boolean
+  memUsage?: number
+  loadAvg?: number
 }
 
 export interface ClientSession {
