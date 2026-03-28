@@ -14,13 +14,13 @@ gen: ## Generate Go + TS SDK from api.yaml
 # ── TypeScript ──────────────────────────────────────────────
 
 ts-install: ## Install TS dependencies
-	cd ts && npm install
+	cd ts && bun install
 
 ts-check: ts-install ## Type-check TS
-	cd ts && npx tsc --noEmit
+	cd ts && bunx tsc --noEmit
 
 ts-build: ts-install ## Build TS
-	cd ts && npx tsc
+	cd ts && bunx tsc
 
 ts-publish: ts-build ## Publish TS package to npm
 	@npm whoami >/dev/null 2>&1 || npm login
