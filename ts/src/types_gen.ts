@@ -220,6 +220,10 @@ export interface LicenseDetails {
   graceDaysLeft: number
 }
 
+export interface LicenseTerms {
+  terms: string
+}
+
 export interface ServiceAlert {
   id: number
   alertId: string

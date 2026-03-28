@@ -13,7 +13,7 @@ import type {
   RevokeVolumeAPIKeysByUserRequest, UpdateVolumeQuotaRequest, Fork, AuditLog, 
   AuditLogListOptions, RegionAuditLogListOptions, ServiceNode, ClientSession, 
   ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, DashboardStats, 
-  LicenseDetails, ServiceAlert, AlertListOptions, AlertCountResponse,
+  LicenseDetails, LicenseTerms, ServiceAlert, AlertListOptions, AlertCountResponse,
 } from './types_gen.js'
 
 function queryString(params: Record<string, string | number | boolean | undefined>): string {
@@ -385,6 +385,10 @@ class LicenseResource {
 
   get(): Promise<LicenseDetails> {
     return this.client.request('GET', '/api/v1/license')
+  }
+
+  terms(): Promise<LicenseTerms> {
+    return this.client.request('GET', '/api/v1/license/terms')
   }
 }
 

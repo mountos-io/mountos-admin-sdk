@@ -588,6 +588,14 @@ func (s *LicenseService) Get(ctx context.Context) (*LicenseDetails, error) {
 	return decodeJSON[LicenseDetails](data)
 }
 
+func (s *LicenseService) Terms(ctx context.Context) (*LicenseTerms, error) {
+	data, err := s.c.get(ctx, "/api/v1/license/terms")
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[LicenseTerms](data)
+}
+
 type AlertsService struct{ c *Client }
 
 func (s *AlertsService) List(ctx context.Context, opts *AlertListOptions) (*PaginatedResponse[ServiceAlert], error) {

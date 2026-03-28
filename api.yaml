@@ -246,6 +246,9 @@ types:
     - "graceEndsAt: string"
     - "graceDaysLeft: int"
 
+  LicenseTerms:
+    - "terms: string"
+
 resources:
   - name: Accounts
     path: /accounts
@@ -720,6 +723,10 @@ resources:
         method: GET
         path: /
         responseType: LicenseDetails
+      - action: terms
+        method: GET
+        path: /terms
+        responseType: LicenseTerms
 
   - name: Alerts
     path: /alerts

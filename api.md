@@ -612,6 +612,9 @@ Response data: `DashboardStats`
 ### GET /api/v1/license
 Response data: `LicenseDetails`
 
+### GET /api/v1/license/terms
+Response data: `LicenseTerms`
+
 ### LicenseDetails Type
 ```
 {

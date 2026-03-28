@@ -234,6 +234,10 @@ type LicenseDetails struct {
 	GraceDaysLeft   int           `json:"graceDaysLeft"`
 }
 
+type LicenseTerms struct {
+	Terms string `json:"terms"`
+}
+
 type ServiceAlert struct {
 	ID          int64  `json:"id"`
 	AlertID     string `json:"alertId"`
