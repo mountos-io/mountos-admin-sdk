@@ -166,7 +166,7 @@ type ServiceNode struct {
 	LastHeartbeat int64          `json:"lastHeartbeat,omitempty"`
 	IsActive      bool           `json:"isActive"`
 	MemUsage      float64        `json:"memUsage,omitempty"`
-	LoadAvg       float64        `json:"loadAvg,omitempty"`
+	SysLoad       int            `json:"sysLoad,omitempty"`
 }
 
 type ClientSession struct {

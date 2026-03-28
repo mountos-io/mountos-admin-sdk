@@ -152,7 +152,7 @@ export interface ServiceNode {
   lastHeartbeat?: number
   isActive: boolean
   memUsage?: number
-  loadAvg?: number
+  sysLoad?: number
 }
 
 export interface ClientSession {

@@ -515,7 +515,7 @@ Response data: `string`
   "lastHeartbeat"?: int64,
   "isActive": bool,
   "memUsage"?: float,
-  "loadAvg"?: float
+  "sysLoad"?: int
 }
 ```
 
@@ -541,7 +541,7 @@ Response data: `ServiceNode[]`
   "lastHeartbeat"?: int64,
   "isActive": bool,
   "memUsage"?: float,
-  "loadAvg"?: float
+  "sysLoad"?: int
 }
 ```
 

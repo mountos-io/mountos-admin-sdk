@@ -171,7 +171,7 @@ types:
     - "lastHeartbeat: int64?"
     - "isActive: bool"
     - "memUsage: float?"
-    - "loadAvg: float?"
+    - "sysLoad: int?"
 
   ClientSession:
     - "id: int64"
