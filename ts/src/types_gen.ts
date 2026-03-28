@@ -234,8 +234,8 @@ export interface ServiceAlert {
   category: string
   title: string
   description?: string
-  regionId?: number
-  accountId?: number
+  region?: Ref
+  account?: Ref
   eventTime: string
   resolvedAt?: string
   createdAt?: string

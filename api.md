@@ -661,8 +661,8 @@ Param: `alertId`
   "category": string,
   "title": string,
   "description"?: string,
-  "regionId"?: int64,
-  "accountId"?: int64,
+  "region"?: Ref,
+  "account"?: Ref,
   "eventTime": RFC3339,
   "resolvedAt"?: RFC3339,
   "createdAt"?: RFC3339

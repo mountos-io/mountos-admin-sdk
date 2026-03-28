@@ -248,8 +248,8 @@ type ServiceAlert struct {
 	Category    string `json:"category"`
 	Title       string `json:"title"`
 	Description string `json:"description,omitempty"`
-	RegionID    int64  `json:"regionId,omitempty"`
-	AccountID   int64  `json:"accountId,omitempty"`
+	Region      Ref    `json:"region,omitempty"`
+	Account     Ref    `json:"account,omitempty"`
 	EventTime   string `json:"eventTime"`
 	ResolvedAt  string `json:"resolvedAt,omitempty"`
 	CreatedAt   string `json:"createdAt,omitempty"`
