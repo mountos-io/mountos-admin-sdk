@@ -1,6 +1,6 @@
 {
   "name": "@mountos-app/admin-sdk",
-  "version": "0.36.0",
+  "version": "0.37.0",
   "description": "mountOS Admin SDK for vendor API",
   "type": "module",
   "main": "dist/index.js",
