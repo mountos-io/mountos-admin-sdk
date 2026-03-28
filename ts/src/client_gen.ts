@@ -2,18 +2,20 @@
 
 import { TokenSigner } from './auth.js'
 import { MountOSError } from './errors.js'
+import { signDashboardUser } from './dashboard_user.js'
 import type {
   Config, StandardResponse, ListOptions,
   PaginatedResponse, CursorPaginatedResponse,
-  CreateAccountRequest, Account, EditAccountRequest, AddUserRequest, User, UserListOptions, 
-  EditUserRequest, CreateRegionRequest, Region, EditRegionRequest, CreateStorageRequest, 
-  Storage, StorageListOptions, EditStorageRequest, TestStorageBucketRequest, 
-  CreateVolumeRequest, Volume, VolumeListOptions, EditVolumeRequest, 
-  DeactivateVolumeRequest, GenerateVolumeAPIKeysRequest, RevokeVolumeAPIKeyRequest, 
-  RevokeVolumeAPIKeysByUserRequest, UpdateVolumeQuotaRequest, Fork, AuditLog, 
-  AuditLogListOptions, RegionAuditLogListOptions, ServiceNode, ClientSession, 
-  ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, DashboardStats, 
-  LicenseDetails, LicenseTerms, ServiceAlert, AlertListOptions, AlertCountResponse,
+  DashboardUser, CreateAccountRequest, Account, EditAccountRequest, AddUserRequest, User, 
+  UserListOptions, EditUserRequest, CreateRegionRequest, Region, EditRegionRequest, 
+  CreateStorageRequest, Storage, StorageListOptions, EditStorageRequest, 
+  TestStorageBucketRequest, CreateVolumeRequest, Volume, VolumeListOptions, 
+  EditVolumeRequest, DeactivateVolumeRequest, GenerateVolumeAPIKeysRequest, 
+  RevokeVolumeAPIKeyRequest, RevokeVolumeAPIKeysByUserRequest, UpdateVolumeQuotaRequest, 
+  Fork, AuditLog, AuditLogListOptions, RegionAuditLogListOptions, ServiceNode, 
+  ClientSession, ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, 
+  DashboardStats, LicenseDetails, LicenseTerms, ServiceAlert, AlertListOptions, 
+  AlertCountResponse,
 } from './types_gen.js'
 
 function queryString(params: Record<string, string | number | boolean | undefined>): string {
@@ -25,6 +27,8 @@ function queryString(params: Record<string, string | number | boolean | undefine
 export class MountOSAdmin {
   private readonly baseUrl: string
   private readonly signer: TokenSigner
+  private readonly dashboardUser?: DashboardUser
+  private readonly privateKey: string
 
   private _accounts?: AccountsResource
   private _users?: UsersResource
@@ -45,6 +49,8 @@ export class MountOSAdmin {
   constructor(config: Config) {
     this.baseUrl = config.baseUrl.replace(/\/+$/, '')
     this.signer = new TokenSigner(config.privateKey)
+    this.dashboardUser = config.dashboardUser
+    this.privateKey = config.privateKey
   }
 
   get accounts(): AccountsResource {
@@ -111,6 +117,9 @@ export class MountOSAdmin {
     const token = await this.signer.getToken()
     const headers: Record<string, string> = {
       'Authorization': `Bearer ${token}`,
+    }
+    if (this.dashboardUser) {
+      headers['X-MountOS-Dashboard-User'] = await signDashboardUser(this.dashboardUser, this.privateKey)
     }
 
     const init: RequestInit = { method, headers }

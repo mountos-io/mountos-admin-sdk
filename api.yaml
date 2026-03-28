@@ -219,6 +219,17 @@ types:
     - "totalVolumeUsed: int64"
     - "totalQuotaLimit: int64"
 
+  DashboardUser:
+    - "id: string"
+    - "name: string"
+    - "email: string?"
+    - "role: string"
+    - "username: string?"
+    - "accountId: int64?"
+    - "userId: int64?"
+    - "volumeId: int64?"
+    - "exp: int64?"
+
   DashboardStats:
     - "userCount: int64"
     - "volumeCount: int64"

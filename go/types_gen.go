@@ -6,8 +6,9 @@ import "encoding/json"
 
 // Config holds client configuration.
 type Config struct {
-	BaseURL    string
-	PrivateKey string // base64-encoded 64-byte ED25519 private key
+	BaseURL       string
+	PrivateKey    string         // base64-encoded 64-byte ED25519 private key
+	DashboardUser *DashboardUser // optional dashboard operator context
 }
 
 // ListOptions for page-based pagination.
@@ -260,6 +261,18 @@ type AlertCountResponse struct {
 	InfoCount     int64 `json:"infoCount"`
 	WarningCount  int64 `json:"warningCount"`
 	CriticalCount int64 `json:"criticalCount"`
+}
+
+type DashboardUser struct {
+	ID        string `json:"id"`
+	Name      string `json:"name"`
+	Email     string `json:"email,omitempty"`
+	Role      string `json:"role"`
+	Username  string `json:"username,omitempty"`
+	AccountID int64  `json:"accountId,omitempty"`
+	UserID    int64  `json:"userId,omitempty"`
+	VolumeID  int64  `json:"volumeId,omitempty"`
+	Exp       int64  `json:"exp,omitempty"`
 }
 
 type DiscoverEndpoint struct {

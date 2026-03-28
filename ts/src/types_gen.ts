@@ -3,6 +3,7 @@
 export interface Config {
   baseUrl: string
   privateKey: string
+  dashboardUser?: DashboardUser
 }
 
 export interface StandardResponse<T = unknown> {
@@ -246,6 +247,18 @@ export interface AlertCountResponse {
   infoCount: number
   warningCount: number
   criticalCount: number
+}
+
+export interface DashboardUser {
+  id: string
+  name: string
+  email?: string
+  role: string
+  username?: string
+  accountId?: number
+  userId?: number
+  volumeId?: number
+  exp?: number
 }
 
 export interface DiscoverEndpoint {

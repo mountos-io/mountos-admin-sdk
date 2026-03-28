@@ -172,8 +172,9 @@ func generateGoTypes(spec *Spec, outDir string) {
 	// Config
 	w.WriteString("// Config holds client configuration.\n")
 	w.WriteString("type Config struct {\n")
-	w.WriteString("\tBaseURL    string\n")
-	w.WriteString("\tPrivateKey string // base64-encoded 64-byte ED25519 private key\n")
+	w.WriteString("\tBaseURL       string\n")
+	w.WriteString("\tPrivateKey    string         // base64-encoded 64-byte ED25519 private key\n")
+	w.WriteString("\tDashboardUser *DashboardUser // optional dashboard operator context\n")
 	w.WriteString("}\n\n")
 
 	// ListOptions
@@ -415,9 +416,11 @@ func generateGoClient(spec *Spec, outDir string) {
 	// Client struct
 	w.WriteString("// Client is the mountOS Admin API client.\n")
 	w.WriteString("type Client struct {\n")
-	w.WriteString("\tbaseURL string\n")
-	w.WriteString("\thttp    *http.Client\n")
-	w.WriteString("\tauth    *tokenCache\n")
+	w.WriteString("\tbaseURL       string\n")
+	w.WriteString("\thttp          *http.Client\n")
+	w.WriteString("\tauth          *tokenCache\n")
+	w.WriteString("\tdashboardUser *DashboardUser\n")
+	w.WriteString("\tprivateKey    string\n")
 	w.WriteString("\n")
 
 	// Fields - calculate alignment
@@ -441,9 +444,11 @@ func generateGoClient(spec *Spec, outDir string) {
 	w.WriteString("\t\treturn nil, err\n")
 	w.WriteString("\t}\n\n")
 	w.WriteString("\tc := &Client{\n")
-	w.WriteString("\t\tbaseURL: cfg.BaseURL,\n")
-	w.WriteString("\t\thttp:    http.DefaultClient,\n")
-	w.WriteString("\t\tauth:    tc,\n")
+	w.WriteString("\t\tbaseURL:       cfg.BaseURL,\n")
+	w.WriteString("\t\thttp:          http.DefaultClient,\n")
+	w.WriteString("\t\tauth:          tc,\n")
+	w.WriteString("\t\tdashboardUser: cfg.DashboardUser,\n")
+	w.WriteString("\t\tprivateKey:    cfg.PrivateKey,\n")
 	w.WriteString("\t}\n")
 	for _, res := range spec.Resources {
 		svcType := res.Name + "Service"

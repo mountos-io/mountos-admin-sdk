@@ -1,4 +1,6 @@
 export { MountOSAdmin } from './client_gen.js'
 export { MountOSError } from './errors.js'
+export { TokenSigner } from './auth.js'
+export { signDashboardUser } from './dashboard_user.js'
 export type * from './types_gen.js'
 export type * from './types.js'

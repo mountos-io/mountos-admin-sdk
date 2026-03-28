@@ -48,6 +48,7 @@ func generateTSTypes(spec *Spec, outDir string) {
 	w.WriteString("export interface Config {\n")
 	w.WriteString("  baseUrl: string\n")
 	w.WriteString("  privateKey: string\n")
+	w.WriteString("  dashboardUser?: DashboardUser\n")
 	w.WriteString("}\n\n")
 
 	// StandardResponse
@@ -185,6 +186,7 @@ func generateTSClient(spec *Spec, outDir string) {
 	// Imports
 	w.WriteString("import { TokenSigner } from './auth.js'\n")
 	w.WriteString("import { MountOSError } from './errors.js'\n")
+	w.WriteString("import { signDashboardUser } from './dashboard_user.js'\n")
 	w.WriteString("import type {\n")
 	w.WriteString("  Config, StandardResponse, ListOptions,\n")
 	w.WriteString("  PaginatedResponse, CursorPaginatedResponse,\n")
@@ -199,6 +201,7 @@ func generateTSClient(spec *Spec, outDir string) {
 		}
 	}
 
+	addImport("DashboardUser") // used by client for per-request signing
 	for _, res := range spec.Resources {
 		for _, ep := range res.Endpoints {
 			if len(ep.Request) > 0 {
@@ -244,7 +247,9 @@ func generateTSClient(spec *Spec, outDir string) {
 	// MountOSAdmin class
 	w.WriteString("export class MountOSAdmin {\n")
 	w.WriteString("  private readonly baseUrl: string\n")
-	w.WriteString("  private readonly signer: TokenSigner\n\n")
+	w.WriteString("  private readonly signer: TokenSigner\n")
+	w.WriteString("  private readonly dashboardUser?: DashboardUser\n")
+	w.WriteString("  private readonly privateKey: string\n\n")
 
 	// Private fields
 	for _, res := range spec.Resources {
@@ -258,6 +263,8 @@ func generateTSClient(spec *Spec, outDir string) {
 	w.WriteString("  constructor(config: Config) {\n")
 	w.WriteString("    this.baseUrl = config.baseUrl.replace(/\\/+$/, '')\n")
 	w.WriteString("    this.signer = new TokenSigner(config.privateKey)\n")
+	w.WriteString("    this.dashboardUser = config.dashboardUser\n")
+	w.WriteString("    this.privateKey = config.privateKey\n")
 	w.WriteString("  }\n")
 
 	// Lazy getters
@@ -276,6 +283,9 @@ func generateTSClient(spec *Spec, outDir string) {
 	w.WriteString("    const token = await this.signer.getToken()\n")
 	w.WriteString("    const headers: Record<string, string> = {\n")
 	w.WriteString("      'Authorization': `Bearer ${token}`,\n")
+	w.WriteString("    }\n")
+	w.WriteString("    if (this.dashboardUser) {\n")
+	w.WriteString("      headers['X-MountOS-Dashboard-User'] = await signDashboardUser(this.dashboardUser, this.privateKey)\n")
 	w.WriteString("    }\n\n")
 	w.WriteString("    const init: RequestInit = { method, headers }\n")
 	w.WriteString("    if (body !== undefined) {\n")
