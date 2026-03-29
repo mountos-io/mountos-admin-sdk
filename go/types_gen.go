@@ -263,6 +263,20 @@ type AlertCountResponse struct {
 	CriticalCount int64 `json:"criticalCount"`
 }
 
+type RegionAlert struct {
+	ID          int64  `json:"id"`
+	AlertID     string `json:"alertId"`
+	Source      string `json:"source"`
+	NodeID      string `json:"nodeId"`
+	Severity    int    `json:"severity"`
+	Category    string `json:"category"`
+	Title       string `json:"title"`
+	Description string `json:"description,omitempty"`
+	EventTime   string `json:"eventTime"`
+	ResolvedAt  string `json:"resolvedAt,omitempty"`
+	CreatedAt   string `json:"createdAt,omitempty"`
+}
+
 type DashboardUser struct {
 	ID        string `json:"id"`
 	Name      string `json:"name"`
@@ -533,6 +547,18 @@ type AlertListOptions struct {
 	Since     string
 	Page      int
 	Limit     int
+}
+
+// RegionAlerts
+
+type RegionAlertListOptions struct {
+	Active   *bool
+	Severity *int
+	Category string
+	NodeID   string
+	Since    string
+	Page     int
+	Limit    int
 }
 
 // Cache

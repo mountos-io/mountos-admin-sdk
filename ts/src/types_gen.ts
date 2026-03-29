@@ -249,6 +249,20 @@ export interface AlertCountResponse {
   criticalCount: number
 }
 
+export interface RegionAlert {
+  id: number
+  alertId: string
+  source: string
+  nodeId: string
+  severity: number
+  category: string
+  title: string
+  description?: string
+  eventTime: string
+  resolvedAt?: string
+  createdAt?: string
+}
+
 export interface DashboardUser {
   id: string
   name: string
@@ -473,6 +487,16 @@ export interface AlertListOptions extends ListOptions {
   regionId?: number
   severity?: number
   category?: string
+  since?: string
+}
+
+// RegionAlerts
+
+export interface RegionAlertListOptions extends ListOptions {
+  active?: boolean
+  severity?: number
+  category?: string
+  nodeId?: string
   since?: string
 }
 

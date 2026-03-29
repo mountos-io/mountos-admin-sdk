@@ -26,6 +26,7 @@ type Client struct {
 	Dashboard       *DashboardService
 	License         *LicenseService
 	Alerts          *AlertsService
+	RegionAlerts    *RegionAlertsService
 	Cache           *CacheService
 }
 
@@ -57,6 +58,7 @@ func NewClient(cfg Config) (*Client, error) {
 	c.Dashboard = &DashboardService{c: c}
 	c.License = &LicenseService{c: c}
 	c.Alerts = &AlertsService{c: c}
+	c.RegionAlerts = &RegionAlertsService{c: c}
 	c.Cache = &CacheService{c: c}
 	return c, nil
 }

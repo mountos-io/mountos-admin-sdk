@@ -645,6 +645,52 @@ func (s *AlertsService) Resolve(ctx context.Context, alertID string) error {
 	return err
 }
 
+type RegionAlertsService struct{ c *Client }
+
+func (s *RegionAlertsService) List(ctx context.Context, regionID int64, opts *RegionAlertListOptions) (*PaginatedResponse[RegionAlert], error) {
+	q := url.Values{}
+	if opts != nil {
+		if opts.Active != nil {
+			q.Set("active", strconv.FormatBool(*opts.Active))
+		}
+		if opts.Severity != nil {
+			q.Set("severity", strconv.Itoa(*opts.Severity))
+		}
+		if opts.Category != "" {
+			q.Set("category", opts.Category)
+		}
+		if opts.NodeID != "" {
+			q.Set("nodeId", opts.NodeID)
+		}
+		if opts.Since != "" {
+			q.Set("since", opts.Since)
+		}
+		addPagination(q, opts.Page, opts.Limit)
+	}
+	path := fmt.Sprintf("/api/v1/regions/%s/alerts/list", strconv.FormatInt(regionID, 10))
+	if qs := q.Encode(); qs != "" {
+		path += "?" + qs
+	}
+	data, err := s.c.get(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[PaginatedResponse[RegionAlert]](data)
+}
+
+func (s *RegionAlertsService) Count(ctx context.Context, regionID int64) (*AlertCountResponse, error) {
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/regions/%s/alerts/count", strconv.FormatInt(regionID, 10)))
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[AlertCountResponse](data)
+}
+
+func (s *RegionAlertsService) Resolve(ctx context.Context, regionID int64, alertID string) error {
+	_, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%s/alerts/%s/resolve", strconv.FormatInt(regionID, 10), alertID), nil)
+	return err
+}
+
 type CacheService struct{ c *Client }
 
 func (s *CacheService) Refresh(ctx context.Context) error {

@@ -152,6 +152,19 @@ types:
     - "resolvedAt: datetime?"
     - "createdAt: datetime?"
 
+  RegionAlert:
+    - "id: int64"
+    - "alertId: string"
+    - "source: string"
+    - "nodeId: string"
+    - "severity: int"
+    - "category: string"
+    - "title: string"
+    - "description: string?"
+    - "eventTime: datetime"
+    - "resolvedAt: datetime?"
+    - "createdAt: datetime?"
+
   AlertCountResponse:
     - "active: int64"
     - "recent: int64"
@@ -758,6 +771,35 @@ resources:
           - "page: int=1"
           - "limit: int=20"
         responseType: ServiceAlert
+
+      - action: count
+        method: GET
+        path: /count
+        responseType: AlertCountResponse
+
+      - action: resolve
+        method: POST
+        path: /:alertId/resolve
+
+  - name: RegionAlerts
+    path: /regions/:regionId/alerts
+    pathParamTypes:
+      regionId: int64
+      alertId: string
+    endpoints:
+      - action: list
+        method: GET
+        path: /list
+        pagination: page
+        query:
+          - "active: bool=true"
+          - "severity: int"
+          - "category: string"
+          - "nodeId: string"
+          - "since: string"
+          - "page: int=1"
+          - "limit: int=20"
+        responseType: RegionAlert
 
       - action: count
         method: GET

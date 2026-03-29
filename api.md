@@ -671,6 +671,40 @@ Param: `alertId`
 
 ---
 
+## RegionAlerts
+
+### GET /api/v1/regions/:regionId/alerts/list
+Param: `regionId`
+Query: `active=bool(default true)`, `severity=int`, `category=string`, `nodeId=string`, `since=string`, `page=int(default 1)`, `limit=int(default 20)`
+Response data: `{ "items": RegionAlert[], "pagination": PaginationMeta }`
+
+### GET /api/v1/regions/:regionId/alerts/count
+Param: `regionId`
+Response data: `AlertCountResponse`
+
+### POST /api/v1/regions/:regionId/alerts/:alertId/resolve
+Param: `regionId`
+Param: `alertId`
+
+### RegionAlert Type
+```
+{
+  "id": int64,
+  "alertId": string,
+  "source": string,
+  "nodeId": string,
+  "severity": int,
+  "category": string,
+  "title": string,
+  "description"?: string,
+  "eventTime": RFC3339,
+  "resolvedAt"?: RFC3339,
+  "createdAt"?: RFC3339
+}
+```
+
+---
+
 ## Cache
 
 ### POST /api/v1/cache/refresh
