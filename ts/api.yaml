@@ -124,6 +124,9 @@ types:
     - "createdBy: string?"
     - "createdAt: int64"
     - "childrenCount: int32"
+    - "inactive: bool?"
+    - "inactiveAt: int64?"
+    - "status: string"
 
   AuditLog:
     - "id: int64"
@@ -626,6 +629,25 @@ resources:
         path: /:volumeId/forks
         responseType: Fork
         responseArray: true
+
+      - action: listAllForks
+        method: GET
+        path: /:volumeId/forks?include_inactive=true
+        responseType: Fork
+        responseArray: true
+
+      - action: deleteFork
+        method: POST
+        path: /:volumeId/forks/:forkName/delete
+        request:
+          - "force: bool"
+        response:
+          - "inactivatedFids: int32[]"
+
+      - action: restoreFork
+        method: POST
+        path: /:volumeId/forks/:forkName/restore
+        responseType: Fork
 
   - name: AuditLogs
     path: /audit-logs

@@ -412,6 +412,26 @@ Response data: `{ "volumeId": string, "liveVolume": int64, "totalVolume": int64,
 Param: `volumeId`
 Response data: `Fork[]`
 
+### GET /api/v1/volumes/:volumeId/forks?include_inactive=true
+Param: `volumeId`
+Response data: `Fork[]`
+
+### POST /api/v1/volumes/:volumeId/forks/:forkName/delete
+Param: `volumeId`
+Param: `forkName`
+Request:
+```
+{
+  "force"?: bool
+}
+```
+Response data: `{ "inactivatedFids": int32[] }`
+
+### POST /api/v1/volumes/:volumeId/forks/:forkName/restore
+Param: `volumeId`
+Param: `forkName`
+Response data: `Fork`
+
 ### Volume Type
 ```
 {

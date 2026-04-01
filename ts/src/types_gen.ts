@@ -125,6 +125,9 @@ export interface Fork {
   createdBy?: string
   createdAt: number
   childrenCount: number
+  inactive?: boolean
+  inactiveAt?: number
+  status: string
 }
 
 export interface AuditLog {
@@ -432,6 +435,10 @@ export interface RevokeVolumeAPIKeysByUserRequest {
 
 export interface UpdateVolumeQuotaRequest {
   quotaLimit: number
+}
+
+export interface DeleteVolumeForkRequest {
+  force?: boolean
 }
 
 export interface VolumeListOptions extends ListOptions {

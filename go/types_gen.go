@@ -139,6 +139,9 @@ type Fork struct {
 	CreatedBy     string `json:"createdBy,omitempty"`
 	CreatedAt     int64  `json:"createdAt"`
 	ChildrenCount int32  `json:"childrenCount"`
+	Inactive      bool   `json:"inactive,omitempty"`
+	InactiveAt    int64  `json:"inactiveAt,omitempty"`
+	Status        string `json:"status"`
 }
 
 type AuditLog struct {
@@ -485,6 +488,14 @@ type StatsVolumeResponse struct {
 	LiveVolume    int64  `json:"liveVolume"`
 	TotalVolume   int64  `json:"totalVolume"`
 	PendingVolume int64  `json:"pendingVolume"`
+}
+
+type DeleteVolumeForkRequest struct {
+	Force bool `json:"force,omitempty"`
+}
+
+type DeleteForkVolumeResponse struct {
+	InactivatedFids []int32 `json:"inactivatedFids"`
 }
 
 type VolumeListOptions struct {

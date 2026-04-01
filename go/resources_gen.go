@@ -365,6 +365,34 @@ func (s *VolumesService) ListForks(ctx context.Context, volumeID int64) ([]Fork,
 	return *result, nil
 }
 
+func (s *VolumesService) ListAllForks(ctx context.Context, volumeID int64) ([]Fork, error) {
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/volumes/%s/forks?include_inactive=true", strconv.FormatInt(volumeID, 10)))
+	if err != nil {
+		return nil, err
+	}
+	result, err := decodeJSON[[]Fork](data)
+	if err != nil {
+		return nil, err
+	}
+	return *result, nil
+}
+
+func (s *VolumesService) DeleteFork(ctx context.Context, volumeID int64, forkName int64, req *DeleteVolumeForkRequest) (*DeleteForkVolumeResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/volumes/%s/forks/%s/delete", strconv.FormatInt(volumeID, 10), strconv.FormatInt(forkName, 10)), req)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[DeleteForkVolumeResponse](data)
+}
+
+func (s *VolumesService) RestoreFork(ctx context.Context, volumeID int64, forkName int64) (*Fork, error) {
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/volumes/%s/forks/%s/restore", strconv.FormatInt(volumeID, 10), strconv.FormatInt(forkName, 10)))
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[Fork](data)
+}
+
 type AuditLogsService struct{ c *Client }
 
 func (s *AuditLogsService) List(ctx context.Context, opts *AuditLogListOptions) (*CursorPaginatedResponse[AuditLog], error) {
