@@ -725,9 +725,9 @@ Param: `alertId`
 
 ---
 
-## Cache
+## Vault
 
-### POST /api/v1/cache/refresh
+### POST /api/v1/vault/resync
 
 ---
 

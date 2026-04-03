@@ -45,7 +45,7 @@ export class MountOSAdmin {
   private _license?: LicenseResource
   private _alerts?: AlertsResource
   private _regionAlerts?: RegionAlertsResource
-  private _cache?: CacheResource
+  private _vault?: VaultResource
 
   constructor(config: Config) {
     this.baseUrl = config.baseUrl.replace(/\/+$/, '')
@@ -114,8 +114,8 @@ export class MountOSAdmin {
     return (this._regionAlerts ??= new RegionAlertsResource(this))
   }
 
-  get cache(): CacheResource {
-    return (this._cache ??= new CacheResource(this))
+  get vault(): VaultResource {
+    return (this._vault ??= new VaultResource(this))
   }
 
   async request<T>(method: string, path: string, body?: unknown): Promise<T> {
@@ -450,10 +450,10 @@ class RegionAlertsResource {
   }
 }
 
-class CacheResource {
+class VaultResource {
   constructor(private client: MountOSAdmin) {}
 
-  refresh(): Promise<void> {
-    return this.client.request('POST', '/api/v1/cache/refresh')
+  resync(): Promise<void> {
+    return this.client.request('POST', '/api/v1/vault/resync')
   }
 }

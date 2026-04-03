@@ -832,9 +832,9 @@ resources:
         method: POST
         path: /:alertId/resolve
 
-  - name: Cache
-    path: /cache
+  - name: Vault
+    path: /vault
     endpoints:
-      - action: refresh
+      - action: resync
         method: POST
-        path: /refresh
+        path: /resync

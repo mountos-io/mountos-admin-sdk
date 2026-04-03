@@ -122,7 +122,7 @@ func main() {
 
   // --- Audit Logs ---
   logs, err := client.AuditLogs.List(ctx, &sdk.AuditLogListOptions{
-    AccountID: acct.ID,
+    AccountID: &acct.ID,
     Limit:     5,
   })
   if err != nil {
@@ -134,7 +134,7 @@ func main() {
   }
 
   // --- Service Nodes ---
-  nodes, err := client.ServiceNodes.List(ctx, regionResp.ID, nil)
+  nodes, err := client.ServiceNodes.List(ctx, regionResp.ID, "", "", 0)
   if err != nil {
     fmt.Println("List nodes:", err)
   } else {
@@ -144,11 +144,11 @@ func main() {
     }
   }
 
-  // --- Cache ---
-  if err := client.Cache.Refresh(ctx); err != nil {
-    fmt.Println("Cache refresh:", err)
+  // --- Vault ---
+  if err := client.Vault.Resync(ctx); err != nil {
+    fmt.Println("Vault resync:", err)
   } else {
-    fmt.Println("Cache refreshed")
+    fmt.Println("Vault resynced")
   }
 
   fmt.Println("Done.")

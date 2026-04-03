@@ -719,9 +719,9 @@ func (s *RegionAlertsService) Resolve(ctx context.Context, regionID int64, alert
 	return err
 }
 
-type CacheService struct{ c *Client }
+type VaultService struct{ c *Client }
 
-func (s *CacheService) Refresh(ctx context.Context) error {
-	_, err := s.c.post(ctx, "/api/v1/cache/refresh", nil)
+func (s *VaultService) Resync(ctx context.Context) error {
+	_, err := s.c.post(ctx, "/api/v1/vault/resync", nil)
 	return err
 }

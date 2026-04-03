@@ -27,7 +27,7 @@ type Client struct {
 	License         *LicenseService
 	Alerts          *AlertsService
 	RegionAlerts    *RegionAlertsService
-	Cache           *CacheService
+	Vault           *VaultService
 }
 
 // NewClient creates a new SDK client.
@@ -59,6 +59,6 @@ func NewClient(cfg Config) (*Client, error) {
 	c.License = &LicenseService{c: c}
 	c.Alerts = &AlertsService{c: c}
 	c.RegionAlerts = &RegionAlertsService{c: c}
-	c.Cache = &CacheService{c: c}
+	c.Vault = &VaultService{c: c}
 	return c, nil
 }

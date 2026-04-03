@@ -107,13 +107,13 @@ async function main() {
     }
   }
 
-  // --- Cache ---
+  // --- Vault ---
   try {
-    await client.cache.refresh()
-    console.log('Cache refreshed')
+    await client.vault.resync()
+    console.log('Vault resynced')
   } catch (err) {
     if (err instanceof MountOSError) {
-      console.log(`Cache refresh: ${err.message}`)
+      console.log(`Vault resync: ${err.message}`)
     }
   }
 
