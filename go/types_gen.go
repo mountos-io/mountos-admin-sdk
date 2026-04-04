@@ -152,6 +152,7 @@ type AuditLog struct {
 	Success     bool            `json:"success"`
 	Data        json.RawMessage `json:"data,omitempty"`
 	CreatedBy   string          `json:"createdBy,omitempty"`
+	Node        string          `json:"node,omitempty"`
 	AccountID   int64           `json:"accountId,omitempty"`
 	CreatedAt   string          `json:"createdAt,omitempty"`
 	UpdatedAt   string          `json:"updatedAt,omitempty"`
@@ -521,6 +522,7 @@ type RegionAuditLogListOptions struct {
 	Cursor  int64
 	Limit   int
 	Subject string
+	Node    string
 }
 
 // ServiceNodes

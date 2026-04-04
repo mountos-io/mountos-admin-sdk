@@ -136,6 +136,7 @@ types:
     - "success: bool"
     - "data: json?"
     - "createdBy: string?"
+    - "node: string?"
     - "accountId: int64?"
     - "createdAt: datetime?"
     - "updatedAt: datetime?"
@@ -676,6 +677,7 @@ resources:
           - "cursor: int64"
           - "limit: int=20"
           - "subject: string"
+          - "node: string"
         responseType: AuditLog
 
   - name: ServiceNodes

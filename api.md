@@ -476,6 +476,7 @@ Response data: `{ "items": AuditLog[], "nextCursor": int64|null }`
   "success": bool,
   "data"?: object,
   "createdBy"?: string,
+  "node"?: string,
   "accountId"?: int64,
   "createdAt"?: RFC3339,
   "updatedAt"?: RFC3339
@@ -488,7 +489,7 @@ Response data: `{ "items": AuditLog[], "nextCursor": int64|null }`
 
 ### GET /api/v1/regions/:regionId/audit-logs/list
 Param: `regionId`
-Query: `cursor=int64`, `limit=int(default 20)`, `subject=string`
+Query: `cursor=int64`, `limit=int(default 20)`, `subject=string`, `node=string`
 Response data: `{ "items": AuditLog[], "nextCursor": int64|null }`
 
 ### AuditLog Type
@@ -501,6 +502,7 @@ Response data: `{ "items": AuditLog[], "nextCursor": int64|null }`
   "success": bool,
   "data"?: object,
   "createdBy"?: string,
+  "node"?: string,
   "accountId"?: int64,
   "createdAt"?: RFC3339,
   "updatedAt"?: RFC3339

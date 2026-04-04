@@ -436,6 +436,9 @@ func (s *RegionAuditLogsService) List(ctx context.Context, regionID int64, opts 
 		if opts.Subject != "" {
 			q.Set("subject", opts.Subject)
 		}
+		if opts.Node != "" {
+			q.Set("node", opts.Node)
+		}
 	}
 	path := fmt.Sprintf("/api/v1/regions/%s/audit-logs/list", strconv.FormatInt(regionID, 10))
 	if qs := q.Encode(); qs != "" {

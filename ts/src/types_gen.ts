@@ -138,6 +138,7 @@ export interface AuditLog {
   success: boolean
   data?: unknown
   createdBy?: string
+  node?: string
   accountId?: number
   createdAt?: string
   updatedAt?: string
@@ -462,6 +463,7 @@ export interface RegionAuditLogListOptions {
   cursor?: number
   limit?: number
   subject?: string
+  node?: string
 }
 
 // ServiceNodes
