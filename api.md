@@ -341,7 +341,8 @@ Request:
 {
   "description"?: string,
   "retentionPeriod"?: int32,
-  "gracePeriod"?: int32
+  "gracePeriod"?: int32,
+  "restrictByLiveVolume"?: bool
 }
 ```
 Response data: `{ "id": int64 }`
@@ -406,7 +407,18 @@ Response data: `{ "id": int64 }`
 
 ### GET /api/v1/volumes/:volumeId/stats
 Param: `volumeId`
-Response data: `{ "volumeId": string, "liveVolume": int64, "totalVolume": int64, "pendingVolume": int64 }`
+Response data: `{ "volumeId": string, "liveVolume": int64, "totalVolume": int64, "pendingVolume": int64, "liveInactiveVolume": int64, "restrictByLiveVolume": bool }`
+
+### POST /api/v1/volumes/:volumeId/forks/create
+Param: `volumeId`
+Request:
+```
+{
+  "name": string(required),
+  "parentName"?: string
+}
+```
+Response data: `Fork`
 
 ### GET /api/v1/volumes/:volumeId/forks
 Param: `volumeId`
@@ -446,6 +458,8 @@ Response data: `Fork`
   "liveVolume": int64,
   "totalVolume": int64,
   "pendingVolume": int64,
+  "liveInactiveVolume": int64,
+  "restrictByLiveVolume": bool,
   "locked": bool,
   "retentionPeriod": int32,
   "gracePeriod": int32,

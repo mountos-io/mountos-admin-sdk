@@ -353,6 +353,14 @@ func (s *VolumesService) Stats(ctx context.Context, volumeID int64) (*StatsVolum
 	return decodeJSON[StatsVolumeResponse](data)
 }
 
+func (s *VolumesService) CreateFork(ctx context.Context, volumeID int64, req *CreateVolumeForkRequest) (*Fork, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/volumes/%s/forks/create", strconv.FormatInt(volumeID, 10)), req)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[Fork](data)
+}
+
 func (s *VolumesService) ListForks(ctx context.Context, volumeID int64) ([]Fork, error) {
 	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/volumes/%s/forks", strconv.FormatInt(volumeID, 10)))
 	if err != nil {

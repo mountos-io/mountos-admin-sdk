@@ -105,6 +105,8 @@ export interface Volume {
   liveVolume: number
   totalVolume: number
   pendingVolume: number
+  liveInactiveVolume: number
+  restrictByLiveVolume: boolean
   locked: boolean
   retentionPeriod: number
   gracePeriod: number
@@ -128,6 +130,7 @@ export interface Fork {
   inactive?: boolean
   inactiveAt?: number
   status: string
+  size: number
 }
 
 export interface AuditLog {
@@ -414,6 +417,7 @@ export interface EditVolumeRequest {
   description?: string
   retentionPeriod?: number
   gracePeriod?: number
+  restrictByLiveVolume?: boolean
 }
 
 export interface DeactivateVolumeRequest {
@@ -436,6 +440,11 @@ export interface RevokeVolumeAPIKeysByUserRequest {
 
 export interface UpdateVolumeQuotaRequest {
   quotaLimit: number
+}
+
+export interface CreateVolumeForkRequest {
+  name: string
+  parentName?: string
 }
 
 export interface DeleteVolumeForkRequest {

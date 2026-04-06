@@ -119,6 +119,8 @@ type Volume struct {
 	LiveVolume              int64  `json:"liveVolume"`
 	TotalVolume             int64  `json:"totalVolume"`
 	PendingVolume           int64  `json:"pendingVolume"`
+	LiveInactiveVolume      int64  `json:"liveInactiveVolume"`
+	RestrictByLiveVolume    bool   `json:"restrictByLiveVolume"`
 	Locked                  bool   `json:"locked"`
 	RetentionPeriod         int32  `json:"retentionPeriod"`
 	GracePeriod             int32  `json:"gracePeriod"`
@@ -142,6 +144,7 @@ type Fork struct {
 	Inactive      bool   `json:"inactive,omitempty"`
 	InactiveAt    int64  `json:"inactiveAt,omitempty"`
 	Status        string `json:"status"`
+	Size          int64  `json:"size"`
 }
 
 type AuditLog struct {
@@ -452,9 +455,10 @@ type CreateVolumeResponse struct {
 }
 
 type EditVolumeRequest struct {
-	Description     string `json:"description,omitempty"`
-	RetentionPeriod int32  `json:"retentionPeriod,omitempty"`
-	GracePeriod     int32  `json:"gracePeriod,omitempty"`
+	Description          string `json:"description,omitempty"`
+	RetentionPeriod      int32  `json:"retentionPeriod,omitempty"`
+	GracePeriod          int32  `json:"gracePeriod,omitempty"`
+	RestrictByLiveVolume bool   `json:"restrictByLiveVolume,omitempty"`
 }
 
 type DeactivateVolumeRequest struct {
@@ -485,10 +489,17 @@ type UpdateVolumeQuotaRequest struct {
 }
 
 type StatsVolumeResponse struct {
-	VolumeID      string `json:"volumeId"`
-	LiveVolume    int64  `json:"liveVolume"`
-	TotalVolume   int64  `json:"totalVolume"`
-	PendingVolume int64  `json:"pendingVolume"`
+	VolumeID             string `json:"volumeId"`
+	LiveVolume           int64  `json:"liveVolume"`
+	TotalVolume          int64  `json:"totalVolume"`
+	PendingVolume        int64  `json:"pendingVolume"`
+	LiveInactiveVolume   int64  `json:"liveInactiveVolume"`
+	RestrictByLiveVolume bool   `json:"restrictByLiveVolume"`
+}
+
+type CreateVolumeForkRequest struct {
+	Name       string `json:"name"`
+	ParentName string `json:"parentName,omitempty"`
 }
 
 type DeleteVolumeForkRequest struct {

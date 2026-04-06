@@ -105,6 +105,8 @@ types:
     - "liveVolume: int64"
     - "totalVolume: int64"
     - "pendingVolume: int64"
+    - "liveInactiveVolume: int64"
+    - "restrictByLiveVolume: bool"
     - "locked: bool"
     - "retentionPeriod: int32"
     - "gracePeriod: int32"
@@ -127,6 +129,7 @@ types:
     - "inactive: bool?"
     - "inactiveAt: int64?"
     - "status: string"
+    - "size: int64"
 
   AuditLog:
     - "id: int64"
@@ -564,6 +567,7 @@ resources:
           - "description: string"
           - "retentionPeriod: int32"
           - "gracePeriod: int32"
+          - "restrictByLiveVolume: bool"
         response:
           - "id: int64"
 
@@ -626,6 +630,16 @@ resources:
           - "liveVolume: int64"
           - "totalVolume: int64"
           - "pendingVolume: int64"
+          - "liveInactiveVolume: int64"
+          - "restrictByLiveVolume: bool"
+
+      - action: createFork
+        method: POST
+        path: /:volumeId/forks/create
+        request:
+          - "name: string!"
+          - "parentName: string"
+        responseType: Fork
 
       - action: listForks
         method: GET
