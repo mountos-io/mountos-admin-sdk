@@ -445,6 +445,7 @@ export interface UpdateVolumeQuotaRequest {
 export interface CreateVolumeForkRequest {
   name: string
   parentName?: string
+  asOf?: number
 }
 
 export interface DeleteVolumeForkRequest {

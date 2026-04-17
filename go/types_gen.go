@@ -500,6 +500,7 @@ type StatsVolumeResponse struct {
 type CreateVolumeForkRequest struct {
 	Name       string `json:"name"`
 	ParentName string `json:"parentName,omitempty"`
+	AsOf       int64  `json:"asOf,omitempty"`
 }
 
 type DeleteVolumeForkRequest struct {

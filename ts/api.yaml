@@ -639,6 +639,7 @@ resources:
         request:
           - "name: string!"
           - "parentName: string"
+          - "asOf: int64?"
         responseType: Fork
 
       - action: listForks
