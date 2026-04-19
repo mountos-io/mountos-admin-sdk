@@ -549,6 +549,15 @@ func (s *ClientSessionsService) List(ctx context.Context, opts *ClientSessionLis
 		if opts.IsActive != "" {
 			q.Set("isActive", opts.IsActive)
 		}
+		if opts.OsName != "" {
+			q.Set("osName", opts.OsName)
+		}
+		if opts.Platform != "" {
+			q.Set("platform", opts.Platform)
+		}
+		if opts.Search != "" {
+			q.Set("search", opts.Search)
+		}
 		addPagination(q, opts.Page, opts.Limit)
 	}
 	path := "/api/v1/client-sessions/list"
@@ -570,27 +579,15 @@ func (s *ClientSessionsService) Get(ctx context.Context, sessionID int64) (*Clie
 	return decodeJSON[ClientSession](data)
 }
 
-func (s *ClientSessionsService) Summary(ctx context.Context, accountID int64, volumeID int64) ([]SessionSummary, error) {
+func (s *ClientSessionsService) Summary(ctx context.Context, accountID int64, volumeID int64) (*SessionSummary, error) {
 	q := url.Values{}
-	if accountID != 0 {
-		q.Set("accountId", strconv.FormatInt(accountID, 10))
-	}
-	if volumeID != 0 {
-		q.Set("volumeId", strconv.FormatInt(volumeID, 10))
-	}
-	path := "/api/v1/client-sessions/summary"
-	if qs := q.Encode(); qs != "" {
-		path += "?" + qs
-	}
-	data, err := s.c.get(ctx, path)
+	q.Set("accountId", strconv.FormatInt(accountID, 10))
+	q.Set("volumeId", strconv.FormatInt(volumeID, 10))
+	data, err := s.c.get(ctx, "/api/v1/client-sessions/summary"+"?"+q.Encode())
 	if err != nil {
 		return nil, err
 	}
-	result, err := decodeJSON[[]SessionSummary](data)
-	if err != nil {
-		return nil, err
-	}
-	return *result, nil
+	return decodeJSON[SessionSummary](data)
 }
 
 type DiscoverService struct{ c *Client }

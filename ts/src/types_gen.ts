@@ -188,9 +188,9 @@ export interface ClientSession {
 }
 
 export interface SessionSummary {
-  clientType: string
-  status: string
-  count: number
+  byStatus: SessionSummaryStatusEntry[]
+  byPlatform: SessionSummaryFacet[]
+  byOsName: SessionSummaryFacet[]
 }
 
 export interface DiscoverMetaResponse {
@@ -299,6 +299,17 @@ export interface RegionVolumeMetrics {
   volumeCount: number
   totalVolumeUsed: number
   totalQuotaLimit: number
+}
+
+export interface SessionSummaryFacet {
+  label: string
+  count: number
+}
+
+export interface SessionSummaryStatusEntry {
+  clientType: string
+  status: string
+  count: number
 }
 
 // Accounts
@@ -490,6 +501,9 @@ export interface ClientSessionListOptions extends ListOptions {
   clientType?: string
   status?: string
   isActive?: string
+  osName?: string
+  platform?: string
+  search?: string
 }
 
 // Discover

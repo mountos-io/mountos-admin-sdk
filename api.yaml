@@ -217,10 +217,19 @@ types:
     - "disconnectedAt: int64?"
     - "isActive: bool"
 
-  SessionSummary:
+  SessionSummaryStatusEntry:
     - "clientType: string"
     - "status: string"
     - "count: int64"
+
+  SessionSummaryFacet:
+    - "label: string"
+    - "count: int64"
+
+  SessionSummary:
+    - "byStatus: SessionSummaryStatusEntry[]"
+    - "byPlatform: SessionSummaryFacet[]"
+    - "byOsName: SessionSummaryFacet[]"
 
   DiscoverMetaResponse:
     - "regionId: int64"
@@ -743,6 +752,9 @@ resources:
           - "clientType: string"
           - "status: string"
           - "isActive: string"
+          - "osName: string"
+          - "platform: string"
+          - "search: string"
           - "page: int=1"
           - "limit: int=20"
         responseType: ClientSession
@@ -759,7 +771,6 @@ resources:
           - "accountId: int64"
           - "volumeId: int64"
         responseType: SessionSummary
-        responseArray: true
 
   - name: Discover
     path: /discover

@@ -202,9 +202,9 @@ type ClientSession struct {
 }
 
 type SessionSummary struct {
-	ClientType string `json:"clientType"`
-	Status     string `json:"status"`
-	Count      int64  `json:"count"`
+	ByStatus   []SessionSummaryStatusEntry `json:"byStatus"`
+	ByPlatform []SessionSummaryFacet       `json:"byPlatform"`
+	ByOsName   []SessionSummaryFacet       `json:"byOsName"`
 }
 
 type DiscoverMetaResponse struct {
@@ -313,6 +313,17 @@ type RegionVolumeMetrics struct {
 	VolumeCount     int64  `json:"volumeCount"`
 	TotalVolumeUsed int64  `json:"totalVolumeUsed"`
 	TotalQuotaLimit int64  `json:"totalQuotaLimit"`
+}
+
+type SessionSummaryFacet struct {
+	Label string `json:"label"`
+	Count int64  `json:"count"`
+}
+
+type SessionSummaryStatusEntry struct {
+	ClientType string `json:"clientType"`
+	Status     string `json:"status"`
+	Count      int64  `json:"count"`
 }
 
 // Accounts
@@ -551,6 +562,9 @@ type ClientSessionListOptions struct {
 	ClientType string
 	Status     string
 	IsActive   string
+	OsName     string
+	Platform   string
+	Search     string
 	Page       int
 	Limit      int
 }

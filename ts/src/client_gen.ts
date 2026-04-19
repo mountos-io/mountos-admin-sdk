@@ -383,14 +383,14 @@ class ClientSessionsResource {
   constructor(private client: MountOSAdmin) {}
 
   list(opts?: ClientSessionListOptions): Promise<PaginatedResponse<ClientSession>> {
-    return this.client.request('GET', `/api/v1/client-sessions/list${queryString({ accountId: opts?.accountId, regionId: opts?.regionId, volumeId: opts?.volumeId, userId: opts?.userId, clientType: opts?.clientType, status: opts?.status, isActive: opts?.isActive, page: opts?.page, limit: opts?.limit })}`)
+    return this.client.request('GET', `/api/v1/client-sessions/list${queryString({ accountId: opts?.accountId, regionId: opts?.regionId, volumeId: opts?.volumeId, userId: opts?.userId, clientType: opts?.clientType, status: opts?.status, isActive: opts?.isActive, osName: opts?.osName, platform: opts?.platform, search: opts?.search, page: opts?.page, limit: opts?.limit })}`)
   }
 
   get(sessionId: number): Promise<ClientSession> {
     return this.client.request('GET', `/api/v1/client-sessions/${sessionId}`)
   }
 
-  summary(accountId?: number, volumeId?: number): Promise<SessionSummary[]> {
+  summary(accountId: number, volumeId: number): Promise<SessionSummary> {
     return this.client.request('GET', `/api/v1/client-sessions/summary${queryString({ accountId: accountId, volumeId: volumeId })}`)
   }
 }
