@@ -47,6 +47,7 @@ const (
 	LicenseStatusValid LicenseStatus = "valid"
 	LicenseStatusExpiring LicenseStatus = "expiring"
 	LicenseStatusGrace LicenseStatus = "grace"
+	LicenseStatusExpiredAccess LicenseStatus = "expired_access"
 	LicenseStatusExpired LicenseStatus = "expired"
 )
 
@@ -225,21 +226,26 @@ type DashboardStats struct {
 }
 
 type LicenseDetails struct {
-	LicenseID       string        `json:"licenseId"`
-	Licensee        string        `json:"licensee"`
-	Contact         string        `json:"contact"`
-	LicenseType     string        `json:"licenseType"`
-	IssuedAt        string        `json:"issuedAt"`
-	ExpiresAt       string        `json:"expiresAt"`
-	GracePeriodDays int           `json:"gracePeriodDays"`
-	MaxNodes        int64         `json:"maxNodes"`
-	MaxVolumes      int64         `json:"maxVolumes"`
-	MaxUsers        int64         `json:"maxUsers"`
-	MaxStorageBytes int64         `json:"maxStorageBytes"`
-	Status          LicenseStatus `json:"status"`
-	DaysRemaining   int           `json:"daysRemaining"`
-	GraceEndsAt     string        `json:"graceEndsAt"`
-	GraceDaysLeft   int           `json:"graceDaysLeft"`
+	LicenseID             string        `json:"licenseId"`
+	Licensee              string        `json:"licensee"`
+	Contact               string        `json:"contact"`
+	LicenseType           string        `json:"licenseType"`
+	IssuedAt              string        `json:"issuedAt"`
+	ExpiresAt             string        `json:"expiresAt"`
+	GracePeriodDays       int           `json:"gracePeriodDays"`
+	ExpiredAccessDays     int           `json:"expiredAccessDays"`
+	MaxNodes              int64         `json:"maxNodes"`
+	MaxVolumes            int64         `json:"maxVolumes"`
+	MaxUsers              int64         `json:"maxUsers"`
+	MaxAccounts           int64         `json:"maxAccounts"`
+	MaxRegions            int64         `json:"maxRegions"`
+	MaxStorageBytes       int64         `json:"maxStorageBytes"`
+	Status                LicenseStatus `json:"status"`
+	DaysRemaining         int           `json:"daysRemaining"`
+	GraceEndsAt           string        `json:"graceEndsAt"`
+	GraceDaysLeft         int           `json:"graceDaysLeft"`
+	ExpiredAccessEndsAt   string        `json:"expiredAccessEndsAt"`
+	ExpiredAccessDaysLeft int           `json:"expiredAccessDaysLeft"`
 }
 
 type LicenseTerms struct {

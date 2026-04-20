@@ -662,14 +662,19 @@ Response data: `LicenseTerms`
   "issuedAt": string,
   "expiresAt": string,
   "gracePeriodDays": int,
+  "expiredAccessDays": int,
   "maxNodes": int64,
   "maxVolumes": int64,
   "maxUsers": int64,
+  "maxAccounts": int64,
+  "maxRegions": int64,
   "maxStorageBytes": int64,
   "status": LicenseStatus,
   "daysRemaining": int,
   "graceEndsAt": string,
-  "graceDaysLeft": int
+  "graceDaysLeft": int,
+  "expiredAccessEndsAt": string,
+  "expiredAccessDaysLeft": int
 }
 ```
 
