@@ -53,17 +53,17 @@ const (
 
 
 type Account struct {
-	ID          int64          `json:"id"`
-	Name        string         `json:"name"`
-	Description string         `json:"description"`
-	IconURL     string         `json:"iconUrl,omitempty"`
-	VendorInfo  map[string]any `json:"vendorInfo,omitempty"`
-	LiveVolume  int64          `json:"liveVolume"`
-	TotalVolume int64          `json:"totalVolume"`
-	IsActive    bool           `json:"isActive"`
-	Locked      bool           `json:"locked"`
-	CreatedAt   string         `json:"createdAt"`
-	UpdatedAt   string         `json:"updatedAt"`
+	ID           int64          `json:"id"`
+	Name         string         `json:"name"`
+	Description  string         `json:"description"`
+	IconURL      string         `json:"iconUrl,omitempty"`
+	ProviderInfo map[string]any `json:"providerInfo,omitempty"`
+	LiveVolume   int64          `json:"liveVolume"`
+	TotalVolume  int64          `json:"totalVolume"`
+	IsActive     bool           `json:"isActive"`
+	Locked       bool           `json:"locked"`
+	CreatedAt    string         `json:"createdAt"`
+	UpdatedAt    string         `json:"updatedAt"`
 }
 
 type User struct {
@@ -335,34 +335,34 @@ type SessionSummaryStatusEntry struct {
 // Accounts
 
 type CreateAccountRequest struct {
-	Name        string         `json:"name"`
-	Description string         `json:"description,omitempty"`
-	IconURL     string         `json:"iconUrl,omitempty"`
-	VendorInfo  map[string]any `json:"vendorInfo,omitempty"`
+	Name         string         `json:"name"`
+	Description  string         `json:"description,omitempty"`
+	IconURL      string         `json:"iconUrl,omitempty"`
+	ProviderInfo map[string]any `json:"providerInfo,omitempty"`
 }
 
 type EditAccountRequest struct {
-	Name        string         `json:"name"`
-	Description string         `json:"description,omitempty"`
-	IconURL     string         `json:"iconUrl,omitempty"`
-	VendorInfo  map[string]any `json:"vendorInfo,omitempty"`
+	Name         string         `json:"name"`
+	Description  string         `json:"description,omitempty"`
+	IconURL      string         `json:"iconUrl,omitempty"`
+	ProviderInfo map[string]any `json:"providerInfo,omitempty"`
 }
 
 // Users
 
 type AddUserRequest struct {
-	AccountID  int64          `json:"accountId"`
-	Username   string         `json:"username"`
-	Email      string         `json:"email"`
-	Name       string         `json:"name,omitempty"`
-	VendorInfo map[string]any `json:"vendorInfo,omitempty"`
+	AccountID    int64          `json:"accountId"`
+	Username     string         `json:"username"`
+	Email        string         `json:"email"`
+	Name         string         `json:"name,omitempty"`
+	ProviderInfo map[string]any `json:"providerInfo,omitempty"`
 }
 
 type EditUserRequest struct {
-	Username   string         `json:"username"`
-	Email      string         `json:"email"`
-	Name       string         `json:"name,omitempty"`
-	VendorInfo map[string]any `json:"vendorInfo,omitempty"`
+	Username     string         `json:"username"`
+	Email        string         `json:"email"`
+	Name         string         `json:"name,omitempty"`
+	ProviderInfo map[string]any `json:"providerInfo,omitempty"`
 }
 
 type UserListOptions struct {

@@ -1,7 +1,7 @@
 # mountOS Admin API Reference
 
 Base path: `/api/v1`
-Auth: `Authorization: Bearer <JWT>` (ED25519/EdDSA, sub=vendor, aud=mountos/appserv)
+Auth: `Authorization: Bearer <JWT>` (ED25519/EdDSA, sub=mountos:provider, aud=mountos/appserv)
 
 ## Response Envelope
 
@@ -46,7 +46,7 @@ Request:
   "name": string(required),
   "description"?: string,
   "iconUrl"?: string,
-  "vendorInfo"?: object
+  "providerInfo"?: object
 }
 ```
 Response data: `{ "id": int64 }`
@@ -67,7 +67,7 @@ Request:
   "name": string(required),
   "description"?: string,
   "iconUrl"?: string,
-  "vendorInfo"?: object
+  "providerInfo"?: object
 }
 ```
 Response data: `{ "id": int64 }`
@@ -91,7 +91,7 @@ Response data: `{ "id": int64 }`
   "name": string,
   "description": string,
   "iconUrl"?: string,
-  "vendorInfo"?: object,
+  "providerInfo"?: object,
   "liveVolume": int64,
   "totalVolume": int64,
   "isActive": bool,
@@ -113,7 +113,7 @@ Request:
   "username": string(required),
   "email": string(required),
   "name"?: string,
-  "vendorInfo"?: object
+  "providerInfo"?: object
 }
 ```
 Response data: `{ "id": int64 }`
@@ -134,7 +134,7 @@ Request:
   "username": string(required),
   "email": string(required),
   "name"?: string,
-  "vendorInfo"?: object
+  "providerInfo"?: object
 }
 ```
 Response data: `{ "id": int64 }`
@@ -758,7 +758,7 @@ Param: `alertId`
 ```
 Header:  { "alg": "EdDSA", "typ": "JWT" }
 Payload: {
-  "sub": "vendor",
+  "sub": "mountos:provider",
   "aud": ["mountos/appserv"],
   "iat": unix_now,
   "nbf": unix_now,

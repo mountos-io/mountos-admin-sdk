@@ -3,7 +3,7 @@ basePath: /api/v1
 
 jwt:
   algorithm: EdDSA
-  subject: vendor
+  subject: mountos:provider
   audience: mountos/appserv
   scope: service
   keyFormat: "raw 64-byte ED25519 private key, base64-encoded (standard encoding)"
@@ -47,7 +47,7 @@ types:
     - "name: string"
     - "description: string"
     - "iconUrl: string?"
-    - "vendorInfo: object?"
+    - "providerInfo: object?"
     - "liveVolume: int64"
     - "totalVolume: int64"
     - "isActive: bool"
@@ -306,7 +306,7 @@ resources:
           - "name: string!"
           - "description: string"
           - "iconUrl: string"
-          - "vendorInfo: object"
+          - "providerInfo: object"
         response:
           - "id: int64"
 
@@ -331,7 +331,7 @@ resources:
           - "name: string!"
           - "description: string"
           - "iconUrl: string"
-          - "vendorInfo: object"
+          - "providerInfo: object"
         response:
           - "id: int64"
 
@@ -364,7 +364,7 @@ resources:
           - "username: string!"
           - "email: string!"
           - "name: string"
-          - "vendorInfo: object"
+          - "providerInfo: object"
         response:
           - "id: int64"
 
@@ -391,7 +391,7 @@ resources:
           - "username: string!"
           - "email: string!"
           - "name: string"
-          - "vendorInfo: object"
+          - "providerInfo: object"
         response:
           - "id: int64"
 

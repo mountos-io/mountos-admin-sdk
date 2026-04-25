@@ -13,7 +13,7 @@ async function main() {
   const { id: accountId } = await client.accounts.create({
     name: 'Acme Corp',
     description: 'Demo account',
-    vendorInfo: { tier: 'enterprise' },
+    providerInfo: { tier: 'enterprise' },
   })
   console.log('Created account ID:', accountId)
 

@@ -42,7 +42,7 @@ export interface Account {
   name: string
   description: string
   iconUrl?: string
-  vendorInfo?: Record<string, unknown>
+  providerInfo?: Record<string, unknown>
   liveVolume: number
   totalVolume: number
   isActive: boolean
@@ -323,14 +323,14 @@ export interface CreateAccountRequest {
   name: string
   description?: string
   iconUrl?: string
-  vendorInfo?: Record<string, unknown>
+  providerInfo?: Record<string, unknown>
 }
 
 export interface EditAccountRequest {
   name: string
   description?: string
   iconUrl?: string
-  vendorInfo?: Record<string, unknown>
+  providerInfo?: Record<string, unknown>
 }
 
 // Users
@@ -340,14 +340,14 @@ export interface AddUserRequest {
   username: string
   email: string
   name?: string
-  vendorInfo?: Record<string, unknown>
+  providerInfo?: Record<string, unknown>
 }
 
 export interface EditUserRequest {
   username: string
   email: string
   name?: string
-  vendorInfo?: Record<string, unknown>
+  providerInfo?: Record<string, unknown>
 }
 
 export interface UserListOptions extends ListOptions {
