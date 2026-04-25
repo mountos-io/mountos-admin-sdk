@@ -96,7 +96,7 @@ export class TokenSigner {
       kfp: this.kfp,
     })
       .setProtectedHeader({ alg: 'EdDSA', typ: 'JWT', kid: this.kfp })
-      .setSubject('vendor')
+      .setSubject('mountos:provider')
       .setAudience('mountos/appserv')
       .setIssuedAt(now)
       .setNotBefore(now - CLOCK_SKEW_LEEWAY)

@@ -3,7 +3,7 @@ basePath: /api/v1
 
 jwt:
   algorithm: EdDSA
-  subject: vendor
+  subject: mountos:provider
   audience: mountos/appserv
   scope: service
   keyFormat: "raw 64-byte ED25519 private key, base64-encoded (standard encoding)"

@@ -52,7 +52,7 @@ func (tc *tokenCache) getToken() (string, error) {
 
 	header := fmt.Sprintf(`{"alg":"EdDSA","typ":"JWT","kid":"%s"}`, tc.kfp)
 	payload := fmt.Sprintf(
-		`{"sub":"vendor","aud":"mountos/appserv","iat":%d,"nbf":%d,"exp":%d,"jti":"%s","scope":"service","kfp":"%s"}`,
+		`{"sub":"mountos:provider","aud":"mountos/appserv","iat":%d,"nbf":%d,"exp":%d,"jti":"%s","scope":"service","kfp":"%s"}`,
 		now, now-clockSkewLeeway, exp, jti, tc.kfp,
 	)
 
