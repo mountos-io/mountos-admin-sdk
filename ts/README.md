@@ -1,6 +1,6 @@
 # @mountos-app/admin-sdk
 
-TypeScript SDK for the mountOS vendor API. ESM-only, Node 18+/Bun/Deno.
+TypeScript SDK for the mountOS provider API. ESM-only, Node 18+/Bun/Deno.
 
 ## Install
 

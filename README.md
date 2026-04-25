@@ -1,6 +1,6 @@
 # mountOS Admin SDK
 
-Vendor-facing SDK for the mountOS Admin API. Wraps the appserv vendor API (`/api/v1/*`) with ED25519 JWT authentication.
+Provider-facing SDK for the mountOS Admin API. Wraps the appserv provider API (`/api/v1/*`) with ED25519 JWT authentication.
 
 ## SDKs
 

@@ -25,7 +25,7 @@ func main() {
   acct, err := client.Accounts.Create(ctx, &sdk.CreateAccountRequest{
     Name:        "Acme Corp",
     Description: "Demo account",
-    VendorInfo:  map[string]any{"tier": "enterprise"},
+    ProviderInfo: map[string]any{"tier": "enterprise"},
   })
   if err != nil {
     log.Fatal("create account:", err)

@@ -1,6 +1,6 @@
 # mountOS Admin SDK for Go
 
-Go SDK for the mountOS vendor API. Zero external dependencies — pure stdlib.
+Go SDK for the mountOS provider API. Zero external dependencies — pure stdlib.
 
 ## Install
 
