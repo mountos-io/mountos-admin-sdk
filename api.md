@@ -409,6 +409,11 @@ Response data: `{ "id": int64 }`
 Param: `volumeId`
 Response data: `{ "volumeId": string, "liveVolume": int64, "totalVolume": int64, "pendingVolume": int64, "liveInactiveVolume": int64, "restrictByLiveVolume": bool }`
 
+### GET /api/v1/volumes/:volumeId/size-history
+Param: `volumeId`
+Query: `from=string`, `to=string`
+Response data: `{ "points": VolumeSizePoint[] }`
+
 ### POST /api/v1/volumes/:volumeId/forks/create
 Param: `volumeId`
 Request:

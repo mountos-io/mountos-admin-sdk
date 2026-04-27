@@ -13,10 +13,20 @@ func generateTS(spec *Spec, outDir string) {
 
 func isPrimitiveType(specType string) bool {
 	switch specType {
-	case "string", "datetime", "int64", "int32", "int", "bool", "object", "json":
+	case "string", "datetime", "int64", "int32", "int", "float", "float64", "bool", "object", "json":
 		return true
 	}
 	return false
+}
+
+// baseTypeName strips array suffix and optional marker from a spec type string,
+// returning the bare type name suitable for import resolution.
+func baseTypeName(specType string) string {
+	t := strings.TrimSuffix(specType, "?")
+	for strings.HasSuffix(t, "[]") {
+		t = t[:len(t)-2]
+	}
+	return t
 }
 
 func tsType(specType string) string {
@@ -209,6 +219,14 @@ func generateTSClient(spec *Spec, outDir string) {
 			}
 			if ep.ResponseType != "" {
 				addImport(ep.ResponseType)
+			}
+			for _, s := range ep.Response {
+				f := parseField(s)
+				addImport(baseTypeName(f.Type))
+			}
+			for _, s := range ep.Request {
+				f := parseField(s)
+				addImport(baseTypeName(f.Type))
 			}
 			if ep.Pagination == "page" && hasExtraQueryParam(ep.Query) {
 				addImport(listOptionsTypeName(res.Name))

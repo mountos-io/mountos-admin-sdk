@@ -118,6 +118,13 @@ types:
     - "createdAt: datetime"
     - "updatedAt: datetime"
 
+  VolumeSizePoint:
+    - "bucketEnd: datetime"
+    - "liveVolume: int64"
+    - "totalVolume: int64"
+    - "pendingVolume: int64"
+    - "liveInactiveVolume: int64"
+
   Fork:
     - "fid: int32"
     - "name: string"
@@ -647,6 +654,15 @@ resources:
           - "pendingVolume: int64"
           - "liveInactiveVolume: int64"
           - "restrictByLiveVolume: bool"
+
+      - action: sizeHistory
+        method: GET
+        path: /:volumeId/size-history
+        query:
+          - "from: string"
+          - "to: string"
+        response:
+          - "points: VolumeSizePoint[]"
 
       - action: createFork
         method: POST

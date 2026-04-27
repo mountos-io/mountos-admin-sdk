@@ -12,10 +12,11 @@ import type {
   TestStorageBucketRequest, CreateVolumeRequest, Volume, VolumeListOptions, 
   EditVolumeRequest, DeactivateVolumeRequest, GenerateVolumeAPIKeysRequest, 
   RevokeVolumeAPIKeyRequest, RevokeVolumeAPIKeysByUserRequest, UpdateVolumeQuotaRequest, 
-  CreateVolumeForkRequest, Fork, DeleteVolumeForkRequest, AuditLog, AuditLogListOptions, 
-  RegionAuditLogListOptions, ServiceNode, ClientSession, ClientSessionListOptions, 
-  SessionSummary, DiscoverMetaResponse, DashboardStats, LicenseDetails, LicenseTerms, 
-  ServiceAlert, AlertListOptions, AlertCountResponse, RegionAlert, RegionAlertListOptions,
+  VolumeSizePoint, CreateVolumeForkRequest, Fork, DeleteVolumeForkRequest, AuditLog, 
+  AuditLogListOptions, RegionAuditLogListOptions, ServiceNode, ClientSession, 
+  ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, DashboardStats, 
+  LicenseDetails, LicenseTerms, ServiceAlert, AlertListOptions, AlertCountResponse, 
+  RegionAlert, RegionAlertListOptions,
 } from './types_gen.js'
 
 function queryString(params: Record<string, string | number | boolean | undefined>): string {
@@ -310,6 +311,10 @@ class VolumesResource {
 
   stats(volumeId: number): Promise<{ volumeId: string; liveVolume: number; totalVolume: number; pendingVolume: number; liveInactiveVolume: number; restrictByLiveVolume: boolean }> {
     return this.client.request('GET', `/api/v1/volumes/${volumeId}/stats`)
+  }
+
+  sizeHistory(volumeId: number, from: string, to: string): Promise<{ points: VolumeSizePoint[] }> {
+    return this.client.request('GET', `/api/v1/volumes/${volumeId}/size-history${queryString({ from: from, to: to })}`)
   }
 
   createFork(volumeId: number, req: CreateVolumeForkRequest): Promise<Fork> {

@@ -317,6 +317,14 @@ export interface SessionSummaryStatusEntry {
   count: number
 }
 
+export interface VolumeSizePoint {
+  bucketEnd: string
+  liveVolume: number
+  totalVolume: number
+  pendingVolume: number
+  liveInactiveVolume: number
+}
+
 // Accounts
 
 export interface CreateAccountRequest {

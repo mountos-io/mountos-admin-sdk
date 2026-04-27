@@ -332,6 +332,14 @@ type SessionSummaryStatusEntry struct {
 	Count      int64  `json:"count"`
 }
 
+type VolumeSizePoint struct {
+	BucketEnd          string `json:"bucketEnd"`
+	LiveVolume         int64  `json:"liveVolume"`
+	TotalVolume        int64  `json:"totalVolume"`
+	PendingVolume      int64  `json:"pendingVolume"`
+	LiveInactiveVolume int64  `json:"liveInactiveVolume"`
+}
+
 // Accounts
 
 type CreateAccountRequest struct {
@@ -512,6 +520,10 @@ type StatsVolumeResponse struct {
 	PendingVolume        int64  `json:"pendingVolume"`
 	LiveInactiveVolume   int64  `json:"liveInactiveVolume"`
 	RestrictByLiveVolume bool   `json:"restrictByLiveVolume"`
+}
+
+type SizeHistoryVolumeResponse struct {
+	Points []VolumeSizePoint `json:"points"`
 }
 
 type CreateVolumeForkRequest struct {
