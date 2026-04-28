@@ -679,7 +679,8 @@ Response data: `LicenseTerms`
   "graceEndsAt": string,
   "graceDaysLeft": int,
   "expiredAccessEndsAt": string,
-  "expiredAccessDaysLeft": int
+  "expiredAccessDaysLeft": int,
+  "quota": LicenseQuota
 }
 ```
 

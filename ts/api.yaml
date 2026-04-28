@@ -37,6 +37,11 @@ enums:
     - expired_access
     - expired
 
+  LicenseQuotaState:
+    - ok
+    - exceeded
+    - unknown
+
 types:
   Ref:
     - "id: int64"
@@ -277,6 +282,13 @@ types:
     - "activeSessionCount: int64"
     - "regionBreakdown: RegionVolumeMetrics[]"
 
+  LicenseQuota:
+    - "state: LicenseQuotaState"
+    - "liveVolume: int64"
+    - "totalVolume: int64"
+    - "generation: int64"
+    - "lastTransitionAtMs: int64"
+
   LicenseDetails:
     - "licenseId: string"
     - "licensee: string"
@@ -298,6 +310,7 @@ types:
     - "graceDaysLeft: int"
     - "expiredAccessEndsAt: string"
     - "expiredAccessDaysLeft: int"
+    - "quota: LicenseQuota"
 
   LicenseTerms:
     - "terms: string"

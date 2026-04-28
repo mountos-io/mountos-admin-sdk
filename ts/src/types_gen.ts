@@ -35,6 +35,8 @@ export interface ListOptions {
   limit?: number
 }
 
+export type LicenseQuotaState = 'ok' | 'exceeded' | 'unknown'
+
 export type LicenseStatus = 'valid' | 'expiring' | 'grace' | 'expired_access' | 'expired'
 
 export interface Account {
@@ -231,6 +233,7 @@ export interface LicenseDetails {
   graceDaysLeft: number
   expiredAccessEndsAt: string
   expiredAccessDaysLeft: number
+  quota: LicenseQuota
 }
 
 export interface LicenseTerms {
@@ -291,6 +294,14 @@ export interface DiscoverEndpoint {
   nodeId: string
   addr: string
   status: string
+}
+
+export interface LicenseQuota {
+  state: LicenseQuotaState
+  liveVolume: number
+  totalVolume: number
+  generation: number
+  lastTransitionAtMs: number
 }
 
 export interface Ref {

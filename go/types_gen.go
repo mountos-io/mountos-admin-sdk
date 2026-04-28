@@ -41,6 +41,14 @@ type CursorPaginatedResponse[T any] struct {
 type IDResponse struct {
 	ID int64 `json:"id"`
 }
+type LicenseQuotaState = string
+
+const (
+	LicenseQuotaStateOk LicenseQuotaState = "ok"
+	LicenseQuotaStateExceeded LicenseQuotaState = "exceeded"
+	LicenseQuotaStateUnknown LicenseQuotaState = "unknown"
+)
+
 type LicenseStatus = string
 
 const (
@@ -246,6 +254,7 @@ type LicenseDetails struct {
 	GraceDaysLeft         int           `json:"graceDaysLeft"`
 	ExpiredAccessEndsAt   string        `json:"expiredAccessEndsAt"`
 	ExpiredAccessDaysLeft int           `json:"expiredAccessDaysLeft"`
+	Quota                 LicenseQuota  `json:"quota"`
 }
 
 type LicenseTerms struct {
@@ -306,6 +315,14 @@ type DiscoverEndpoint struct {
 	NodeID string `json:"nodeId"`
 	Addr   string `json:"addr"`
 	Status string `json:"status"`
+}
+
+type LicenseQuota struct {
+	State              LicenseQuotaState `json:"state"`
+	LiveVolume         int64             `json:"liveVolume"`
+	TotalVolume        int64             `json:"totalVolume"`
+	Generation         int64             `json:"generation"`
+	LastTransitionAtMs int64             `json:"lastTransitionAtMs"`
 }
 
 type Ref struct {
