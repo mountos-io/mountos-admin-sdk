@@ -372,8 +372,16 @@ func (s *VolumesService) CreateFork(ctx context.Context, volumeID int64, req *Cr
 	return decodeJSON[Fork](data)
 }
 
-func (s *VolumesService) ListForks(ctx context.Context, volumeID int64) ([]Fork, error) {
-	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/volumes/%s/forks", strconv.FormatInt(volumeID, 10)))
+func (s *VolumesService) ListForks(ctx context.Context, volumeID int64, volumeType string) ([]Fork, error) {
+	q := url.Values{}
+	if volumeType != "" {
+		q.Set("volumeType", volumeType)
+	}
+	path := fmt.Sprintf("/api/v1/volumes/%s/forks", strconv.FormatInt(volumeID, 10))
+	if qs := q.Encode(); qs != "" {
+		path += "?" + qs
+	}
+	data, err := s.c.get(ctx, path)
 	if err != nil {
 		return nil, err
 	}
@@ -384,8 +392,16 @@ func (s *VolumesService) ListForks(ctx context.Context, volumeID int64) ([]Fork,
 	return *result, nil
 }
 
-func (s *VolumesService) ListAllForks(ctx context.Context, volumeID int64) ([]Fork, error) {
-	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/volumes/%s/forks?include_inactive=true", strconv.FormatInt(volumeID, 10)))
+func (s *VolumesService) ListAllForks(ctx context.Context, volumeID int64, volumeType string) ([]Fork, error) {
+	q := url.Values{}
+	if volumeType != "" {
+		q.Set("volumeType", volumeType)
+	}
+	path := fmt.Sprintf("/api/v1/volumes/%s/forks?include_inactive=true", strconv.FormatInt(volumeID, 10))
+	if qs := q.Encode(); qs != "" {
+		path += "?" + qs
+	}
+	data, err := s.c.get(ctx, path)
 	if err != nil {
 		return nil, err
 	}
@@ -404,8 +420,8 @@ func (s *VolumesService) DeleteFork(ctx context.Context, volumeID int64, forkNam
 	return decodeJSON[DeleteForkVolumeResponse](data)
 }
 
-func (s *VolumesService) RestoreFork(ctx context.Context, volumeID int64, forkName string) (*Fork, error) {
-	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/volumes/%s/forks/%s/restore", strconv.FormatInt(volumeID, 10), forkName))
+func (s *VolumesService) RestoreFork(ctx context.Context, volumeID int64, forkName string, req *RestoreVolumeForkRequest) (*Fork, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/volumes/%s/forks/%s/restore", strconv.FormatInt(volumeID, 10), forkName), req)
 	if err != nil {
 		return nil, err
 	}

@@ -421,17 +421,20 @@ Request:
 {
   "name": string(required),
   "parentName"?: string,
-  "asOf"?: int64
+  "asOf"?: int64,
+  "volumeType"?: string
 }
 ```
 Response data: `Fork`
 
 ### GET /api/v1/volumes/:volumeId/forks
 Param: `volumeId`
+Query: `volumeType=string`
 Response data: `Fork[]`
 
 ### GET /api/v1/volumes/:volumeId/forks?include_inactive=true
 Param: `volumeId`
+Query: `volumeType=string`
 Response data: `Fork[]`
 
 ### POST /api/v1/volumes/:volumeId/forks/:forkName/delete
@@ -440,7 +443,8 @@ Param: `forkName`
 Request:
 ```
 {
-  "force"?: bool
+  "force"?: bool,
+  "volumeType"?: string
 }
 ```
 Response data: `{ "inactivatedFids": int32[] }`
@@ -448,6 +452,12 @@ Response data: `{ "inactivatedFids": int32[] }`
 ### POST /api/v1/volumes/:volumeId/forks/:forkName/restore
 Param: `volumeId`
 Param: `forkName`
+Request:
+```
+{
+  "volumeType"?: string
+}
+```
 Response data: `Fork`
 
 ### Volume Type

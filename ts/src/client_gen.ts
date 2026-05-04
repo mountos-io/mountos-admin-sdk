@@ -12,11 +12,11 @@ import type {
   TestStorageBucketRequest, CreateVolumeRequest, Volume, VolumeListOptions, 
   EditVolumeRequest, DeactivateVolumeRequest, GenerateVolumeAPIKeysRequest, 
   RevokeVolumeAPIKeyRequest, RevokeVolumeAPIKeysByUserRequest, UpdateVolumeQuotaRequest, 
-  VolumeSizePoint, CreateVolumeForkRequest, Fork, DeleteVolumeForkRequest, AuditLog, 
-  AuditLogListOptions, RegionAuditLogListOptions, ServiceNode, ClientSession, 
-  ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, DashboardStats, 
-  LicenseDetails, LicenseTerms, ServiceAlert, AlertListOptions, AlertCountResponse, 
-  RegionAlert, RegionAlertListOptions,
+  VolumeSizePoint, CreateVolumeForkRequest, Fork, DeleteVolumeForkRequest, 
+  RestoreVolumeForkRequest, AuditLog, AuditLogListOptions, RegionAuditLogListOptions, 
+  ServiceNode, ClientSession, ClientSessionListOptions, SessionSummary, 
+  DiscoverMetaResponse, DashboardStats, LicenseDetails, LicenseTerms, ServiceAlert, 
+  AlertListOptions, AlertCountResponse, RegionAlert, RegionAlertListOptions,
 } from './types_gen.js'
 
 function queryString(params: Record<string, string | number | boolean | undefined>): string {
@@ -321,20 +321,20 @@ class VolumesResource {
     return this.client.request('POST', `/api/v1/volumes/${volumeId}/forks/create`, req)
   }
 
-  listForks(volumeId: number): Promise<Fork[]> {
-    return this.client.request('GET', `/api/v1/volumes/${volumeId}/forks`)
+  listForks(volumeId: number, volumeType?: string): Promise<Fork[]> {
+    return this.client.request('GET', `/api/v1/volumes/${volumeId}/forks${queryString({ volumeType: volumeType })}`)
   }
 
-  listAllForks(volumeId: number): Promise<Fork[]> {
-    return this.client.request('GET', `/api/v1/volumes/${volumeId}/forks?include_inactive=true`)
+  listAllForks(volumeId: number, volumeType?: string): Promise<Fork[]> {
+    return this.client.request('GET', `/api/v1/volumes/${volumeId}/forks?include_inactive=true${queryString({ volumeType: volumeType })}`)
   }
 
   deleteFork(volumeId: number, forkName: string, req: DeleteVolumeForkRequest): Promise<{ inactivatedFids: number[] }> {
     return this.client.request('POST', `/api/v1/volumes/${volumeId}/forks/${forkName}/delete`, req)
   }
 
-  restoreFork(volumeId: number, forkName: string): Promise<Fork> {
-    return this.client.request('GET', `/api/v1/volumes/${volumeId}/forks/${forkName}/restore`)
+  restoreFork(volumeId: number, forkName: string, req: RestoreVolumeForkRequest): Promise<Fork> {
+    return this.client.request('POST', `/api/v1/volumes/${volumeId}/forks/${forkName}/restore`, req)
   }
 }
 

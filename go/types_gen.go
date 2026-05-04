@@ -547,14 +547,20 @@ type CreateVolumeForkRequest struct {
 	Name       string `json:"name"`
 	ParentName string `json:"parentName,omitempty"`
 	AsOf       int64  `json:"asOf,omitempty"`
+	VolumeType string `json:"volumeType,omitempty"`
 }
 
 type DeleteVolumeForkRequest struct {
-	Force bool `json:"force,omitempty"`
+	Force      bool   `json:"force,omitempty"`
+	VolumeType string `json:"volumeType,omitempty"`
 }
 
 type DeleteForkVolumeResponse struct {
 	InactivatedFids []int32 `json:"inactivatedFids"`
+}
+
+type RestoreVolumeForkRequest struct {
+	VolumeType string `json:"volumeType,omitempty"`
 }
 
 type VolumeListOptions struct {

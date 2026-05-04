@@ -684,17 +684,27 @@ resources:
           - "name: string!"
           - "parentName: string"
           - "asOf: int64?"
+          # volumeType: "general" (default) | "iceberg"
+          # General forks operate on the file/object volume; iceberg forks
+          # branch the lake catalog (separate fork namespace, COW overlay
+          # via lake_fork_view).
+          - "volumeType: string?"
         responseType: Fork
 
       - action: listForks
         method: GET
         path: /:volumeId/forks
+        # ?volumeType=iceberg → list lake forks; default = general.
+        query:
+          - "volumeType: string?"
         responseType: Fork
         responseArray: true
 
       - action: listAllForks
         method: GET
         path: /:volumeId/forks?include_inactive=true
+        query:
+          - "volumeType: string?"
         responseType: Fork
         responseArray: true
 
@@ -703,12 +713,15 @@ resources:
         path: /:volumeId/forks/:forkName/delete
         request:
           - "force: bool"
+          - "volumeType: string?"
         response:
           - "inactivatedFids: int32[]"
 
       - action: restoreFork
         method: POST
         path: /:volumeId/forks/:forkName/restore
+        request:
+          - "volumeType: string?"
         responseType: Fork
 
   - name: AuditLogs

@@ -481,10 +481,16 @@ export interface CreateVolumeForkRequest {
   name: string
   parentName?: string
   asOf?: number
+  volumeType?: string
 }
 
 export interface DeleteVolumeForkRequest {
   force?: boolean
+  volumeType?: string
+}
+
+export interface RestoreVolumeForkRequest {
+  volumeType?: string
 }
 
 export interface VolumeListOptions extends ListOptions {
