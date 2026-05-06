@@ -1,3 +1,3 @@
-module github.com/mountos-app/mountos-admin-sdk/go
+module github.com/mountos-io/mountos-admin-sdk/go
 
 go 1.26

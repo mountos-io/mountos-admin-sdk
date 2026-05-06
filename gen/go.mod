@@ -1,4 +1,4 @@
-module github.com/mountos-app/mountos-admin-sdk/gen
+module github.com/mountos-io/mountos-admin-sdk/gen
 
 go 1.24
 

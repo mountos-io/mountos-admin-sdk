@@ -7,7 +7,7 @@ import (
   "log"
   "os"
 
-  sdk "github.com/mountos-app/mountos-admin-sdk/go"
+  sdk "github.com/mountos-io/mountos-admin-sdk/go"
 )
 
 func main() {

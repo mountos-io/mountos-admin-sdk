@@ -60,7 +60,7 @@ func generateBrowserClient(spec *Spec, outDir string) {
 		line += ","
 		w.WriteString(line + "\n")
 	}
-	w.WriteString("} from '@mountos-app/admin-sdk'\n\n")
+	w.WriteString("} from '@mountos-io/admin-sdk'\n\n")
 
 	// queryString helper
 	w.WriteString("function queryString(params: Record<string, string | number | undefined>): string {\n")

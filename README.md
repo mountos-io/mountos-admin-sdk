@@ -6,8 +6,8 @@ Provider-facing SDK for the mountOS Admin API. Wraps the appserv provider API (`
 
 | Language                   | Path  | Package                                              |
 | -------------------------- | ----- | ---------------------------------------------------- |
-| [TypeScript](ts/README.md) | `ts/` | `@mountos-app/admin-sdk` (GitHub / private registry) |
-| [Go](go/README.md)         | `go/` | `github.com/mountos-app/mountos-admin-sdk/go`        |
+| [TypeScript](ts/README.md) | `ts/` | `@mountos-io/admin-sdk` (GitHub / private registry) |
+| [Go](go/README.md)         | `go/` | `github.com/mountos-io/mountos-admin-sdk/go`        |
 
 ## Examples
 

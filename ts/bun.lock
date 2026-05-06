@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "@mountos-app/admin-sdk",
+      "name": "@mountos-io/admin-sdk",
       "dependencies": {
         "jose": "^6.0.11",
       },

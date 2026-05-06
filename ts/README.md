@@ -1,4 +1,4 @@
-# @mountos-app/admin-sdk
+# @mountos-io/admin-sdk
 
 TypeScript SDK for the mountOS provider API. ESM-only, Node 18+/Bun/Deno.
 
@@ -11,7 +11,7 @@ This package is not published to npm. Use one of the following methods:
 ```json
 {
   "dependencies": {
-    "@mountos-app/admin-sdk": "github:mountos-app/mountos-admin-sdk#main"
+    "@mountos-io/admin-sdk": "github:mountos-io/mountos-admin-sdk#main"
   }
 }
 ```
@@ -21,7 +21,7 @@ Note: since the TS package lives under `ts/`, you may need to reference the subd
 ```json
 {
   "dependencies": {
-    "@mountos-app/admin-sdk": "github:mountos-app/mountos-admin-sdk#main&path:ts"
+    "@mountos-io/admin-sdk": "github:mountos-io/mountos-admin-sdk#main&path:ts"
   }
 }
 ```
@@ -29,7 +29,7 @@ Note: since the TS package lives under `ts/`, you may need to reference the subd
 **Git submodule:**
 
 ```bash
-git submodule add https://github.com/mountos-app/mountos-admin-sdk.git vendor/mountos-admin-sdk
+git submodule add https://github.com/mountos-io/mountos-admin-sdk.git vendor/mountos-admin-sdk
 ```
 
 Then reference in your tsconfig paths or use a workspace/symlink pointing to `vendor/mountos-admin-sdk/ts`.
@@ -39,13 +39,13 @@ Then reference in your tsconfig paths or use a workspace/symlink pointing to `ve
 If your organization runs a private npm registry (Verdaccio, GitHub Packages, etc.), publish the `ts/` package there and install normally:
 
 ```bash
-npm install @mountos-app/admin-sdk --registry=https://npm.your-org.com
+npm install @mountos-io/admin-sdk --registry=https://npm.your-org.com
 ```
 
 ## Usage
 
 ```typescript
-import { MountOSAdmin } from "@mountos-app/admin-sdk";
+import { MountOSAdmin } from "@mountos-io/admin-sdk";
 
 const client = new MountOSAdmin({
   baseUrl: "https://appserv.example.com",
@@ -115,7 +115,7 @@ await client.cache.refresh();
 ## Error Handling
 
 ```typescript
-import { MountOSError } from "@mountos-app/admin-sdk";
+import { MountOSError } from "@mountos-io/admin-sdk";
 
 try {
   await client.accounts.get(999);

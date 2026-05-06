@@ -5,7 +5,7 @@ Go SDK for the mountOS provider API. Zero external dependencies — pure stdlib.
 ## Install
 
 ```bash
-go get github.com/mountos-app/mountos-admin-sdk/go
+go get github.com/mountos-io/mountos-admin-sdk/go
 ```
 
 ## Usage
@@ -18,7 +18,7 @@ import (
   "fmt"
   "log"
 
-  sdk "github.com/mountos-app/mountos-admin-sdk/go"
+  sdk "github.com/mountos-io/mountos-admin-sdk/go"
 )
 
 func main() {

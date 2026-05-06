@@ -1,7 +1,7 @@
-module github.com/mountos-app/mountos-admin-sdk/examples/go
+module github.com/mountos-io/mountos-admin-sdk/examples/go
 
 go 1.26
 
-require github.com/mountos-app/mountos-admin-sdk/go v0.0.0
+require github.com/mountos-io/mountos-admin-sdk/go v0.0.0
 
-replace github.com/mountos-app/mountos-admin-sdk/go => ../../go
+replace github.com/mountos-io/mountos-admin-sdk/go => ../../go
