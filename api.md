@@ -469,6 +469,7 @@ Response data: `Fork`
   "region": Ref,
   "name": string,
   "description"?: string,
+  "volumeType": string,
   "encryption": bool,
   "quotaLimit": int64,
   "liveVolume": int64,

@@ -102,6 +102,7 @@ export interface Volume {
   region: Ref
   name: string
   description?: string
+  volumeType: string
   encryption: boolean
   quotaLimit: number
   liveVolume: number

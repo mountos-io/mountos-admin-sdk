@@ -123,6 +123,7 @@ type Volume struct {
 	Region                  Ref    `json:"region"`
 	Name                    string `json:"name"`
 	Description             string `json:"description,omitempty"`
+	VolumeType              string `json:"volumeType"`
 	Encryption              bool   `json:"encryption"`
 	QuotaLimit              int64  `json:"quotaLimit"`
 	LiveVolume              int64  `json:"liveVolume"`
