@@ -10,3 +10,5 @@ gen/gen
 
 # OS
 .DS_Store
+
+examples/go/go
