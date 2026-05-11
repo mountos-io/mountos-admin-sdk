@@ -366,6 +366,10 @@ interface SessionSummary {
   byStatus: SessionSummaryStatusEntry[];
   byPlatform: SessionSummaryFacet[];
   byOsName: SessionSummaryFacet[];
+  regionCount: number;
+  volumeCount: number;
+  hostCount: number;
+  unhealthyCount: number;
 }
 ```
 

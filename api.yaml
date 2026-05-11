@@ -251,6 +251,10 @@ types:
     - "byStatus: SessionSummaryStatusEntry[]"
     - "byPlatform: SessionSummaryFacet[]"
     - "byOsName: SessionSummaryFacet[]"
+    - "regionCount: int64"
+    - "volumeCount: int64"
+    - "hostCount: int64"
+    - "unhealthyCount: int64"
 
   DiscoverMetaResponse:
     - "regionId: int64"
