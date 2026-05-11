@@ -1,4 +1,4 @@
-.PHONY: all gen check build install clean ts-install ts-check ts-build ts-publish go-check go-build tag tag-minor tag-major help
+.PHONY: all gen docs check build install clean ts-install ts-check ts-build ts-publish go-check go-build tag tag-minor tag-major help
 
 all: gen check build
 
@@ -7,9 +7,12 @@ help: ## Show available targets
 
 # ── Generator ───────────────────────────────────────────────
 
-gen: ## Generate Go + TS SDK from api.yaml
-	cd gen && go run . --spec ../api.yaml --go-out ../go --ts-out ../ts/src --doc-out ..
+gen: ## Generate Go + TS SDK and docs from api.yaml
+	cd gen && go run . --spec ../api.yaml --go-out ../go --ts-out ../ts/src --doc-out .. --docs-out ../docs
 	cp api.yaml ts/api.yaml
+
+docs: ## Regenerate docs/ts.md and docs/go.md from api.yaml
+	cd gen && go run . --spec ../api.yaml --go-out ../go --ts-out ../ts/src --doc-out .. --docs-out ../docs
 
 # ── TypeScript ──────────────────────────────────────────────
 

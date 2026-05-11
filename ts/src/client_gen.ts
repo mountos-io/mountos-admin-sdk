@@ -270,7 +270,7 @@ class VolumesResource {
   }
 
   list(opts: VolumeListOptions): Promise<PaginatedResponse<Volume>> {
-    return this.client.request('GET', `/api/v1/volumes/list${queryString({ accountId: opts.accountId, regionId: opts.regionId, storageId: opts.storageId, page: opts.page, limit: opts.limit })}`)
+    return this.client.request('GET', `/api/v1/volumes/list${queryString({ accountId: opts.accountId, regionId: opts.regionId, storageId: opts.storageId, volumeType: opts.volumeType, locked: opts.locked, page: opts.page, limit: opts.limit })}`)
   }
 
   get(volumeId: number): Promise<Volume> {

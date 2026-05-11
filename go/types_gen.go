@@ -565,11 +565,13 @@ type RestoreVolumeForkRequest struct {
 }
 
 type VolumeListOptions struct {
-	AccountID int64
-	RegionID  *int64
-	StorageID *int64
-	Page      int
-	Limit     int
+	AccountID  int64
+	RegionID   *int64
+	StorageID  *int64
+	VolumeType string
+	Locked     *bool
+	Page       int
+	Limit      int
 }
 
 // AuditLogs

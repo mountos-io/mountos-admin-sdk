@@ -270,6 +270,12 @@ func (s *VolumesService) List(ctx context.Context, opts *VolumeListOptions) (*Pa
 		if opts.StorageID != nil {
 			q.Set("storageId", strconv.FormatInt(*opts.StorageID, 10))
 		}
+		if opts.VolumeType != "" {
+			q.Set("volumeType", opts.VolumeType)
+		}
+		if opts.Locked != nil {
+			q.Set("locked", strconv.FormatBool(*opts.Locked))
+		}
 		addPagination(q, opts.Page, opts.Limit)
 	}
 	data, err := s.c.get(ctx, "/api/v1/volumes/list"+"?"+q.Encode())

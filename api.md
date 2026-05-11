@@ -327,7 +327,7 @@ Request:
 Response data: `{ "id": int64, "encryptionKey": string }`
 
 ### GET /api/v1/volumes/list
-Query: `accountId=int64(required)`, `regionId=int64`, `storageId=int64`, `page=int(default 1)`, `limit=int(default 10)`
+Query: `accountId=int64(required)`, `regionId=int64`, `storageId=int64`, `volumeType=string`, `locked=bool`, `page=int(default 1)`, `limit=int(default 10)`
 Response data: `{ "items": Volume[], "pagination": PaginationMeta }`
 
 ### GET /api/v1/volumes/:volumeId

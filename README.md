@@ -4,10 +4,10 @@ Provider-facing SDK for the mountOS Admin API. Wraps the appserv provider API (`
 
 ## SDKs
 
-| Language                   | Path  | Package                                              |
-| -------------------------- | ----- | ---------------------------------------------------- |
-| [TypeScript](ts/README.md) | `ts/` | `@mountos-io/admin-sdk` (GitHub / private registry) |
-| [Go](go/README.md)         | `go/` | `github.com/mountos-io/mountos-admin-sdk/go`        |
+| Language                   | Path  | Package                                             | Reference                        |
+| -------------------------- | ----- | --------------------------------------------------- | -------------------------------- |
+| [TypeScript](ts/README.md) | `ts/` | `@mountos-io/admin-sdk` (GitHub / private registry) | [docs/ts.md](docs/ts.md)         |
+| [Go](go/README.md)         | `go/` | `github.com/mountos-io/mountos-admin-sdk/go`        | [docs/go.md](docs/go.md)         |
 
 ## Examples
 
@@ -15,7 +15,11 @@ See [examples/](examples/) for working Go and TypeScript sample code.
 
 ## API Reference
 
-See [api.md](api.md) for the complete, machine-readable API specification.
+- Language-neutral: [api.md](api.md)
+- TypeScript SDK: [docs/ts.md](docs/ts.md)
+- Go SDK: [docs/go.md](docs/go.md)
+
+All references are regenerated from [api.yaml](api.yaml) via `make gen` (or `make docs` for the language-specific docs only).
 
 ## Porting to Other Languages
 

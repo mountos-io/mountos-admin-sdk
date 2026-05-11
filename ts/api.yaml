@@ -594,6 +594,8 @@ resources:
           - "accountId: int64!"
           - "regionId: int64"
           - "storageId: int64"
+          - "volumeType: string"
+          - "locked: bool"
           - "page: int=1"
           - "limit: int=10"
         responseType: Volume

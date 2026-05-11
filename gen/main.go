@@ -15,6 +15,7 @@ func main() {
 	tsOut := flag.String("ts-out", "ts/src", "TS output directory")
 	browserOut := flag.String("browser-client-out", "", "Browser client output directory (optional)")
 	docOut := flag.String("doc-out", ".", "api.md output directory")
+	docsOut := flag.String("docs-out", "docs", "language-specific docs output directory (ts.md, go.md)")
 	flag.Parse()
 
 	spec := loadSpec(*specPath)
@@ -22,6 +23,8 @@ func main() {
 	generateTS(spec, *tsOut)
 	generateBrowserClient(spec, *browserOut)
 	generateDoc(spec, *docOut)
+	generateDocTS(spec, *docsOut)
+	generateDocGo(spec, *docsOut)
 	fmt.Println("generation complete")
 }
 

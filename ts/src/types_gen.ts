@@ -498,6 +498,8 @@ export interface VolumeListOptions extends ListOptions {
   accountId: number
   regionId?: number
   storageId?: number
+  volumeType?: string
+  locked?: boolean
 }
 
 // AuditLogs
