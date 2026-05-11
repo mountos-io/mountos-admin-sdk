@@ -44,10 +44,12 @@ npm install @mountos-io/admin-sdk --registry=https://npm.your-org.com
 
 ## Usage
 
-```typescript
-import { MountOSAdmin } from "@mountos-io/admin-sdk";
+### Server-side (Node/Bun/Deno) with JWT auth
 
-const client = new MountOSAdmin({
+```typescript
+import { createServerClient } from "@mountos-io/admin-sdk";
+
+const client = createServerClient({
   baseUrl: "https://appserv.example.com",
   privateKey: "base64-encoded-ed25519-key", // 32-byte seed or 64-byte seed+pubkey
 });
@@ -110,6 +112,32 @@ const meta = await client.discover.meta("AKID...");
 
 // Cache
 await client.cache.refresh();
+```
+
+### Browser / custom transport
+
+For browser apps (cookie/session auth, token refresh, etc.) supply your own `RequestFn`:
+
+```typescript
+import { createClient, type RequestFn } from "@mountos-io/admin-sdk";
+
+const request: RequestFn = async (method, path, body, signal) => {
+  const res = await fetch(`https://api.example.com${path}`, {
+    method,
+    credentials: "include",
+    headers: body !== undefined ? { "Content-Type": "application/json" } : {},
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+    signal,
+  });
+  const json = await res.json();
+  if (json.status !== "success") {
+    throw new Error(json.message);
+  }
+  return json.data;
+};
+
+const client = createClient(request);
+await client.accounts.list({ page: 1, limit: 10 });
 ```
 
 ## Error Handling

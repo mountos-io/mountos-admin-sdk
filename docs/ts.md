@@ -11,17 +11,19 @@ Generated from [api.yaml](../api.yaml). Do not edit.
 ## Quick Start
 
 ```typescript
-import { MountOSAdmin } from "@mountos-io/admin-sdk";
+import { createServerClient } from "@mountos-io/admin-sdk";
 
-const client = new MountOSAdmin({
+const client = createServerClient({
   baseUrl: "https://appserv.example.com",
   privateKey: "<base64 ED25519 key>",
 });
 ```
 
+Browser apps use `createClient(request)` with a custom `RequestFn`. See `README.md`.
+
 ## Response Envelope
 
-All SDK methods return the unwrapped `data` payload and throw `MountOSAdminError` on `status="failure"`.
+All SDK methods return the unwrapped `data` payload and throw `MountOSError` on `status="failure"`.
 
 ```typescript
 type StandardResponse<T> = {

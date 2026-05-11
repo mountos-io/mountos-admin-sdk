@@ -1,10 +1,10 @@
-import { MountOSAdmin, MountOSError } from '@mountos/admin-sdk'
+import { createServerClient, MountOSError } from '@mountos-io/admin-sdk'
 
 const BASE_URL = process.env.MOUNTOS_BASE_URL || 'https://appserv.example.com'
 const PRIVATE_KEY = process.env.MOUNTOS_PRIVATE_KEY || ''
 
 async function main() {
-  const client = new MountOSAdmin({
+  const client = createServerClient({
     baseUrl: BASE_URL,
     privateKey: PRIVATE_KEY,
   })

@@ -6,7 +6,7 @@
     "start": "npx tsx main.ts"
   },
   "dependencies": {
-    "@mountos/admin-sdk": "file:../../ts"
+    "@mountos-io/admin-sdk": "file:../../ts"
   },
   "devDependencies": {
     "@types/node": "^25.4.0",

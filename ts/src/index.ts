@@ -1,4 +1,5 @@
-export { MountOSAdmin } from './client_gen.js'
+export { createClient, type RequestFn, type AdminClient } from './client_gen.js'
+export { createServerClient } from './server.js'
 export { MountOSError } from './errors.js'
 export { TokenSigner } from './auth.js'
 export { signDashboardUser } from './dashboard_user.js'
