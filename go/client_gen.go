@@ -12,22 +12,25 @@ type Client struct {
 	dashboardUser *DashboardUser
 	privateKey    string
 
-	Accounts        *AccountsService
-	Users           *UsersService
-	Regions         *RegionsService
-	Storages        *StoragesService
-	Volumes         *VolumesService
-	AuditLogs       *AuditLogsService
-	RegionAuditLogs *RegionAuditLogsService
-	ServiceNodes    *ServiceNodesService
-	Nodes           *NodesService
-	ClientSessions  *ClientSessionsService
-	Discover        *DiscoverService
-	Dashboard       *DashboardService
-	License         *LicenseService
-	Alerts          *AlertsService
-	RegionAlerts    *RegionAlertsService
-	Vault           *VaultService
+	Accounts           *AccountsService
+	Users              *UsersService
+	Regions            *RegionsService
+	Storages           *StoragesService
+	Volumes            *VolumesService
+	VolumeForkTrees    *VolumeForkTreesService
+	VolumeForkEntries  *VolumeForkEntriesService
+	VolumeForkSearches *VolumeForkSearchesService
+	AuditLogs          *AuditLogsService
+	RegionAuditLogs    *RegionAuditLogsService
+	ServiceNodes       *ServiceNodesService
+	Nodes              *NodesService
+	ClientSessions     *ClientSessionsService
+	Discover           *DiscoverService
+	Dashboard          *DashboardService
+	License            *LicenseService
+	Alerts             *AlertsService
+	RegionAlerts       *RegionAlertsService
+	Vault              *VaultService
 }
 
 // NewClient creates a new SDK client.
@@ -49,6 +52,9 @@ func NewClient(cfg Config) (*Client, error) {
 	c.Regions = &RegionsService{c: c}
 	c.Storages = &StoragesService{c: c}
 	c.Volumes = &VolumesService{c: c}
+	c.VolumeForkTrees = &VolumeForkTreesService{c: c}
+	c.VolumeForkEntries = &VolumeForkEntriesService{c: c}
+	c.VolumeForkSearches = &VolumeForkSearchesService{c: c}
 	c.AuditLogs = &AuditLogsService{c: c}
 	c.RegionAuditLogs = &RegionAuditLogsService{c: c}
 	c.ServiceNodes = &ServiceNodesService{c: c}

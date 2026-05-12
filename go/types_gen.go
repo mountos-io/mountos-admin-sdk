@@ -157,6 +157,47 @@ type Fork struct {
 	Size          int64  `json:"size"`
 }
 
+type ForkTreeEntry struct {
+	Inode      int64  `json:"inode"`
+	Name       string `json:"name"`
+	Kind       string `json:"kind"`
+	Size       int64  `json:"size"`
+	Mtime      int64  `json:"mtime"`
+	Ctime      int64  `json:"ctime"`
+	Generation int64  `json:"generation"`
+	HasXattr   bool   `json:"hasXattr"`
+}
+
+type ForkEntryDetail struct {
+	Inode      int64          `json:"inode"`
+	Path       string         `json:"path"`
+	Name       string         `json:"name"`
+	Kind       string         `json:"kind"`
+	Size       int64          `json:"size"`
+	Mtime      int64          `json:"mtime"`
+	Ctime      int64          `json:"ctime"`
+	Generation int64          `json:"generation"`
+	Owner      string         `json:"owner,omitempty"`
+	Mode       int32          `json:"mode,omitempty"`
+	Xattrs     map[string]any `json:"xattrs,omitempty"`
+}
+
+type ForkEntryVersion struct {
+	Generation  int64  `json:"generation"`
+	Size        int64  `json:"size"`
+	Mtime       int64  `json:"mtime"`
+	ModifiedBy  string `json:"modifiedBy,omitempty"`
+	ContentHash string `json:"contentHash,omitempty"`
+}
+
+type ForkTreeMatch struct {
+	Path  string `json:"path"`
+	Inode int64  `json:"inode"`
+	Kind  string `json:"kind"`
+	Size  int64  `json:"size"`
+	Mtime int64  `json:"mtime"`
+}
+
 type AuditLog struct {
 	ID          int64           `json:"id"`
 	Title       string          `json:"title"`
@@ -591,6 +632,37 @@ type VolumeListOptions struct {
 	IsActive   *bool
 	Page       int
 	Limit      int
+}
+
+// VolumeForkTrees
+
+type VolumeForkTreeListOptions struct {
+	Path   string
+	AsOf   *int64
+	Cursor int64
+	Limit  int
+	Sort   string
+	Kind   string
+}
+
+// VolumeForkEntries
+
+type VolumeForkEntryListOptions struct {
+	Path   string
+	Cursor int64
+	Limit  int
+}
+
+// VolumeForkSearches
+
+type VolumeForkSearchListOptions struct {
+	Q      string
+	Path   string
+	AsOf   *int64
+	Exact  *bool
+	Cursor int64
+	Limit  int
+	Kind   string
 }
 
 // AuditLogs

@@ -495,6 +495,84 @@ Response data: `Fork`
 
 ---
 
+## VolumeForkTrees
+
+### GET /api/v1/volumes/:volumeId/forks/:forkName/tree
+Param: `volumeId`
+Param: `forkName`
+Query: `path=string`, `asOf=int64`, `cursor=int64`, `limit=int(default 20)`, `sort=string`, `kind=string`
+Response data: `{ "items": ForkTreeEntry[], "nextCursor": int64|null }`
+
+### ForkTreeEntry Type
+```
+{
+  "inode": int64,
+  "name": string,
+  "kind": string,
+  "size": int64,
+  "mtime": int64,
+  "ctime": int64,
+  "generation": int64,
+  "hasXattr": bool
+}
+```
+
+---
+
+## VolumeForkEntries
+
+### GET /api/v1/volumes/:volumeId/forks/:forkName/entry
+Param: `volumeId`
+Param: `forkName`
+Query: `path=string(required)`, `asOf=int64`
+Response data: `ForkEntryDetail`
+
+### GET /api/v1/volumes/:volumeId/forks/:forkName/entry/versions
+Param: `volumeId`
+Param: `forkName`
+Query: `path=string`, `cursor=int64`, `limit=int(default 20)`
+Response data: `{ "items": ForkEntryVersion[], "nextCursor": int64|null }`
+
+### ForkEntryDetail Type
+```
+{
+  "inode": int64,
+  "path": string,
+  "name": string,
+  "kind": string,
+  "size": int64,
+  "mtime": int64,
+  "ctime": int64,
+  "generation": int64,
+  "owner"?: string,
+  "mode"?: int32,
+  "xattrs"?: object
+}
+```
+
+---
+
+## VolumeForkSearches
+
+### GET /api/v1/volumes/:volumeId/forks/:forkName/search
+Param: `volumeId`
+Param: `forkName`
+Query: `q=string`, `path=string`, `asOf=int64`, `exact=bool`, `cursor=int64`, `limit=int(default 20)`, `kind=string`
+Response data: `{ "items": ForkTreeMatch[], "nextCursor": int64|null }`
+
+### ForkTreeMatch Type
+```
+{
+  "path": string,
+  "inode": int64,
+  "kind": string,
+  "size": int64,
+  "mtime": int64
+}
+```
+
+---
+
 ## AuditLogs
 
 ### GET /api/v1/audit-logs/list

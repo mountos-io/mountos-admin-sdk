@@ -9,10 +9,12 @@ import type {
   EditVolumeRequest, DeactivateVolumeRequest, GenerateVolumeAPIKeysRequest, 
   RevokeVolumeAPIKeyRequest, RevokeVolumeAPIKeysByUserRequest, UpdateVolumeQuotaRequest, 
   VolumeSizePoint, CreateVolumeForkRequest, Fork, DeleteVolumeForkRequest, 
-  RestoreVolumeForkRequest, AuditLog, AuditLogListOptions, RegionAuditLogListOptions, 
-  ServiceNode, ClientSession, ClientSessionListOptions, SessionSummary, 
-  DiscoverMetaResponse, DashboardStats, LicenseDetails, LicenseTerms, ServiceAlert, 
-  AlertListOptions, AlertCountResponse, RegionAlert, RegionAlertListOptions,
+  RestoreVolumeForkRequest, ForkTreeEntry, VolumeForkTreeListOptions, ForkEntryDetail, 
+  ForkEntryVersion, VolumeForkEntryListOptions, ForkTreeMatch, VolumeForkSearchListOptions, 
+  AuditLog, AuditLogListOptions, RegionAuditLogListOptions, ServiceNode, ClientSession, 
+  ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, DashboardStats, 
+  LicenseDetails, LicenseTerms, ServiceAlert, AlertListOptions, AlertCountResponse, 
+  RegionAlert, RegionAlertListOptions,
 } from './types_gen.js'
 
 export type RequestFn = <T>(method: string, path: string, body?: unknown, signal?: AbortSignal) => Promise<T>
@@ -31,6 +33,9 @@ export interface AdminClient {
   readonly regions: RegionsResource
   readonly storages: StoragesResource
   readonly volumes: VolumesResource
+  readonly volumeForkTrees: VolumeForkTreesResource
+  readonly volumeForkEntries: VolumeForkEntriesResource
+  readonly volumeForkSearches: VolumeForkSearchesResource
   readonly auditLogs: AuditLogsResource
   readonly regionAuditLogs: RegionAuditLogsResource
   readonly serviceNodes: ServiceNodesResource
@@ -51,6 +56,9 @@ export function createClient(request: RequestFn): AdminClient {
   let _regions: RegionsResource | undefined
   let _storages: StoragesResource | undefined
   let _volumes: VolumesResource | undefined
+  let _volumeForkTrees: VolumeForkTreesResource | undefined
+  let _volumeForkEntries: VolumeForkEntriesResource | undefined
+  let _volumeForkSearches: VolumeForkSearchesResource | undefined
   let _auditLogs: AuditLogsResource | undefined
   let _regionAuditLogs: RegionAuditLogsResource | undefined
   let _serviceNodes: ServiceNodesResource | undefined
@@ -68,6 +76,9 @@ export function createClient(request: RequestFn): AdminClient {
     get regions() { return _regions ??= new RegionsResource(client) },
     get storages() { return _storages ??= new StoragesResource(client) },
     get volumes() { return _volumes ??= new VolumesResource(client) },
+    get volumeForkTrees() { return _volumeForkTrees ??= new VolumeForkTreesResource(client) },
+    get volumeForkEntries() { return _volumeForkEntries ??= new VolumeForkEntriesResource(client) },
+    get volumeForkSearches() { return _volumeForkSearches ??= new VolumeForkSearchesResource(client) },
     get auditLogs() { return _auditLogs ??= new AuditLogsResource(client) },
     get regionAuditLogs() { return _regionAuditLogs ??= new RegionAuditLogsResource(client) },
     get serviceNodes() { return _serviceNodes ??= new ServiceNodesResource(client) },
@@ -271,6 +282,53 @@ export class VolumesResource {
 
   restoreFork(volumeId: number, forkName: string, req: RestoreVolumeForkRequest, signal?: AbortSignal): Promise<Fork> {
     return this.client.request('POST', `/api/v1/volumes/${volumeId}/forks/${forkName}/restore`, req, signal)
+  }
+}
+
+export class VolumeForkTreesResource {
+  constructor(private client: Client) {}
+
+  list(volumeId: number, forkName: string, opts?: VolumeForkTreeListOptions, signal?: AbortSignal): Promise<CursorPaginatedResponse<ForkTreeEntry>> {
+    return this.client.request('GET', `/api/v1/volumes/${volumeId}/forks/${forkName}/tree${queryString({
+      path: opts?.path,
+      asOf: opts?.asOf,
+      cursor: opts?.cursor,
+      limit: opts?.limit,
+      sort: opts?.sort,
+      kind: opts?.kind,
+    })}`, undefined, signal)
+  }
+}
+
+export class VolumeForkEntriesResource {
+  constructor(private client: Client) {}
+
+  get(volumeId: number, forkName: string, path: string, asOf: number, signal?: AbortSignal): Promise<ForkEntryDetail> {
+    return this.client.request('GET', `/api/v1/volumes/${volumeId}/forks/${forkName}/entry${queryString({ path: path, asOf: asOf })}`, undefined, signal)
+  }
+
+  versions(volumeId: number, forkName: string, opts?: VolumeForkEntryListOptions, signal?: AbortSignal): Promise<CursorPaginatedResponse<ForkEntryVersion>> {
+    return this.client.request('GET', `/api/v1/volumes/${volumeId}/forks/${forkName}/entry/versions${queryString({
+      path: opts?.path,
+      cursor: opts?.cursor,
+      limit: opts?.limit,
+    })}`, undefined, signal)
+  }
+}
+
+export class VolumeForkSearchesResource {
+  constructor(private client: Client) {}
+
+  find(volumeId: number, forkName: string, opts?: VolumeForkSearchListOptions, signal?: AbortSignal): Promise<CursorPaginatedResponse<ForkTreeMatch>> {
+    return this.client.request('GET', `/api/v1/volumes/${volumeId}/forks/${forkName}/search${queryString({
+      q: opts?.q,
+      path: opts?.path,
+      asOf: opts?.asOf,
+      exact: opts?.exact,
+      cursor: opts?.cursor,
+      limit: opts?.limit,
+      kind: opts?.kind,
+    })}`, undefined, signal)
   }
 }
 

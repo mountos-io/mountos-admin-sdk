@@ -457,6 +457,116 @@ func (s *VolumesService) RestoreFork(ctx context.Context, volumeID int64, forkNa
 	return decodeJSON[Fork](data)
 }
 
+type VolumeForkTreesService struct{ c *Client }
+
+func (s *VolumeForkTreesService) List(ctx context.Context, volumeID int64, forkName string, opts *VolumeForkTreeListOptions) (*CursorPaginatedResponse[ForkTreeEntry], error) {
+	q := url.Values{}
+	if opts != nil {
+		if opts.Path != "" {
+			q.Set("path", opts.Path)
+		}
+		if opts.AsOf != nil {
+			q.Set("asOf", strconv.FormatInt(*opts.AsOf, 10))
+		}
+		if opts.Cursor > 0 {
+			q.Set("cursor", strconv.FormatInt(opts.Cursor, 10))
+		}
+		if opts.Limit > 0 {
+			q.Set("limit", strconv.Itoa(opts.Limit))
+		}
+		if opts.Sort != "" {
+			q.Set("sort", opts.Sort)
+		}
+		if opts.Kind != "" {
+			q.Set("kind", opts.Kind)
+		}
+	}
+	path := fmt.Sprintf("/api/v1/volumes/%s/forks/%s/tree", strconv.FormatInt(volumeID, 10), forkName)
+	if qs := q.Encode(); qs != "" {
+		path += "?" + qs
+	}
+	data, err := s.c.get(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[CursorPaginatedResponse[ForkTreeEntry]](data)
+}
+
+type VolumeForkEntriesService struct{ c *Client }
+
+func (s *VolumeForkEntriesService) Get(ctx context.Context, volumeID int64, forkName string, path string, asOf int64) (*ForkEntryDetail, error) {
+	q := url.Values{}
+	q.Set("path", path)
+	q.Set("asOf", strconv.FormatInt(asOf, 10))
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/volumes/%s/forks/%s/entry", strconv.FormatInt(volumeID, 10), forkName)+"?"+q.Encode())
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[ForkEntryDetail](data)
+}
+
+func (s *VolumeForkEntriesService) Versions(ctx context.Context, volumeID int64, forkName string, opts *VolumeForkEntryListOptions) (*CursorPaginatedResponse[ForkEntryVersion], error) {
+	q := url.Values{}
+	if opts != nil {
+		if opts.Path != "" {
+			q.Set("path", opts.Path)
+		}
+		if opts.Cursor > 0 {
+			q.Set("cursor", strconv.FormatInt(opts.Cursor, 10))
+		}
+		if opts.Limit > 0 {
+			q.Set("limit", strconv.Itoa(opts.Limit))
+		}
+	}
+	path := fmt.Sprintf("/api/v1/volumes/%s/forks/%s/entry/versions", strconv.FormatInt(volumeID, 10), forkName)
+	if qs := q.Encode(); qs != "" {
+		path += "?" + qs
+	}
+	data, err := s.c.get(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[CursorPaginatedResponse[ForkEntryVersion]](data)
+}
+
+type VolumeForkSearchesService struct{ c *Client }
+
+func (s *VolumeForkSearchesService) Find(ctx context.Context, volumeID int64, forkName string, opts *VolumeForkSearchListOptions) (*CursorPaginatedResponse[ForkTreeMatch], error) {
+	q := url.Values{}
+	if opts != nil {
+		if opts.Q != "" {
+			q.Set("q", opts.Q)
+		}
+		if opts.Path != "" {
+			q.Set("path", opts.Path)
+		}
+		if opts.AsOf != nil {
+			q.Set("asOf", strconv.FormatInt(*opts.AsOf, 10))
+		}
+		if opts.Exact != nil {
+			q.Set("exact", strconv.FormatBool(*opts.Exact))
+		}
+		if opts.Cursor > 0 {
+			q.Set("cursor", strconv.FormatInt(opts.Cursor, 10))
+		}
+		if opts.Limit > 0 {
+			q.Set("limit", strconv.Itoa(opts.Limit))
+		}
+		if opts.Kind != "" {
+			q.Set("kind", opts.Kind)
+		}
+	}
+	path := fmt.Sprintf("/api/v1/volumes/%s/forks/%s/search", strconv.FormatInt(volumeID, 10), forkName)
+	if qs := q.Encode(); qs != "" {
+		path += "?" + qs
+	}
+	data, err := s.c.get(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[CursorPaginatedResponse[ForkTreeMatch]](data)
+}
+
 type AuditLogsService struct{ c *Client }
 
 func (s *AuditLogsService) List(ctx context.Context, opts *AuditLogListOptions) (*CursorPaginatedResponse[AuditLog], error) {

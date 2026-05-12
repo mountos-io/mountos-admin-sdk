@@ -152,6 +152,52 @@ types:
     - "status: string"
     - "size: int64"
 
+  # Single directory entry in a (volume, fork, asOf) tree listing.
+  # For iceberg volumes the gatewayserv synthesises namespace -> table
+  # -> leaf inodes (kind: file|dir) keyed by stable hash of the tuple
+  # (namespace, table, kind, basename) so cursors stay stable.
+  # Timestamps (mtime, ctime) are microseconds since Unix epoch, matching
+  # the Fork.snapshotTs / Fork.createdAt convention used elsewhere in the SDK.
+  ForkTreeEntry:
+    - "inode: int64"
+    - "name: string"
+    - "kind: string"
+    - "size: int64"
+    - "mtime: int64"
+    - "ctime: int64"
+    - "generation: int64"
+    - "hasXattr: bool"
+
+  # Timestamps (mtime, ctime) in microseconds since Unix epoch.
+  ForkEntryDetail:
+    - "inode: int64"
+    - "path: string"
+    - "name: string"
+    - "kind: string"
+    - "size: int64"
+    - "mtime: int64"
+    - "ctime: int64"
+    - "generation: int64"
+    - "owner: string?"
+    - "mode: int32?"
+    - "xattrs: object?"
+
+  # mtime in microseconds since Unix epoch.
+  ForkTreeMatch:
+    - "path: string"
+    - "inode: int64"
+    - "kind: string"
+    - "size: int64"
+    - "mtime: int64"
+
+  # mtime in microseconds since Unix epoch.
+  ForkEntryVersion:
+    - "generation: int64"
+    - "size: int64"
+    - "mtime: int64"
+    - "modifiedBy: string?"
+    - "contentHash: string?"
+
   AuditLog:
     - "id: int64"
     - "title: string"
@@ -755,6 +801,76 @@ resources:
         request:
           - "volumeType: string?"
         responseType: Fork
+
+  # Live + as-of metadata tree browse for a (volume, fork) pair.
+  # appserv forwards to dataserv or gatewayserv via existing SRPC selection
+  # (no branching on volumeType). Both services honour the same contract;
+  # gatewayserv synthesises a tree for iceberg volumes from
+  # (namespace, table, kind, basename) tuples.
+  - name: VolumeForkTrees
+    path: /volumes/:volumeId/forks/:forkName/tree
+    pathParamTypes:
+      forkName: string
+    endpoints:
+      # cursor pagination; asOf=0 means live. Sort accepts
+      # "<field>:<dir>" where field is name|size|mtime|kind and
+      # dir is asc|desc. kind narrows to file|dir|symlink.
+      - action: list
+        method: GET
+        path: /
+        pagination: cursor
+        query:
+          - "path: string"
+          - "asOf: int64"
+          - "cursor: int64"
+          - "limit: int=20"
+          - "sort: string"
+          - "kind: string"
+        responseType: ForkTreeEntry
+
+  - name: VolumeForkEntries
+    path: /volumes/:volumeId/forks/:forkName/entry
+    pathParamTypes:
+      forkName: string
+    endpoints:
+      - action: get
+        method: GET
+        path: /
+        query:
+          - "path: string!"
+          - "asOf: int64"
+        responseType: ForkEntryDetail
+
+      # Fork-local version history of a single file (no cross-fork visibility).
+      - action: versions
+        method: GET
+        path: /versions
+        pagination: cursor
+        query:
+          - "path: string"
+          - "cursor: int64"
+          - "limit: int=20"
+        responseType: ForkEntryVersion
+
+  - name: VolumeForkSearches
+    path: /volumes/:volumeId/forks/:forkName/search
+    pathParamTypes:
+      forkName: string
+    endpoints:
+      # exact=true → name equality; default prefix match. path scopes to subtree.
+      - action: find
+        method: GET
+        path: /
+        pagination: cursor
+        query:
+          - "q: string"
+          - "path: string"
+          - "asOf: int64"
+          - "exact: bool"
+          - "cursor: int64"
+          - "limit: int=20"
+          - "kind: string"
+        responseType: ForkTreeMatch
 
   - name: AuditLogs
     path: /audit-logs

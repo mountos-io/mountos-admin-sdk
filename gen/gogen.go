@@ -92,6 +92,9 @@ func singularize(s string) string {
 	if strings.HasSuffix(s, "ies") {
 		return s[:len(s)-3] + "y"
 	}
+	if strings.HasSuffix(s, "ches") || strings.HasSuffix(s, "shes") {
+		return s[:len(s)-2]
+	}
 	if strings.HasSuffix(s, "ses") || strings.HasSuffix(s, "xes") {
 		return s[:len(s)-2]
 	}

@@ -136,6 +136,47 @@ export interface Fork {
   size: number
 }
 
+export interface ForkTreeEntry {
+  inode: number
+  name: string
+  kind: string
+  size: number
+  mtime: number
+  ctime: number
+  generation: number
+  hasXattr: boolean
+}
+
+export interface ForkEntryDetail {
+  inode: number
+  path: string
+  name: string
+  kind: string
+  size: number
+  mtime: number
+  ctime: number
+  generation: number
+  owner?: string
+  mode?: number
+  xattrs?: Record<string, unknown>
+}
+
+export interface ForkEntryVersion {
+  generation: number
+  size: number
+  mtime: number
+  modifiedBy?: string
+  contentHash?: string
+}
+
+export interface ForkTreeMatch {
+  path: string
+  inode: number
+  kind: string
+  size: number
+  mtime: number
+}
+
 export interface AuditLog {
   id: number
   title: string
@@ -515,6 +556,37 @@ export interface VolumeListOptions extends ListOptions {
   volumeType?: string
   locked?: boolean
   isActive?: boolean
+}
+
+// VolumeForkTrees
+
+export interface VolumeForkTreeListOptions {
+  path?: string
+  asOf?: number
+  cursor?: number
+  limit?: number
+  sort?: string
+  kind?: string
+}
+
+// VolumeForkEntries
+
+export interface VolumeForkEntryListOptions {
+  path?: string
+  cursor?: number
+  limit?: number
+}
+
+// VolumeForkSearches
+
+export interface VolumeForkSearchListOptions {
+  q?: string
+  path?: string
+  asOf?: number
+  exact?: boolean
+  cursor?: number
+  limit?: number
+  kind?: string
 }
 
 // AuditLogs

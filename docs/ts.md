@@ -216,6 +216,63 @@ interface Fork {
 }
 ```
 
+### `ForkEntryDetail`
+
+```typescript
+interface ForkEntryDetail {
+  inode: number;
+  path: string;
+  name: string;
+  kind: string;
+  size: number;
+  mtime: number;
+  ctime: number;
+  generation: number;
+  owner?: string;
+  mode?: number;
+  xattrs?: Record<string, unknown>;
+}
+```
+
+### `ForkEntryVersion`
+
+```typescript
+interface ForkEntryVersion {
+  generation: number;
+  size: number;
+  mtime: number;
+  modifiedBy?: string;
+  contentHash?: string;
+}
+```
+
+### `ForkTreeEntry`
+
+```typescript
+interface ForkTreeEntry {
+  inode: number;
+  name: string;
+  kind: string;
+  size: number;
+  mtime: number;
+  ctime: number;
+  generation: number;
+  hasXattr: boolean;
+}
+```
+
+### `ForkTreeMatch`
+
+```typescript
+interface ForkTreeMatch {
+  path: string;
+  inode: number;
+  kind: string;
+  size: number;
+  mtime: number;
+}
+```
+
 ### `LicenseDetails`
 
 ```typescript
@@ -1180,6 +1237,110 @@ Request body:
 ```typescript
 {
   volumeType?: string;
+}
+```
+
+### VolumeForkTrees
+
+Accessor: `client.volumeForkTrees`
+
+#### `list` — GET /api/v1/volumes/:volumeId/forks/:forkName/tree
+
+```typescript
+client.volumeForkTrees.list(volumeID: number, forkName: string, params: {
+    path?: string;
+    asOf?: number;
+    cursor?: number;
+    limit?: number;
+    sort?: string;
+    kind?: string;
+  }): Promise<CursorResponse<ForkTreeEntry>>;
+```
+
+Query params:
+
+```typescript
+{
+  path?: string;
+  asOf?: number;
+  cursor?: number;
+  limit?: number;  // default: 20
+  sort?: string;
+  kind?: string;
+}
+```
+
+### VolumeForkEntries
+
+Accessor: `client.volumeForkEntries`
+
+#### `get` — GET /api/v1/volumes/:volumeId/forks/:forkName/entry
+
+```typescript
+client.volumeForkEntries.get(volumeID: number, forkName: string, params: {
+    path: string;
+    asOf?: number;
+  }): Promise<ForkEntryDetail>;
+```
+
+Query params:
+
+```typescript
+{
+  path: string;
+  asOf?: number;
+}
+```
+
+#### `versions` — GET /api/v1/volumes/:volumeId/forks/:forkName/entry/versions
+
+```typescript
+client.volumeForkEntries.versions(volumeID: number, forkName: string, params: {
+    path?: string;
+    cursor?: number;
+    limit?: number;
+  }): Promise<CursorResponse<ForkEntryVersion>>;
+```
+
+Query params:
+
+```typescript
+{
+  path?: string;
+  cursor?: number;
+  limit?: number;  // default: 20
+}
+```
+
+### VolumeForkSearches
+
+Accessor: `client.volumeForkSearches`
+
+#### `find` — GET /api/v1/volumes/:volumeId/forks/:forkName/search
+
+```typescript
+client.volumeForkSearches.find(volumeID: number, forkName: string, params: {
+    q?: string;
+    path?: string;
+    asOf?: number;
+    exact?: boolean;
+    cursor?: number;
+    limit?: number;
+    kind?: string;
+  }): Promise<CursorResponse<ForkTreeMatch>>;
+```
+
+Query params:
+
+```typescript
+{
+  q?: string;
+  path?: string;
+  asOf?: number;
+  exact?: boolean;
+  cursor?: number;
+  limit?: number;  // default: 20
+  kind?: string;
 }
 ```
 

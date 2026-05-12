@@ -234,6 +234,63 @@ type Fork struct {
 }
 ```
 
+### `ForkEntryDetail`
+
+```go
+type ForkEntryDetail struct {
+    Inode                    int64                    `json:"inode"`
+    Path                     string                   `json:"path"`
+    Name                     string                   `json:"name"`
+    Kind                     string                   `json:"kind"`
+    Size                     int64                    `json:"size"`
+    Mtime                    int64                    `json:"mtime"`
+    Ctime                    int64                    `json:"ctime"`
+    Generation               int64                    `json:"generation"`
+    Owner                    string                   `json:"owner,omitempty"`
+    Mode                     int32                    `json:"mode,omitempty"`
+    Xattrs                   map[string]any           `json:"xattrs,omitempty"`
+}
+```
+
+### `ForkEntryVersion`
+
+```go
+type ForkEntryVersion struct {
+    Generation               int64                    `json:"generation"`
+    Size                     int64                    `json:"size"`
+    Mtime                    int64                    `json:"mtime"`
+    ModifiedBy               string                   `json:"modifiedBy,omitempty"`
+    ContentHash              string                   `json:"contentHash,omitempty"`
+}
+```
+
+### `ForkTreeEntry`
+
+```go
+type ForkTreeEntry struct {
+    Inode                    int64                    `json:"inode"`
+    Name                     string                   `json:"name"`
+    Kind                     string                   `json:"kind"`
+    Size                     int64                    `json:"size"`
+    Mtime                    int64                    `json:"mtime"`
+    Ctime                    int64                    `json:"ctime"`
+    Generation               int64                    `json:"generation"`
+    HasXattr                 bool                     `json:"hasXattr"`
+}
+```
+
+### `ForkTreeMatch`
+
+```go
+type ForkTreeMatch struct {
+    Path                     string                   `json:"path"`
+    Inode                    int64                    `json:"inode"`
+    Kind                     string                   `json:"kind"`
+    Size                     int64                    `json:"size"`
+    Mtime                    int64                    `json:"mtime"`
+}
+```
+
 ### `LicenseDetails`
 
 ```go
@@ -1063,6 +1120,88 @@ Request body:
 ```go
 type RestoreForkVolumeRequest struct {
     VolumeType               string                   `json:"volumeType,omitempty"`
+}
+```
+
+### VolumeForkTrees
+
+Accessor: `client.VolumeForkTrees`
+
+#### `List` — GET /api/v1/volumes/:volumeId/forks/:forkName/tree
+
+```go
+func (s *VolumeForkTreesService) List(ctx context.Context, volumeID int64, forkName string, opts *ListVolumeForkTreeOptions) (*CursorResponse[ForkTreeEntry], error)
+```
+
+Query params:
+
+```go
+type ListVolumeForkTreeOptions struct {
+    Path                 string       `url:"path"`
+    AsOf                 int64        `url:"asOf"`
+    Cursor               int64        `url:"cursor"`
+    Limit                int          `url:"limit"` // default: 20
+    Sort                 string       `url:"sort"`
+    Kind                 string       `url:"kind"`
+}
+```
+
+### VolumeForkEntries
+
+Accessor: `client.VolumeForkEntries`
+
+#### `Get` — GET /api/v1/volumes/:volumeId/forks/:forkName/entry
+
+```go
+func (s *VolumeForkEntriesService) Get(ctx context.Context, volumeID int64, forkName string, opts *GetVolumeForkEntryOptions) (*ForkEntryDetail, error)
+```
+
+Query params:
+
+```go
+type GetVolumeForkEntryOptions struct {
+    Path                 string       `url:"path"`
+    AsOf                 int64        `url:"asOf"`
+}
+```
+
+#### `Versions` — GET /api/v1/volumes/:volumeId/forks/:forkName/entry/versions
+
+```go
+func (s *VolumeForkEntriesService) Versions(ctx context.Context, volumeID int64, forkName string, opts *VersionsVolumeForkEntryOptions) (*CursorResponse[ForkEntryVersion], error)
+```
+
+Query params:
+
+```go
+type VersionsVolumeForkEntryOptions struct {
+    Path                 string       `url:"path"`
+    Cursor               int64        `url:"cursor"`
+    Limit                int          `url:"limit"` // default: 20
+}
+```
+
+### VolumeForkSearches
+
+Accessor: `client.VolumeForkSearches`
+
+#### `Find` — GET /api/v1/volumes/:volumeId/forks/:forkName/search
+
+```go
+func (s *VolumeForkSearchesService) Find(ctx context.Context, volumeID int64, forkName string, opts *FindVolumeForkSearcheOptions) (*CursorResponse[ForkTreeMatch], error)
+```
+
+Query params:
+
+```go
+type FindVolumeForkSearcheOptions struct {
+    Q                    string       `url:"q"`
+    Path                 string       `url:"path"`
+    AsOf                 int64        `url:"asOf"`
+    Exact                bool         `url:"exact"`
+    Cursor               int64        `url:"cursor"`
+    Limit                int          `url:"limit"` // default: 20
+    Kind                 string       `url:"kind"`
 }
 ```
 
