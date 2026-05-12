@@ -2,17 +2,17 @@
 
 import type {
   ListOptions, PaginatedResponse, CursorPaginatedResponse,
-  CreateAccountRequest, Account, EditAccountRequest, AddUserRequest, User, UserListOptions, 
-  EditUserRequest, CreateRegionRequest, Region, EditRegionRequest, CreateStorageRequest, 
-  Storage, StorageListOptions, EditStorageRequest, TestStorageBucketRequest, 
-  CreateVolumeRequest, Volume, VolumeListOptions, EditVolumeRequest, 
-  DeactivateVolumeRequest, GenerateVolumeAPIKeysRequest, RevokeVolumeAPIKeyRequest, 
-  RevokeVolumeAPIKeysByUserRequest, UpdateVolumeQuotaRequest, VolumeSizePoint, 
-  CreateVolumeForkRequest, Fork, DeleteVolumeForkRequest, RestoreVolumeForkRequest, 
-  AuditLog, AuditLogListOptions, RegionAuditLogListOptions, ServiceNode, ClientSession, 
-  ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, DashboardStats, 
-  LicenseDetails, LicenseTerms, ServiceAlert, AlertListOptions, AlertCountResponse, 
-  RegionAlert, RegionAlertListOptions,
+  CreateAccountRequest, Account, AccountListOptions, EditAccountRequest, AddUserRequest, 
+  User, UserListOptions, EditUserRequest, CreateRegionRequest, Region, RegionListOptions, 
+  EditRegionRequest, CreateStorageRequest, Storage, StorageListOptions, EditStorageRequest, 
+  TestStorageBucketRequest, CreateVolumeRequest, Volume, VolumeListOptions, 
+  EditVolumeRequest, DeactivateVolumeRequest, GenerateVolumeAPIKeysRequest, 
+  RevokeVolumeAPIKeyRequest, RevokeVolumeAPIKeysByUserRequest, UpdateVolumeQuotaRequest, 
+  VolumeSizePoint, CreateVolumeForkRequest, Fork, DeleteVolumeForkRequest, 
+  RestoreVolumeForkRequest, AuditLog, AuditLogListOptions, RegionAuditLogListOptions, 
+  ServiceNode, ClientSession, ClientSessionListOptions, SessionSummary, 
+  DiscoverMetaResponse, DashboardStats, LicenseDetails, LicenseTerms, ServiceAlert, 
+  AlertListOptions, AlertCountResponse, RegionAlert, RegionAlertListOptions,
 } from './types_gen.js'
 
 export type RequestFn = <T>(method: string, path: string, body?: unknown, signal?: AbortSignal) => Promise<T>
@@ -89,8 +89,8 @@ export class AccountsResource {
     return this.client.request('POST', '/api/v1/accounts/create', req, signal)
   }
 
-  list(opts?: ListOptions, signal?: AbortSignal): Promise<PaginatedResponse<Account>> {
-    return this.client.request('GET', `/api/v1/accounts/list${queryString({ page: opts?.page, limit: opts?.limit })}`, undefined, signal)
+  list(opts?: AccountListOptions, signal?: AbortSignal): Promise<PaginatedResponse<Account>> {
+    return this.client.request('GET', `/api/v1/accounts/list${queryString({ isActive: opts?.isActive, page: opts?.page, limit: opts?.limit })}`, undefined, signal)
   }
 
   get(accountId: number, signal?: AbortSignal): Promise<Account> {
@@ -122,7 +122,7 @@ export class UsersResource {
   }
 
   list(opts: UserListOptions, signal?: AbortSignal): Promise<PaginatedResponse<User>> {
-    return this.client.request('GET', `/api/v1/users/list${queryString({ accountId: opts.accountId, search: opts.search, page: opts.page, limit: opts.limit })}`, undefined, signal)
+    return this.client.request('GET', `/api/v1/users/list${queryString({ accountId: opts.accountId, search: opts.search, isActive: opts.isActive, page: opts.page, limit: opts.limit })}`, undefined, signal)
   }
 
   get(userId: number, signal?: AbortSignal): Promise<User> {
@@ -145,8 +145,8 @@ export class RegionsResource {
     return this.client.request('POST', '/api/v1/regions/create', req, signal)
   }
 
-  list(opts?: ListOptions, signal?: AbortSignal): Promise<PaginatedResponse<Region>> {
-    return this.client.request('GET', `/api/v1/regions/list${queryString({ page: opts?.page, limit: opts?.limit })}`, undefined, signal)
+  list(opts?: RegionListOptions, signal?: AbortSignal): Promise<PaginatedResponse<Region>> {
+    return this.client.request('GET', `/api/v1/regions/list${queryString({ isActive: opts?.isActive, page: opts?.page, limit: opts?.limit })}`, undefined, signal)
   }
 
   get(regionId: number, signal?: AbortSignal): Promise<Region> {
@@ -170,7 +170,7 @@ export class StoragesResource {
   }
 
   list(opts: StorageListOptions, signal?: AbortSignal): Promise<PaginatedResponse<Storage>> {
-    return this.client.request('GET', `/api/v1/storages/list${queryString({ accountId: opts.accountId, search: opts.search, regionId: opts.regionId, storageType: opts.storageType, providerType: opts.providerType, page: opts.page, limit: opts.limit })}`, undefined, signal)
+    return this.client.request('GET', `/api/v1/storages/list${queryString({ accountId: opts.accountId, search: opts.search, regionId: opts.regionId, storageType: opts.storageType, providerType: opts.providerType, isActive: opts.isActive, page: opts.page, limit: opts.limit })}`, undefined, signal)
   }
 
   get(storageId: number, signal?: AbortSignal): Promise<Storage> {
@@ -202,7 +202,7 @@ export class VolumesResource {
   }
 
   list(opts: VolumeListOptions, signal?: AbortSignal): Promise<PaginatedResponse<Volume>> {
-    return this.client.request('GET', `/api/v1/volumes/list${queryString({ accountId: opts.accountId, regionId: opts.regionId, storageId: opts.storageId, volumeType: opts.volumeType, locked: opts.locked, page: opts.page, limit: opts.limit })}`, undefined, signal)
+    return this.client.request('GET', `/api/v1/volumes/list${queryString({ accountId: opts.accountId, regionId: opts.regionId, storageId: opts.storageId, volumeType: opts.volumeType, locked: opts.locked, isActive: opts.isActive, page: opts.page, limit: opts.limit })}`, undefined, signal)
   }
 
   get(volumeId: number, signal?: AbortSignal): Promise<Volume> {
@@ -223,6 +223,10 @@ export class VolumesResource {
 
   deactivate(volumeId: number, req: DeactivateVolumeRequest, signal?: AbortSignal): Promise<{ id: number }> {
     return this.client.request('POST', `/api/v1/volumes/${volumeId}/deactivate`, req, signal)
+  }
+
+  activate(volumeId: number, signal?: AbortSignal): Promise<{ id: number }> {
+    return this.client.request('POST', `/api/v1/volumes/${volumeId}/activate`, undefined, signal)
   }
 
   generateAPIKeys(volumeId: number, req: GenerateVolumeAPIKeysRequest, signal?: AbortSignal): Promise<{ apiKey: string; apiSecret: string }> {

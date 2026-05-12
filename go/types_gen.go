@@ -378,6 +378,12 @@ type EditAccountRequest struct {
 	ProviderInfo map[string]any `json:"providerInfo,omitempty"`
 }
 
+type AccountListOptions struct {
+	IsActive *bool
+	Page     int
+	Limit    int
+}
+
 // Users
 
 type AddUserRequest struct {
@@ -398,6 +404,7 @@ type EditUserRequest struct {
 type UserListOptions struct {
 	AccountID int64
 	Search    string
+	IsActive  *bool
 	Page      int
 	Limit     int
 }
@@ -414,6 +421,12 @@ type EditRegionRequest struct {
 	AccountID int64  `json:"accountId"`
 	Name      string `json:"name"`
 	DNS       string `json:"dns"`
+}
+
+type RegionListOptions struct {
+	IsActive *bool
+	Page     int
+	Limit    int
 }
 
 // Storages
@@ -477,6 +490,7 @@ type StorageListOptions struct {
 	RegionID     *int64
 	StorageType  string
 	ProviderType string
+	IsActive     *bool
 	Page         int
 	Limit        int
 }
@@ -574,6 +588,7 @@ type VolumeListOptions struct {
 	StorageID  *int64
 	VolumeType string
 	Locked     *bool
+	IsActive   *bool
 	Page       int
 	Limit      int
 }

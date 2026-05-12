@@ -19,9 +19,12 @@ func (s *AccountsService) Create(ctx context.Context, req *CreateAccountRequest)
 	return decodeJSON[IDResponse](data)
 }
 
-func (s *AccountsService) List(ctx context.Context, opts *ListOptions) (*PaginatedResponse[Account], error) {
+func (s *AccountsService) List(ctx context.Context, opts *AccountListOptions) (*PaginatedResponse[Account], error) {
 	q := url.Values{}
 	if opts != nil {
+		if opts.IsActive != nil {
+			q.Set("isActive", strconv.FormatBool(*opts.IsActive))
+		}
 		addPagination(q, opts.Page, opts.Limit)
 	}
 	path := "/api/v1/accounts/list"
@@ -92,6 +95,9 @@ func (s *UsersService) List(ctx context.Context, opts *UserListOptions) (*Pagina
 		if opts.Search != "" {
 			q.Set("search", opts.Search)
 		}
+		if opts.IsActive != nil {
+			q.Set("isActive", strconv.FormatBool(*opts.IsActive))
+		}
 		addPagination(q, opts.Page, opts.Limit)
 	}
 	data, err := s.c.get(ctx, "/api/v1/users/list"+"?"+q.Encode())
@@ -135,9 +141,12 @@ func (s *RegionsService) Create(ctx context.Context, req *CreateRegionRequest) (
 	return decodeJSON[IDResponse](data)
 }
 
-func (s *RegionsService) List(ctx context.Context, opts *ListOptions) (*PaginatedResponse[Region], error) {
+func (s *RegionsService) List(ctx context.Context, opts *RegionListOptions) (*PaginatedResponse[Region], error) {
 	q := url.Values{}
 	if opts != nil {
+		if opts.IsActive != nil {
+			q.Set("isActive", strconv.FormatBool(*opts.IsActive))
+		}
 		addPagination(q, opts.Page, opts.Limit)
 	}
 	path := "/api/v1/regions/list"
@@ -200,6 +209,9 @@ func (s *StoragesService) List(ctx context.Context, opts *StorageListOptions) (*
 		}
 		if opts.ProviderType != "" {
 			q.Set("providerType", opts.ProviderType)
+		}
+		if opts.IsActive != nil {
+			q.Set("isActive", strconv.FormatBool(*opts.IsActive))
 		}
 		addPagination(q, opts.Page, opts.Limit)
 	}
@@ -276,6 +288,9 @@ func (s *VolumesService) List(ctx context.Context, opts *VolumeListOptions) (*Pa
 		if opts.Locked != nil {
 			q.Set("locked", strconv.FormatBool(*opts.Locked))
 		}
+		if opts.IsActive != nil {
+			q.Set("isActive", strconv.FormatBool(*opts.IsActive))
+		}
 		addPagination(q, opts.Page, opts.Limit)
 	}
 	data, err := s.c.get(ctx, "/api/v1/volumes/list"+"?"+q.Encode())
@@ -319,6 +334,14 @@ func (s *VolumesService) Unlock(ctx context.Context, volumeID int64) (*IDRespons
 
 func (s *VolumesService) Deactivate(ctx context.Context, volumeID int64, req *DeactivateVolumeRequest) (*IDResponse, error) {
 	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/volumes/%s/deactivate", strconv.FormatInt(volumeID, 10)), req)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[IDResponse](data)
+}
+
+func (s *VolumesService) Activate(ctx context.Context, volumeID int64) (*IDResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/volumes/%s/activate", strconv.FormatInt(volumeID, 10)), nil)
 	if err != nil {
 		return nil, err
 	}

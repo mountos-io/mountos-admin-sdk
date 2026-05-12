@@ -52,7 +52,7 @@ Request:
 Response data: `{ "id": int64 }`
 
 ### GET /api/v1/accounts/list
-Query: `page=int(default 1)`, `limit=int(default 10)`
+Query: `isActive=bool`, `page=int(default 1)`, `limit=int(default 10)`
 Response data: `{ "items": Account[], "pagination": PaginationMeta }`
 
 ### GET /api/v1/accounts/:accountId
@@ -119,7 +119,7 @@ Request:
 Response data: `{ "id": int64 }`
 
 ### GET /api/v1/users/list
-Query: `accountId=int64(required)`, `search=string`, `page=int(default 1)`, `limit=int(default 10)`
+Query: `accountId=int64(required)`, `search=string`, `isActive=bool`, `page=int(default 1)`, `limit=int(default 10)`
 Response data: `{ "items": User[], "pagination": PaginationMeta }`
 
 ### GET /api/v1/users/:userId
@@ -171,7 +171,7 @@ Request:
 Response data: `{ "id": int64 }`
 
 ### GET /api/v1/regions/list
-Query: `page=int(default 1)`, `limit=int(default 10)`
+Query: `isActive=bool`, `page=int(default 1)`, `limit=int(default 10)`
 Response data: `{ "items": Region[], "pagination": PaginationMeta }`
 
 ### GET /api/v1/regions/:regionId
@@ -238,7 +238,7 @@ Request:
 Response data: `{ "id": int64 }`
 
 ### GET /api/v1/storages/list
-Query: `accountId=int64(required)`, `search=string`, `regionId=int64`, `storageType=string`, `providerType=string`, `page=int(default 1)`, `limit=int(default 10)`
+Query: `accountId=int64(required)`, `search=string`, `regionId=int64`, `storageType=string`, `providerType=string`, `isActive=bool`, `page=int(default 1)`, `limit=int(default 10)`
 Response data: `{ "items": Storage[], "pagination": PaginationMeta }`
 
 ### GET /api/v1/storages/:storageId
@@ -327,7 +327,7 @@ Request:
 Response data: `{ "id": int64, "encryptionKey": string }`
 
 ### GET /api/v1/volumes/list
-Query: `accountId=int64(required)`, `regionId=int64`, `storageId=int64`, `volumeType=string`, `locked=bool`, `page=int(default 1)`, `limit=int(default 10)`
+Query: `accountId=int64(required)`, `regionId=int64`, `storageId=int64`, `volumeType=string`, `locked=bool`, `isActive=bool`, `page=int(default 1)`, `limit=int(default 10)`
 Response data: `{ "items": Volume[], "pagination": PaginationMeta }`
 
 ### GET /api/v1/volumes/:volumeId
@@ -365,6 +365,10 @@ Request:
   "isCleanupVaultEnabled"?: bool
 }
 ```
+Response data: `{ "id": int64 }`
+
+### POST /api/v1/volumes/:volumeId/activate
+Param: `volumeId`
 Response data: `{ "id": int64 }`
 
 ### POST /api/v1/volumes/:volumeId/api-keys/generate

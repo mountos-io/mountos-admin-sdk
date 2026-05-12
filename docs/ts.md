@@ -503,6 +503,7 @@ Request body:
 
 ```typescript
 client.accounts.list(params: {
+    isActive?: boolean;
     page?: number;
     limit?: number;
   }): Promise<PaginatedResponse<Account>>;
@@ -512,6 +513,7 @@ Query params:
 
 ```typescript
 {
+  isActive?: boolean;
   page?: number;  // default: 1
   limit?: number;  // default: 10
 }
@@ -597,6 +599,7 @@ Request body:
 client.users.list(params: {
     accountId: number;
     search?: string;
+    isActive?: boolean;
     page?: number;
     limit?: number;
   }): Promise<PaginatedResponse<User>>;
@@ -608,6 +611,7 @@ Query params:
 {
   accountId: number;
   search?: string;
+  isActive?: boolean;
   page?: number;  // default: 1
   limit?: number;  // default: 10
 }
@@ -675,6 +679,7 @@ Request body:
 
 ```typescript
 client.regions.list(params: {
+    isActive?: boolean;
     page?: number;
     limit?: number;
   }): Promise<PaginatedResponse<Region>>;
@@ -684,6 +689,7 @@ Query params:
 
 ```typescript
 {
+  isActive?: boolean;
   page?: number;  // default: 1
   limit?: number;  // default: 10
 }
@@ -778,6 +784,7 @@ client.storages.list(params: {
     regionId?: number;
     storageType?: string;
     providerType?: string;
+    isActive?: boolean;
     page?: number;
     limit?: number;
   }): Promise<PaginatedResponse<Storage>>;
@@ -792,6 +799,7 @@ Query params:
   regionId?: number;
   storageType?: string;
   providerType?: string;
+  isActive?: boolean;
   page?: number;  // default: 1
   limit?: number;  // default: 10
 }
@@ -912,6 +920,7 @@ client.volumes.list(params: {
     storageId?: number;
     volumeType?: string;
     locked?: boolean;
+    isActive?: boolean;
     page?: number;
     limit?: number;
   }): Promise<PaginatedResponse<Volume>>;
@@ -926,6 +935,7 @@ Query params:
   storageId?: number;
   volumeType?: string;
   locked?: boolean;
+  isActive?: boolean;
   page?: number;  // default: 1
   limit?: number;  // default: 10
 }
@@ -989,6 +999,12 @@ Request body:
   isCleanupStorageEnabled?: boolean;
   isCleanupVaultEnabled?: boolean;
 }
+```
+
+#### `activate` — POST /api/v1/volumes/:volumeId/activate
+
+```typescript
+client.volumes.activate(volumeID: number): Promise<{ id: number }>;
 ```
 
 #### `generateAPIKeys` — POST /api/v1/volumes/:volumeId/api-keys/generate

@@ -357,6 +357,10 @@ export interface EditAccountRequest {
   providerInfo?: Record<string, unknown>
 }
 
+export interface AccountListOptions extends ListOptions {
+  isActive?: boolean
+}
+
 // Users
 
 export interface AddUserRequest {
@@ -377,6 +381,7 @@ export interface EditUserRequest {
 export interface UserListOptions extends ListOptions {
   accountId: number
   search?: string
+  isActive?: boolean
 }
 
 // Regions
@@ -391,6 +396,10 @@ export interface EditRegionRequest {
   accountId: number
   name: string
   dns: string
+}
+
+export interface RegionListOptions extends ListOptions {
+  isActive?: boolean
 }
 
 // Storages
@@ -436,6 +445,7 @@ export interface StorageListOptions extends ListOptions {
   regionId?: number
   storageType?: string
   providerType?: string
+  isActive?: boolean
 }
 
 // Volumes
@@ -504,6 +514,7 @@ export interface VolumeListOptions extends ListOptions {
   storageId?: number
   volumeType?: string
   locked?: boolean
+  isActive?: boolean
 }
 
 // AuditLogs

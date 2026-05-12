@@ -522,6 +522,7 @@ Query params:
 
 ```go
 type ListAccountOptions struct {
+    IsActive             bool         `url:"isActive"`
     Page                 int          `url:"page"` // default: 1
     Limit                int          `url:"limit"` // default: 10
 }
@@ -602,6 +603,7 @@ Query params:
 type ListUserOptions struct {
     AccountID            int64        `url:"accountId"`
     Search               string       `url:"search"`
+    IsActive             bool         `url:"isActive"`
     Page                 int          `url:"page"` // default: 1
     Limit                int          `url:"limit"` // default: 10
 }
@@ -666,6 +668,7 @@ Query params:
 
 ```go
 type ListRegionOptions struct {
+    IsActive             bool         `url:"isActive"`
     Page                 int          `url:"page"` // default: 1
     Limit                int          `url:"limit"` // default: 10
 }
@@ -746,6 +749,7 @@ type ListStorageOptions struct {
     RegionID             int64        `url:"regionId"`
     StorageType          string       `url:"storageType"`
     ProviderType         string       `url:"providerType"`
+    IsActive             bool         `url:"isActive"`
     Page                 int          `url:"page"` // default: 1
     Limit                int          `url:"limit"` // default: 10
 }
@@ -848,6 +852,7 @@ type ListVolumeOptions struct {
     StorageID            int64        `url:"storageId"`
     VolumeType           string       `url:"volumeType"`
     Locked               bool         `url:"locked"`
+    IsActive             bool         `url:"isActive"`
     Page                 int          `url:"page"` // default: 1
     Limit                int          `url:"limit"` // default: 10
 }
@@ -902,6 +907,12 @@ type DeactivateVolumeRequest struct {
     IsCleanupStorageEnabled  bool                     `json:"isCleanupStorageEnabled,omitempty"`
     IsCleanupVaultEnabled    bool                     `json:"isCleanupVaultEnabled,omitempty"`
 }
+```
+
+#### `Activate` — POST /api/v1/volumes/:volumeId/activate
+
+```go
+func (s *VolumesService) Activate(ctx context.Context, volumeID int64) (*IDResponse, error)
 ```
 
 #### `GenerateAPIKeys` — POST /api/v1/volumes/:volumeId/api-keys/generate

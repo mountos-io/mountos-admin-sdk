@@ -347,6 +347,7 @@ resources:
         path: /list
         pagination: page
         query:
+          - "isActive: bool"
           - "page: int=1"
           - "limit: int=10"
         responseType: Account
@@ -407,6 +408,7 @@ resources:
         query:
           - "accountId: int64!"
           - "search: string"
+          - "isActive: bool"
           - "page: int=1"
           - "limit: int=10"
         responseType: User
@@ -451,6 +453,7 @@ resources:
         path: /list
         pagination: page
         query:
+          - "isActive: bool"
           - "page: int=1"
           - "limit: int=10"
         responseType: Region
@@ -511,6 +514,7 @@ resources:
           - "regionId: int64"
           - "storageType: string"
           - "providerType: string"
+          - "isActive: bool"
           - "page: int=1"
           - "limit: int=10"
         responseType: Storage
@@ -600,6 +604,7 @@ resources:
           - "storageId: int64"
           - "volumeType: string"
           - "locked: bool"
+          - "isActive: bool"
           - "page: int=1"
           - "limit: int=10"
         responseType: Volume
@@ -643,6 +648,15 @@ resources:
           - "isCleanupMetaEnabled: bool"
           - "isCleanupStorageEnabled: bool"
           - "isCleanupVaultEnabled: bool"
+        response:
+          - "id: int64"
+
+      # Reactivate a deactivated volume during the grace window, while none
+      # of gc_meta_completed / gc_storage_completed / gc_vault_completed are
+      # set. Server returns 409 when cleanup has already begun.
+      - action: activate
+        method: POST
+        path: /:volumeId/activate
         response:
           - "id: int64"
 
