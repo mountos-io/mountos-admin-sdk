@@ -126,6 +126,15 @@ Response data: `{ "items": User[], "pagination": PaginationMeta }`
 Param: `userId`
 Response data: `User`
 
+### POST /api/v1/users/bulk
+Request:
+```
+{
+  "ids": int64[](required)
+}
+```
+Response data: `{ "users": UserLite[] }`
+
 ### PUT /api/v1/users/:userId/edit
 Param: `userId`
 Request:
@@ -513,7 +522,8 @@ Response data: `{ "items": ForkTreeEntry[], "nextCursor": int64|null }`
   "mtime": int64,
   "ctime": int64,
   "generation": int64,
-  "hasXattr": bool
+  "hasXattr": bool,
+  "updaterId"?: int64
 }
 ```
 
@@ -524,7 +534,7 @@ Response data: `{ "items": ForkTreeEntry[], "nextCursor": int64|null }`
 ### GET /api/v1/volumes/:volumeId/forks/:forkName/entry
 Param: `volumeId`
 Param: `forkName`
-Query: `path=string(required)`, `asOf=int64`
+Query: `path=string`, `inode=int64`, `asOf=int64`
 Response data: `ForkEntryDetail`
 
 ### GET /api/v1/volumes/:volumeId/forks/:forkName/entry/versions
@@ -546,7 +556,9 @@ Response data: `{ "items": ForkEntryVersion[], "nextCursor": int64|null }`
   "generation": int64,
   "owner"?: string,
   "mode"?: int32,
-  "xattrs"?: object
+  "xattrs"?: object,
+  "creatorId"?: int64,
+  "updaterId"?: int64
 }
 ```
 

@@ -249,6 +249,8 @@ type ForkEntryDetail struct {
     Owner                    string                   `json:"owner,omitempty"`
     Mode                     int32                    `json:"mode,omitempty"`
     Xattrs                   map[string]any           `json:"xattrs,omitempty"`
+    CreatorID                int64                    `json:"creatorId,omitempty"`
+    UpdaterID                int64                    `json:"updaterId,omitempty"`
 }
 ```
 
@@ -259,7 +261,7 @@ type ForkEntryVersion struct {
     Generation               int64                    `json:"generation"`
     Size                     int64                    `json:"size"`
     Mtime                    int64                    `json:"mtime"`
-    ModifiedBy               string                   `json:"modifiedBy,omitempty"`
+    UpdaterID                int64                    `json:"updaterId,omitempty"`
     ContentHash              string                   `json:"contentHash,omitempty"`
 }
 ```
@@ -276,6 +278,7 @@ type ForkTreeEntry struct {
     Ctime                    int64                    `json:"ctime"`
     Generation               int64                    `json:"generation"`
     HasXattr                 bool                     `json:"hasXattr"`
+    UpdaterID                int64                    `json:"updaterId,omitempty"`
 }
 ```
 
@@ -504,6 +507,16 @@ type User struct {
 }
 ```
 
+### `UserLite`
+
+```go
+type UserLite struct {
+    ID                       int64                    `json:"id"`
+    Username                 string                   `json:"username"`
+    Name                     string                   `json:"name"`
+}
+```
+
 ### `Volume`
 
 ```go
@@ -670,6 +683,20 @@ type ListUserOptions struct {
 
 ```go
 func (s *UsersService) Get(ctx context.Context, userID int64) (*User, error)
+```
+
+#### `Bulk` — POST /api/v1/users/bulk
+
+```go
+func (s *UsersService) Bulk(ctx context.Context, req *BulkUserRequest) (*struct { Users []UserLite }, error)
+```
+
+Request body:
+
+```go
+type BulkUserRequest struct {
+    Ids                      []int64                  `json:"ids"`
+}
 ```
 
 #### `Edit` — PUT /api/v1/users/:userId/edit
@@ -1161,6 +1188,7 @@ Query params:
 ```go
 type GetVolumeForkEntryOptions struct {
     Path                 string       `url:"path"`
+    Inode                int64        `url:"inode"`
     AsOf                 int64        `url:"asOf"`
 }
 ```

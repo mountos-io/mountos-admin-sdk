@@ -145,6 +145,7 @@ export interface ForkTreeEntry {
   ctime: number
   generation: number
   hasXattr: boolean
+  updaterId?: number
 }
 
 export interface ForkEntryDetail {
@@ -159,13 +160,15 @@ export interface ForkEntryDetail {
   owner?: string
   mode?: number
   xattrs?: Record<string, unknown>
+  creatorId?: number
+  updaterId?: number
 }
 
 export interface ForkEntryVersion {
   generation: number
   size: number
   mtime: number
-  modifiedBy?: string
+  updaterId?: number
   contentHash?: string
 }
 
@@ -374,6 +377,12 @@ export interface SessionSummaryStatusEntry {
   count: number
 }
 
+export interface UserLite {
+  id: number
+  username: string
+  name: string
+}
+
 export interface VolumeSizePoint {
   bucketEnd: string
   liveVolume: number
@@ -410,6 +419,10 @@ export interface AddUserRequest {
   email: string
   name?: string
   providerInfo?: Record<string, unknown>
+}
+
+export interface BulkUserRequest {
+  ids: number[]
 }
 
 export interface EditUserRequest {

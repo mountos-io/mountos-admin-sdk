@@ -68,6 +68,14 @@ types:
     - "name: string"
     - "isActive: bool"
 
+  # Compact projection of User used by bulk-resolve callers (admin tree
+  # browse). Omits accountId/email so the response is small even for large
+  # id sets, and matches what badges actually render.
+  UserLite:
+    - "id: int64"
+    - "username: string"
+    - "name: string"
+
   Region:
     - "id: int64"
     - "exportId: string"
@@ -167,8 +175,11 @@ types:
     - "ctime: int64"
     - "generation: int64"
     - "hasXattr: bool"
+    - "updaterId: int64?"
 
-  # Timestamps (mtime, ctime) in microseconds since Unix epoch.
+  # Timestamps (mtime, ctime) in microseconds since Unix epoch. creatorId /
+  # updaterId are 48-bit mountOS user ids (0 = unknown/system); resolve via
+  # Users.bulk for display names.
   ForkEntryDetail:
     - "inode: int64"
     - "path: string"
@@ -181,6 +192,8 @@ types:
     - "owner: string?"
     - "mode: int32?"
     - "xattrs: object?"
+    - "creatorId: int64?"
+    - "updaterId: int64?"
 
   # mtime in microseconds since Unix epoch.
   ForkTreeMatch:
@@ -190,12 +203,13 @@ types:
     - "size: int64"
     - "mtime: int64"
 
-  # mtime in microseconds since Unix epoch.
+  # mtime in microseconds since Unix epoch. updaterId is the mountOS user
+  # id that produced this version (0 = unknown/system).
   ForkEntryVersion:
     - "generation: int64"
     - "size: int64"
     - "mtime: int64"
-    - "modifiedBy: string?"
+    - "updaterId: int64?"
     - "contentHash: string?"
 
   AuditLog:
@@ -463,6 +477,19 @@ resources:
         method: GET
         path: /:userId
         responseType: User
+
+      # Resolve a set of user ids in one round-trip. Used by surfaces that
+      # render many creator/updater badges (admin tree browse) without
+      # firing N detail requests. Missing ids return UserLite{id: 0, ...}
+      # entries omitted from the response; clients display "user#<id>" for
+      # unresolved ids.
+      - action: bulk
+        method: POST
+        path: /bulk
+        request:
+          - "ids: int64[]!"
+        response:
+          - "users: UserLite[]"
 
       - action: edit
         method: PUT
@@ -837,7 +864,8 @@ resources:
         method: GET
         path: /
         query:
-          - "path: string!"
+          - "path: string"
+          - "inode: int64"
           - "asOf: int64"
         responseType: ForkEntryDetail
 

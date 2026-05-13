@@ -3,15 +3,16 @@
 import type {
   ListOptions, PaginatedResponse, CursorPaginatedResponse,
   CreateAccountRequest, Account, AccountListOptions, EditAccountRequest, AddUserRequest, 
-  User, UserListOptions, EditUserRequest, CreateRegionRequest, Region, RegionListOptions, 
-  EditRegionRequest, CreateStorageRequest, Storage, StorageListOptions, EditStorageRequest, 
-  TestStorageBucketRequest, CreateVolumeRequest, Volume, VolumeListOptions, 
-  EditVolumeRequest, DeactivateVolumeRequest, GenerateVolumeAPIKeysRequest, 
-  RevokeVolumeAPIKeyRequest, RevokeVolumeAPIKeysByUserRequest, UpdateVolumeQuotaRequest, 
-  VolumeSizePoint, CreateVolumeForkRequest, Fork, DeleteVolumeForkRequest, 
-  RestoreVolumeForkRequest, ForkTreeEntry, VolumeForkTreeListOptions, ForkEntryDetail, 
-  ForkEntryVersion, VolumeForkEntryListOptions, ForkTreeMatch, VolumeForkSearchListOptions, 
-  AuditLog, AuditLogListOptions, RegionAuditLogListOptions, ServiceNode, ClientSession, 
+  User, UserListOptions, BulkUserRequest, UserLite, EditUserRequest, CreateRegionRequest, 
+  Region, RegionListOptions, EditRegionRequest, CreateStorageRequest, Storage, 
+  StorageListOptions, EditStorageRequest, TestStorageBucketRequest, CreateVolumeRequest, 
+  Volume, VolumeListOptions, EditVolumeRequest, DeactivateVolumeRequest, 
+  GenerateVolumeAPIKeysRequest, RevokeVolumeAPIKeyRequest, 
+  RevokeVolumeAPIKeysByUserRequest, UpdateVolumeQuotaRequest, VolumeSizePoint, 
+  CreateVolumeForkRequest, Fork, DeleteVolumeForkRequest, RestoreVolumeForkRequest, 
+  ForkTreeEntry, VolumeForkTreeListOptions, ForkEntryDetail, ForkEntryVersion, 
+  VolumeForkEntryListOptions, ForkTreeMatch, VolumeForkSearchListOptions, AuditLog, 
+  AuditLogListOptions, RegionAuditLogListOptions, ServiceNode, ClientSession, 
   ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, DashboardStats, 
   LicenseDetails, LicenseTerms, ServiceAlert, AlertListOptions, AlertCountResponse, 
   RegionAlert, RegionAlertListOptions,
@@ -138,6 +139,10 @@ export class UsersResource {
 
   get(userId: number, signal?: AbortSignal): Promise<User> {
     return this.client.request('GET', `/api/v1/users/${userId}`, undefined, signal)
+  }
+
+  bulk(req: BulkUserRequest, signal?: AbortSignal): Promise<{ users: UserLite[] }> {
+    return this.client.request('POST', '/api/v1/users/bulk', req, signal)
   }
 
   edit(userId: number, req: EditUserRequest, signal?: AbortSignal): Promise<{ id: number }> {
@@ -303,8 +308,8 @@ export class VolumeForkTreesResource {
 export class VolumeForkEntriesResource {
   constructor(private client: Client) {}
 
-  get(volumeId: number, forkName: string, path: string, asOf: number, signal?: AbortSignal): Promise<ForkEntryDetail> {
-    return this.client.request('GET', `/api/v1/volumes/${volumeId}/forks/${forkName}/entry${queryString({ path: path, asOf: asOf })}`, undefined, signal)
+  get(volumeId: number, forkName: string, path: string, inode: number, asOf: number, signal?: AbortSignal): Promise<ForkEntryDetail> {
+    return this.client.request('GET', `/api/v1/volumes/${volumeId}/forks/${forkName}/entry${queryString({ path: path, inode: inode, asOf: asOf })}`, undefined, signal)
   }
 
   versions(volumeId: number, forkName: string, opts?: VolumeForkEntryListOptions, signal?: AbortSignal): Promise<CursorPaginatedResponse<ForkEntryVersion>> {

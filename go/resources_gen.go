@@ -115,6 +115,14 @@ func (s *UsersService) Get(ctx context.Context, userID int64) (*User, error) {
 	return decodeJSON[User](data)
 }
 
+func (s *UsersService) Bulk(ctx context.Context, req *BulkUserRequest) (*BulkUserResponse, error) {
+	data, err := s.c.post(ctx, "/api/v1/users/bulk", req)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[BulkUserResponse](data)
+}
+
 func (s *UsersService) Edit(ctx context.Context, userID int64, req *EditUserRequest) (*IDResponse, error) {
 	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/users/%s/edit", strconv.FormatInt(userID, 10)), req)
 	if err != nil {
@@ -494,9 +502,10 @@ func (s *VolumeForkTreesService) List(ctx context.Context, volumeID int64, forkN
 
 type VolumeForkEntriesService struct{ c *Client }
 
-func (s *VolumeForkEntriesService) Get(ctx context.Context, volumeID int64, forkName string, path string, asOf int64) (*ForkEntryDetail, error) {
+func (s *VolumeForkEntriesService) Get(ctx context.Context, volumeID int64, forkName string, path string, inode int64, asOf int64) (*ForkEntryDetail, error) {
 	q := url.Values{}
 	q.Set("path", path)
+	q.Set("inode", strconv.FormatInt(inode, 10))
 	q.Set("asOf", strconv.FormatInt(asOf, 10))
 	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/volumes/%s/forks/%s/entry", strconv.FormatInt(volumeID, 10), forkName)+"?"+q.Encode())
 	if err != nil {

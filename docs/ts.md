@@ -231,6 +231,8 @@ interface ForkEntryDetail {
   owner?: string;
   mode?: number;
   xattrs?: Record<string, unknown>;
+  creatorId?: number;
+  updaterId?: number;
 }
 ```
 
@@ -241,7 +243,7 @@ interface ForkEntryVersion {
   generation: number;
   size: number;
   mtime: number;
-  modifiedBy?: string;
+  updaterId?: number;
   contentHash?: string;
 }
 ```
@@ -258,6 +260,7 @@ interface ForkTreeEntry {
   ctime: number;
   generation: number;
   hasXattr: boolean;
+  updaterId?: number;
 }
 ```
 
@@ -486,6 +489,16 @@ interface User {
 }
 ```
 
+### `UserLite`
+
+```typescript
+interface UserLite {
+  id: number;
+  username: string;
+  name: string;
+}
+```
+
 ### `Volume`
 
 ```typescript
@@ -678,6 +691,22 @@ Query params:
 
 ```typescript
 client.users.get(userID: number): Promise<User>;
+```
+
+#### `bulk` — POST /api/v1/users/bulk
+
+```typescript
+client.users.bulk(body: {
+    ids: number[];
+  }): Promise<{ users: UserLite[] }>;
+```
+
+Request body:
+
+```typescript
+{
+  ids: number[];
+}
 ```
 
 #### `edit` — PUT /api/v1/users/:userId/edit
@@ -1278,7 +1307,8 @@ Accessor: `client.volumeForkEntries`
 
 ```typescript
 client.volumeForkEntries.get(volumeID: number, forkName: string, params: {
-    path: string;
+    path?: string;
+    inode?: number;
     asOf?: number;
   }): Promise<ForkEntryDetail>;
 ```
@@ -1287,7 +1317,8 @@ Query params:
 
 ```typescript
 {
-  path: string;
+  path?: string;
+  inode?: number;
   asOf?: number;
 }
 ```

@@ -166,6 +166,7 @@ type ForkTreeEntry struct {
 	Ctime      int64  `json:"ctime"`
 	Generation int64  `json:"generation"`
 	HasXattr   bool   `json:"hasXattr"`
+	UpdaterID  int64  `json:"updaterId,omitempty"`
 }
 
 type ForkEntryDetail struct {
@@ -180,13 +181,15 @@ type ForkEntryDetail struct {
 	Owner      string         `json:"owner,omitempty"`
 	Mode       int32          `json:"mode,omitempty"`
 	Xattrs     map[string]any `json:"xattrs,omitempty"`
+	CreatorID  int64          `json:"creatorId,omitempty"`
+	UpdaterID  int64          `json:"updaterId,omitempty"`
 }
 
 type ForkEntryVersion struct {
 	Generation  int64  `json:"generation"`
 	Size        int64  `json:"size"`
 	Mtime       int64  `json:"mtime"`
-	ModifiedBy  string `json:"modifiedBy,omitempty"`
+	UpdaterID   int64  `json:"updaterId,omitempty"`
 	ContentHash string `json:"contentHash,omitempty"`
 }
 
@@ -395,6 +398,12 @@ type SessionSummaryStatusEntry struct {
 	Count      int64  `json:"count"`
 }
 
+type UserLite struct {
+	ID       int64  `json:"id"`
+	Username string `json:"username"`
+	Name     string `json:"name"`
+}
+
 type VolumeSizePoint struct {
 	BucketEnd          string `json:"bucketEnd"`
 	LiveVolume         int64  `json:"liveVolume"`
@@ -433,6 +442,14 @@ type AddUserRequest struct {
 	Email        string         `json:"email"`
 	Name         string         `json:"name,omitempty"`
 	ProviderInfo map[string]any `json:"providerInfo,omitempty"`
+}
+
+type BulkUserRequest struct {
+	Ids []int64 `json:"ids"`
+}
+
+type BulkUserResponse struct {
+	Users []UserLite `json:"users"`
 }
 
 type EditUserRequest struct {
