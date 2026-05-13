@@ -606,7 +606,7 @@ type SizeHistoryVolumeResponse struct {
 type CreateVolumeForkRequest struct {
 	Name       string `json:"name"`
 	ParentName string `json:"parentName,omitempty"`
-	AsOf       int64  `json:"asOf,omitempty"`
+	AsOf       *int64 `json:"asOf,omitempty"`
 	VolumeType string `json:"volumeType,omitempty"`
 }
 

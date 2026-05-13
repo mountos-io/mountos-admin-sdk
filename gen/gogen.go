@@ -328,6 +328,15 @@ func writeGoStruct(w *strings.Builder, name string, fields []string, isRequest b
 		f := parseField(s)
 		gn := goFieldName(f.Name)
 		gt := goType(f.Type)
+		// Request body fields marked optional ("?") on bool/int types get a
+		// pointer so callers can distinguish "not set" from zero — mirrors
+		// goOptionalQueryType for query params.
+		if isRequest && f.Optional {
+			switch f.Type {
+			case "bool", "int", "int32", "int64":
+				gt = "*" + gt
+			}
+		}
 		tag := goTag(f, isRequest)
 		if len(gn) > maxName {
 			maxName = len(gn)
