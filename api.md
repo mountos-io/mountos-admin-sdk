@@ -521,8 +521,7 @@ Response data: `{ "items": ForkTreeEntry[], "nextCursor": int64|null }`
   "size": int64,
   "mtime": int64,
   "ctime": int64,
-  "generation": int64,
-  "hasXattr": bool,
+  "creatorId"?: int64,
   "updaterId"?: int64
 }
 ```

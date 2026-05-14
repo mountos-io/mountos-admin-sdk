@@ -143,8 +143,7 @@ export interface ForkTreeEntry {
   size: number
   mtime: number
   ctime: number
-  generation: number
-  hasXattr: boolean
+  creatorId?: number
   updaterId?: number
 }
 

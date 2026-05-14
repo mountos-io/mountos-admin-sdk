@@ -158,15 +158,14 @@ type Fork struct {
 }
 
 type ForkTreeEntry struct {
-	Inode      int64  `json:"inode"`
-	Name       string `json:"name"`
-	Kind       string `json:"kind"`
-	Size       int64  `json:"size"`
-	Mtime      int64  `json:"mtime"`
-	Ctime      int64  `json:"ctime"`
-	Generation int64  `json:"generation"`
-	HasXattr   bool   `json:"hasXattr"`
-	UpdaterID  int64  `json:"updaterId,omitempty"`
+	Inode     int64  `json:"inode"`
+	Name      string `json:"name"`
+	Kind      string `json:"kind"`
+	Size      int64  `json:"size"`
+	Mtime     int64  `json:"mtime"`
+	Ctime     int64  `json:"ctime"`
+	CreatorID int64  `json:"creatorId,omitempty"`
+	UpdaterID int64  `json:"updaterId,omitempty"`
 }
 
 type ForkEntryDetail struct {

@@ -276,8 +276,7 @@ type ForkTreeEntry struct {
     Size                     int64                    `json:"size"`
     Mtime                    int64                    `json:"mtime"`
     Ctime                    int64                    `json:"ctime"`
-    Generation               int64                    `json:"generation"`
-    HasXattr                 bool                     `json:"hasXattr"`
+    CreatorID                int64                    `json:"creatorId,omitempty"`
     UpdaterID                int64                    `json:"updaterId,omitempty"`
 }
 ```
