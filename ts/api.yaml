@@ -129,10 +129,9 @@ types:
     # Immutable storage personality picked at create time. One of:
     # "general" | "iceberg" (extensible to "s3-tables", "delta", ...).
     # Empty/legacy values ("object", "block") fall back to general semantics.
-    # Drives admin-client kind badge + client-side mount gating
-    # (mfuse/mountosx/mountos-windows/mountos-hdfs-sdk refuse to mount
-    # iceberg volumes as a regular filesystem — engines must use the
-    # lake REST + S3 endpoints instead).
+    # Drives kind badge + client-side mount gating: iceberg volumes are
+    # not mountable as a regular filesystem; engines must use the lake
+    # REST + S3 endpoints instead.
     - "volumeType: string"
     - "encryption: bool"
     - "quotaLimit: int64"
@@ -173,8 +172,8 @@ types:
     - "size: int64"
 
   # Single directory entry in a (volume, fork, asOf) tree listing.
-  # For iceberg volumes the gatewayserv synthesises namespace -> table
-  # -> leaf inodes (kind: file|dir) keyed by stable hash of the tuple
+  # For iceberg volumes the server synthesises namespace -> table -> leaf
+  # inodes (kind: file|dir) keyed by stable hash of the tuple
   # (namespace, table, kind, basename) so cursors stay stable.
   # Timestamps (mtime, ctime) are microseconds since Unix epoch, matching
   # the Fork.snapshotTs / Fork.createdAt convention used elsewhere in the SDK.
@@ -914,10 +913,9 @@ resources:
         responseType: Fork
 
   # Live + as-of metadata tree browse for a (volume, fork) pair.
-  # appserv forwards to dataserv or gatewayserv via existing SRPC selection
-  # (no branching on volumeType). Both services honour the same contract;
-  # gatewayserv synthesises a tree for iceberg volumes from
-  # (namespace, table, kind, basename) tuples.
+  # The same contract is honoured for all volume types; iceberg volumes
+  # are presented as a synthesised tree from (namespace, table, kind,
+  # basename) tuples.
   - name: VolumeForkTrees
     path: /volumes/:volumeId/forks/:forkName/tree
     pathParamTypes:

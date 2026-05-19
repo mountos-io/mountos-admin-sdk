@@ -2,10 +2,6 @@ package sdk
 
 // Provider type constants — stable string identifiers accepted by the
 // admin storage API for Storage.providerType / CreateStorageRequest.providerType.
-//
-// Server-side validation lives in
-// mountos-servers/internal/constants/app_constants_providers.go
-// (IsValidObjectStorageProvider). Keep these in sync.
 const (
 	ProviderTypeS3              = "s3"
 	ProviderTypeBackblaze       = "backblaze"
