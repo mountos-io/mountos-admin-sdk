@@ -221,6 +221,77 @@ Response data: `{ "id": int64 }`
 
 ---
 
+## RegionClusters
+
+### POST /api/v1/regions/:regionId/clusters/create
+Param: `regionId`
+Request:
+```
+{
+  "name": string(required)
+}
+```
+Response data: `{ "id": int64 }`
+
+### GET /api/v1/regions/:regionId/clusters/list
+Param: `regionId`
+Query: `isActive=bool`, `page=int(default 1)`, `limit=int(default 20)`
+Response data: `{ "items": RegionCluster[], "pagination": PaginationMeta }`
+
+### GET /api/v1/regions/:regionId/clusters/:clusterId
+Param: `regionId`
+Param: `clusterId`
+Response data: `RegionCluster`
+
+### PUT /api/v1/regions/:regionId/clusters/:clusterId/edit
+Param: `regionId`
+Param: `clusterId`
+Request:
+```
+{
+  "name": string(required)
+}
+```
+Response data: `{ "id": int64 }`
+
+### POST /api/v1/regions/:regionId/clusters/:clusterId/set-default
+Param: `regionId`
+Param: `clusterId`
+Response data: `{ "id": int64 }`
+
+### POST /api/v1/regions/:regionId/clusters/:clusterId/set-ready
+Param: `regionId`
+Param: `clusterId`
+Request:
+```
+{
+  "ready": bool(required)
+}
+```
+Response data: `{ "id": int64, "ready": bool }`
+
+### POST /api/v1/regions/:regionId/clusters/:clusterId/deactivate
+Param: `regionId`
+Param: `clusterId`
+Response data: `{ "id": int64 }`
+
+### RegionCluster Type
+```
+{
+  "id": int64,
+  "exportId": string,
+  "regionId": int64,
+  "name": string,
+  "defaultCluster": bool,
+  "isReady": bool,
+  "isActive": bool,
+  "createdAt": RFC3339,
+  "updatedAt": RFC3339
+}
+```
+
+---
+
 ## Storages
 
 ### POST /api/v1/storages/create
@@ -330,13 +401,15 @@ Request:
   "encryptionKey"?: string,
   "retentionPeriod"?: int32,
   "gracePeriod"?: int32,
-  "quotaLimit"?: int64
+  "quotaLimit"?: int64,
+  "regionClusterId"?: int64,
+  "regionClusterUuid"?: string
 }
 ```
 Response data: `{ "id": int64, "encryptionKey": string }`
 
 ### GET /api/v1/volumes/list
-Query: `accountId=int64(required)`, `regionId=int64`, `storageId=int64`, `volumeType=string`, `locked=bool`, `isActive=bool`, `page=int(default 1)`, `limit=int(default 10)`
+Query: `accountId=int64(required)`, `regionId=int64`, `regionClusterId=int64`, `storageId=int64`, `volumeType=string`, `locked=bool`, `isActive=bool`, `page=int(default 1)`, `limit=int(default 10)`
 Response data: `{ "items": Volume[], "pagination": PaginationMeta }`
 
 ### GET /api/v1/volumes/:volumeId
@@ -363,6 +436,17 @@ Response data: `{ "id": int64 }`
 ### POST /api/v1/volumes/:volumeId/unlock
 Param: `volumeId`
 Response data: `{ "id": int64 }`
+
+### POST /api/v1/volumes/:volumeId/move-cluster
+Param: `volumeId`
+Request:
+```
+{
+  "targetClusterId"?: int64,
+  "targetClusterUuid"?: string
+}
+```
+Response data: `{ "id": int64, "sourceClusterId": int64, "targetClusterId": int64, "handoverUntil": int64 }`
 
 ### POST /api/v1/volumes/:volumeId/deactivate
 Param: `volumeId`
@@ -480,6 +564,7 @@ Response data: `Fork`
   "account": Ref,
   "storage": Ref,
   "region": Ref,
+  "regionCluster"?: Ref,
   "name": string,
   "description"?: string,
   "volumeType": string,

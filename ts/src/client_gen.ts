@@ -4,9 +4,11 @@ import type {
   ListOptions, PaginatedResponse, CursorPaginatedResponse,
   CreateAccountRequest, Account, AccountListOptions, EditAccountRequest, AddUserRequest, 
   User, UserListOptions, BulkUserRequest, UserLite, EditUserRequest, CreateRegionRequest, 
-  Region, RegionListOptions, EditRegionRequest, CreateStorageRequest, Storage, 
-  StorageListOptions, EditStorageRequest, TestStorageBucketRequest, CreateVolumeRequest, 
-  Volume, VolumeListOptions, EditVolumeRequest, DeactivateVolumeRequest, 
+  Region, RegionListOptions, EditRegionRequest, CreateRegionClusterRequest, RegionCluster, 
+  RegionClusterListOptions, EditRegionClusterRequest, SetRegionClusterReadyRequest, 
+  CreateStorageRequest, Storage, StorageListOptions, EditStorageRequest, 
+  TestStorageBucketRequest, CreateVolumeRequest, Volume, VolumeListOptions, 
+  EditVolumeRequest, MoveVolumeClusterRequest, DeactivateVolumeRequest, 
   GenerateVolumeAPIKeysRequest, RevokeVolumeAPIKeyRequest, 
   RevokeVolumeAPIKeysByUserRequest, UpdateVolumeQuotaRequest, VolumeSizePoint, 
   CreateVolumeForkRequest, Fork, DeleteVolumeForkRequest, RestoreVolumeForkRequest, 
@@ -32,6 +34,7 @@ export interface AdminClient {
   readonly accounts: AccountsResource
   readonly users: UsersResource
   readonly regions: RegionsResource
+  readonly regionClusters: RegionClustersResource
   readonly storages: StoragesResource
   readonly volumes: VolumesResource
   readonly volumeForkTrees: VolumeForkTreesResource
@@ -55,6 +58,7 @@ export function createClient(request: RequestFn): AdminClient {
   let _accounts: AccountsResource | undefined
   let _users: UsersResource | undefined
   let _regions: RegionsResource | undefined
+  let _regionClusters: RegionClustersResource | undefined
   let _storages: StoragesResource | undefined
   let _volumes: VolumesResource | undefined
   let _volumeForkTrees: VolumeForkTreesResource | undefined
@@ -75,6 +79,7 @@ export function createClient(request: RequestFn): AdminClient {
     get accounts() { return _accounts ??= new AccountsResource(client) },
     get users() { return _users ??= new UsersResource(client) },
     get regions() { return _regions ??= new RegionsResource(client) },
+    get regionClusters() { return _regionClusters ??= new RegionClustersResource(client) },
     get storages() { return _storages ??= new StoragesResource(client) },
     get volumes() { return _volumes ??= new VolumesResource(client) },
     get volumeForkTrees() { return _volumeForkTrees ??= new VolumeForkTreesResource(client) },
@@ -178,6 +183,38 @@ export class RegionsResource {
   }
 }
 
+export class RegionClustersResource {
+  constructor(private client: Client) {}
+
+  create(regionId: number, req: CreateRegionClusterRequest, signal?: AbortSignal): Promise<{ id: number }> {
+    return this.client.request('POST', `/api/v1/regions/${regionId}/clusters/create`, req, signal)
+  }
+
+  list(regionId: number, opts?: RegionClusterListOptions, signal?: AbortSignal): Promise<PaginatedResponse<RegionCluster>> {
+    return this.client.request('GET', `/api/v1/regions/${regionId}/clusters/list` + queryString({ isActive: opts?.isActive, page: opts?.page, limit: opts?.limit }), undefined, signal)
+  }
+
+  get(regionId: number, clusterId: number, signal?: AbortSignal): Promise<RegionCluster> {
+    return this.client.request('GET', `/api/v1/regions/${regionId}/clusters/${clusterId}`, undefined, signal)
+  }
+
+  edit(regionId: number, clusterId: number, req: EditRegionClusterRequest, signal?: AbortSignal): Promise<{ id: number }> {
+    return this.client.request('PUT', `/api/v1/regions/${regionId}/clusters/${clusterId}/edit`, req, signal)
+  }
+
+  setDefault(regionId: number, clusterId: number, signal?: AbortSignal): Promise<{ id: number }> {
+    return this.client.request('POST', `/api/v1/regions/${regionId}/clusters/${clusterId}/set-default`, undefined, signal)
+  }
+
+  setReady(regionId: number, clusterId: number, req: SetRegionClusterReadyRequest, signal?: AbortSignal): Promise<{ id: number; ready: boolean }> {
+    return this.client.request('POST', `/api/v1/regions/${regionId}/clusters/${clusterId}/set-ready`, req, signal)
+  }
+
+  deactivate(regionId: number, clusterId: number, signal?: AbortSignal): Promise<{ id: number }> {
+    return this.client.request('POST', `/api/v1/regions/${regionId}/clusters/${clusterId}/deactivate`, undefined, signal)
+  }
+}
+
 export class StoragesResource {
   constructor(private client: Client) {}
 
@@ -218,7 +255,7 @@ export class VolumesResource {
   }
 
   list(opts: VolumeListOptions, signal?: AbortSignal): Promise<PaginatedResponse<Volume>> {
-    return this.client.request('GET', `/api/v1/volumes/list${queryString({ accountId: opts.accountId, regionId: opts.regionId, storageId: opts.storageId, volumeType: opts.volumeType, locked: opts.locked, isActive: opts.isActive, page: opts.page, limit: opts.limit })}`, undefined, signal)
+    return this.client.request('GET', `/api/v1/volumes/list${queryString({ accountId: opts.accountId, regionId: opts.regionId, regionClusterId: opts.regionClusterId, storageId: opts.storageId, volumeType: opts.volumeType, locked: opts.locked, isActive: opts.isActive, page: opts.page, limit: opts.limit })}`, undefined, signal)
   }
 
   get(volumeId: number, signal?: AbortSignal): Promise<Volume> {
@@ -235,6 +272,10 @@ export class VolumesResource {
 
   unlock(volumeId: number, signal?: AbortSignal): Promise<{ id: number }> {
     return this.client.request('POST', `/api/v1/volumes/${volumeId}/unlock`, undefined, signal)
+  }
+
+  moveCluster(volumeId: number, req: MoveVolumeClusterRequest, signal?: AbortSignal): Promise<{ id: number; sourceClusterId: number; targetClusterId: number; handoverUntil: number }> {
+    return this.client.request('POST', `/api/v1/volumes/${volumeId}/move-cluster`, req, signal)
   }
 
   deactivate(volumeId: number, req: DeactivateVolumeRequest, signal?: AbortSignal): Promise<{ id: number }> {

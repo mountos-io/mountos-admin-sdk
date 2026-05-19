@@ -367,6 +367,22 @@ interface RegionAlert {
 }
 ```
 
+### `RegionCluster`
+
+```typescript
+interface RegionCluster {
+  id: number;
+  exportId: string;
+  regionId: number;
+  name: string;
+  defaultCluster: boolean;
+  isReady: boolean;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+```
+
 ### `RegionVolumeMetrics`
 
 ```typescript
@@ -506,6 +522,7 @@ interface Volume {
   account: Ref;
   storage: Ref;
   region: Ref;
+  regionCluster?: Ref;
   name: string;
   description?: string;
   volumeType: string;
@@ -812,6 +829,96 @@ Request body:
 client.regions.deactivate(regionID: number): Promise<{ id: number }>;
 ```
 
+### RegionClusters
+
+Accessor: `client.regionClusters`
+
+#### `create` — POST /api/v1/regions/:regionId/clusters/create
+
+```typescript
+client.regionClusters.create(regionID: number, body: {
+    name: string;
+  }): Promise<{ id: number }>;
+```
+
+Request body:
+
+```typescript
+{
+  name: string;
+}
+```
+
+#### `list` — GET /api/v1/regions/:regionId/clusters/list
+
+```typescript
+client.regionClusters.list(regionID: number, params: {
+    isActive?: boolean;
+    page?: number;
+    limit?: number;
+  }): Promise<PaginatedResponse<RegionCluster>>;
+```
+
+Query params:
+
+```typescript
+{
+  isActive?: boolean;
+  page?: number;  // default: 1
+  limit?: number;  // default: 20
+}
+```
+
+#### `get` — GET /api/v1/regions/:regionId/clusters/:clusterId
+
+```typescript
+client.regionClusters.get(regionID: number, clusterID: number): Promise<RegionCluster>;
+```
+
+#### `edit` — PUT /api/v1/regions/:regionId/clusters/:clusterId/edit
+
+```typescript
+client.regionClusters.edit(regionID: number, clusterID: number, body: {
+    name: string;
+  }): Promise<{ id: number }>;
+```
+
+Request body:
+
+```typescript
+{
+  name: string;
+}
+```
+
+#### `setDefault` — POST /api/v1/regions/:regionId/clusters/:clusterId/set-default
+
+```typescript
+client.regionClusters.setDefault(regionID: number, clusterID: number): Promise<{ id: number }>;
+```
+
+#### `setReady` — POST /api/v1/regions/:regionId/clusters/:clusterId/set-ready
+
+```typescript
+client.regionClusters.setReady(regionID: number, clusterID: number, body: {
+    ready: boolean;
+  }): Promise<{ id: number; ready: boolean }>;
+```
+
+Request body:
+
+```typescript
+{
+  ready: boolean;
+}
+```
+
+#### `deactivate` — POST /api/v1/regions/:regionId/clusters/:clusterId/deactivate
+
+```typescript
+client.regionClusters.deactivate(regionID: number, clusterID: number): Promise<{ id: number }>;
+```
+
 ### Storages
 
 Accessor: `client.storages`
@@ -976,6 +1083,8 @@ client.volumes.create(body: {
     retentionPeriod?: number;
     gracePeriod?: number;
     quotaLimit?: number;
+    regionClusterId?: number;
+    regionClusterUuid?: string;
   }): Promise<{ id: number; encryptionKey: string }>;
 ```
 
@@ -993,6 +1102,8 @@ Request body:
   retentionPeriod?: number;
   gracePeriod?: number;
   quotaLimit?: number;
+  regionClusterId?: number;
+  regionClusterUuid?: string;
 }
 ```
 
@@ -1002,6 +1113,7 @@ Request body:
 client.volumes.list(params: {
     accountId: number;
     regionId?: number;
+    regionClusterId?: number;
     storageId?: number;
     volumeType?: string;
     locked?: boolean;
@@ -1017,6 +1129,7 @@ Query params:
 {
   accountId: number;
   regionId?: number;
+  regionClusterId?: number;
   storageId?: number;
   volumeType?: string;
   locked?: boolean;
@@ -1064,6 +1177,24 @@ client.volumes.lock(volumeID: number): Promise<{ id: number }>;
 
 ```typescript
 client.volumes.unlock(volumeID: number): Promise<{ id: number }>;
+```
+
+#### `moveCluster` — POST /api/v1/volumes/:volumeId/move-cluster
+
+```typescript
+client.volumes.moveCluster(volumeID: number, body: {
+    targetClusterId?: number;
+    targetClusterUuid?: string;
+  }): Promise<{ id: number; sourceClusterId: number; targetClusterId: number; handoverUntil: number }>;
+```
+
+Request body:
+
+```typescript
+{
+  targetClusterId?: number;
+  targetClusterUuid?: string;
+}
 ```
 
 #### `deactivate` — POST /api/v1/volumes/:volumeId/deactivate

@@ -75,6 +75,18 @@ export interface Region {
   updatedAt: string
 }
 
+export interface RegionCluster {
+  id: number
+  exportId: string
+  regionId: number
+  name: string
+  defaultCluster: boolean
+  isReady: boolean
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
 export interface Storage {
   id: number
   account: Ref
@@ -100,6 +112,7 @@ export interface Volume {
   account: Ref
   storage: Ref
   region: Ref
+  regionCluster?: Ref
   name: string
   description?: string
   volumeType: string
@@ -455,6 +468,24 @@ export interface RegionListOptions extends ListOptions {
   isActive?: boolean
 }
 
+// RegionClusters
+
+export interface CreateRegionClusterRequest {
+  name: string
+}
+
+export interface EditRegionClusterRequest {
+  name: string
+}
+
+export interface SetRegionClusterReadyRequest {
+  ready: boolean
+}
+
+export interface RegionClusterListOptions extends ListOptions {
+  isActive?: boolean
+}
+
 // Storages
 
 export interface CreateStorageRequest {
@@ -514,6 +545,8 @@ export interface CreateVolumeRequest {
   retentionPeriod?: number
   gracePeriod?: number
   quotaLimit?: number
+  regionClusterId?: number
+  regionClusterUuid?: string
 }
 
 export interface EditVolumeRequest {
@@ -521,6 +554,11 @@ export interface EditVolumeRequest {
   retentionPeriod?: number
   gracePeriod?: number
   restrictByLiveVolume?: boolean
+}
+
+export interface MoveVolumeClusterRequest {
+  targetClusterId?: number
+  targetClusterUuid?: string
 }
 
 export interface DeactivateVolumeRequest {
@@ -564,6 +602,7 @@ export interface RestoreVolumeForkRequest {
 export interface VolumeListOptions extends ListOptions {
   accountId: number
   regionId?: number
+  regionClusterId?: number
   storageId?: number
   volumeType?: string
   locked?: boolean

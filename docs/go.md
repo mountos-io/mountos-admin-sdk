@@ -385,6 +385,22 @@ type RegionAlert struct {
 }
 ```
 
+### `RegionCluster`
+
+```go
+type RegionCluster struct {
+    ID                       int64                    `json:"id"`
+    ExportID                 string                   `json:"exportId"`
+    RegionID                 int64                    `json:"regionId"`
+    Name                     string                   `json:"name"`
+    DefaultCluster           bool                     `json:"defaultCluster"`
+    IsReady                  bool                     `json:"isReady"`
+    IsActive                 bool                     `json:"isActive"`
+    CreatedAt                string                   `json:"createdAt"`
+    UpdatedAt                string                   `json:"updatedAt"`
+}
+```
+
 ### `RegionVolumeMetrics`
 
 ```go
@@ -524,6 +540,7 @@ type Volume struct {
     Account                  Ref                      `json:"account"`
     Storage                  Ref                      `json:"storage"`
     Region                   Ref                      `json:"region"`
+    RegionCluster            Ref                      `json:"regionCluster,omitempty"`
     Name                     string                   `json:"name"`
     Description              string                   `json:"description,omitempty"`
     VolumeType               string                   `json:"volumeType"`
@@ -785,6 +802,86 @@ type EditRegionRequest struct {
 func (s *RegionsService) Deactivate(ctx context.Context, regionID int64) (*IDResponse, error)
 ```
 
+### RegionClusters
+
+Accessor: `client.RegionClusters`
+
+#### `Create` — POST /api/v1/regions/:regionId/clusters/create
+
+```go
+func (s *RegionClustersService) Create(ctx context.Context, regionID int64, req *CreateRegionClusterRequest) (*IDResponse, error)
+```
+
+Request body:
+
+```go
+type CreateRegionClusterRequest struct {
+    Name                     string                   `json:"name"`
+}
+```
+
+#### `List` — GET /api/v1/regions/:regionId/clusters/list
+
+```go
+func (s *RegionClustersService) List(ctx context.Context, regionID int64, opts *ListRegionClusterOptions) (*PaginatedResponse[RegionCluster], error)
+```
+
+Query params:
+
+```go
+type ListRegionClusterOptions struct {
+    IsActive             bool         `url:"isActive"`
+    Page                 int          `url:"page"` // default: 1
+    Limit                int          `url:"limit"` // default: 20
+}
+```
+
+#### `Get` — GET /api/v1/regions/:regionId/clusters/:clusterId
+
+```go
+func (s *RegionClustersService) Get(ctx context.Context, regionID int64, clusterID int64) (*RegionCluster, error)
+```
+
+#### `Edit` — PUT /api/v1/regions/:regionId/clusters/:clusterId/edit
+
+```go
+func (s *RegionClustersService) Edit(ctx context.Context, regionID int64, clusterID int64, req *EditRegionClusterRequest) (*IDResponse, error)
+```
+
+Request body:
+
+```go
+type EditRegionClusterRequest struct {
+    Name                     string                   `json:"name"`
+}
+```
+
+#### `SetDefault` — POST /api/v1/regions/:regionId/clusters/:clusterId/set-default
+
+```go
+func (s *RegionClustersService) SetDefault(ctx context.Context, regionID int64, clusterID int64) (*IDResponse, error)
+```
+
+#### `SetReady` — POST /api/v1/regions/:regionId/clusters/:clusterId/set-ready
+
+```go
+func (s *RegionClustersService) SetReady(ctx context.Context, regionID int64, clusterID int64, req *SetReadyRegionClusterRequest) (*struct { ID int64; Ready bool }, error)
+```
+
+Request body:
+
+```go
+type SetReadyRegionClusterRequest struct {
+    Ready                    bool                     `json:"ready"`
+}
+```
+
+#### `Deactivate` — POST /api/v1/regions/:regionId/clusters/:clusterId/deactivate
+
+```go
+func (s *RegionClustersService) Deactivate(ctx context.Context, regionID int64, clusterID int64) (*IDResponse, error)
+```
+
 ### Storages
 
 Accessor: `client.Storages`
@@ -917,6 +1014,8 @@ type CreateVolumeRequest struct {
     RetentionPeriod          int32                    `json:"retentionPeriod,omitempty"`
     GracePeriod              int32                    `json:"gracePeriod,omitempty"`
     QuotaLimit               int64                    `json:"quotaLimit,omitempty"`
+    RegionClusterID          int64                    `json:"regionClusterId,omitempty"`
+    RegionClusterUUID        string                   `json:"regionClusterUuid,omitempty"`
 }
 ```
 
@@ -932,6 +1031,7 @@ Query params:
 type ListVolumeOptions struct {
     AccountID            int64        `url:"accountId"`
     RegionID             int64        `url:"regionId"`
+    RegionClusterID      int64        `url:"regionClusterId"`
     StorageID            int64        `url:"storageId"`
     VolumeType           string       `url:"volumeType"`
     Locked               bool         `url:"locked"`
@@ -974,6 +1074,21 @@ func (s *VolumesService) Lock(ctx context.Context, volumeID int64) (*IDResponse,
 
 ```go
 func (s *VolumesService) Unlock(ctx context.Context, volumeID int64) (*IDResponse, error)
+```
+
+#### `MoveCluster` — POST /api/v1/volumes/:volumeId/move-cluster
+
+```go
+func (s *VolumesService) MoveCluster(ctx context.Context, volumeID int64, req *MoveClusterVolumeRequest) (*struct { ID int64; SourceClusterID int64; TargetClusterID int64; HandoverUntil int64 }, error)
+```
+
+Request body:
+
+```go
+type MoveClusterVolumeRequest struct {
+    TargetClusterID          int64                    `json:"targetClusterId,omitempty"`
+    TargetClusterUUID        string                   `json:"targetClusterUuid,omitempty"`
+}
 ```
 
 #### `Deactivate` — POST /api/v1/volumes/:volumeId/deactivate

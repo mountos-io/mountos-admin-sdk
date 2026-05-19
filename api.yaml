@@ -88,6 +88,17 @@ types:
     - "createdAt: datetime"
     - "updatedAt: datetime"
 
+  RegionCluster:
+    - "id: int64"
+    - "exportId: string"
+    - "regionId: int64"
+    - "name: string"
+    - "defaultCluster: bool"
+    - "isReady: bool"
+    - "isActive: bool"
+    - "createdAt: datetime"
+    - "updatedAt: datetime"
+
   Storage:
     - "id: int64"
     - "account: Ref"
@@ -112,6 +123,7 @@ types:
     - "account: Ref"
     - "storage: Ref"
     - "region: Ref"
+    - "regionCluster: Ref?"
     - "name: string"
     - "description: string?"
     # Immutable storage personality picked at create time. One of:
@@ -551,6 +563,61 @@ resources:
         response:
           - "id: int64"
 
+  - name: RegionClusters
+    path: /regions/:regionId/clusters
+    endpoints:
+      - action: create
+        method: POST
+        path: /create
+        request:
+          - "name: string!"
+        response:
+          - "id: int64"
+
+      - action: list
+        method: GET
+        path: /list
+        pagination: page
+        query:
+          - "isActive: bool"
+          - "page: int=1"
+          - "limit: int=20"
+        responseType: RegionCluster
+
+      - action: get
+        method: GET
+        path: /:clusterId
+        responseType: RegionCluster
+
+      - action: edit
+        method: PUT
+        path: /:clusterId/edit
+        request:
+          - "name: string!"
+        response:
+          - "id: int64"
+
+      - action: setDefault
+        method: POST
+        path: /:clusterId/set-default
+        response:
+          - "id: int64"
+
+      - action: setReady
+        method: POST
+        path: /:clusterId/set-ready
+        request:
+          - "ready: bool!"
+        response:
+          - "id: int64"
+          - "ready: bool"
+
+      - action: deactivate
+        method: POST
+        path: /:clusterId/deactivate
+        response:
+          - "id: int64"
+
   - name: Storages
     path: /storages
     endpoints:
@@ -662,6 +729,11 @@ resources:
           - "retentionPeriod: int32"
           - "gracePeriod: int32"
           - "quotaLimit: int64"
+          # Optional cluster pin. Omit to land on the region's default cluster.
+          # If set, the cluster must belong to the storage's region, be
+          # is_active=TRUE and is_ready=TRUE; otherwise create fails 4xx.
+          - "regionClusterId: int64"
+          - "regionClusterUuid: string"
         response:
           - "id: int64"
           - "encryptionKey: string?"
@@ -673,6 +745,7 @@ resources:
         query:
           - "accountId: int64!"
           - "regionId: int64"
+          - "regionClusterId: int64"
           - "storageId: int64"
           - "volumeType: string"
           - "locked: bool"
@@ -712,6 +785,18 @@ resources:
         path: /:volumeId/unlock
         response:
           - "id: int64"
+
+      - action: moveCluster
+        method: POST
+        path: /:volumeId/move-cluster
+        request:
+          - "targetClusterId: int64"
+          - "targetClusterUuid: string"
+        response:
+          - "id: int64"
+          - "sourceClusterId: int64"
+          - "targetClusterId: int64"
+          - "handoverUntil: int64"
 
       - action: deactivate
         method: POST

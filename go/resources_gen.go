@@ -192,6 +192,75 @@ func (s *RegionsService) Deactivate(ctx context.Context, regionID int64) (*IDRes
 	return decodeJSON[IDResponse](data)
 }
 
+type RegionClustersService struct{ c *Client }
+
+func (s *RegionClustersService) Create(ctx context.Context, regionID int64, req *CreateRegionClusterRequest) (*IDResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%s/clusters/create", strconv.FormatInt(regionID, 10)), req)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[IDResponse](data)
+}
+
+func (s *RegionClustersService) List(ctx context.Context, regionID int64, opts *RegionClusterListOptions) (*PaginatedResponse[RegionCluster], error) {
+	q := url.Values{}
+	if opts != nil {
+		if opts.IsActive != nil {
+			q.Set("isActive", strconv.FormatBool(*opts.IsActive))
+		}
+		addPagination(q, opts.Page, opts.Limit)
+	}
+	path := fmt.Sprintf("/api/v1/regions/%s/clusters/list", strconv.FormatInt(regionID, 10))
+	if qs := q.Encode(); qs != "" {
+		path += "?" + qs
+	}
+	data, err := s.c.get(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[PaginatedResponse[RegionCluster]](data)
+}
+
+func (s *RegionClustersService) Get(ctx context.Context, regionID int64, clusterID int64) (*RegionCluster, error) {
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/regions/%s/clusters/%s", strconv.FormatInt(regionID, 10), strconv.FormatInt(clusterID, 10)))
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[RegionCluster](data)
+}
+
+func (s *RegionClustersService) Edit(ctx context.Context, regionID int64, clusterID int64, req *EditRegionClusterRequest) (*IDResponse, error) {
+	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/regions/%s/clusters/%s/edit", strconv.FormatInt(regionID, 10), strconv.FormatInt(clusterID, 10)), req)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[IDResponse](data)
+}
+
+func (s *RegionClustersService) SetDefault(ctx context.Context, regionID int64, clusterID int64) (*IDResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%s/clusters/%s/set-default", strconv.FormatInt(regionID, 10), strconv.FormatInt(clusterID, 10)), nil)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[IDResponse](data)
+}
+
+func (s *RegionClustersService) SetReady(ctx context.Context, regionID int64, clusterID int64, req *SetRegionClusterReadyRequest) (*SetReadyRegionClusterResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%s/clusters/%s/set-ready", strconv.FormatInt(regionID, 10), strconv.FormatInt(clusterID, 10)), req)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[SetReadyRegionClusterResponse](data)
+}
+
+func (s *RegionClustersService) Deactivate(ctx context.Context, regionID int64, clusterID int64) (*IDResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%s/clusters/%s/deactivate", strconv.FormatInt(regionID, 10), strconv.FormatInt(clusterID, 10)), nil)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[IDResponse](data)
+}
+
 type StoragesService struct{ c *Client }
 
 func (s *StoragesService) Create(ctx context.Context, req *CreateStorageRequest) (*IDResponse, error) {
@@ -287,6 +356,9 @@ func (s *VolumesService) List(ctx context.Context, opts *VolumeListOptions) (*Pa
 		if opts.RegionID != nil {
 			q.Set("regionId", strconv.FormatInt(*opts.RegionID, 10))
 		}
+		if opts.RegionClusterID != nil {
+			q.Set("regionClusterId", strconv.FormatInt(*opts.RegionClusterID, 10))
+		}
 		if opts.StorageID != nil {
 			q.Set("storageId", strconv.FormatInt(*opts.StorageID, 10))
 		}
@@ -338,6 +410,14 @@ func (s *VolumesService) Unlock(ctx context.Context, volumeID int64) (*IDRespons
 		return nil, err
 	}
 	return decodeJSON[IDResponse](data)
+}
+
+func (s *VolumesService) MoveCluster(ctx context.Context, volumeID int64, req *MoveVolumeClusterRequest) (*MoveClusterVolumeResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/volumes/%s/move-cluster", strconv.FormatInt(volumeID, 10)), req)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[MoveClusterVolumeResponse](data)
 }
 
 func (s *VolumesService) Deactivate(ctx context.Context, volumeID int64, req *DeactivateVolumeRequest) (*IDResponse, error) {
