@@ -494,8 +494,8 @@ export class RegionAlertsResource {
     return this.client.request('GET', `/api/v1/regions/${regionId}/alerts/list` + queryString({ active: opts?.active, severity: opts?.severity, category: opts?.category, nodeId: opts?.nodeId, regionClusterId: opts?.regionClusterId, since: opts?.since, page: opts?.page, limit: opts?.limit }), undefined, signal)
   }
 
-  count(regionId: number, signal?: AbortSignal): Promise<AlertCountResponse> {
-    return this.client.request('GET', `/api/v1/regions/${regionId}/alerts/count`, undefined, signal)
+  count(regionId: number, regionClusterId: number, signal?: AbortSignal): Promise<AlertCountResponse> {
+    return this.client.request('GET', `/api/v1/regions/${regionId}/alerts/count${queryString({ regionClusterId: regionClusterId })}`, undefined, signal)
   }
 
   resolve(regionId: number, alertId: string, signal?: AbortSignal): Promise<void> {

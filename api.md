@@ -923,6 +923,7 @@ Response data: `{ "items": RegionAlert[], "pagination": PaginationMeta }`
 
 ### GET /api/v1/regions/:regionId/alerts/count
 Param: `regionId`
+Query: `regionClusterId=int64`
 Response data: `AlertCountResponse`
 
 ### POST /api/v1/regions/:regionId/alerts/:alertId/resolve

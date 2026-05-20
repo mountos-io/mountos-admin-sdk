@@ -1828,7 +1828,17 @@ Query params:
 #### `count` — GET /api/v1/regions/:regionId/alerts/count
 
 ```typescript
-client.regionAlerts.count(regionID: number): Promise<AlertCountResponse>;
+client.regionAlerts.count(regionID: number, params: {
+    regionClusterId?: number;
+  }): Promise<AlertCountResponse>;
+```
+
+Query params:
+
+```typescript
+{
+  regionClusterId?: number;
+}
 ```
 
 #### `resolve` — POST /api/v1/regions/:regionId/alerts/:alertId/resolve

@@ -91,6 +91,9 @@ export class TokenSigner {
 
     const exp = now + TOKEN_TTL
 
+    // hub understands only one role: user and rest of them are admin
+    // since we dont pass in role info, token level opt-in auth will be ignored
+    // DashboardUser (opt-in) may provide user level auth through http header
     const token = await new SignJWT({
       scope: 'service',
       kfp: this.kfp,

@@ -1610,7 +1610,15 @@ type ListRegionAlertOptions struct {
 #### `Count` — GET /api/v1/regions/:regionId/alerts/count
 
 ```go
-func (s *RegionAlertsService) Count(ctx context.Context, regionID int64) (*AlertCountResponse, error)
+func (s *RegionAlertsService) Count(ctx context.Context, regionID int64, opts *CountRegionAlertOptions) (*AlertCountResponse, error)
+```
+
+Query params:
+
+```go
+type CountRegionAlertOptions struct {
+    RegionClusterID      int64        `url:"regionClusterId"`
+}
 ```
 
 #### `Resolve` — POST /api/v1/regions/:regionId/alerts/:alertId/resolve

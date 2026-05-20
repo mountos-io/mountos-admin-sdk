@@ -984,8 +984,10 @@ func (s *RegionAlertsService) List(ctx context.Context, regionID int64, opts *Re
 	return decodeJSON[PaginatedResponse[RegionAlert]](data)
 }
 
-func (s *RegionAlertsService) Count(ctx context.Context, regionID int64) (*AlertCountResponse, error) {
-	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/regions/%s/alerts/count", strconv.FormatInt(regionID, 10)))
+func (s *RegionAlertsService) Count(ctx context.Context, regionID int64, regionClusterID int64) (*AlertCountResponse, error) {
+	q := url.Values{}
+	q.Set("regionClusterId", strconv.FormatInt(regionClusterID, 10))
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/regions/%s/alerts/count", strconv.FormatInt(regionID, 10))+"?"+q.Encode())
 	if err != nil {
 		return nil, err
 	}

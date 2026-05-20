@@ -1174,6 +1174,8 @@ resources:
       - action: count
         method: GET
         path: /count
+        query:
+          - "regionClusterId: int64?"
         responseType: AlertCountResponse
 
       - action: resolve
