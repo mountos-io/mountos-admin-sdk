@@ -222,6 +222,9 @@ types:
     - "updaterId: int64?"
     - "contentHash: string?"
 
+  # Shared model for both /audit-logs (admin DB) and /regions/:regionId/audit-logs.
+  # node is populated only on region-DB rows; regionId only on admin-DB rows.
+  # Both sides rely on omitempty to absorb the absence.
   AuditLog:
     - "id: int64"
     - "title: string"
@@ -232,6 +235,8 @@ types:
     - "createdBy: string?"
     - "node: string?"
     - "accountId: int64?"
+    - "regionId: int64?"
+    - "regionClusterId: int64?"
     - "createdAt: datetime?"
     - "updatedAt: datetime?"
 
@@ -255,6 +260,7 @@ types:
     - "alertId: string"
     - "source: string"
     - "nodeId: string"
+    - "regionClusterId: int64?"
     - "severity: int"
     - "category: string"
     - "title: string"
@@ -273,6 +279,7 @@ types:
   ServiceNode:
     - "id: int64"
     - "regionId: int64"
+    - "regionClusterId: int64?"
     - "serviceType: string"
     - "nodeId: string"
     - "advertiseAddr: string"
@@ -991,6 +998,8 @@ resources:
         pagination: cursor
         query:
           - "accountId: int64"
+          - "regionId: int64"
+          - "regionClusterId: int64"
           - "cursor: int64"
           - "limit: int=20"
           - "subject: string"
@@ -1004,6 +1013,7 @@ resources:
         path: /list
         pagination: cursor
         query:
+          - "regionClusterId: int64"
           - "cursor: int64"
           - "limit: int=20"
           - "subject: string"
@@ -1022,6 +1032,7 @@ resources:
           - "serviceType: string"
           - "status: string"
           - "inactiveHours: int"
+          - "regionClusterId: int64"
         responseType: ServiceNode
         responseArray: true
 
@@ -1154,6 +1165,7 @@ resources:
           - "severity: int"
           - "category: string"
           - "nodeId: string"
+          - "regionClusterId: int64"
           - "since: string"
           - "page: int=1"
           - "limit: int=20"

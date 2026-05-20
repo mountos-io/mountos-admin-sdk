@@ -202,6 +202,8 @@ export interface AuditLog {
   createdBy?: string
   node?: string
   accountId?: number
+  regionId?: number
+  regionClusterId?: number
   createdAt?: string
   updatedAt?: string
 }
@@ -209,6 +211,7 @@ export interface AuditLog {
 export interface ServiceNode {
   id: number
   regionId: number
+  regionClusterId?: number
   serviceType: string
   nodeId: string
   advertiseAddr: string
@@ -330,6 +333,7 @@ export interface RegionAlert {
   alertId: string
   source: string
   nodeId: string
+  regionClusterId?: number
   severity: number
   category: string
   title: string
@@ -644,6 +648,8 @@ export interface VolumeForkSearchListOptions {
 
 export interface AuditLogListOptions {
   accountId?: number
+  regionId?: number
+  regionClusterId?: number
   cursor?: number
   limit?: number
   subject?: string
@@ -652,6 +658,7 @@ export interface AuditLogListOptions {
 // RegionAuditLogs
 
 export interface RegionAuditLogListOptions {
+  regionClusterId?: number
   cursor?: number
   limit?: number
   subject?: string
@@ -701,6 +708,7 @@ export interface RegionAlertListOptions extends ListOptions {
   severity?: number
   category?: string
   nodeId?: string
+  regionClusterId?: number
   since?: string
 }
 

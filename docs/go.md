@@ -130,6 +130,8 @@ type AuditLog struct {
     CreatedBy                string                   `json:"createdBy,omitempty"`
     Node                     string                   `json:"node,omitempty"`
     AccountID                int64                    `json:"accountId,omitempty"`
+    RegionID                 int64                    `json:"regionId,omitempty"`
+    RegionClusterID          int64                    `json:"regionClusterId,omitempty"`
     CreatedAt                string                   `json:"createdAt,omitempty"`
     UpdatedAt                string                   `json:"updatedAt,omitempty"`
 }
@@ -375,6 +377,7 @@ type RegionAlert struct {
     AlertID                  string                   `json:"alertId"`
     Source                   string                   `json:"source"`
     NodeID                   string                   `json:"nodeId"`
+    RegionClusterID          int64                    `json:"regionClusterId,omitempty"`
     Severity                 int                      `json:"severity"`
     Category                 string                   `json:"category"`
     Title                    string                   `json:"title"`
@@ -439,6 +442,7 @@ type ServiceAlert struct {
 type ServiceNode struct {
     ID                       int64                    `json:"id"`
     RegionID                 int64                    `json:"regionId"`
+    RegionClusterID          int64                    `json:"regionClusterId,omitempty"`
     ServiceType              string                   `json:"serviceType"`
     NodeID                   string                   `json:"nodeId"`
     AdvertiseAddr            string                   `json:"advertiseAddr"`
@@ -1362,6 +1366,8 @@ Query params:
 ```go
 type ListAuditLogOptions struct {
     AccountID            int64        `url:"accountId"`
+    RegionID             int64        `url:"regionId"`
+    RegionClusterID      int64        `url:"regionClusterId"`
     Cursor               int64        `url:"cursor"`
     Limit                int          `url:"limit"` // default: 20
     Subject              string       `url:"subject"`
@@ -1382,6 +1388,7 @@ Query params:
 
 ```go
 type ListRegionAuditLogOptions struct {
+    RegionClusterID      int64        `url:"regionClusterId"`
     Cursor               int64        `url:"cursor"`
     Limit                int          `url:"limit"` // default: 20
     Subject              string       `url:"subject"`
@@ -1406,6 +1413,7 @@ type ListServiceNodeOptions struct {
     ServiceType          string       `url:"serviceType"`
     Status               string       `url:"status"`
     InactiveHours        int          `url:"inactiveHours"`
+    RegionClusterID      int64        `url:"regionClusterId"`
 }
 ```
 
@@ -1592,6 +1600,7 @@ type ListRegionAlertOptions struct {
     Severity             int          `url:"severity"`
     Category             string       `url:"category"`
     NodeID               string       `url:"nodeId"`
+    RegionClusterID      int64        `url:"regionClusterId"`
     Since                string       `url:"since"`
     Page                 int          `url:"page"` // default: 1
     Limit                int          `url:"limit"` // default: 20

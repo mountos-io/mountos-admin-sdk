@@ -672,7 +672,7 @@ Response data: `{ "items": ForkTreeMatch[], "nextCursor": int64|null }`
 ## AuditLogs
 
 ### GET /api/v1/audit-logs/list
-Query: `accountId=int64`, `cursor=int64`, `limit=int(default 20)`, `subject=string`
+Query: `accountId=int64`, `regionId=int64`, `regionClusterId=int64`, `cursor=int64`, `limit=int(default 20)`, `subject=string`
 Response data: `{ "items": AuditLog[], "nextCursor": int64|null }`
 
 ### AuditLog Type
@@ -687,6 +687,8 @@ Response data: `{ "items": AuditLog[], "nextCursor": int64|null }`
   "createdBy"?: string,
   "node"?: string,
   "accountId"?: int64,
+  "regionId"?: int64,
+  "regionClusterId"?: int64,
   "createdAt"?: RFC3339,
   "updatedAt"?: RFC3339
 }
@@ -698,7 +700,7 @@ Response data: `{ "items": AuditLog[], "nextCursor": int64|null }`
 
 ### GET /api/v1/regions/:regionId/audit-logs/list
 Param: `regionId`
-Query: `cursor=int64`, `limit=int(default 20)`, `subject=string`, `node=string`
+Query: `regionClusterId=int64`, `cursor=int64`, `limit=int(default 20)`, `subject=string`, `node=string`
 Response data: `{ "items": AuditLog[], "nextCursor": int64|null }`
 
 ### AuditLog Type
@@ -713,6 +715,8 @@ Response data: `{ "items": AuditLog[], "nextCursor": int64|null }`
   "createdBy"?: string,
   "node"?: string,
   "accountId"?: int64,
+  "regionId"?: int64,
+  "regionClusterId"?: int64,
   "createdAt"?: RFC3339,
   "updatedAt"?: RFC3339
 }
@@ -724,7 +728,7 @@ Response data: `{ "items": AuditLog[], "nextCursor": int64|null }`
 
 ### GET /api/v1/regions/:regionId/nodes
 Param: `regionId`
-Query: `serviceType=string`, `status=string`, `inactiveHours=int`
+Query: `serviceType=string`, `status=string`, `inactiveHours=int`, `regionClusterId=int64`
 Response data: `ServiceNode[]`
 
 ### GET /api/v1/regions/:regionId/nodes/:nodeId/stats
@@ -737,6 +741,7 @@ Response data: `string`
 {
   "id": int64,
   "regionId": int64,
+  "regionClusterId"?: int64,
   "serviceType": string,
   "nodeId": string,
   "advertiseAddr": string,
@@ -763,6 +768,7 @@ Response data: `ServiceNode[]`
 {
   "id": int64,
   "regionId": int64,
+  "regionClusterId"?: int64,
   "serviceType": string,
   "nodeId": string,
   "advertiseAddr": string,
@@ -912,7 +918,7 @@ Param: `alertId`
 
 ### GET /api/v1/regions/:regionId/alerts/list
 Param: `regionId`
-Query: `active=bool(default true)`, `severity=int`, `category=string`, `nodeId=string`, `since=string`, `page=int(default 1)`, `limit=int(default 20)`
+Query: `active=bool(default true)`, `severity=int`, `category=string`, `nodeId=string`, `regionClusterId=int64`, `since=string`, `page=int(default 1)`, `limit=int(default 20)`
 Response data: `{ "items": RegionAlert[], "pagination": PaginationMeta }`
 
 ### GET /api/v1/regions/:regionId/alerts/count
@@ -930,6 +936,7 @@ Param: `alertId`
   "alertId": string,
   "source": string,
   "nodeId": string,
+  "regionClusterId"?: int64,
   "severity": int,
   "category": string,
   "title": string,

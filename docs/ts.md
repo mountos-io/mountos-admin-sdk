@@ -112,6 +112,8 @@ interface AuditLog {
   createdBy?: string;
   node?: string;
   accountId?: number;
+  regionId?: number;
+  regionClusterId?: number;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -357,6 +359,7 @@ interface RegionAlert {
   alertId: string;
   source: string;
   nodeId: string;
+  regionClusterId?: number;
   severity: number;
   category: string;
   title: string;
@@ -421,6 +424,7 @@ interface ServiceAlert {
 interface ServiceNode {
   id: number;
   regionId: number;
+  regionClusterId?: number;
   serviceType: string;
   nodeId: string;
   advertiseAddr: string;
@@ -1514,6 +1518,8 @@ Accessor: `client.auditLogs`
 ```typescript
 client.auditLogs.list(params: {
     accountId?: number;
+    regionId?: number;
+    regionClusterId?: number;
     cursor?: number;
     limit?: number;
     subject?: string;
@@ -1525,6 +1531,8 @@ Query params:
 ```typescript
 {
   accountId?: number;
+  regionId?: number;
+  regionClusterId?: number;
   cursor?: number;
   limit?: number;  // default: 20
   subject?: string;
@@ -1539,6 +1547,7 @@ Accessor: `client.regionAuditLogs`
 
 ```typescript
 client.regionAuditLogs.list(regionID: number, params: {
+    regionClusterId?: number;
     cursor?: number;
     limit?: number;
     subject?: string;
@@ -1550,6 +1559,7 @@ Query params:
 
 ```typescript
 {
+  regionClusterId?: number;
   cursor?: number;
   limit?: number;  // default: 20
   subject?: string;
@@ -1568,6 +1578,7 @@ client.serviceNodes.list(regionID: number, params: {
     serviceType?: string;
     status?: string;
     inactiveHours?: number;
+    regionClusterId?: number;
   }): Promise<ServiceNode[]>;
 ```
 
@@ -1578,6 +1589,7 @@ Query params:
   serviceType?: string;
   status?: string;
   inactiveHours?: number;
+  regionClusterId?: number;
 }
 ```
 
@@ -1791,6 +1803,7 @@ client.regionAlerts.list(regionID: number, params: {
     severity?: number;
     category?: string;
     nodeId?: string;
+    regionClusterId?: number;
     since?: string;
     page?: number;
     limit?: number;
@@ -1805,6 +1818,7 @@ Query params:
   severity?: number;
   category?: string;
   nodeId?: string;
+  regionClusterId?: number;
   since?: string;
   page?: number;  // default: 1
   limit?: number;  // default: 20

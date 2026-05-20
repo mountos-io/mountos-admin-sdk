@@ -384,6 +384,8 @@ export class AuditLogsResource {
   list(opts?: AuditLogListOptions, signal?: AbortSignal): Promise<CursorPaginatedResponse<AuditLog>> {
     return this.client.request('GET', `/api/v1/audit-logs/list${queryString({
       accountId: opts?.accountId,
+      regionId: opts?.regionId,
+      regionClusterId: opts?.regionClusterId,
       cursor: opts?.cursor,
       limit: opts?.limit,
       subject: opts?.subject,
@@ -396,6 +398,7 @@ export class RegionAuditLogsResource {
 
   list(regionId: number, opts?: RegionAuditLogListOptions, signal?: AbortSignal): Promise<CursorPaginatedResponse<AuditLog>> {
     return this.client.request('GET', `/api/v1/regions/${regionId}/audit-logs/list${queryString({
+      regionClusterId: opts?.regionClusterId,
       cursor: opts?.cursor,
       limit: opts?.limit,
       subject: opts?.subject,
@@ -407,8 +410,8 @@ export class RegionAuditLogsResource {
 export class ServiceNodesResource {
   constructor(private client: Client) {}
 
-  list(regionId: number, serviceType?: string, status?: string, inactiveHours?: number, signal?: AbortSignal): Promise<ServiceNode[]> {
-    return this.client.request('GET', `/api/v1/regions/${regionId}/nodes${queryString({ serviceType: serviceType, status: status, inactiveHours: inactiveHours })}`, undefined, signal)
+  list(regionId: number, serviceType?: string, status?: string, inactiveHours?: number, regionClusterId?: number, signal?: AbortSignal): Promise<ServiceNode[]> {
+    return this.client.request('GET', `/api/v1/regions/${regionId}/nodes${queryString({ serviceType: serviceType, status: status, inactiveHours: inactiveHours, regionClusterId: regionClusterId })}`, undefined, signal)
   }
 
   stats(regionId: number, nodeId: string, signal?: AbortSignal): Promise<string> {
@@ -488,7 +491,7 @@ export class RegionAlertsResource {
   constructor(private client: Client) {}
 
   list(regionId: number, opts?: RegionAlertListOptions, signal?: AbortSignal): Promise<PaginatedResponse<RegionAlert>> {
-    return this.client.request('GET', `/api/v1/regions/${regionId}/alerts/list` + queryString({ active: opts?.active, severity: opts?.severity, category: opts?.category, nodeId: opts?.nodeId, since: opts?.since, page: opts?.page, limit: opts?.limit }), undefined, signal)
+    return this.client.request('GET', `/api/v1/regions/${regionId}/alerts/list` + queryString({ active: opts?.active, severity: opts?.severity, category: opts?.category, nodeId: opts?.nodeId, regionClusterId: opts?.regionClusterId, since: opts?.since, page: opts?.page, limit: opts?.limit }), undefined, signal)
   }
 
   count(regionId: number, signal?: AbortSignal): Promise<AlertCountResponse> {

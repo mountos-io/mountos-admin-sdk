@@ -214,32 +214,35 @@ type ForkTreeMatch struct {
 }
 
 type AuditLog struct {
-	ID          int64           `json:"id"`
-	Title       string          `json:"title"`
-	Description string          `json:"description,omitempty"`
-	Subject     string          `json:"subject,omitempty"`
-	Success     bool            `json:"success"`
-	Data        json.RawMessage `json:"data,omitempty"`
-	CreatedBy   string          `json:"createdBy,omitempty"`
-	Node        string          `json:"node,omitempty"`
-	AccountID   int64           `json:"accountId,omitempty"`
-	CreatedAt   string          `json:"createdAt,omitempty"`
-	UpdatedAt   string          `json:"updatedAt,omitempty"`
+	ID              int64           `json:"id"`
+	Title           string          `json:"title"`
+	Description     string          `json:"description,omitempty"`
+	Subject         string          `json:"subject,omitempty"`
+	Success         bool            `json:"success"`
+	Data            json.RawMessage `json:"data,omitempty"`
+	CreatedBy       string          `json:"createdBy,omitempty"`
+	Node            string          `json:"node,omitempty"`
+	AccountID       int64           `json:"accountId,omitempty"`
+	RegionID        int64           `json:"regionId,omitempty"`
+	RegionClusterID int64           `json:"regionClusterId,omitempty"`
+	CreatedAt       string          `json:"createdAt,omitempty"`
+	UpdatedAt       string          `json:"updatedAt,omitempty"`
 }
 
 type ServiceNode struct {
-	ID            int64          `json:"id"`
-	RegionID      int64          `json:"regionId"`
-	ServiceType   string         `json:"serviceType"`
-	NodeID        string         `json:"nodeId"`
-	AdvertiseAddr string         `json:"advertiseAddr"`
-	RpcAddr       string         `json:"rpcAddr,omitempty"`
-	Metadata      map[string]any `json:"metadata,omitempty"`
-	Status        string         `json:"status"`
-	LastHeartbeat int64          `json:"lastHeartbeat,omitempty"`
-	IsActive      bool           `json:"isActive"`
-	MemUsage      float64        `json:"memUsage,omitempty"`
-	SysLoad       int            `json:"sysLoad,omitempty"`
+	ID              int64          `json:"id"`
+	RegionID        int64          `json:"regionId"`
+	RegionClusterID int64          `json:"regionClusterId,omitempty"`
+	ServiceType     string         `json:"serviceType"`
+	NodeID          string         `json:"nodeId"`
+	AdvertiseAddr   string         `json:"advertiseAddr"`
+	RpcAddr         string         `json:"rpcAddr,omitempty"`
+	Metadata        map[string]any `json:"metadata,omitempty"`
+	Status          string         `json:"status"`
+	LastHeartbeat   int64          `json:"lastHeartbeat,omitempty"`
+	IsActive        bool           `json:"isActive"`
+	MemUsage        float64        `json:"memUsage,omitempty"`
+	SysLoad         int            `json:"sysLoad,omitempty"`
 }
 
 type ClientSession struct {
@@ -347,17 +350,18 @@ type AlertCountResponse struct {
 }
 
 type RegionAlert struct {
-	ID          int64  `json:"id"`
-	AlertID     string `json:"alertId"`
-	Source      string `json:"source"`
-	NodeID      string `json:"nodeId"`
-	Severity    int    `json:"severity"`
-	Category    string `json:"category"`
-	Title       string `json:"title"`
-	Description string `json:"description,omitempty"`
-	EventTime   string `json:"eventTime"`
-	ResolvedAt  string `json:"resolvedAt,omitempty"`
-	CreatedAt   string `json:"createdAt,omitempty"`
+	ID              int64  `json:"id"`
+	AlertID         string `json:"alertId"`
+	Source          string `json:"source"`
+	NodeID          string `json:"nodeId"`
+	RegionClusterID int64  `json:"regionClusterId,omitempty"`
+	Severity        int    `json:"severity"`
+	Category        string `json:"category"`
+	Title           string `json:"title"`
+	Description     string `json:"description,omitempty"`
+	EventTime       string `json:"eventTime"`
+	ResolvedAt      string `json:"resolvedAt,omitempty"`
+	CreatedAt       string `json:"createdAt,omitempty"`
 }
 
 type DashboardUser struct {
@@ -737,19 +741,22 @@ type VolumeForkSearchListOptions struct {
 // AuditLogs
 
 type AuditLogListOptions struct {
-	AccountID *int64
-	Cursor    int64
-	Limit     int
-	Subject   string
+	AccountID       *int64
+	RegionID        *int64
+	RegionClusterID *int64
+	Cursor          int64
+	Limit           int
+	Subject         string
 }
 
 // RegionAuditLogs
 
 type RegionAuditLogListOptions struct {
-	Cursor  int64
-	Limit   int
-	Subject string
-	Node    string
+	RegionClusterID *int64
+	Cursor          int64
+	Limit           int
+	Subject         string
+	Node            string
 }
 
 // ServiceNodes
@@ -795,13 +802,14 @@ type AlertListOptions struct {
 // RegionAlerts
 
 type RegionAlertListOptions struct {
-	Active   *bool
-	Severity *int
-	Category string
-	NodeID   string
-	Since    string
-	Page     int
-	Limit    int
+	Active          *bool
+	Severity        *int
+	Category        string
+	NodeID          string
+	RegionClusterID *int64
+	Since           string
+	Page            int
+	Limit           int
 }
 
 // Vault

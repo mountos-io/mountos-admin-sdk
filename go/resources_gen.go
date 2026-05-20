@@ -664,6 +664,12 @@ func (s *AuditLogsService) List(ctx context.Context, opts *AuditLogListOptions) 
 		if opts.AccountID != nil {
 			q.Set("accountId", strconv.FormatInt(*opts.AccountID, 10))
 		}
+		if opts.RegionID != nil {
+			q.Set("regionId", strconv.FormatInt(*opts.RegionID, 10))
+		}
+		if opts.RegionClusterID != nil {
+			q.Set("regionClusterId", strconv.FormatInt(*opts.RegionClusterID, 10))
+		}
 		if opts.Cursor > 0 {
 			q.Set("cursor", strconv.FormatInt(opts.Cursor, 10))
 		}
@@ -690,6 +696,9 @@ type RegionAuditLogsService struct{ c *Client }
 func (s *RegionAuditLogsService) List(ctx context.Context, regionID int64, opts *RegionAuditLogListOptions) (*CursorPaginatedResponse[AuditLog], error) {
 	q := url.Values{}
 	if opts != nil {
+		if opts.RegionClusterID != nil {
+			q.Set("regionClusterId", strconv.FormatInt(*opts.RegionClusterID, 10))
+		}
 		if opts.Cursor > 0 {
 			q.Set("cursor", strconv.FormatInt(opts.Cursor, 10))
 		}
@@ -716,7 +725,7 @@ func (s *RegionAuditLogsService) List(ctx context.Context, regionID int64, opts 
 
 type ServiceNodesService struct{ c *Client }
 
-func (s *ServiceNodesService) List(ctx context.Context, regionID int64, serviceType string, status string, inactiveHours int) ([]ServiceNode, error) {
+func (s *ServiceNodesService) List(ctx context.Context, regionID int64, serviceType string, status string, inactiveHours int, regionClusterID int64) ([]ServiceNode, error) {
 	q := url.Values{}
 	if serviceType != "" {
 		q.Set("serviceType", serviceType)
@@ -726,6 +735,9 @@ func (s *ServiceNodesService) List(ctx context.Context, regionID int64, serviceT
 	}
 	if inactiveHours != 0 {
 		q.Set("inactiveHours", strconv.Itoa(inactiveHours))
+	}
+	if regionClusterID != 0 {
+		q.Set("regionClusterId", strconv.FormatInt(regionClusterID, 10))
 	}
 	path := fmt.Sprintf("/api/v1/regions/%s/nodes", strconv.FormatInt(regionID, 10))
 	if qs := q.Encode(); qs != "" {
@@ -952,6 +964,9 @@ func (s *RegionAlertsService) List(ctx context.Context, regionID int64, opts *Re
 		}
 		if opts.NodeID != "" {
 			q.Set("nodeId", opts.NodeID)
+		}
+		if opts.RegionClusterID != nil {
+			q.Set("regionClusterId", strconv.FormatInt(*opts.RegionClusterID, 10))
 		}
 		if opts.Since != "" {
 			q.Set("since", opts.Since)
