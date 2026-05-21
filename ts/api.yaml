@@ -295,6 +295,7 @@ types:
     - "id: int64"
     - "account: Ref"
     - "region: Ref"
+    - "regionCluster: Ref?"
     - "volume: Ref"
     - "user: Ref?"
     - "clientType: string"
@@ -1064,6 +1065,7 @@ resources:
         query:
           - "accountId: int64"
           - "regionId: int64"
+          - "regionClusterId: int64"
           - "volumeId: int64"
           - "userId: int64"
           - "clientType: string"

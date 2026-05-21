@@ -144,6 +144,7 @@ type ClientSession struct {
     ID                       int64                    `json:"id"`
     Account                  Ref                      `json:"account"`
     Region                   Ref                      `json:"region"`
+    RegionCluster            Ref                      `json:"regionCluster,omitempty"`
     Volume                   Ref                      `json:"volume"`
     User                     Ref                      `json:"user,omitempty"`
     ClientType               string                   `json:"clientType"`
@@ -1459,6 +1460,7 @@ Query params:
 type ListClientSessionOptions struct {
     AccountID            int64        `url:"accountId"`
     RegionID             int64        `url:"regionId"`
+    RegionClusterID      int64        `url:"regionClusterId"`
     VolumeID             int64        `url:"volumeId"`
     UserID               int64        `url:"userId"`
     ClientType           string       `url:"clientType"`

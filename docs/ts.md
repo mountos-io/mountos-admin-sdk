@@ -126,6 +126,7 @@ interface ClientSession {
   id: number;
   account: Ref;
   region: Ref;
+  regionCluster?: Ref;
   volume: Ref;
   user?: Ref;
   clientType: string;
@@ -1633,6 +1634,7 @@ Accessor: `client.clientSessions`
 client.clientSessions.list(params: {
     accountId?: number;
     regionId?: number;
+    regionClusterId?: number;
     volumeId?: number;
     userId?: number;
     clientType?: string;
@@ -1652,6 +1654,7 @@ Query params:
 {
   accountId?: number;
   regionId?: number;
+  regionClusterId?: number;
   volumeId?: number;
   userId?: number;
   clientType?: string;

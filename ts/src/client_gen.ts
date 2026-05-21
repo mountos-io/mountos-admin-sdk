@@ -431,7 +431,7 @@ export class ClientSessionsResource {
   constructor(private client: Client) {}
 
   list(opts?: ClientSessionListOptions, signal?: AbortSignal): Promise<PaginatedResponse<ClientSession>> {
-    return this.client.request('GET', `/api/v1/client-sessions/list${queryString({ accountId: opts?.accountId, regionId: opts?.regionId, volumeId: opts?.volumeId, userId: opts?.userId, clientType: opts?.clientType, status: opts?.status, isActive: opts?.isActive, osName: opts?.osName, platform: opts?.platform, search: opts?.search, page: opts?.page, limit: opts?.limit })}`, undefined, signal)
+    return this.client.request('GET', `/api/v1/client-sessions/list${queryString({ accountId: opts?.accountId, regionId: opts?.regionId, regionClusterId: opts?.regionClusterId, volumeId: opts?.volumeId, userId: opts?.userId, clientType: opts?.clientType, status: opts?.status, isActive: opts?.isActive, osName: opts?.osName, platform: opts?.platform, search: opts?.search, page: opts?.page, limit: opts?.limit })}`, undefined, signal)
   }
 
   get(sessionId: number, signal?: AbortSignal): Promise<ClientSession> {

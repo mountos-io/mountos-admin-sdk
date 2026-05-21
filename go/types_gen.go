@@ -249,6 +249,7 @@ type ClientSession struct {
 	ID              int64           `json:"id"`
 	Account         Ref             `json:"account"`
 	Region          Ref             `json:"region"`
+	RegionCluster   Ref             `json:"regionCluster,omitempty"`
 	Volume          Ref             `json:"volume"`
 	User            Ref             `json:"user,omitempty"`
 	ClientType      string          `json:"clientType"`
@@ -766,18 +767,19 @@ type RegionAuditLogListOptions struct {
 // ClientSessions
 
 type ClientSessionListOptions struct {
-	AccountID  *int64
-	RegionID   *int64
-	VolumeID   *int64
-	UserID     *int64
-	ClientType string
-	Status     string
-	IsActive   string
-	OsName     string
-	Platform   string
-	Search     string
-	Page       int
-	Limit      int
+	AccountID       *int64
+	RegionID        *int64
+	RegionClusterID *int64
+	VolumeID        *int64
+	UserID          *int64
+	ClientType      string
+	Status          string
+	IsActive        string
+	OsName          string
+	Platform        string
+	Search          string
+	Page            int
+	Limit           int
 }
 
 // Discover

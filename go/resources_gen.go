@@ -801,6 +801,9 @@ func (s *ClientSessionsService) List(ctx context.Context, opts *ClientSessionLis
 		if opts.RegionID != nil {
 			q.Set("regionId", strconv.FormatInt(*opts.RegionID, 10))
 		}
+		if opts.RegionClusterID != nil {
+			q.Set("regionClusterId", strconv.FormatInt(*opts.RegionClusterID, 10))
+		}
 		if opts.VolumeID != nil {
 			q.Set("volumeId", strconv.FormatInt(*opts.VolumeID, 10))
 		}

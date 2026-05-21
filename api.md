@@ -787,7 +787,7 @@ Response data: `ServiceNode[]`
 ## ClientSessions
 
 ### GET /api/v1/client-sessions/list
-Query: `accountId=int64`, `regionId=int64`, `volumeId=int64`, `userId=int64`, `clientType=string`, `status=string`, `isActive=string`, `osName=string`, `platform=string`, `search=string`, `page=int(default 1)`, `limit=int(default 20)`
+Query: `accountId=int64`, `regionId=int64`, `regionClusterId=int64`, `volumeId=int64`, `userId=int64`, `clientType=string`, `status=string`, `isActive=string`, `osName=string`, `platform=string`, `search=string`, `page=int(default 1)`, `limit=int(default 20)`
 Response data: `{ "items": ClientSession[], "pagination": PaginationMeta }`
 
 ### GET /api/v1/client-sessions/:sessionId
@@ -804,6 +804,7 @@ Response data: `SessionSummary`
   "id": int64,
   "account": Ref,
   "region": Ref,
+  "regionCluster"?: Ref,
   "volume": Ref,
   "user"?: Ref,
   "clientType": string,

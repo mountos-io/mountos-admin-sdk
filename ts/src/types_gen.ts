@@ -228,6 +228,7 @@ export interface ClientSession {
   id: number
   account: Ref
   region: Ref
+  regionCluster?: Ref
   volume: Ref
   user?: Ref
   clientType: string
@@ -674,6 +675,7 @@ export interface RegionAuditLogListOptions {
 export interface ClientSessionListOptions extends ListOptions {
   accountId?: number
   regionId?: number
+  regionClusterId?: number
   volumeId?: number
   userId?: number
   clientType?: string
