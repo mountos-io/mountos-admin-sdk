@@ -1,3 +1,14 @@
+TS_RUNTIME ?= node
+TS_INSTALL_bun  := bun install
+TS_INSTALL_deno := deno install
+TS_INSTALL_node := npm install
+TS_INSTALL      := $(or $(TS_INSTALL_$(TS_RUNTIME)),$(TS_RUNTIME) install)
+
+TS_RUN_bun  := bun run
+TS_RUN_deno := deno task
+TS_RUN_node := npm run
+TS_RUN      := $(or $(TS_RUN_$(TS_RUNTIME)),$(TS_RUNTIME) run)
+
 .PHONY: all gen docs check build install clean ts-install ts-check ts-build ts-publish go-check go-build tag tag-minor tag-major help
 
 all: gen check build
@@ -17,13 +28,13 @@ docs: ## Regenerate docs/ts.md and docs/go.md from api.yaml
 # ── TypeScript ──────────────────────────────────────────────
 
 ts-install: ## Install TS dependencies
-	cd ts && bun install
+	cd ts && $(TS_INSTALL)
 
 ts-check: ts-install ## Type-check TS
-	cd ts && bunx tsc --noEmit
+	cd ts && $(TS_RUN) check
 
 ts-build: ts-install ## Build TS
-	cd ts && bunx tsc
+	cd ts && $(TS_RUN) build
 
 ts-publish: ts-build ## Publish TS package to npm
 	@npm whoami >/dev/null 2>&1 || npm login
