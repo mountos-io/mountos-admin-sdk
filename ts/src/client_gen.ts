@@ -438,8 +438,8 @@ export class ClientSessionsResource {
     return this.client.request('GET', `/api/v1/client-sessions/${sessionId}`, undefined, signal)
   }
 
-  summary(accountId: number, volumeId: number, signal?: AbortSignal): Promise<SessionSummary> {
-    return this.client.request('GET', `/api/v1/client-sessions/summary${queryString({ accountId: accountId, volumeId: volumeId })}`, undefined, signal)
+  summary(accountId: number, regionId: number, regionClusterId: number, volumeId: number, signal?: AbortSignal): Promise<SessionSummary> {
+    return this.client.request('GET', `/api/v1/client-sessions/summary${queryString({ accountId: accountId, regionId: regionId, regionClusterId: regionClusterId, volumeId: volumeId })}`, undefined, signal)
   }
 }
 

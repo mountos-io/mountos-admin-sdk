@@ -59,6 +59,21 @@ type CursorResponse[T any] struct {
 
 ## Enums
 
+### `ClientSessionStatus`
+
+```go
+type ClientSessionStatus string
+
+const (
+    ClientSessionStatusConnected ClientSessionStatus = "connected"
+    ClientSessionStatusActive ClientSessionStatus = "active"
+    ClientSessionStatusUnhealthy ClientSessionStatus = "unhealthy"
+    ClientSessionStatusDisconnected ClientSessionStatus = "disconnected"
+    ClientSessionStatusExpired ClientSessionStatus = "expired"
+    ClientSessionStatusUnknown ClientSessionStatus = "unknown"
+)
+```
+
 ### `LicenseQuotaState`
 
 ```go
@@ -67,7 +82,6 @@ type LicenseQuotaState string
 const (
     LicenseQuotaStateOk LicenseQuotaState = "ok"
     LicenseQuotaStateExceeded LicenseQuotaState = "exceeded"
-    LicenseQuotaStateUnknown LicenseQuotaState = "unknown"
 )
 ```
 
@@ -159,7 +173,7 @@ type ClientSession struct {
     IsTemporaryFork          bool                     `json:"isTemporaryFork"`
     Metadata                 json.RawMessage          `json:"metadata,omitempty"`
     Metrics                  json.RawMessage          `json:"metrics,omitempty"`
-    Status                   string                   `json:"status"`
+    Status                   ClientSessionStatus      `json:"status"`
     LastHeartbeat            int64                    `json:"lastHeartbeat,omitempty"`
     ConnectedAt              int64                    `json:"connectedAt,omitempty"`
     DisconnectedAt           int64                    `json:"disconnectedAt,omitempty"`
@@ -1464,7 +1478,7 @@ type ListClientSessionOptions struct {
     VolumeID             int64        `url:"volumeId"`
     UserID               int64        `url:"userId"`
     ClientType           string       `url:"clientType"`
-    Status               string       `url:"status"`
+    Status               ClientSessionStatus `url:"status"`
     IsActive             string       `url:"isActive"`
     OsName               string       `url:"osName"`
     Platform             string       `url:"platform"`
@@ -1491,6 +1505,8 @@ Query params:
 ```go
 type SummaryClientSessionOptions struct {
     AccountID            int64        `url:"accountId"`
+    RegionID             int64        `url:"regionId"`
+    RegionClusterID      int64        `url:"regionClusterId"`
     VolumeID             int64        `url:"volumeId"`
 }
 ```

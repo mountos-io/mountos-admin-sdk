@@ -40,6 +40,22 @@ enums:
   LicenseQuotaState:
     - ok
     - exceeded
+
+  # Client session lifecycle. Labels are the stable public vocabulary;
+  # the underlying numeric DB codes are internal and may be renumbered.
+  #   connected    - row written by register; replaced by 'active' on first
+  #                  heartbeat. Rarely seen on the wire in practice.
+  #   active       - heartbeating; healthy connection
+  #   unhealthy    - 6 to 15 min of silence, may still recover on next heartbeat
+  #   disconnected - clean unmount; client sent an explicit disconnect
+  #   expired      - dead-sweep gave up after 15 min of silence with no explicit
+  #                  disconnect; row is also is_active=false. Terminal state.
+  ClientSessionStatus:
+    - connected
+    - active
+    - unhealthy
+    - disconnected
+    - expired
     - unknown
 
 types:
@@ -310,7 +326,7 @@ types:
     - "isTemporaryFork: bool"
     - "metadata: json?"
     - "metrics: json?"
-    - "status: string"
+    - "status: ClientSessionStatus"
     - "lastHeartbeat: int64?"
     - "connectedAt: int64?"
     - "disconnectedAt: int64?"
@@ -1069,7 +1085,7 @@ resources:
           - "volumeId: int64"
           - "userId: int64"
           - "clientType: string"
-          - "status: string"
+          - "status: ClientSessionStatus"
           - "isActive: string"
           - "osName: string"
           - "platform: string"
@@ -1088,6 +1104,8 @@ resources:
         path: /summary
         query:
           - "accountId: int64"
+          - "regionId: int64"
+          - "regionClusterId: int64"
           - "volumeId: int64"
         responseType: SessionSummary
 

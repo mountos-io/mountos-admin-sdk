@@ -55,10 +55,16 @@ type PaginationMeta      = { page: number; limit: number; total: number; totalPa
 
 ## Enums
 
+### `ClientSessionStatus`
+
+```typescript
+type ClientSessionStatus = "connected" | "active" | "unhealthy" | "disconnected" | "expired" | "unknown";
+```
+
 ### `LicenseQuotaState`
 
 ```typescript
-type LicenseQuotaState = "ok" | "exceeded" | "unknown";
+type LicenseQuotaState = "ok" | "exceeded";
 ```
 
 ### `LicenseStatus`
@@ -141,7 +147,7 @@ interface ClientSession {
   isTemporaryFork: boolean;
   metadata?: Record<string, unknown>;
   metrics?: Record<string, unknown>;
-  status: string;
+  status: ClientSessionStatus;
   lastHeartbeat?: number;
   connectedAt?: number;
   disconnectedAt?: number;
@@ -1638,7 +1644,7 @@ client.clientSessions.list(params: {
     volumeId?: number;
     userId?: number;
     clientType?: string;
-    status?: string;
+    status?: ClientSessionStatus;
     isActive?: string;
     osName?: string;
     platform?: string;
@@ -1658,7 +1664,7 @@ Query params:
   volumeId?: number;
   userId?: number;
   clientType?: string;
-  status?: string;
+  status?: ClientSessionStatus;
   isActive?: string;
   osName?: string;
   platform?: string;
@@ -1679,6 +1685,8 @@ client.clientSessions.get(sessionID: number): Promise<ClientSession>;
 ```typescript
 client.clientSessions.summary(params: {
     accountId?: number;
+    regionId?: number;
+    regionClusterId?: number;
     volumeId?: number;
   }): Promise<SessionSummary>;
 ```
@@ -1688,6 +1696,8 @@ Query params:
 ```typescript
 {
   accountId?: number;
+  regionId?: number;
+  regionClusterId?: number;
   volumeId?: number;
 }
 ```

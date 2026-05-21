@@ -849,9 +849,11 @@ func (s *ClientSessionsService) Get(ctx context.Context, sessionID int64) (*Clie
 	return decodeJSON[ClientSession](data)
 }
 
-func (s *ClientSessionsService) Summary(ctx context.Context, accountID int64, volumeID int64) (*SessionSummary, error) {
+func (s *ClientSessionsService) Summary(ctx context.Context, accountID int64, regionID int64, regionClusterID int64, volumeID int64) (*SessionSummary, error) {
 	q := url.Values{}
 	q.Set("accountId", strconv.FormatInt(accountID, 10))
+	q.Set("regionId", strconv.FormatInt(regionID, 10))
+	q.Set("regionClusterId", strconv.FormatInt(regionClusterID, 10))
 	q.Set("volumeId", strconv.FormatInt(volumeID, 10))
 	data, err := s.c.get(ctx, "/api/v1/client-sessions/summary"+"?"+q.Encode())
 	if err != nil {

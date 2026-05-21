@@ -41,12 +41,22 @@ type CursorPaginatedResponse[T any] struct {
 type IDResponse struct {
 	ID int64 `json:"id"`
 }
+type ClientSessionStatus = string
+
+const (
+	ClientSessionStatusConnected ClientSessionStatus = "connected"
+	ClientSessionStatusActive ClientSessionStatus = "active"
+	ClientSessionStatusUnhealthy ClientSessionStatus = "unhealthy"
+	ClientSessionStatusDisconnected ClientSessionStatus = "disconnected"
+	ClientSessionStatusExpired ClientSessionStatus = "expired"
+	ClientSessionStatusUnknown ClientSessionStatus = "unknown"
+)
+
 type LicenseQuotaState = string
 
 const (
 	LicenseQuotaStateOk LicenseQuotaState = "ok"
 	LicenseQuotaStateExceeded LicenseQuotaState = "exceeded"
-	LicenseQuotaStateUnknown LicenseQuotaState = "unknown"
 )
 
 type LicenseStatus = string
@@ -246,29 +256,29 @@ type ServiceNode struct {
 }
 
 type ClientSession struct {
-	ID              int64           `json:"id"`
-	Account         Ref             `json:"account"`
-	Region          Ref             `json:"region"`
-	RegionCluster   Ref             `json:"regionCluster,omitempty"`
-	Volume          Ref             `json:"volume"`
-	User            Ref             `json:"user,omitempty"`
-	ClientType      string          `json:"clientType"`
-	OsName          string          `json:"osName"`
-	OsVersion       string          `json:"osVersion,omitempty"`
-	AppVersion      string          `json:"appVersion,omitempty"`
-	Hostname        string          `json:"hostname,omitempty"`
-	IPAddr          string          `json:"ipAddr"`
-	MountMode       string          `json:"mountMode,omitempty"`
-	MountPath       string          `json:"mountPath,omitempty"`
-	ForkName        string          `json:"forkName,omitempty"`
-	IsTemporaryFork bool            `json:"isTemporaryFork"`
-	Metadata        json.RawMessage `json:"metadata,omitempty"`
-	Metrics         json.RawMessage `json:"metrics,omitempty"`
-	Status          string          `json:"status"`
-	LastHeartbeat   int64           `json:"lastHeartbeat,omitempty"`
-	ConnectedAt     int64           `json:"connectedAt,omitempty"`
-	DisconnectedAt  int64           `json:"disconnectedAt,omitempty"`
-	IsActive        bool            `json:"isActive"`
+	ID              int64               `json:"id"`
+	Account         Ref                 `json:"account"`
+	Region          Ref                 `json:"region"`
+	RegionCluster   Ref                 `json:"regionCluster,omitempty"`
+	Volume          Ref                 `json:"volume"`
+	User            Ref                 `json:"user,omitempty"`
+	ClientType      string              `json:"clientType"`
+	OsName          string              `json:"osName"`
+	OsVersion       string              `json:"osVersion,omitempty"`
+	AppVersion      string              `json:"appVersion,omitempty"`
+	Hostname        string              `json:"hostname,omitempty"`
+	IPAddr          string              `json:"ipAddr"`
+	MountMode       string              `json:"mountMode,omitempty"`
+	MountPath       string              `json:"mountPath,omitempty"`
+	ForkName        string              `json:"forkName,omitempty"`
+	IsTemporaryFork bool                `json:"isTemporaryFork"`
+	Metadata        json.RawMessage     `json:"metadata,omitempty"`
+	Metrics         json.RawMessage     `json:"metrics,omitempty"`
+	Status          ClientSessionStatus `json:"status"`
+	LastHeartbeat   int64               `json:"lastHeartbeat,omitempty"`
+	ConnectedAt     int64               `json:"connectedAt,omitempty"`
+	DisconnectedAt  int64               `json:"disconnectedAt,omitempty"`
+	IsActive        bool                `json:"isActive"`
 }
 
 type SessionSummary struct {
@@ -773,7 +783,7 @@ type ClientSessionListOptions struct {
 	VolumeID        *int64
 	UserID          *int64
 	ClientType      string
-	Status          string
+	Status          ClientSessionStatus
 	IsActive        string
 	OsName          string
 	Platform        string

@@ -35,7 +35,9 @@ export interface ListOptions {
   limit?: number
 }
 
-export type LicenseQuotaState = 'ok' | 'exceeded' | 'unknown'
+export type ClientSessionStatus = 'connected' | 'active' | 'unhealthy' | 'disconnected' | 'expired' | 'unknown'
+
+export type LicenseQuotaState = 'ok' | 'exceeded'
 
 export type LicenseStatus = 'valid' | 'expiring' | 'grace' | 'expired_access' | 'expired'
 
@@ -243,7 +245,7 @@ export interface ClientSession {
   isTemporaryFork: boolean
   metadata?: unknown
   metrics?: unknown
-  status: string
+  status: ClientSessionStatus
   lastHeartbeat?: number
   connectedAt?: number
   disconnectedAt?: number
@@ -679,7 +681,7 @@ export interface ClientSessionListOptions extends ListOptions {
   volumeId?: number
   userId?: number
   clientType?: string
-  status?: string
+  status?: ClientSessionStatus
   isActive?: string
   osName?: string
   platform?: string
