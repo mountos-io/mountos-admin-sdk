@@ -401,6 +401,8 @@ Request:
   "encryptionKey"?: string,
   "retentionPeriod"?: int32,
   "gracePeriod"?: int32,
+  "forkGracePeriod"?: int32,
+  "eventLogRetentionPeriod"?: int32,
   "quotaLimit"?: int64,
   "regionClusterId"?: int64,
   "regionClusterUuid"?: string
@@ -424,6 +426,8 @@ Request:
   "description"?: string,
   "retentionPeriod"?: int32,
   "gracePeriod"?: int32,
+  "forkGracePeriod"?: int32,
+  "eventLogRetentionPeriod"?: int32,
   "restrictByLiveVolume"?: bool
 }
 ```
@@ -578,6 +582,8 @@ Response data: `Fork`
   "locked": bool,
   "retentionPeriod": int32,
   "gracePeriod": int32,
+  "forkGracePeriod": int32,
+  "eventLogRetentionPeriod": int32,
   "isActive": bool,
   "isCleanupMetaEnabled": bool,
   "isCleanupStorageEnabled": bool,

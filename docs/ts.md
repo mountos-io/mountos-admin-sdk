@@ -547,6 +547,8 @@ interface Volume {
   locked: boolean;
   retentionPeriod: number;
   gracePeriod: number;
+  forkGracePeriod: number;
+  eventLogRetentionPeriod: number;
   isActive: boolean;
   isCleanupMetaEnabled: boolean;
   isCleanupStorageEnabled: boolean;
@@ -1093,6 +1095,8 @@ client.volumes.create(body: {
     encryptionKey?: string;
     retentionPeriod?: number;
     gracePeriod?: number;
+    forkGracePeriod?: number;
+    eventLogRetentionPeriod?: number;
     quotaLimit?: number;
     regionClusterId?: number;
     regionClusterUuid?: string;
@@ -1112,6 +1116,8 @@ Request body:
   encryptionKey?: string;
   retentionPeriod?: number;
   gracePeriod?: number;
+  forkGracePeriod?: number;
+  eventLogRetentionPeriod?: number;
   quotaLimit?: number;
   regionClusterId?: number;
   regionClusterUuid?: string;
@@ -1163,6 +1169,8 @@ client.volumes.edit(volumeID: number, body: {
     description?: string;
     retentionPeriod?: number;
     gracePeriod?: number;
+    forkGracePeriod?: number;
+    eventLogRetentionPeriod?: number;
     restrictByLiveVolume?: boolean;
   }): Promise<{ id: number }>;
 ```
@@ -1174,6 +1182,8 @@ Request body:
   description?: string;
   retentionPeriod?: number;
   gracePeriod?: number;
+  forkGracePeriod?: number;
+  eventLogRetentionPeriod?: number;
   restrictByLiveVolume?: boolean;
 }
 ```

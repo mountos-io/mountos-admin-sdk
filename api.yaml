@@ -159,6 +159,8 @@ types:
     - "locked: bool"
     - "retentionPeriod: int32"
     - "gracePeriod: int32"
+    - "forkGracePeriod: int32"
+    - "eventLogRetentionPeriod: int32"
     - "isActive: bool"
     - "isCleanupMetaEnabled: bool"
     - "isCleanupStorageEnabled: bool"
@@ -751,6 +753,8 @@ resources:
           - "encryptionKey: string"
           - "retentionPeriod: int32"
           - "gracePeriod: int32"
+          - "forkGracePeriod: int32"
+          - "eventLogRetentionPeriod: int32"
           - "quotaLimit: int64"
           # Optional cluster pin. Omit to land on the region's default cluster.
           # If set, the cluster must belong to the storage's region, be
@@ -793,6 +797,8 @@ resources:
           - "description: string"
           - "retentionPeriod: int32"
           - "gracePeriod: int32"
+          - "forkGracePeriod: int32"
+          - "eventLogRetentionPeriod: int32"
           - "restrictByLiveVolume: bool"
         response:
           - "id: int64"

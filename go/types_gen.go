@@ -157,6 +157,8 @@ type Volume struct {
 	Locked                  bool   `json:"locked"`
 	RetentionPeriod         int32  `json:"retentionPeriod"`
 	GracePeriod             int32  `json:"gracePeriod"`
+	ForkGracePeriod         int32  `json:"forkGracePeriod"`
+	EventLogRetentionPeriod int32  `json:"eventLogRetentionPeriod"`
 	IsActive                bool   `json:"isActive"`
 	IsCleanupMetaEnabled    bool   `json:"isCleanupMetaEnabled"`
 	IsCleanupStorageEnabled bool   `json:"isCleanupStorageEnabled"`
@@ -608,18 +610,20 @@ type StorageListOptions struct {
 // Volumes
 
 type CreateVolumeRequest struct {
-	AccountID         int64  `json:"accountId"`
-	StorageID         int64  `json:"storageId"`
-	Name              string `json:"name"`
-	Description       string `json:"description,omitempty"`
-	VolumeType        string `json:"volumeType"`
-	Encryption        bool   `json:"encryption,omitempty"`
-	EncryptionKey     string `json:"encryptionKey,omitempty"`
-	RetentionPeriod   int32  `json:"retentionPeriod,omitempty"`
-	GracePeriod       int32  `json:"gracePeriod,omitempty"`
-	QuotaLimit        int64  `json:"quotaLimit,omitempty"`
-	RegionClusterID   int64  `json:"regionClusterId,omitempty"`
-	RegionClusterUUID string `json:"regionClusterUuid,omitempty"`
+	AccountID               int64  `json:"accountId"`
+	StorageID               int64  `json:"storageId"`
+	Name                    string `json:"name"`
+	Description             string `json:"description,omitempty"`
+	VolumeType              string `json:"volumeType"`
+	Encryption              bool   `json:"encryption,omitempty"`
+	EncryptionKey           string `json:"encryptionKey,omitempty"`
+	RetentionPeriod         int32  `json:"retentionPeriod,omitempty"`
+	GracePeriod             int32  `json:"gracePeriod,omitempty"`
+	ForkGracePeriod         int32  `json:"forkGracePeriod,omitempty"`
+	EventLogRetentionPeriod int32  `json:"eventLogRetentionPeriod,omitempty"`
+	QuotaLimit              int64  `json:"quotaLimit,omitempty"`
+	RegionClusterID         int64  `json:"regionClusterId,omitempty"`
+	RegionClusterUUID       string `json:"regionClusterUuid,omitempty"`
 }
 
 type CreateVolumeResponse struct {
@@ -628,10 +632,12 @@ type CreateVolumeResponse struct {
 }
 
 type EditVolumeRequest struct {
-	Description          string `json:"description,omitempty"`
-	RetentionPeriod      int32  `json:"retentionPeriod,omitempty"`
-	GracePeriod          int32  `json:"gracePeriod,omitempty"`
-	RestrictByLiveVolume bool   `json:"restrictByLiveVolume,omitempty"`
+	Description             string `json:"description,omitempty"`
+	RetentionPeriod         int32  `json:"retentionPeriod,omitempty"`
+	GracePeriod             int32  `json:"gracePeriod,omitempty"`
+	ForkGracePeriod         int32  `json:"forkGracePeriod,omitempty"`
+	EventLogRetentionPeriod int32  `json:"eventLogRetentionPeriod,omitempty"`
+	RestrictByLiveVolume    bool   `json:"restrictByLiveVolume,omitempty"`
 }
 
 type MoveVolumeClusterRequest struct {

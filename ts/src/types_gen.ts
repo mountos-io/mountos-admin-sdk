@@ -128,6 +128,8 @@ export interface Volume {
   locked: boolean
   retentionPeriod: number
   gracePeriod: number
+  forkGracePeriod: number
+  eventLogRetentionPeriod: number
   isActive: boolean
   isCleanupMetaEnabled: boolean
   isCleanupStorageEnabled: boolean
@@ -551,6 +553,8 @@ export interface CreateVolumeRequest {
   encryptionKey?: string
   retentionPeriod?: number
   gracePeriod?: number
+  forkGracePeriod?: number
+  eventLogRetentionPeriod?: number
   quotaLimit?: number
   regionClusterId?: number
   regionClusterUuid?: string
@@ -560,6 +564,8 @@ export interface EditVolumeRequest {
   description?: string
   retentionPeriod?: number
   gracePeriod?: number
+  forkGracePeriod?: number
+  eventLogRetentionPeriod?: number
   restrictByLiveVolume?: boolean
 }
 
