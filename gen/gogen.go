@@ -976,11 +976,11 @@ func writeGoQueryMethod(w *strings.Builder, svcType, methodName string, ep Endpo
 		sig += ", " + pathParams
 	}
 
-	// Query params become method parameters
+	// Query params become method parameters; optional params use pointer types
 	for _, qs := range ep.Query {
 		f := parseField(qs)
 		paramName := goParamName(":" + f.Name)
-		sig += ", " + paramName + " " + goType(f.Type)
+		sig += ", " + paramName + " " + goOptionalQueryType(f)
 	}
 
 	var retType string
@@ -999,17 +999,32 @@ func writeGoQueryMethod(w *strings.Builder, svcType, methodName string, ep Endpo
 	for _, qs := range ep.Query {
 		f := parseField(qs)
 		paramName := goParamName(":" + f.Name)
-		switch f.Type {
-		case "int64":
-			fmt.Fprintf(w, "\tq.Set(%q, strconv.FormatInt(%s, 10))\n", f.Name, paramName)
-		case "int32":
-			fmt.Fprintf(w, "\tq.Set(%q, strconv.FormatInt(int64(%s), 10))\n", f.Name, paramName)
-		case "int":
-			fmt.Fprintf(w, "\tq.Set(%q, strconv.Itoa(%s))\n", f.Name, paramName)
-		case "bool":
-			fmt.Fprintf(w, "\tq.Set(%q, strconv.FormatBool(%s))\n", f.Name, paramName)
-		default:
-			fmt.Fprintf(w, "\tq.Set(%q, %s)\n", f.Name, paramName)
+		if f.Required || f.Name == "page" || f.Name == "limit" || f.Name == "cursor" {
+			switch f.Type {
+			case "int64":
+				fmt.Fprintf(w, "\tq.Set(%q, strconv.FormatInt(%s, 10))\n", f.Name, paramName)
+			case "int32":
+				fmt.Fprintf(w, "\tq.Set(%q, strconv.FormatInt(int64(%s), 10))\n", f.Name, paramName)
+			case "int":
+				fmt.Fprintf(w, "\tq.Set(%q, strconv.Itoa(%s))\n", f.Name, paramName)
+			case "bool":
+				fmt.Fprintf(w, "\tq.Set(%q, strconv.FormatBool(%s))\n", f.Name, paramName)
+			default:
+				fmt.Fprintf(w, "\tq.Set(%q, %s)\n", f.Name, paramName)
+			}
+		} else {
+			switch f.Type {
+			case "int64":
+				fmt.Fprintf(w, "\tif %s != nil {\n\t\tq.Set(%q, strconv.FormatInt(*%s, 10))\n\t}\n", paramName, f.Name, paramName)
+			case "int32":
+				fmt.Fprintf(w, "\tif %s != nil {\n\t\tq.Set(%q, strconv.FormatInt(int64(*%s), 10))\n\t}\n", paramName, f.Name, paramName)
+			case "int":
+				fmt.Fprintf(w, "\tif %s != nil {\n\t\tq.Set(%q, strconv.Itoa(*%s))\n\t}\n", paramName, f.Name, paramName)
+			case "bool":
+				fmt.Fprintf(w, "\tif %s != nil {\n\t\tq.Set(%q, strconv.FormatBool(*%s))\n\t}\n", paramName, f.Name, paramName)
+			default:
+				fmt.Fprintf(w, "\tif %s != \"\" {\n\t\tq.Set(%q, %s)\n\t}\n", paramName, f.Name, paramName)
+			}
 		}
 	}
 	pathExpr := goPathExpr(fullPath, allPathParams, pt)

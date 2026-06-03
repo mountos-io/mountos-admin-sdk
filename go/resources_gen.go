@@ -472,8 +472,12 @@ func (s *VolumesService) Stats(ctx context.Context, volumeID int64) (*StatsVolum
 
 func (s *VolumesService) SizeHistory(ctx context.Context, volumeID int64, from string, to string) (*SizeHistoryVolumeResponse, error) {
 	q := url.Values{}
-	q.Set("from", from)
-	q.Set("to", to)
+	if from != "" {
+		q.Set("from", from)
+	}
+	if to != "" {
+		q.Set("to", to)
+	}
 	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/volumes/%s/size-history", strconv.FormatInt(volumeID, 10))+"?"+q.Encode())
 	if err != nil {
 		return nil, err
@@ -582,11 +586,17 @@ func (s *VolumeForkTreesService) List(ctx context.Context, volumeID int64, forkN
 
 type VolumeForkEntriesService struct{ c *Client }
 
-func (s *VolumeForkEntriesService) Get(ctx context.Context, volumeID int64, forkName string, path string, inode int64, asOf int64) (*ForkEntryDetail, error) {
+func (s *VolumeForkEntriesService) Get(ctx context.Context, volumeID int64, forkName string, path string, inode *int64, asOf *int64) (*ForkEntryDetail, error) {
 	q := url.Values{}
-	q.Set("path", path)
-	q.Set("inode", strconv.FormatInt(inode, 10))
-	q.Set("asOf", strconv.FormatInt(asOf, 10))
+	if path != "" {
+		q.Set("path", path)
+	}
+	if inode != nil {
+		q.Set("inode", strconv.FormatInt(*inode, 10))
+	}
+	if asOf != nil {
+		q.Set("asOf", strconv.FormatInt(*asOf, 10))
+	}
 	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/volumes/%s/forks/%s/entry", strconv.FormatInt(volumeID, 10), forkName)+"?"+q.Encode())
 	if err != nil {
 		return nil, err
@@ -849,12 +859,23 @@ func (s *ClientSessionsService) Get(ctx context.Context, sessionID int64) (*Clie
 	return decodeJSON[ClientSession](data)
 }
 
-func (s *ClientSessionsService) Summary(ctx context.Context, accountID int64, regionID int64, regionClusterID int64, volumeID int64) (*SessionSummary, error) {
+func (s *ClientSessionsService) Summary(ctx context.Context, accountID *int64, regionID *int64, regionClusterID *int64, volumeID *int64, userID *int64) (*SessionSummary, error) {
 	q := url.Values{}
-	q.Set("accountId", strconv.FormatInt(accountID, 10))
-	q.Set("regionId", strconv.FormatInt(regionID, 10))
-	q.Set("regionClusterId", strconv.FormatInt(regionClusterID, 10))
-	q.Set("volumeId", strconv.FormatInt(volumeID, 10))
+	if accountID != nil {
+		q.Set("accountId", strconv.FormatInt(*accountID, 10))
+	}
+	if regionID != nil {
+		q.Set("regionId", strconv.FormatInt(*regionID, 10))
+	}
+	if regionClusterID != nil {
+		q.Set("regionClusterId", strconv.FormatInt(*regionClusterID, 10))
+	}
+	if volumeID != nil {
+		q.Set("volumeId", strconv.FormatInt(*volumeID, 10))
+	}
+	if userID != nil {
+		q.Set("userId", strconv.FormatInt(*userID, 10))
+	}
 	data, err := s.c.get(ctx, "/api/v1/client-sessions/summary"+"?"+q.Encode())
 	if err != nil {
 		return nil, err
@@ -989,9 +1010,11 @@ func (s *RegionAlertsService) List(ctx context.Context, regionID int64, opts *Re
 	return decodeJSON[PaginatedResponse[RegionAlert]](data)
 }
 
-func (s *RegionAlertsService) Count(ctx context.Context, regionID int64, regionClusterID int64) (*AlertCountResponse, error) {
+func (s *RegionAlertsService) Count(ctx context.Context, regionID int64, regionClusterID *int64) (*AlertCountResponse, error) {
 	q := url.Values{}
-	q.Set("regionClusterId", strconv.FormatInt(regionClusterID, 10))
+	if regionClusterID != nil {
+		q.Set("regionClusterId", strconv.FormatInt(*regionClusterID, 10))
+	}
 	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/regions/%s/alerts/count", strconv.FormatInt(regionID, 10))+"?"+q.Encode())
 	if err != nil {
 		return nil, err

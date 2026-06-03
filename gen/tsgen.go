@@ -622,7 +622,11 @@ func writeTSQueryMethod(w *strings.Builder, methodName string, ep Endpoint, full
 		if params != "" {
 			params += ", "
 		}
-		params += paramName + ": " + tsType(f.Type)
+		opt := "?"
+		if f.Required {
+			opt = ""
+		}
+		params += paramName + opt + ": " + tsType(f.Type)
 	}
 	if params != "" {
 		params += ", "

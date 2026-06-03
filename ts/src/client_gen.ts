@@ -306,7 +306,7 @@ export class VolumesResource {
     return this.client.request('GET', `/api/v1/volumes/${volumeId}/stats`, undefined, signal)
   }
 
-  sizeHistory(volumeId: number, from: string, to: string, signal?: AbortSignal): Promise<{ points: VolumeSizePoint[] }> {
+  sizeHistory(volumeId: number, from?: string, to?: string, signal?: AbortSignal): Promise<{ points: VolumeSizePoint[] }> {
     return this.client.request('GET', `/api/v1/volumes/${volumeId}/size-history${queryString({ from: from, to: to })}`, undefined, signal)
   }
 
@@ -349,7 +349,7 @@ export class VolumeForkTreesResource {
 export class VolumeForkEntriesResource {
   constructor(private client: Client) {}
 
-  get(volumeId: number, forkName: string, path: string, inode: number, asOf: number, signal?: AbortSignal): Promise<ForkEntryDetail> {
+  get(volumeId: number, forkName: string, path?: string, inode?: number, asOf?: number, signal?: AbortSignal): Promise<ForkEntryDetail> {
     return this.client.request('GET', `/api/v1/volumes/${volumeId}/forks/${forkName}/entry${queryString({ path: path, inode: inode, asOf: asOf })}`, undefined, signal)
   }
 
@@ -438,8 +438,8 @@ export class ClientSessionsResource {
     return this.client.request('GET', `/api/v1/client-sessions/${sessionId}`, undefined, signal)
   }
 
-  summary(accountId: number, regionId: number, regionClusterId: number, volumeId: number, signal?: AbortSignal): Promise<SessionSummary> {
-    return this.client.request('GET', `/api/v1/client-sessions/summary${queryString({ accountId: accountId, regionId: regionId, regionClusterId: regionClusterId, volumeId: volumeId })}`, undefined, signal)
+  summary(accountId?: number, regionId?: number, regionClusterId?: number, volumeId?: number, userId?: number, signal?: AbortSignal): Promise<SessionSummary> {
+    return this.client.request('GET', `/api/v1/client-sessions/summary${queryString({ accountId: accountId, regionId: regionId, regionClusterId: regionClusterId, volumeId: volumeId, userId: userId })}`, undefined, signal)
   }
 }
 
@@ -494,7 +494,7 @@ export class RegionAlertsResource {
     return this.client.request('GET', `/api/v1/regions/${regionId}/alerts/list` + queryString({ active: opts?.active, severity: opts?.severity, category: opts?.category, nodeId: opts?.nodeId, regionClusterId: opts?.regionClusterId, since: opts?.since, page: opts?.page, limit: opts?.limit }), undefined, signal)
   }
 
-  count(regionId: number, regionClusterId: number, signal?: AbortSignal): Promise<AlertCountResponse> {
+  count(regionId: number, regionClusterId?: number, signal?: AbortSignal): Promise<AlertCountResponse> {
     return this.client.request('GET', `/api/v1/regions/${regionId}/alerts/count${queryString({ regionClusterId: regionClusterId })}`, undefined, signal)
   }
 

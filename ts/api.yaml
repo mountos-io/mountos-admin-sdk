@@ -1113,6 +1113,7 @@ resources:
           - "regionId: int64"
           - "regionClusterId: int64"
           - "volumeId: int64"
+          - "userId: int64"
         responseType: SessionSummary
 
   - name: Discover

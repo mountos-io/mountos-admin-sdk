@@ -801,7 +801,7 @@ Param: `sessionId`
 Response data: `ClientSession`
 
 ### GET /api/v1/client-sessions/summary
-Query: `accountId=int64`, `regionId=int64`, `regionClusterId=int64`, `volumeId=int64`
+Query: `accountId=int64`, `regionId=int64`, `regionClusterId=int64`, `volumeId=int64`, `userId=int64`
 Response data: `SessionSummary`
 
 ### ClientSession Type

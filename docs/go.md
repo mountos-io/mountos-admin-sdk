@@ -1514,6 +1514,7 @@ type SummaryClientSessionOptions struct {
     RegionID             int64        `url:"regionId"`
     RegionClusterID      int64        `url:"regionClusterId"`
     VolumeID             int64        `url:"volumeId"`
+    UserID               int64        `url:"userId"`
 }
 ```
 

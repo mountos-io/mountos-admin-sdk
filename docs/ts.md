@@ -1698,6 +1698,7 @@ client.clientSessions.summary(params: {
     regionId?: number;
     regionClusterId?: number;
     volumeId?: number;
+    userId?: number;
   }): Promise<SessionSummary>;
 ```
 
@@ -1709,6 +1710,7 @@ Query params:
   regionId?: number;
   regionClusterId?: number;
   volumeId?: number;
+  userId?: number;
 }
 ```
 
