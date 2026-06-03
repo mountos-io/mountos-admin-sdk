@@ -569,7 +569,6 @@ type Volume struct {
     TotalVolume              int64                    `json:"totalVolume"`
     PendingVolume            int64                    `json:"pendingVolume"`
     LiveInactiveVolume       int64                    `json:"liveInactiveVolume"`
-    RestrictByLiveVolume     bool                     `json:"restrictByLiveVolume"`
     Locked                   bool                     `json:"locked"`
     RetentionPeriod          int32                    `json:"retentionPeriod"`
     GracePeriod              int32                    `json:"gracePeriod"`
@@ -1085,7 +1084,6 @@ type EditVolumeRequest struct {
     GracePeriod              int32                    `json:"gracePeriod,omitempty"`
     ForkGracePeriod          int32                    `json:"forkGracePeriod,omitempty"`
     EventLogRetentionPeriod  int32                    `json:"eventLogRetentionPeriod,omitempty"`
-    RestrictByLiveVolume     bool                     `json:"restrictByLiveVolume,omitempty"`
 }
 ```
 
@@ -1197,7 +1195,7 @@ type UpdateQuotaVolumeRequest struct {
 #### `Stats` — GET /api/v1/volumes/:volumeId/stats
 
 ```go
-func (s *VolumesService) Stats(ctx context.Context, volumeID int64) (*struct { VolumeID string; LiveVolume int64; TotalVolume int64; PendingVolume int64; LiveInactiveVolume int64; RestrictByLiveVolume bool }, error)
+func (s *VolumesService) Stats(ctx context.Context, volumeID int64) (*struct { VolumeID string; LiveVolume int64; TotalVolume int64; PendingVolume int64; LiveInactiveVolume int64 }, error)
 ```
 
 #### `SizeHistory` — GET /api/v1/volumes/:volumeId/size-history

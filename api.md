@@ -427,8 +427,7 @@ Request:
   "retentionPeriod"?: int32,
   "gracePeriod"?: int32,
   "forkGracePeriod"?: int32,
-  "eventLogRetentionPeriod"?: int32,
-  "restrictByLiveVolume"?: bool
+  "eventLogRetentionPeriod"?: int32
 }
 ```
 Response data: `{ "id": int64 }`
@@ -508,7 +507,7 @@ Response data: `{ "id": int64 }`
 
 ### GET /api/v1/volumes/:volumeId/stats
 Param: `volumeId`
-Response data: `{ "volumeId": string, "liveVolume": int64, "totalVolume": int64, "pendingVolume": int64, "liveInactiveVolume": int64, "restrictByLiveVolume": bool }`
+Response data: `{ "volumeId": string, "liveVolume": int64, "totalVolume": int64, "pendingVolume": int64, "liveInactiveVolume": int64 }`
 
 ### GET /api/v1/volumes/:volumeId/size-history
 Param: `volumeId`
@@ -578,7 +577,6 @@ Response data: `Fork`
   "totalVolume": int64,
   "pendingVolume": int64,
   "liveInactiveVolume": int64,
-  "restrictByLiveVolume": bool,
   "locked": bool,
   "retentionPeriod": int32,
   "gracePeriod": int32,

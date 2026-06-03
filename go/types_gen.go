@@ -153,7 +153,6 @@ type Volume struct {
 	TotalVolume             int64  `json:"totalVolume"`
 	PendingVolume           int64  `json:"pendingVolume"`
 	LiveInactiveVolume      int64  `json:"liveInactiveVolume"`
-	RestrictByLiveVolume    bool   `json:"restrictByLiveVolume"`
 	Locked                  bool   `json:"locked"`
 	RetentionPeriod         int32  `json:"retentionPeriod"`
 	GracePeriod             int32  `json:"gracePeriod"`
@@ -637,7 +636,6 @@ type EditVolumeRequest struct {
 	GracePeriod             int32  `json:"gracePeriod,omitempty"`
 	ForkGracePeriod         *int32 `json:"forkGracePeriod,omitempty"`
 	EventLogRetentionPeriod *int32 `json:"eventLogRetentionPeriod,omitempty"`
-	RestrictByLiveVolume    bool   `json:"restrictByLiveVolume,omitempty"`
 }
 
 type MoveVolumeClusterRequest struct {
@@ -680,12 +678,11 @@ type UpdateVolumeQuotaRequest struct {
 }
 
 type StatsVolumeResponse struct {
-	VolumeID             string `json:"volumeId"`
-	LiveVolume           int64  `json:"liveVolume"`
-	TotalVolume          int64  `json:"totalVolume"`
-	PendingVolume        int64  `json:"pendingVolume"`
-	LiveInactiveVolume   int64  `json:"liveInactiveVolume"`
-	RestrictByLiveVolume bool   `json:"restrictByLiveVolume"`
+	VolumeID           string `json:"volumeId"`
+	LiveVolume         int64  `json:"liveVolume"`
+	TotalVolume        int64  `json:"totalVolume"`
+	PendingVolume      int64  `json:"pendingVolume"`
+	LiveInactiveVolume int64  `json:"liveInactiveVolume"`
 }
 
 type SizeHistoryVolumeResponse struct {

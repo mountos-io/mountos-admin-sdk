@@ -543,7 +543,6 @@ interface Volume {
   totalVolume: number;
   pendingVolume: number;
   liveInactiveVolume: number;
-  restrictByLiveVolume: boolean;
   locked: boolean;
   retentionPeriod: number;
   gracePeriod: number;
@@ -1171,7 +1170,6 @@ client.volumes.edit(volumeID: number, body: {
     gracePeriod?: number;
     forkGracePeriod?: number;
     eventLogRetentionPeriod?: number;
-    restrictByLiveVolume?: boolean;
   }): Promise<{ id: number }>;
 ```
 
@@ -1184,7 +1182,6 @@ Request body:
   gracePeriod?: number;
   forkGracePeriod?: number;
   eventLogRetentionPeriod?: number;
-  restrictByLiveVolume?: boolean;
 }
 ```
 
@@ -1311,7 +1308,7 @@ Request body:
 #### `stats` — GET /api/v1/volumes/:volumeId/stats
 
 ```typescript
-client.volumes.stats(volumeID: number): Promise<{ volumeId: string; liveVolume: number; totalVolume: number; pendingVolume: number; liveInactiveVolume: number; restrictByLiveVolume: boolean }>;
+client.volumes.stats(volumeID: number): Promise<{ volumeId: string; liveVolume: number; totalVolume: number; pendingVolume: number; liveInactiveVolume: number }>;
 ```
 
 #### `sizeHistory` — GET /api/v1/volumes/:volumeId/size-history

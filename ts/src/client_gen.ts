@@ -302,7 +302,7 @@ export class VolumesResource {
     return this.client.request('PUT', `/api/v1/volumes/${volumeId}/quota`, req, signal)
   }
 
-  stats(volumeId: number, signal?: AbortSignal): Promise<{ volumeId: string; liveVolume: number; totalVolume: number; pendingVolume: number; liveInactiveVolume: number; restrictByLiveVolume: boolean }> {
+  stats(volumeId: number, signal?: AbortSignal): Promise<{ volumeId: string; liveVolume: number; totalVolume: number; pendingVolume: number; liveInactiveVolume: number }> {
     return this.client.request('GET', `/api/v1/volumes/${volumeId}/stats`, undefined, signal)
   }
 

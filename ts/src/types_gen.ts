@@ -124,7 +124,6 @@ export interface Volume {
   totalVolume: number
   pendingVolume: number
   liveInactiveVolume: number
-  restrictByLiveVolume: boolean
   locked: boolean
   retentionPeriod: number
   gracePeriod: number
@@ -566,7 +565,6 @@ export interface EditVolumeRequest {
   gracePeriod?: number
   forkGracePeriod?: number
   eventLogRetentionPeriod?: number
-  restrictByLiveVolume?: boolean
 }
 
 export interface MoveVolumeClusterRequest {

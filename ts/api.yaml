@@ -155,7 +155,6 @@ types:
     - "totalVolume: int64"
     - "pendingVolume: int64"
     - "liveInactiveVolume: int64"
-    - "restrictByLiveVolume: bool"
     - "locked: bool"
     - "retentionPeriod: int32"
     - "gracePeriod: int32"
@@ -799,7 +798,6 @@ resources:
           - "gracePeriod: int32"
           - "forkGracePeriod: int32?"
           - "eventLogRetentionPeriod: int32?"
-          - "restrictByLiveVolume: bool"
         response:
           - "id: int64"
 
@@ -884,7 +882,6 @@ resources:
           - "totalVolume: int64"
           - "pendingVolume: int64"
           - "liveInactiveVolume: int64"
-          - "restrictByLiveVolume: bool"
 
       - action: sizeHistory
         method: GET
