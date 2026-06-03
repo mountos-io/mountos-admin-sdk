@@ -78,6 +78,14 @@ func (s *AccountsService) Deactivate(ctx context.Context, accountID int64) (*IDR
 	return decodeJSON[IDResponse](data)
 }
 
+func (s *AccountsService) UpdateQuota(ctx context.Context, accountID int64, req *UpdateAccountQuotaRequest) (*IDResponse, error) {
+	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/accounts/%s/quota", strconv.FormatInt(accountID, 10)), req)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[IDResponse](data)
+}
+
 type UsersService struct{ c *Client }
 
 func (s *UsersService) Add(ctx context.Context, req *AddUserRequest) (*IDResponse, error) {

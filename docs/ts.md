@@ -86,6 +86,8 @@ interface Account {
   providerInfo?: Record<string, unknown>;
   liveVolume: number;
   totalVolume: number;
+  quotaLimit: number;
+  quotaExcessPct: number;
   isActive: boolean;
   locked: boolean;
   createdAt: string;
@@ -661,6 +663,24 @@ client.accounts.unlock(accountID: number): Promise<{ id: number }>;
 
 ```typescript
 client.accounts.deactivate(accountID: number): Promise<{ id: number }>;
+```
+
+#### `updateQuota` — PUT /api/v1/accounts/:accountId/quota
+
+```typescript
+client.accounts.updateQuota(accountID: number, body: {
+    quotaLimit: number;
+    quotaExcessPct?: number;
+  }): Promise<{ id: number }>;
+```
+
+Request body:
+
+```typescript
+{
+  quotaLimit: number;
+  quotaExcessPct?: number;
+}
 ```
 
 ### Users

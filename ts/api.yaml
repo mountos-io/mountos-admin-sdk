@@ -71,6 +71,8 @@ types:
     - "providerInfo: object?"
     - "liveVolume: int64"
     - "totalVolume: int64"
+    - "quotaLimit: int64"
+    - "quotaExcessPct: int32"
     - "isActive: bool"
     - "locked: bool"
     - "createdAt: datetime"
@@ -478,6 +480,20 @@ resources:
       - action: deactivate
         method: POST
         path: /:accountId/deactivate
+        response:
+          - "id: int64"
+
+      # Account-wide storage quota. quotaLimit is the hard cap in bytes
+      # (0 = unlimited); quotaExcessPct is the whole-number percentage of
+      # headroom allowed above the limit before writes are blocked
+      # (0 = no excess). Enforcement is on total volume, independent of
+      # per-volume quotas.
+      - action: updateQuota
+        method: PUT
+        path: /:accountId/quota
+        request:
+          - "quotaLimit: int64!"
+          - "quotaExcessPct: int32"
         response:
           - "id: int64"
 

@@ -84,6 +84,17 @@ Response data: `{ "id": int64 }`
 Param: `accountId`
 Response data: `{ "id": int64 }`
 
+### PUT /api/v1/accounts/:accountId/quota
+Param: `accountId`
+Request:
+```
+{
+  "quotaLimit": int64(required),
+  "quotaExcessPct"?: int32
+}
+```
+Response data: `{ "id": int64 }`
+
 ### Account Type
 ```
 {
@@ -94,6 +105,8 @@ Response data: `{ "id": int64 }`
   "providerInfo"?: object,
   "liveVolume": int64,
   "totalVolume": int64,
+  "quotaLimit": int64,
+  "quotaExcessPct": int32,
   "isActive": bool,
   "locked": bool,
   "createdAt": RFC3339,

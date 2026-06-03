@@ -112,6 +112,8 @@ type Account struct {
     ProviderInfo             map[string]any           `json:"providerInfo,omitempty"`
     LiveVolume               int64                    `json:"liveVolume"`
     TotalVolume              int64                    `json:"totalVolume"`
+    QuotaLimit               int64                    `json:"quotaLimit"`
+    QuotaExcessPct           int32                    `json:"quotaExcessPct"`
     IsActive                 bool                     `json:"isActive"`
     Locked                   bool                     `json:"locked"`
     CreatedAt                string                   `json:"createdAt"`
@@ -673,6 +675,21 @@ func (s *AccountsService) Unlock(ctx context.Context, accountID int64) (*IDRespo
 
 ```go
 func (s *AccountsService) Deactivate(ctx context.Context, accountID int64) (*IDResponse, error)
+```
+
+#### `UpdateQuota` — PUT /api/v1/accounts/:accountId/quota
+
+```go
+func (s *AccountsService) UpdateQuota(ctx context.Context, accountID int64, req *UpdateQuotaAccountRequest) (*IDResponse, error)
+```
+
+Request body:
+
+```go
+type UpdateQuotaAccountRequest struct {
+    QuotaLimit               int64                    `json:"quotaLimit"`
+    QuotaExcessPct           int32                    `json:"quotaExcessPct,omitempty"`
+}
 ```
 
 ### Users

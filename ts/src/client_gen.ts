@@ -2,14 +2,14 @@
 
 import type {
   ListOptions, PaginatedResponse, CursorPaginatedResponse,
-  CreateAccountRequest, Account, AccountListOptions, EditAccountRequest, AddUserRequest, 
-  User, UserListOptions, BulkUserRequest, UserLite, EditUserRequest, CreateRegionRequest, 
-  Region, RegionListOptions, EditRegionRequest, CreateRegionClusterRequest, RegionCluster, 
-  RegionClusterListOptions, EditRegionClusterRequest, SetRegionClusterReadyRequest, 
-  CreateStorageRequest, Storage, StorageListOptions, EditStorageRequest, 
-  TestStorageBucketRequest, CreateVolumeRequest, Volume, VolumeListOptions, 
-  EditVolumeRequest, MoveVolumeClusterRequest, DeactivateVolumeRequest, 
-  GenerateVolumeAPIKeysRequest, RevokeVolumeAPIKeyRequest, 
+  CreateAccountRequest, Account, AccountListOptions, EditAccountRequest, 
+  UpdateAccountQuotaRequest, AddUserRequest, User, UserListOptions, BulkUserRequest, 
+  UserLite, EditUserRequest, CreateRegionRequest, Region, RegionListOptions, 
+  EditRegionRequest, CreateRegionClusterRequest, RegionCluster, RegionClusterListOptions, 
+  EditRegionClusterRequest, SetRegionClusterReadyRequest, CreateStorageRequest, Storage, 
+  StorageListOptions, EditStorageRequest, TestStorageBucketRequest, CreateVolumeRequest, 
+  Volume, VolumeListOptions, EditVolumeRequest, MoveVolumeClusterRequest, 
+  DeactivateVolumeRequest, GenerateVolumeAPIKeysRequest, RevokeVolumeAPIKeyRequest, 
   RevokeVolumeAPIKeysByUserRequest, UpdateVolumeQuotaRequest, VolumeSizePoint, 
   CreateVolumeForkRequest, Fork, DeleteVolumeForkRequest, RestoreVolumeForkRequest, 
   ForkTreeEntry, VolumeForkTreeListOptions, ForkEntryDetail, ForkEntryVersion, 
@@ -128,6 +128,10 @@ export class AccountsResource {
 
   deactivate(accountId: number, signal?: AbortSignal): Promise<{ id: number }> {
     return this.client.request('POST', `/api/v1/accounts/${accountId}/deactivate`, undefined, signal)
+  }
+
+  updateQuota(accountId: number, req: UpdateAccountQuotaRequest, signal?: AbortSignal): Promise<{ id: number }> {
+    return this.client.request('PUT', `/api/v1/accounts/${accountId}/quota`, req, signal)
   }
 }
 

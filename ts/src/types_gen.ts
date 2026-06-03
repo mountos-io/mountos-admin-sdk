@@ -49,6 +49,8 @@ export interface Account {
   providerInfo?: Record<string, unknown>
   liveVolume: number
   totalVolume: number
+  quotaLimit: number
+  quotaExcessPct: number
   isActive: boolean
   locked: boolean
   createdAt: string
@@ -425,6 +427,11 @@ export interface EditAccountRequest {
   description?: string
   iconUrl?: string
   providerInfo?: Record<string, unknown>
+}
+
+export interface UpdateAccountQuotaRequest {
+  quotaLimit: number
+  quotaExcessPct?: number
 }
 
 export interface AccountListOptions extends ListOptions {
