@@ -4,10 +4,10 @@ Provider-facing SDK for the mountOS Admin API. Wraps the appserv provider API (`
 
 ## SDKs
 
-| Language                   | Path  | Package                                             | Reference                        |
-| -------------------------- | ----- | --------------------------------------------------- | -------------------------------- |
-| [TypeScript](ts/README.md) | `ts/` | `@mountos-io/admin-sdk` (npm)                        | [docs/ts.md](docs/ts.md)         |
-| [Go](go/README.md)         | `go/` | `github.com/mountos-io/mountos-admin-sdk/go`        | [docs/go.md](docs/go.md)         |
+| Language                   | Path  | Package                                      | Reference                |
+| -------------------------- | ----- | -------------------------------------------- | ------------------------ |
+| [TypeScript](ts/README.md) | `ts/` | `@mountos-io/admin-sdk` (npm)                | [docs/ts.md](docs/ts.md) |
+| [Go](go/README.md)         | `go/` | `github.com/mountos-io/mountos-admin-sdk/go` | [docs/go.md](docs/go.md) |
 
 ## Examples
 
