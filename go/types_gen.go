@@ -7,7 +7,7 @@ import "encoding/json"
 // Config holds client configuration.
 type Config struct {
 	BaseURL       string
-	PrivateKey    string         // base64-encoded 64-byte ED25519 private key
+	PrivateKey    string         // base64-encoded ED25519 key: 32-byte seed or 64-byte seed+pubkey
 	DashboardUser *DashboardUser // optional dashboard operator context
 }
 

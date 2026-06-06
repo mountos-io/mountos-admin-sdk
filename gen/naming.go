@@ -34,7 +34,7 @@ func splitWords(s string) []string {
 		}
 	}
 	runes := []rune(s)
-	for i := 0; i < len(runes); i++ {
+	for i := range len(runes) {
 		r := runes[i]
 		if r == '-' || r == '_' {
 			flush()

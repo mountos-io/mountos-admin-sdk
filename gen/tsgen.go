@@ -306,12 +306,12 @@ func writeTSResource(w *strings.Builder, spec *Spec, res Resource) {
 
 	for _, ep := range res.Endpoints {
 		w.WriteString("\n")
-		writeTSMethod(w, spec, res, ep, fullBasePath, resPathParams)
+		writeTSMethod(w, res, ep, fullBasePath, resPathParams)
 	}
 	w.WriteString("}\n")
 }
 
-func writeTSMethod(w *strings.Builder, spec *Spec, res Resource, ep Endpoint, fullBasePath string, resPathParams []string) {
+func writeTSMethod(w *strings.Builder, res Resource, ep Endpoint, fullBasePath string, resPathParams []string) {
 	epPathParams := extractPathParams(ep.Path)
 	allPathParams := make([]string, 0, len(resPathParams)+len(epPathParams))
 	allPathParams = append(allPathParams, resPathParams...)
@@ -328,19 +328,19 @@ func writeTSMethod(w *strings.Builder, spec *Spec, res Resource, ep Endpoint, fu
 
 	switch {
 	case ep.ResponseArray:
-		writeTSArrayMethod(w, methodName, ep, fullPath, allPathParams, res.Name, pt)
+		writeTSArrayMethod(w, methodName, ep, fullPath, allPathParams, pt)
 	case ep.Pagination == "page":
 		writeTSPageListMethod(w, methodName, ep, fullPath, allPathParams, res.Name, pt)
 	case ep.Pagination == "cursor":
 		writeTSCursorListMethod(w, methodName, ep, fullPath, allPathParams, res.Name, pt)
 	case len(ep.Query) > 0 && ep.Pagination == "":
-		writeTSQueryMethod(w, methodName, ep, fullPath, allPathParams, res.Name, pt)
+		writeTSQueryMethod(w, methodName, ep, fullPath, allPathParams, pt)
 	case len(ep.Request) > 0:
 		writeTSBodyMethod(w, methodName, ep, fullPath, allPathParams, res.Name, pt)
 	case ep.ResponseType != "":
 		writeTSGetMethod(w, methodName, ep, fullPath, allPathParams, pt)
 	case len(ep.Response) > 0:
-		writeTSToggleMethod(w, methodName, ep, fullPath, allPathParams, res.Name, pt)
+		writeTSToggleMethod(w, methodName, ep, fullPath, allPathParams, pt)
 	default:
 		writeTSVoidMethod(w, methodName, ep, fullPath, allPathParams, pt)
 	}
@@ -350,7 +350,7 @@ func tsMethodName(action string) string {
 	return camelCase(action)
 }
 
-func tsReturnType(ep Endpoint, resName string) string {
+func tsReturnType(ep Endpoint) string {
 	if ep.ResponseArray {
 		return ep.ResponseType + "[]"
 	}
@@ -421,7 +421,7 @@ func tsParams(allPathParams []string, paramTypes map[string]string) string {
 // POST/PUT with request body
 func writeTSBodyMethod(w *strings.Builder, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string, pt map[string]string) {
 	reqType := requestTypeName(resName, ep.Action)
-	retType := tsReturnType(ep, resName)
+	retType := tsReturnType(ep)
 
 	params := tsParams(allPathParams, pt)
 	sig := ""
@@ -455,7 +455,7 @@ func writeTSGetMethod(w *strings.Builder, methodName string, ep Endpoint, fullPa
 }
 
 // POST/DELETE with response but no body (toggle actions)
-func writeTSToggleMethod(w *strings.Builder, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string, pt map[string]string) {
+func writeTSToggleMethod(w *strings.Builder, methodName string, ep Endpoint, fullPath string, allPathParams []string, pt map[string]string) {
 	retType := tsInlineResponseType(ep.Response)
 	params := tsParams(allPathParams, pt)
 	sig := params
@@ -486,7 +486,7 @@ func writeTSVoidMethod(w *strings.Builder, methodName string, ep Endpoint, fullP
 }
 
 // GET returning array (with optional query params)
-func writeTSArrayMethod(w *strings.Builder, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string, pt map[string]string) {
+func writeTSArrayMethod(w *strings.Builder, methodName string, ep Endpoint, fullPath string, allPathParams []string, pt map[string]string) {
 	retType := tsType(ep.ResponseType) + "[]"
 	params := tsParams(allPathParams, pt)
 
@@ -611,8 +611,8 @@ func writeTSCursorListMethod(w *strings.Builder, methodName string, ep Endpoint,
 }
 
 // GET with non-pagination query params (like Discover.Meta)
-func writeTSQueryMethod(w *strings.Builder, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string, pt map[string]string) {
-	retType := tsReturnType(ep, resName)
+func writeTSQueryMethod(w *strings.Builder, methodName string, ep Endpoint, fullPath string, allPathParams []string, pt map[string]string) {
+	retType := tsReturnType(ep)
 	params := tsParams(allPathParams, pt)
 
 	// Query params become method parameters (use tsQueryParamName for JS conventions)

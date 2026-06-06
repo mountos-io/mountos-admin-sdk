@@ -38,7 +38,7 @@ func main() {
   }
   fmt.Printf("Account: %s (active=%v, locked=%v)\n", account.Name, account.IsActive, account.Locked)
 
-  list, err := client.Accounts.List(ctx, &sdk.ListOptions{Page: 1, Limit: 10})
+  list, err := client.Accounts.List(ctx, &sdk.AccountListOptions{Page: 1, Limit: 10})
   if err != nil {
     log.Fatal("list accounts:", err)
   }
@@ -52,8 +52,8 @@ func main() {
   // --- Users ---
   user, err := client.Users.Add(ctx, &sdk.AddUserRequest{
     AccountID: acct.ID,
-    Username:  "alice",
-    Email:     "alice@acme.com",
+    Username:  fmt.Sprintf("alice-%d", acct.ID),
+    Email:     fmt.Sprintf("alice-%d@acme.com", acct.ID),
     Name:      "Alice Smith",
   })
   if err != nil {
@@ -77,7 +77,8 @@ func main() {
   // --- Regions ---
   regionResp, err := client.Regions.Create(ctx, &sdk.CreateRegionRequest{
     AccountID: acct.ID,
-    Name:      "us-east-1",
+    Name:      fmt.Sprintf("us-east-%d", acct.ID),
+    DNS:       fmt.Sprintf("us-east-%d.example.com", acct.ID),
   })
   if err != nil {
     log.Fatal("create region:", err)
@@ -91,17 +92,25 @@ func main() {
   storage, err := client.Storages.Create(ctx, &sdk.CreateStorageRequest{
     AccountID:    acct.ID,
     RegionID:     regionResp.ID,
-    Name:         "prod-s3-bucket",
+    Name:         fmt.Sprintf("prod-s3-%d", acct.ID),
     StorageType:  "object",
     ProviderType: "s3",
     Endpoint:     "https://s3.us-east-1.amazonaws.com",
     Bucket:       "my-mountos-bucket",
     Region:       "us-east-1",
+    AccessKey:    "AKIAEXAMPLE",
+    SecretKey:    "secret",
   })
   if err != nil {
-    log.Fatal("create storage:", err)
+    var sdkErr *sdk.Error
+    if errors.As(err, &sdkErr) {
+      fmt.Printf("Create storage rejected: %s (status=%d)\n", sdkErr.Message, sdkErr.Status)
+    } else {
+      log.Fatal("create storage:", err)
+    }
+  } else {
+    fmt.Println("Created storage ID:", storage.ID)
   }
-  fmt.Println("Created storage ID:", storage.ID)
 
   storages, _ := client.Storages.List(ctx, &sdk.StorageListOptions{AccountID: acct.ID})
   for _, s := range storages.Items {
@@ -134,7 +143,7 @@ func main() {
   }
 
   // --- Service Nodes ---
-  nodes, err := client.ServiceNodes.List(ctx, regionResp.ID, "", "", 0)
+  nodes, err := client.ServiceNodes.List(ctx, regionResp.ID, "", "", 0, 0)
   if err != nil {
     fmt.Println("List nodes:", err)
   } else {

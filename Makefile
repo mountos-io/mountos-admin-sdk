@@ -9,7 +9,7 @@ TS_RUN_deno := deno task
 TS_RUN_node := npm run
 TS_RUN      := $(or $(TS_RUN_$(TS_RUNTIME)),$(TS_RUNTIME) run)
 
-.PHONY: all gen docs check build install clean ts-install ts-check ts-build ts-publish go-check go-build rust-check rust-build rust-test rust-publish rust-clean tag tag-minor tag-major help
+.PHONY: all gen docs check build install clean ts-install ts-check ts-build ts-publish go-check go-build rust-check rust-build rust-test rust-publish rust-clean tag tag-minor tag-major bump-version help
 
 all: gen check build
 
@@ -90,9 +90,14 @@ PATCH   := $(word 3,$(subst ., ,$(VERSION)))
 
 tag: tag-minor ## Alias for tag-minor
 
-tag-minor: ## Bump minor version, commit and tag
-	$(eval NEW := $(MAJOR).$(shell echo $$(($(MINOR)+1))).0)
+# bump-version writes $(NEW) into every per-language manifest, keeping TS (npm)
+# and Rust (crates.io) in lockstep. Go versions purely via the go/v* git tag, so
+# it needs no file edit. Cargo.lock is refreshed (--workspace touches only our
+# package, not deps) so `--locked` builds keep working after the bump.
+bump-version:
 	@jq '.version = "$(NEW)"' ts/package.json > ts/package.json.tmp && mv ts/package.json.tmp ts/package.json
+	@sed 's/^version = .*/version = "$(NEW)"/' rust/Cargo.toml > rust/Cargo.toml.tmp && mv rust/Cargo.toml.tmp rust/Cargo.toml
+	@cd rust && cargo update --workspace --offline
 	@git add .
 	@git commit -m "v$(NEW)"
 	@git tag "v$(NEW)"
@@ -100,12 +105,8 @@ tag-minor: ## Bump minor version, commit and tag
 	@git push origin --tags $(shell git branch --show-current)
 	@echo "$(VERSION) → $(NEW)"
 
+tag-minor: ## Bump minor version, commit and tag
+	@$(MAKE) bump-version NEW=$(MAJOR).$(shell echo $$(($(MINOR)+1))).0
+
 tag-major: ## Bump major version, commit and tag
-	$(eval NEW := $(shell echo $$(($(MAJOR)+1))).0.0)
-	@jq '.version = "$(NEW)"' ts/package.json > ts/package.json.tmp && mv ts/package.json.tmp ts/package.json
-	@git add .
-	@git commit -m "v$(NEW)"
-	@git tag "v$(NEW)"
-	@git tag "go/v$(NEW)"
-	@git push origin --tags $(shell git branch --show-current)
-	@echo "$(VERSION) → $(NEW)"
+	@$(MAKE) bump-version NEW=$(shell echo $$(($(MAJOR)+1))).0.0

@@ -30,10 +30,15 @@ func newTokenCache(privateKeyBase64 string) (*tokenCache, error) {
 	if err != nil {
 		return nil, fmt.Errorf("mountos: invalid private key: %w", err)
 	}
-	if len(raw) != ed25519.PrivateKeySize {
-		return nil, fmt.Errorf("mountos: private key must be %d bytes, got %d", ed25519.PrivateKeySize, len(raw))
+	var k ed25519.PrivateKey
+	switch len(raw) {
+	case ed25519.SeedSize:
+		k = ed25519.NewKeyFromSeed(raw)
+	case ed25519.PrivateKeySize:
+		k = ed25519.PrivateKey(raw)
+	default:
+		return nil, fmt.Errorf("mountos: private key must be %d or %d bytes, got %d", ed25519.SeedSize, ed25519.PrivateKeySize, len(raw))
 	}
-	k := ed25519.PrivateKey(raw)
 	h := sha256.Sum256([]byte(k.Public().(ed25519.PublicKey)))
 	return &tokenCache{key: k, kfp: hex.EncodeToString(h[:16])}, nil
 }

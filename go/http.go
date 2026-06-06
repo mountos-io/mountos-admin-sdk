@@ -39,9 +39,11 @@ func (c *Client) do(ctx context.Context, method, path string, body any) (json.Ra
 	}
 	req.Header.Set("Authorization", "Bearer "+token)
 	if c.dashboardUser != nil {
-		if h, err := SignDashboardUser(c.dashboardUser, c.privateKey); err == nil {
-			req.Header.Set("X-MountOS-Dashboard-User", h)
+		h, err := SignDashboardUser(c.dashboardUser, c.privateKey)
+		if err != nil {
+			return nil, err
 		}
+		req.Header.Set("X-MountOS-Dashboard-User", h)
 	}
 	if body != nil {
 		req.Header.Set("Content-Type", "application/json")

@@ -80,11 +80,11 @@ func requestTypeName(resourceName, action string) string {
 	}
 	// verb + Resource + rest, e.g. Update + Volume + Quota + Request
 	verb := pascalCase(words[0])
-	var rest string
+	var rest strings.Builder
 	for _, w := range words[1:] {
-		rest += pascalCase(w)
+		rest.WriteString(pascalCase(w))
 	}
-	return verb + singular + rest + "Request"
+	return verb + singular + rest.String() + "Request"
 }
 
 // singularize strips trailing 's' for simple plurals.
@@ -148,7 +148,7 @@ func listOptionsTypeName(resourceName string) string {
 // extractPathParams extracts :paramName tokens from a path.
 func extractPathParams(path string) []string {
 	var params []string
-	for _, seg := range strings.Split(path, "/") {
+	for seg := range strings.SplitSeq(path, "/") {
 		if strings.HasPrefix(seg, ":") {
 			params = append(params, seg)
 		}
@@ -176,7 +176,7 @@ func generateGoTypes(spec *Spec, outDir string) {
 	w.WriteString("// Config holds client configuration.\n")
 	w.WriteString("type Config struct {\n")
 	w.WriteString("\tBaseURL       string\n")
-	w.WriteString("\tPrivateKey    string         // base64-encoded 64-byte ED25519 private key\n")
+	w.WriteString("\tPrivateKey    string         // base64-encoded ED25519 key: 32-byte seed or 64-byte seed+pubkey\n")
 	w.WriteString("\tDashboardUser *DashboardUser // optional dashboard operator context\n")
 	w.WriteString("}\n\n")
 
@@ -220,10 +220,10 @@ func generateGoTypes(spec *Spec, outDir string) {
 	enumOrder := orderEnums(spec)
 	for _, name := range enumOrder {
 		values := spec.Enums[name]
-		w.WriteString(fmt.Sprintf("type %s = string\n\nconst (\n", name))
+		fmt.Fprintf(&w, "type %s = string\n\nconst (\n", name)
 		for _, v := range values {
 			constName := name + pascalCase(v)
-			w.WriteString(fmt.Sprintf("\t%s %s = %q\n", constName, name, v))
+			fmt.Fprintf(&w, "\t%s %s = %q\n", constName, name, v)
 		}
 		w.WriteString(")\n\n")
 	}
@@ -546,14 +546,14 @@ func generateGoResources(spec *Spec, outDir string) {
 
 		for _, ep := range res.Endpoints {
 			w.WriteString("\n")
-			writeGoMethod(&w, spec, res, ep, svcType, fullBasePath, resPathParams)
+			writeGoMethod(&w, res, ep, svcType, fullBasePath, resPathParams)
 		}
 	}
 
 	writeFile(filepath.Join(outDir, "resources_gen.go"), w.String())
 }
 
-func writeGoMethod(w *strings.Builder, spec *Spec, res Resource, ep Endpoint, svcType, fullBasePath string, resPathParams []string) {
+func writeGoMethod(w *strings.Builder, res Resource, ep Endpoint, svcType, fullBasePath string, resPathParams []string) {
 	epPathParams := extractPathParams(ep.Path)
 	allPathParams := make([]string, 0, len(resPathParams)+len(epPathParams))
 	allPathParams = append(allPathParams, resPathParams...)
@@ -572,7 +572,7 @@ func writeGoMethod(w *strings.Builder, spec *Spec, res Resource, ep Endpoint, sv
 	// Determine return type and method signature
 	switch {
 	case ep.ResponseArray:
-		writeGoArrayMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name, pt)
+		writeGoArrayMethod(w, svcType, methodName, ep, fullPath, allPathParams, pt)
 	case ep.Pagination == "page":
 		writeGoPageListMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name, pt)
 	case ep.Pagination == "cursor":
@@ -804,7 +804,7 @@ func writeGoVoidMethod(w *strings.Builder, svcType, methodName string, ep Endpoi
 }
 
 // GET returning array (with optional query params)
-func writeGoArrayMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string, pt map[string]string) {
+func writeGoArrayMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, pt map[string]string) {
 	pathParams := goMethodParams(allPathParams, pt)
 	sig := "ctx context.Context"
 	if pathParams != "" {
@@ -910,7 +910,7 @@ func writeGoPageListMethod(w *strings.Builder, svcType, methodName string, ep En
 	if hasRequiredQueryParam(ep.Query) {
 		fmt.Fprintf(w, "\tdata, err := s.c.get(ctx, %s+\"?\"+q.Encode())\n", pathExpr)
 	} else {
-		w.WriteString(fmt.Sprintf("\tpath := %s\n", pathExpr))
+		fmt.Fprintf(w, "\tpath := %s\n", pathExpr)
 		w.WriteString("\tif qs := q.Encode(); qs != \"\" {\n")
 		w.WriteString("\t\tpath += \"?\" + qs\n")
 		w.WriteString("\t}\n")
@@ -977,10 +977,14 @@ func writeGoQueryMethod(w *strings.Builder, svcType, methodName string, ep Endpo
 	}
 
 	// Query params become method parameters; optional params use pointer types
+	var qparams []string
 	for _, qs := range ep.Query {
 		f := parseField(qs)
 		paramName := goParamName(":" + f.Name)
-		sig += ", " + paramName + " " + goOptionalQueryType(f)
+		qparams = append(qparams, paramName+" "+goOptionalQueryType(f))
+	}
+	if len(qparams) > 0 {
+		sig += ", " + strings.Join(qparams, ", ")
 	}
 
 	var retType string
