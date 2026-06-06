@@ -4,43 +4,11 @@ TypeScript SDK for the mountOS provider API. ESM-only, Node 18+/Bun/Deno.
 
 ## Install
 
-This package is not published to npm. Use one of the following methods:
-
-**GitHub dependency (package.json):**
-
-```json
-{
-  "dependencies": {
-    "@mountos-io/admin-sdk": "github:mountos-io/mountos-admin-sdk#main"
-  }
-}
-```
-
-Note: since the TS package lives under `ts/`, you may need to reference the subdirectory. With npm/pnpm you can use:
-
-```json
-{
-  "dependencies": {
-    "@mountos-io/admin-sdk": "github:mountos-io/mountos-admin-sdk#main&path:ts"
-  }
-}
-```
-
-**Git submodule:**
-
 ```bash
-git submodule add https://github.com/mountos-io/mountos-admin-sdk.git vendor/mountos-admin-sdk
+npm install @mountos-io/admin-sdk
 ```
 
-Then reference in your tsconfig paths or use a workspace/symlink pointing to `vendor/mountos-admin-sdk/ts`.
-
-**Private registry:**
-
-If your organization runs a private npm registry (Verdaccio, GitHub Packages, etc.), publish the `ts/` package there and install normally:
-
-```bash
-npm install @mountos-io/admin-sdk --registry=https://npm.your-org.com
-```
+Bun (`bun add @mountos-io/admin-sdk`) and Deno (`deno add npm:@mountos-io/admin-sdk`) work too.
 
 ## Usage
 
@@ -163,6 +131,22 @@ The `privateKey` accepts a base64-encoded Ed25519 key in either format:
 - **64 bytes** (seed + public key concatenated) — Go's `ed25519.PrivateKey` format
 
 JWT tokens are auto-generated and cached for ~55 minutes (1h TTL with 5min refresh margin).
+
+## Reference
+
+The published package bundles, alongside `dist/`:
+
+- **`api.yaml`** — the source spec the SDK is generated from; use it to port the API to another language.
+- **`api.md`** — language-neutral REST reference: every endpoint, request/response shape, query params, error codes, and the JWT claim contract.
+- **`SKILL.md`** — an agent skill describing how to use this SDK (TS/Go usage, auth, resources). AI coding agents can load it for accurate, up-to-date guidance.
+
+Resolve their on-disk paths from the package root:
+
+```typescript
+import { createRequire } from "node:module";
+const pkgDir = createRequire(import.meta.url).resolve("@mountos-io/admin-sdk/package.json");
+// api.md and SKILL.md sit next to package.json
+```
 
 ## License
 

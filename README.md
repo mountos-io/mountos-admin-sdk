@@ -6,7 +6,7 @@ Provider-facing SDK for the mountOS Admin API. Wraps the appserv provider API (`
 
 | Language                   | Path  | Package                                             | Reference                        |
 | -------------------------- | ----- | --------------------------------------------------- | -------------------------------- |
-| [TypeScript](ts/README.md) | `ts/` | `@mountos-io/admin-sdk` (GitHub / private registry) | [docs/ts.md](docs/ts.md)         |
+| [TypeScript](ts/README.md) | `ts/` | `@mountos-io/admin-sdk` (npm)                        | [docs/ts.md](docs/ts.md)         |
 | [Go](go/README.md)         | `go/` | `github.com/mountos-io/mountos-admin-sdk/go`        | [docs/go.md](docs/go.md)         |
 
 ## Examples
@@ -20,6 +20,10 @@ See [examples/](examples/) for working Go and TypeScript sample code.
 - Go SDK: [docs/go.md](docs/go.md)
 
 All references are regenerated from [api.yaml](api.yaml) via `make gen` (or `make docs` for the language-specific docs only).
+
+## For AI Agents
+
+[SKILL.md](SKILL.md) is an agent skill covering TS/Go usage, ED25519/JWT auth, and the full resource set. It ships in the npm package (next to `api.md` and `api.yaml`) so coding agents can load accurate, version-matched guidance.
 
 ## Porting to Other Languages
 
