@@ -166,4 +166,4 @@ JWT tokens are auto-generated and cached for ~55 minutes (1h TTL with 5min refre
 
 ## License
 
-MIT
+Apache-2.0

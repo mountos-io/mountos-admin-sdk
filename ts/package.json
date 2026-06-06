@@ -13,7 +13,9 @@
   },
   "files": [
     "dist",
-    "api.yaml"
+    "api.yaml",
+    "api.md",
+    "SKILL.md"
   ],
   "scripts": {
     "build": "tsc",
@@ -28,7 +30,7 @@
   "devDependencies": {
     "typescript": "^5.7.0"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "publishConfig": {
     "access": "public"
   }

@@ -27,4 +27,4 @@ Use [api.yaml](api.yaml) for generating code for other languages or contact supp
 
 ## License
 
-MIT
+Apache-2.0

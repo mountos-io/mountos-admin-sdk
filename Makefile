@@ -21,6 +21,8 @@ help: ## Show available targets
 gen: ## Generate Go + TS SDK and docs from api.yaml
 	cd gen && go run . --spec ../api.yaml --go-out ../go --ts-out ../ts/src --doc-out .. --docs-out ../docs
 	cp api.yaml ts/api.yaml
+	cp api.md ts/api.md
+	cp SKILL.md ts/SKILL.md
 
 docs: ## Regenerate docs/ts.md and docs/go.md from api.yaml
 	cd gen && go run . --spec ../api.yaml --go-out ../go --ts-out ../ts/src --doc-out .. --docs-out ../docs

@@ -107,4 +107,4 @@ JWT tokens are auto-generated using your ED25519 private key and cached for ~55 
 
 ## License
 
-MIT
+Apache-2.0
