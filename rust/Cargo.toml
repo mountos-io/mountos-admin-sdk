@@ -1,0 +1,31 @@
+[package]
+name = "mountos-admin-sdk"
+version = "0.75.0"
+edition = "2024"
+rust-version = "1.85"
+description = "Rust SDK for the mountOS provider API"
+repository = "https://github.com/mountos-io/mountos-admin-sdk"
+homepage = "https://github.com/mountos-io/mountos-admin-sdk"
+documentation = "https://docs.rs/mountos-admin-sdk"
+readme = "README.md"
+license = "Apache-2.0"
+keywords = ["mountos", "sdk", "admin", "api-client"]
+categories = ["api-bindings"]
+
+[dependencies]
+# native-roots uses the OS trust store so self-hosted appserv behind a
+# private/corporate CA is trusted out of the box.
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls-native-roots"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+ed25519-dalek = "2"
+base64 = "0.22"
+sha2 = "0.10"
+hmac = "0.12"
+hex = "0.4"
+uuid = { version = "1", features = ["v4"] }
+percent-encoding = "2"
+thiserror = "2"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }

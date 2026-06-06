@@ -9,7 +9,7 @@ TS_RUN_deno := deno task
 TS_RUN_node := npm run
 TS_RUN      := $(or $(TS_RUN_$(TS_RUNTIME)),$(TS_RUNTIME) run)
 
-.PHONY: all gen docs check build install clean ts-install ts-check ts-build ts-publish go-check go-build tag tag-minor tag-major help
+.PHONY: all gen docs check build install clean ts-install ts-check ts-build ts-publish go-check go-build rust-check rust-build rust-test rust-publish rust-clean tag tag-minor tag-major help
 
 all: gen check build
 
@@ -18,14 +18,15 @@ help: ## Show available targets
 
 # ── Generator ───────────────────────────────────────────────
 
-gen: ## Generate Go + TS SDK and docs from api.yaml
-	cd gen && go run . --spec ../api.yaml --go-out ../go --ts-out ../ts/src --doc-out .. --docs-out ../docs
+gen: ## Generate Go + TS + Rust SDK and docs from api.yaml
+	cd gen && go run . --spec ../api.yaml --go-out ../go --ts-out ../ts/src --rust-out ../rust/src --doc-out .. --docs-out ../docs
 	cp api.yaml ts/api.yaml
 	cp api.md ts/api.md
 	cp SKILL.md ts/SKILL.md
+	cp api.md LICENSE NOTICE rust/
 
-docs: ## Regenerate docs/ts.md and docs/go.md from api.yaml
-	cd gen && go run . --spec ../api.yaml --go-out ../go --ts-out ../ts/src --doc-out .. --docs-out ../docs
+docs: ## Regenerate docs/ts.md, docs/go.md and docs/rust.md from api.yaml
+	cd gen && go run . --spec ../api.yaml --go-out ../go --ts-out ../ts/src --rust-out ../rust/src --doc-out .. --docs-out ../docs
 
 # ── TypeScript ──────────────────────────────────────────────
 
@@ -53,15 +54,32 @@ go-check: ## Vet Go code
 go-build: ## Build Go code
 	cd go && go build ./...
 
+# ── Rust ────────────────────────────────────────────────────
+
+rust-check: ## Clippy-lint Rust code (warnings are errors)
+	cd rust && cargo clippy --all-targets --locked -- -D warnings
+
+rust-build: ## Build Rust crate
+	cd rust && cargo build --locked
+
+rust-test: ## Run Rust unit + doc tests
+	cd rust && cargo test --locked
+
+rust-publish: rust-build ## Publish Rust crate to crates.io
+	cd rust && cargo publish
+
+rust-clean: ## Remove Rust build artifacts
+	cd rust && cargo clean
+
 # ── Combined ────────────────────────────────────────────────
 
 install: ts-install ## Install all dependencies
 
-check: ts-check go-check ## Run all checks
+check: ts-check go-check rust-check ## Run all checks
 
-build: ts-build go-build ## Build all
+build: ts-build go-build rust-build ## Build all
 
-clean: ts-clean ## Clean all artifacts
+clean: ts-clean rust-clean ## Clean all artifacts
 
 # ── Version ────────────────────────────────────────────────
 

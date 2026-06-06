@@ -5,6 +5,15 @@ ts/dist/
 # Go
 go/bin/
 
+# Rust
+rust/target/
+examples/rust/target/
+
+# Installed third-party agent skills + local agent tooling (not part of the SDK)
+.agents/
+.claude/
+skills-lock.json
+
 # Generator binary
 gen/gen
 

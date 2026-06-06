@@ -13,16 +13,19 @@ func main() {
 	specPath := flag.String("spec", "api.yaml", "path to API spec")
 	goOut := flag.String("go-out", "go", "Go output directory")
 	tsOut := flag.String("ts-out", "ts/src", "TS output directory")
+	rustOut := flag.String("rust-out", "rust/src", "Rust output directory")
 	docOut := flag.String("doc-out", ".", "api.md output directory")
-	docsOut := flag.String("docs-out", "docs", "language-specific docs output directory (ts.md, go.md)")
+	docsOut := flag.String("docs-out", "docs", "language-specific docs output directory (ts.md, go.md, rust.md)")
 	flag.Parse()
 
 	spec := loadSpec(*specPath)
 	generateGo(spec, *goOut)
 	generateTS(spec, *tsOut)
+	generateRust(spec, *rustOut)
 	generateDoc(spec, *docOut)
 	generateDocTS(spec, *docsOut)
 	generateDocGo(spec, *docsOut)
+	generateDocRust(spec, *docsOut)
 	fmt.Println("generation complete")
 }
 

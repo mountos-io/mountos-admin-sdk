@@ -110,3 +110,47 @@ func goParamName(pathParam string) string {
 func slugify(name string) string {
 	return camelCase(name)
 }
+
+// rustKeywords are reserved words that cannot be used as bare identifiers;
+// fields colliding with them are emitted as raw identifiers (r#name).
+var rustKeywords = map[string]bool{
+	"as": true, "break": true, "const": true, "continue": true, "crate": true,
+	"dyn": true, "else": true, "enum": true, "extern": true, "false": true,
+	"fn": true, "for": true, "if": true, "impl": true, "in": true, "let": true,
+	"loop": true, "match": true, "mod": true, "move": true, "mut": true,
+	"pub": true, "ref": true, "return": true, "self": true, "static": true,
+	"struct": true, "super": true, "trait": true, "true": true, "type": true,
+	"unsafe": true, "use": true, "where": true, "while": true, "async": true,
+	"await": true, "abstract": true, "become": true, "box": true, "do": true,
+	"final": true, "macro": true, "override": true, "priv": true, "typeof": true,
+	"unsized": true, "virtual": true, "yield": true, "try": true, "gen": true,
+}
+
+// snakeCase converts camelCase/hyphen/underscore names to snake_case.
+func snakeCase(s string) string {
+	words := splitWords(s)
+	for i, w := range words {
+		words[i] = strings.ToLower(w)
+	}
+	return strings.Join(words, "_")
+}
+
+// screamingSnake converts a name to SCREAMING_SNAKE_CASE for Rust consts.
+func screamingSnake(s string) string {
+	return strings.ToUpper(snakeCase(s))
+}
+
+// rustFieldName returns the snake_case Rust field/binding name, escaping
+// reserved keywords as raw identifiers.
+func rustFieldName(jsonName string) string {
+	n := snakeCase(jsonName)
+	if rustKeywords[n] {
+		return "r#" + n
+	}
+	return n
+}
+
+// rustParamName returns the snake_case binding for a :path param.
+func rustParamName(pathParam string) string {
+	return rustFieldName(strings.TrimPrefix(pathParam, ":"))
+}

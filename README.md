@@ -4,20 +4,22 @@ Provider-facing SDK for the mountOS Admin API. Wraps the appserv provider API (`
 
 ## SDKs
 
-| Language                   | Path  | Package                                      | Reference                |
-| -------------------------- | ----- | -------------------------------------------- | ------------------------ |
-| [TypeScript](ts/README.md) | `ts/` | `@mountos-io/admin-sdk` (npm)                | [docs/ts.md](docs/ts.md) |
-| [Go](go/README.md)         | `go/` | `github.com/mountos-io/mountos-admin-sdk/go` | [docs/go.md](docs/go.md) |
+| Language                     | Path    | Package                                      | Reference                    |
+| ---------------------------- | ------- | -------------------------------------------- | ---------------------------- |
+| [TypeScript](ts/README.md)   | `ts/`   | `@mountos-io/admin-sdk` (npm)                | [docs/ts.md](docs/ts.md)     |
+| [Go](go/README.md)           | `go/`   | `github.com/mountos-io/mountos-admin-sdk/go` | [docs/go.md](docs/go.md)     |
+| [Rust](rust/README.md)       | `rust/` | `mountos-admin-sdk` (crates.io)              | [docs/rust.md](docs/rust.md) |
 
 ## Examples
 
-See [examples/](examples/) for working Go and TypeScript sample code.
+See [examples/](examples/) for working Go, TypeScript, and Rust sample code.
 
 ## API Reference
 
 - Language-neutral: [api.md](api.md)
 - TypeScript SDK: [docs/ts.md](docs/ts.md)
 - Go SDK: [docs/go.md](docs/go.md)
+- Rust SDK: [docs/rust.md](docs/rust.md)
 
 All references are regenerated from [api.yaml](api.yaml) via `make gen` (or `make docs` for the language-specific docs only).
 

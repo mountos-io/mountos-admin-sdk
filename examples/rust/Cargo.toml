@@ -1,0 +1,13 @@
+[package]
+name = "mountos-admin-sdk-example"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+mountos-admin-sdk = { path = "../../rust" }
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+
+[[bin]]
+name = "example"
+path = "main.rs"
