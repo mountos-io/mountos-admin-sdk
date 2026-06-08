@@ -146,7 +146,7 @@ pub struct ClientSession {
     pub account: Ref,
     pub region: Ref,
     pub region_cluster: Option<Ref>,
-    pub volume: Ref,
+    pub volume: VolumeRef,
     pub user: Option<Ref>,
     pub client_type: String,
     pub os_name: String,
@@ -567,6 +567,16 @@ pub struct Volume {
     pub is_cleanup_vault_enabled: bool,
     pub created_at: String,
     pub updated_at: String,
+}
+```
+
+### `VolumeRef`
+
+```rust
+pub struct VolumeRef {
+    pub id: i64,
+    pub name: String,
+    pub r#type: Option<String>,
 }
 ```
 

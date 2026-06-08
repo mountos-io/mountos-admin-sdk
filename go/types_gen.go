@@ -263,7 +263,7 @@ type ClientSession struct {
 	Account         Ref                 `json:"account"`
 	Region          Ref                 `json:"region"`
 	RegionCluster   Ref                 `json:"regionCluster,omitempty"`
-	Volume          Ref                 `json:"volume"`
+	Volume          VolumeRef           `json:"volume"`
 	User            Ref                 `json:"user,omitempty"`
 	ClientType      string              `json:"clientType"`
 	OsName          string              `json:"osName"`
@@ -432,6 +432,12 @@ type UserLite struct {
 	ID       int64  `json:"id"`
 	Username string `json:"username"`
 	Name     string `json:"name"`
+}
+
+type VolumeRef struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
+	Type string `json:"type,omitempty"`
 }
 
 type VolumeSizePoint struct {

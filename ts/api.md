@@ -822,7 +822,7 @@ Response data: `SessionSummary`
   "account": Ref,
   "region": Ref,
   "regionCluster"?: Ref,
-  "volume": Ref,
+  "volume": VolumeRef,
   "user"?: Ref,
   "clientType": string,
   "osName": string,

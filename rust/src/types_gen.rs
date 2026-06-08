@@ -375,7 +375,7 @@ pub struct ClientSession {
     pub region: Ref,
     #[serde(rename = "regionCluster", skip_serializing_if = "Option::is_none")]
     pub region_cluster: Option<Ref>,
-    pub volume: Ref,
+    pub volume: VolumeRef,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<Ref>,
     #[serde(rename = "clientType")]
@@ -644,6 +644,14 @@ pub struct UserLite {
     pub id: i64,
     pub username: String,
     pub name: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct VolumeRef {
+    pub id: i64,
+    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub r#type: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

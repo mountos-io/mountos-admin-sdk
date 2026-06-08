@@ -135,7 +135,7 @@ interface ClientSession {
   account: Ref;
   region: Ref;
   regionCluster?: Ref;
-  volume: Ref;
+  volume: VolumeRef;
   user?: Ref;
   clientType: string;
   osName: string;
@@ -556,6 +556,16 @@ interface Volume {
   isCleanupVaultEnabled: boolean;
   createdAt: string;
   updatedAt: string;
+}
+```
+
+### `VolumeRef`
+
+```typescript
+interface VolumeRef {
+  id: number;
+  name: string;
+  type?: string;
 }
 ```
 

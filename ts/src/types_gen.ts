@@ -234,7 +234,7 @@ export interface ClientSession {
   account: Ref
   region: Ref
   regionCluster?: Ref
-  volume: Ref
+  volume: VolumeRef
   user?: Ref
   clientType: string
   osName: string
@@ -403,6 +403,12 @@ export interface UserLite {
   id: number
   username: string
   name: string
+}
+
+export interface VolumeRef {
+  id: number
+  name: string
+  type?: string
 }
 
 export interface VolumeSizePoint {

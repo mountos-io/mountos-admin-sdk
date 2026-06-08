@@ -63,6 +63,13 @@ types:
     - "id: int64"
     - "name: string"
 
+  # Ref plus the volume's storage personality (general | iceberg) so session
+  # views can badge it. Kept separate from Ref so other refs stay {id, name}.
+  VolumeRef:
+    - "id: int64"
+    - "name: string"
+    - "type: string?"
+
   Account:
     - "id: int64"
     - "name: string"
@@ -315,7 +322,7 @@ types:
     - "account: Ref"
     - "region: Ref"
     - "regionCluster: Ref?"
-    - "volume: Ref"
+    - "volume: VolumeRef"
     - "user: Ref?"
     - "clientType: string"
     - "osName: string"
