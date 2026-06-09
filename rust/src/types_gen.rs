@@ -244,7 +244,7 @@ pub struct Fork {
     #[serde(rename = "snapshotTs")]
     pub snapshot_ts: i64,
     #[serde(rename = "createdBy", skip_serializing_if = "Option::is_none")]
-    pub created_by: Option<String>,
+    pub created_by: Option<i64>,
     #[serde(rename = "createdAt")]
     pub created_at: i64,
     #[serde(rename = "childrenCount")]

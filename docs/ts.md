@@ -217,7 +217,7 @@ interface Fork {
   parentFid: number;
   parentName: string;
   snapshotTs: number;
-  createdBy?: string;
+  createdBy?: number;
   createdAt: number;
   childrenCount: number;
   inactive?: boolean;

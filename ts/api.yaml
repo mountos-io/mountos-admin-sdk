@@ -189,7 +189,9 @@ types:
     - "parentFid: int32"
     - "parentName: string"
     - "snapshotTs: int64"
-    - "createdBy: string?"
+    # Creator's mountOS user id (0/absent = system or an admin token with no
+    # user record); resolve via Users.bulk for display names.
+    - "createdBy: int64?"
     - "createdAt: int64"
     - "childrenCount: int32"
     - "inactive: bool?"

@@ -243,7 +243,7 @@ type Fork struct {
     ParentFid                int32                    `json:"parentFid"`
     ParentName               string                   `json:"parentName"`
     SnapshotTs               int64                    `json:"snapshotTs"`
-    CreatedBy                string                   `json:"createdBy,omitempty"`
+    CreatedBy                int64                    `json:"createdBy,omitempty"`
     CreatedAt                int64                    `json:"createdAt"`
     ChildrenCount            int32                    `json:"childrenCount"`
     Inactive                 bool                     `json:"inactive,omitempty"`

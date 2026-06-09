@@ -228,7 +228,7 @@ pub struct Fork {
     pub parent_fid: i32,
     pub parent_name: String,
     pub snapshot_ts: i64,
-    pub created_by: Option<String>,
+    pub created_by: Option<i64>,
     pub created_at: i64,
     pub children_count: i32,
     pub inactive: Option<bool>,
