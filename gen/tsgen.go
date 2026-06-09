@@ -490,7 +490,8 @@ func writeTSArrayMethod(w *strings.Builder, methodName string, ep Endpoint, full
 	retType := tsType(ep.ResponseType) + "[]"
 	params := tsParams(allPathParams, pt)
 
-	if len(ep.Query) > 0 {
+	basePath, litPairs := splitLiteralQuery(fullPath)
+	if len(ep.Query) > 0 || len(litPairs) > 0 {
 		// Add query params as individual optional method params
 		for _, qs := range ep.Query {
 			f := parseField(qs)
@@ -506,13 +507,16 @@ func writeTSArrayMethod(w *strings.Builder, methodName string, ep Endpoint, full
 		}
 		params += ", signal?: AbortSignal"
 		var qsArgs []string
+		for _, kv := range litPairs {
+			qsArgs = append(qsArgs, fmt.Sprintf("%s: %q", kv[0], kv[1]))
+		}
 		for _, qs := range ep.Query {
 			f := parseField(qs)
 			paramName := tsQueryParamName(f.Name)
 			qsArgs = append(qsArgs, f.Name+": "+paramName)
 		}
 		qsCall := "queryString({ " + strings.Join(qsArgs, ", ") + " })"
-		pathExpr := tsPathExpr(fullPath, allPathParams)
+		pathExpr := tsPathExpr(basePath, allPathParams)
 		pathInner := pathExpr[1 : len(pathExpr)-1]
 		fmt.Fprintf(w, "  %s(%s): Promise<%s> {\n", methodName, params, retType)
 		fmt.Fprintf(w, "    return this.client.request('GET', `%s${%s}`, undefined, signal)\n", pathInner, qsCall)

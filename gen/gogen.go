@@ -813,7 +813,8 @@ func writeGoArrayMethod(w *strings.Builder, svcType, methodName string, ep Endpo
 
 	retType := goType(ep.ResponseType)
 
-	if len(ep.Query) > 0 {
+	basePath, litPairs := splitLiteralQuery(fullPath)
+	if len(ep.Query) > 0 || len(litPairs) > 0 {
 		for _, qs := range ep.Query {
 			f := parseField(qs)
 			paramName := goParamName(":" + f.Name)
@@ -821,6 +822,9 @@ func writeGoArrayMethod(w *strings.Builder, svcType, methodName string, ep Endpo
 		}
 		fmt.Fprintf(w, "func (s *%s) %s(%s) ([]%s, error) {\n", svcType, methodName, sig, retType)
 		w.WriteString("\tq := url.Values{}\n")
+		for _, kv := range litPairs {
+			fmt.Fprintf(w, "\tq.Set(%q, %q)\n", kv[0], kv[1])
+		}
 		for _, qs := range ep.Query {
 			f := parseField(qs)
 			paramName := goParamName(":" + f.Name)
@@ -837,7 +841,7 @@ func writeGoArrayMethod(w *strings.Builder, svcType, methodName string, ep Endpo
 				fmt.Fprintf(w, "\tif %s != \"\" {\n\t\tq.Set(%q, %s)\n\t}\n", paramName, f.Name, paramName)
 			}
 		}
-		pathExpr := goPathExpr(fullPath, allPathParams, pt)
+		pathExpr := goPathExpr(basePath, allPathParams, pt)
 		fmt.Fprintf(w, "\tpath := %s\n", pathExpr)
 		w.WriteString("\tif qs := q.Encode(); qs != \"\" {\n")
 		w.WriteString("\t\tpath += \"?\" + qs\n")

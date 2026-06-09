@@ -54,6 +54,26 @@ type Field struct {
 	Default  string
 }
 
+// splitLiteralQuery separates a literal "?a=b&c=d" suffix baked into a spec
+// path from the bare path, returning the path and the literal key/value pairs.
+// Generators fold these pairs into their query builders so a dynamically
+// appended query string uses a single, correctly-separated "?".
+func splitLiteralQuery(path string) (string, [][2]string) {
+	i := strings.IndexByte(path, '?')
+	if i < 0 {
+		return path, nil
+	}
+	var pairs [][2]string
+	for _, kv := range strings.Split(path[i+1:], "&") {
+		if kv == "" {
+			continue
+		}
+		k, v, _ := strings.Cut(kv, "=")
+		pairs = append(pairs, [2]string{k, v})
+	}
+	return path[:i], pairs
+}
+
 func parseField(s string) Field {
 	// "name: type!", "name: type?", "name: type=X", "name: type"
 	parts := strings.SplitN(s, ":", 2)

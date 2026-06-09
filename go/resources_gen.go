@@ -523,10 +523,11 @@ func (s *VolumesService) ListForks(ctx context.Context, volumeID int64, volumeTy
 
 func (s *VolumesService) ListAllForks(ctx context.Context, volumeID int64, volumeType string) ([]Fork, error) {
 	q := url.Values{}
+	q.Set("include_inactive", "true")
 	if volumeType != "" {
 		q.Set("volumeType", volumeType)
 	}
-	path := fmt.Sprintf("/api/v1/volumes/%s/forks?include_inactive=true", strconv.FormatInt(volumeID, 10))
+	path := fmt.Sprintf("/api/v1/volumes/%s/forks", strconv.FormatInt(volumeID, 10))
 	if qs := q.Encode(); qs != "" {
 		path += "?" + qs
 	}

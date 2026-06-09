@@ -323,7 +323,7 @@ export class VolumesResource {
   }
 
   listAllForks(volumeId: number, volumeType?: string, signal?: AbortSignal): Promise<Fork[]> {
-    return this.client.request('GET', `/api/v1/volumes/${volumeId}/forks?include_inactive=true${queryString({ volumeType: volumeType })}`, undefined, signal)
+    return this.client.request('GET', `/api/v1/volumes/${volumeId}/forks${queryString({ include_inactive: "true", volumeType: volumeType })}`, undefined, signal)
   }
 
   deleteFork(volumeId: number, forkName: string, req: DeleteVolumeForkRequest, signal?: AbortSignal): Promise<{ inactivatedFids: number[] }> {
