@@ -29,7 +29,7 @@ All references are regenerated from [api.yaml](api.yaml) via `make gen` (or `mak
 
 ## Porting to Other Languages
 
-Use [api.yaml](api.yaml) for generating code for other languages or contact support@mountos.app.
+Use [api.yaml](api.yaml) for generating code for other languages or contact support@mountos.io.
 
 ## License
 
