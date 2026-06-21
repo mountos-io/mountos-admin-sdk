@@ -936,7 +936,7 @@ Accessor: `client.Storages`
 #### `Create` — POST /api/v1/storages/create
 
 ```go
-func (s *StoragesService) Create(ctx context.Context, req *CreateStorageRequest) (*IDResponse, error)
+func (s *StoragesService) Create(ctx context.Context, req *CreateStorageRequest) (*struct { ID int64; BlockVolumeIds []string }, error)
 ```
 
 Request body:
@@ -956,6 +956,8 @@ type CreateStorageRequest struct {
     BlockRegion              string                   `json:"blockRegion,omitempty"`
     BlockType                string                   `json:"blockType,omitempty"`
     BlockSize                int32                    `json:"blockSize,omitempty"`
+    StorageMode              string                   `json:"storageMode,omitempty"`
+    AvailabilityZones        []string                 `json:"availabilityZones,omitempty"`
     AccessKey                string                   `json:"accessKey,omitempty"`
     SecretKey                string                   `json:"secretKey,omitempty"`
 }

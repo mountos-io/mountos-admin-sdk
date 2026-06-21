@@ -373,7 +373,11 @@ func tsInlineResponseType(resp []string) string {
 	var parts []string
 	for _, s := range resp {
 		f := parseField(s)
-		parts = append(parts, f.Name+": "+tsType(f.Type))
+		optional := ""
+		if f.Optional {
+			optional = "?"
+		}
+		parts = append(parts, f.Name+optional+": "+tsType(f.Type))
 	}
 	return "{ " + strings.Join(parts, "; ") + " }"
 }

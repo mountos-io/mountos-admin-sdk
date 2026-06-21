@@ -879,7 +879,7 @@ Accessor: `client.storages`
 #### `create` — POST /api/v1/storages/create
 
 ```rust
-pub async fn create(&self, req: &CreateStorageRequest) -> Result<IdResponse, Error>
+pub async fn create(&self, req: &CreateStorageRequest) -> Result<CreateStorageResponse, Error>
 ```
 
 Request body:
@@ -899,6 +899,8 @@ pub struct CreateStorageRequest {
     pub block_region: Option<String>,
     pub block_type: Option<String>,
     pub block_size: Option<i32>,
+    pub storage_mode: Option<String>,
+    pub availability_zones: Option<Vec<String>>,
     pub access_key: Option<String>,
     pub secret_key: Option<String>,
 }

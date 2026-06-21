@@ -222,7 +222,7 @@ export class RegionClustersResource {
 export class StoragesResource {
   constructor(private client: Client) {}
 
-  create(req: CreateStorageRequest, signal?: AbortSignal): Promise<{ id: number }> {
+  create(req: CreateStorageRequest, signal?: AbortSignal): Promise<{ id: number; blockVolumeIds?: string[] }> {
     return this.client.request('POST', '/api/v1/storages/create', req, signal)
   }
 
@@ -254,7 +254,7 @@ export class StoragesResource {
 export class VolumesResource {
   constructor(private client: Client) {}
 
-  create(req: CreateVolumeRequest, signal?: AbortSignal): Promise<{ id: number; encryptionKey: string }> {
+  create(req: CreateVolumeRequest, signal?: AbortSignal): Promise<{ id: number; encryptionKey?: string }> {
     return this.client.request('POST', '/api/v1/volumes/create', req, signal)
   }
 

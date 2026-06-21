@@ -324,11 +324,13 @@ Request:
   "blockRegion"?: string,
   "blockType"?: string,
   "blockSize"?: int32,
+  "storageMode"?: string,
+  "availabilityZones"?: string[],
   "accessKey"?: string,
   "secretKey"?: string
 }
 ```
-Response data: `{ "id": int64 }`
+Response data: `{ "id": int64, "blockVolumeIds": string[] }`
 
 ### GET /api/v1/storages/list
 Query: `accountId=int64(required)`, `search=string`, `regionId=int64`, `storageType=string`, `providerType=string`, `isActive=bool`, `page=int(default 1)`, `limit=int(default 10)`

@@ -523,6 +523,8 @@ export interface CreateStorageRequest {
   blockRegion?: string
   blockType?: string
   blockSize?: number
+  storageMode?: string
+  availabilityZones?: string[]
   accessKey?: string
   secretKey?: string
 }

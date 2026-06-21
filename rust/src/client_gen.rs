@@ -249,7 +249,7 @@ pub struct StoragesService {
 }
 
 impl StoragesService {
-    pub async fn create(&self, req: &CreateStorageRequest) -> Result<IdResponse, Error> {
+    pub async fn create(&self, req: &CreateStorageRequest) -> Result<CreateStorageResponse, Error> {
         self.inner.post("/api/v1/storages/create", req).await
     }
 

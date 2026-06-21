@@ -271,12 +271,12 @@ func (s *RegionClustersService) Deactivate(ctx context.Context, regionID int64, 
 
 type StoragesService struct{ c *Client }
 
-func (s *StoragesService) Create(ctx context.Context, req *CreateStorageRequest) (*IDResponse, error) {
+func (s *StoragesService) Create(ctx context.Context, req *CreateStorageRequest) (*CreateStorageResponse, error) {
 	data, err := s.c.post(ctx, "/api/v1/storages/create", req)
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[IDResponse](data)
+	return decodeJSON[CreateStorageResponse](data)
 }
 
 func (s *StoragesService) List(ctx context.Context, opts *StorageListOptions) (*PaginatedResponse[Storage], error) {

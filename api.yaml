@@ -687,10 +687,13 @@ resources:
           - "blockRegion: string"
           - "blockType: string"
           - "blockSize: int32"
+          - "storageMode: string"
+          - "availabilityZones: string[]"
           - "accessKey: string"
           - "secretKey: string"
         response:
           - "id: int64"
+          - "blockVolumeIds: string[]?"
 
       - action: list
         method: GET

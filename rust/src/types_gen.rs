@@ -833,10 +833,21 @@ pub struct CreateStorageRequest {
     pub block_type: Option<String>,
     #[serde(rename = "blockSize", skip_serializing_if = "Option::is_none")]
     pub block_size: Option<i32>,
+    #[serde(rename = "storageMode", skip_serializing_if = "Option::is_none")]
+    pub storage_mode: Option<String>,
+    #[serde(rename = "availabilityZones", skip_serializing_if = "Option::is_none")]
+    pub availability_zones: Option<Vec<String>>,
     #[serde(rename = "accessKey", skip_serializing_if = "Option::is_none")]
     pub access_key: Option<String>,
     #[serde(rename = "secretKey", skip_serializing_if = "Option::is_none")]
     pub secret_key: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CreateStorageResponse {
+    pub id: i64,
+    #[serde(rename = "blockVolumeIds", skip_serializing_if = "Option::is_none")]
+    pub block_volume_ids: Option<Vec<String>>,
 }
 
 #[derive(Debug, Clone, Serialize)]

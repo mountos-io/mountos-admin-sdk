@@ -556,21 +556,28 @@ type RegionClusterListOptions struct {
 // Storages
 
 type CreateStorageRequest struct {
-	AccountID    int64  `json:"accountId"`
-	RegionID     int64  `json:"regionId"`
-	Name         string `json:"name"`
-	Description  string `json:"description,omitempty"`
-	StorageType  string `json:"storageType"`
-	ProviderType string `json:"providerType"`
-	Endpoint     string `json:"endpoint"`
-	Region       string `json:"region,omitempty"`
-	Bucket       string `json:"bucket,omitempty"`
-	Base         string `json:"base,omitempty"`
-	BlockRegion  string `json:"blockRegion,omitempty"`
-	BlockType    string `json:"blockType,omitempty"`
-	BlockSize    int32  `json:"blockSize,omitempty"`
-	AccessKey    string `json:"accessKey,omitempty"`
-	SecretKey    string `json:"secretKey,omitempty"`
+	AccountID         int64    `json:"accountId"`
+	RegionID          int64    `json:"regionId"`
+	Name              string   `json:"name"`
+	Description       string   `json:"description,omitempty"`
+	StorageType       string   `json:"storageType"`
+	ProviderType      string   `json:"providerType"`
+	Endpoint          string   `json:"endpoint"`
+	Region            string   `json:"region,omitempty"`
+	Bucket            string   `json:"bucket,omitempty"`
+	Base              string   `json:"base,omitempty"`
+	BlockRegion       string   `json:"blockRegion,omitempty"`
+	BlockType         string   `json:"blockType,omitempty"`
+	BlockSize         int32    `json:"blockSize,omitempty"`
+	StorageMode       string   `json:"storageMode,omitempty"`
+	AvailabilityZones []string `json:"availabilityZones,omitempty"`
+	AccessKey         string   `json:"accessKey,omitempty"`
+	SecretKey         string   `json:"secretKey,omitempty"`
+}
+
+type CreateStorageResponse struct {
+	ID             int64    `json:"id"`
+	BlockVolumeIds []string `json:"blockVolumeIds,omitempty"`
 }
 
 type EditStorageRequest struct {

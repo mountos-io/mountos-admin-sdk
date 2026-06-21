@@ -982,9 +982,11 @@ client.storages.create(body: {
     blockRegion?: string;
     blockType?: string;
     blockSize?: number;
+    storageMode?: string;
+    availabilityZones?: string[];
     accessKey?: string;
     secretKey?: string;
-  }): Promise<{ id: number }>;
+  }): Promise<{ id: number; blockVolumeIds: string[] }>;
 ```
 
 Request body:
@@ -1004,6 +1006,8 @@ Request body:
   blockRegion?: string;
   blockType?: string;
   blockSize?: number;
+  storageMode?: string;
+  availabilityZones?: string[];
   accessKey?: string;
   secretKey?: string;
 }
