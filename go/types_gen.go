@@ -6,9 +6,10 @@ import "encoding/json"
 
 // Config holds client configuration.
 type Config struct {
-	BaseURL       string
-	PrivateKey    string         // base64-encoded ED25519 key: 32-byte seed or 64-byte seed+pubkey
-	DashboardUser *DashboardUser // optional dashboard operator context
+	BaseURL          string
+	PrivateKey       string         // base64-encoded ED25519 key: 32-byte seed or 64-byte seed+pubkey
+	DashboardUser    *DashboardUser // optional dashboard operator context
+	DashboardHMACKey string         // dashboard-user header HMAC secret (DASHBOARD_USER_HMAC_KEY); required when DashboardUser is set
 }
 
 // ListOptions for page-based pagination.

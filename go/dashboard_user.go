@@ -1,7 +1,6 @@
 package sdk
 
 import (
-	"crypto/ed25519"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
@@ -12,39 +11,23 @@ import (
 
 const defaultDashboardUserTTL = 10 * time.Minute
 
-// deriveVerificationKey derives the Ed25519 public key from a base64-encoded
-// signing key (32-byte seed) and returns it as a standard base64 string.
-func deriveVerificationKey(signingKeyBase64 string) (string, error) {
-	seed, err := base64.StdEncoding.DecodeString(signingKeyBase64)
-	if err != nil {
-		return "", fmt.Errorf("mountos: decode signing key: %w", err)
-	}
-	if len(seed) == 64 {
-		seed = seed[:32]
-	}
-	if len(seed) != 32 {
-		return "", fmt.Errorf("mountos: signing key must be 32 bytes, got %d", len(seed))
-	}
-	pub := ed25519.NewKeyFromSeed(seed).Public().(ed25519.PublicKey)
-	return base64.StdEncoding.EncodeToString(pub), nil
-}
-
-// deriveDashboardHMACKey derives a dedicated HMAC key from the verification key
-// using domain separation.
-func deriveDashboardHMACKey(verificationKey string) []byte {
-	mac := hmac.New(sha256.New, []byte(verificationKey))
+// deriveDashboardHMACKey derives the dashboard-user signing key from the shared
+// secret using domain separation. The secret must match the appserv vault
+// DASHBOARD_USER_HMAC_KEY; it is a dedicated secret, NOT the public provider
+// verification key.
+func deriveDashboardHMACKey(secret string) []byte {
+	mac := hmac.New(sha256.New, []byte(secret))
 	mac.Write([]byte("dashboard-user"))
 	return mac.Sum(nil)
 }
 
 // SignDashboardUser produces the signed header value for X-MountOS-Dashboard-User.
-// Sets exp to now + 10 minutes. The HMAC key is derived from the Ed25519
-// verification key (derived from privateKey) with domain separation.
+// Sets exp to now + 10 minutes. hmacSecret is the dedicated dashboard-user HMAC
+// secret shared with appserv (DASHBOARD_USER_HMAC_KEY).
 // Format: base64url(json).base64url(hmac-sha256(base64url(json), derived_key))
-func SignDashboardUser(user *DashboardUser, privateKey string) (string, error) {
-	verificationKey, err := deriveVerificationKey(privateKey)
-	if err != nil {
-		return "", err
+func SignDashboardUser(user *DashboardUser, hmacSecret string) (string, error) {
+	if hmacSecret == "" {
+		return "", fmt.Errorf("mountos: dashboard HMAC secret is required to sign a dashboard user header")
 	}
 
 	u := *user
@@ -55,7 +38,7 @@ func SignDashboardUser(user *DashboardUser, privateKey string) (string, error) {
 		return "", fmt.Errorf("mountos: marshal dashboard user: %w", err)
 	}
 
-	key := deriveDashboardHMACKey(verificationKey)
+	key := deriveDashboardHMACKey(hmacSecret)
 	encoded := base64.RawURLEncoding.EncodeToString(payload)
 	mac := hmac.New(sha256.New, key)
 	mac.Write([]byte(encoded))

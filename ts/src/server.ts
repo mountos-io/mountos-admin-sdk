@@ -7,14 +7,14 @@ import type { Config, StandardResponse } from './types_gen.js'
 export function createServerClient(config: Config): AdminClient {
   const baseUrl = config.baseUrl.replace(/\/+$/, '')
   const signer = new TokenSigner(config.privateKey)
-  const privateKey = config.privateKey
   const dashboardUser = config.dashboardUser
+  const dashboardHMACKey = config.dashboardHMACKey
 
   const request: RequestFn = async <T>(method: string, path: string, body?: unknown, signal?: AbortSignal): Promise<T> => {
     const token = await signer.getToken()
     const headers: Record<string, string> = { Authorization: `Bearer ${token}` }
     if (dashboardUser) {
-      headers['X-MountOS-Dashboard-User'] = await signDashboardUser(dashboardUser, privateKey)
+      headers['X-MountOS-Dashboard-User'] = await signDashboardUser(dashboardUser, dashboardHMACKey ?? '')
     }
 
     const init: RequestInit = { method, headers, signal }

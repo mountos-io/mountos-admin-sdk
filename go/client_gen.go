@@ -6,11 +6,11 @@ import "net/http"
 
 // Client is the mountOS Admin API client.
 type Client struct {
-	baseURL       string
-	http          *http.Client
-	auth          *tokenCache
-	dashboardUser *DashboardUser
-	privateKey    string
+	baseURL          string
+	http             *http.Client
+	auth             *tokenCache
+	dashboardUser    *DashboardUser
+	dashboardHMACKey string
 
 	Accounts           *AccountsService
 	Users              *UsersService
@@ -42,11 +42,11 @@ func NewClient(cfg Config) (*Client, error) {
 	}
 
 	c := &Client{
-		baseURL:       cfg.BaseURL,
-		http:          http.DefaultClient,
-		auth:          tc,
-		dashboardUser: cfg.DashboardUser,
-		privateKey:    cfg.PrivateKey,
+		baseURL:          cfg.BaseURL,
+		http:             http.DefaultClient,
+		auth:             tc,
+		dashboardUser:    cfg.DashboardUser,
+		dashboardHMACKey: cfg.DashboardHMACKey,
 	}
 	c.Accounts = &AccountsService{c: c}
 	c.Users = &UsersService{c: c}

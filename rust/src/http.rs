@@ -30,7 +30,7 @@ pub(crate) struct ClientInner {
     http: reqwest::Client,
     auth: TokenCache,
     dashboard_user: Option<DashboardUser>,
-    private_key: String,
+    dashboard_hmac_key: Option<String>,
 }
 
 impl ClientInner {
@@ -42,7 +42,7 @@ impl ClientInner {
             http,
             auth,
             dashboard_user: config.dashboard_user,
-            private_key: config.private_key,
+            dashboard_hmac_key: config.dashboard_hmac_key,
         })
     }
 
@@ -90,7 +90,8 @@ impl ClientInner {
         let token = self.auth.token()?;
         let mut request = request.bearer_auth(token);
         if let Some(user) = &self.dashboard_user {
-            let header = sign_dashboard_user(user, &self.private_key)?;
+            let secret = self.dashboard_hmac_key.as_deref().unwrap_or("");
+            let header = sign_dashboard_user(user, secret)?;
             request = request.header("X-MountOS-Dashboard-User", header);
         }
 

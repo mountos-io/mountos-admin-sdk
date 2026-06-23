@@ -64,6 +64,9 @@ func generateRustTypes(spec *Spec, outDir string) {
 	w.WriteString("    pub private_key: String,\n")
 	w.WriteString("    /// Optional dashboard operator context, signed into each request.\n")
 	w.WriteString("    pub dashboard_user: Option<DashboardUser>,\n")
+	w.WriteString("    /// Dedicated HMAC secret for the `X-MountOS-Dashboard-User` header (appserv\n")
+	w.WriteString("    /// `DASHBOARD_USER_HMAC_KEY`); required when `dashboard_user` is set.\n")
+	w.WriteString("    pub dashboard_hmac_key: Option<String>,\n")
 	w.WriteString("}\n\n")
 
 	// ListOptions

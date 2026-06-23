@@ -59,6 +59,8 @@ func generateTSTypes(spec *Spec, outDir string) {
 	w.WriteString("  baseUrl: string\n")
 	w.WriteString("  privateKey: string\n")
 	w.WriteString("  dashboardUser?: DashboardUser\n")
+	w.WriteString("  /** Dedicated HMAC secret for the X-MountOS-Dashboard-User header (appserv DASHBOARD_USER_HMAC_KEY); required when dashboardUser is set. */\n")
+	w.WriteString("  dashboardHMACKey?: string\n")
 	w.WriteString("}\n\n")
 
 	// StandardResponse

@@ -39,7 +39,7 @@ func (c *Client) do(ctx context.Context, method, path string, body any) (json.Ra
 	}
 	req.Header.Set("Authorization", "Bearer "+token)
 	if c.dashboardUser != nil {
-		h, err := SignDashboardUser(c.dashboardUser, c.privateKey)
+		h, err := SignDashboardUser(c.dashboardUser, c.dashboardHMACKey)
 		if err != nil {
 			return nil, err
 		}

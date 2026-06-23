@@ -11,6 +11,9 @@ pub struct Config {
     pub private_key: String,
     /// Optional dashboard operator context, signed into each request.
     pub dashboard_user: Option<DashboardUser>,
+    /// Dedicated HMAC secret for the `X-MountOS-Dashboard-User` header (appserv
+    /// `DASHBOARD_USER_HMAC_KEY`); required when `dashboard_user` is set.
+    pub dashboard_hmac_key: Option<String>,
 }
 
 /// Page-based pagination options.

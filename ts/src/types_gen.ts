@@ -4,6 +4,8 @@ export interface Config {
   baseUrl: string
   privateKey: string
   dashboardUser?: DashboardUser
+  /** Dedicated HMAC secret for the X-MountOS-Dashboard-User header (appserv DASHBOARD_USER_HMAC_KEY); required when dashboardUser is set. */
+  dashboardHMACKey?: string
 }
 
 export interface StandardResponse<T = unknown> {
