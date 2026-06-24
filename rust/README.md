@@ -67,7 +67,7 @@ match client.accounts.get(999).await {
 
 ## Auth
 
-`private_key` is a base64-encoded ED25519 key — a 32-byte seed or a 64-byte
+`private_key` is a base64-encoded ED25519 key - a 32-byte seed or a 64-byte
 seed+public-key. JWT tokens are signed locally and cached for ~55 minutes (1h
 TTL with a 5-minute refresh margin); the cache is `Mutex`-guarded and never held
 across an `.await`.

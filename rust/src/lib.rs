@@ -20,7 +20,7 @@
 //! # }
 //! ```
 //!
-//! The `private_key` is a base64-encoded ED25519 key — either a 32-byte seed or
+//! The `private_key` is a base64-encoded ED25519 key - either a 32-byte seed or
 //! a 64-byte seed+public-key. JWT tokens are signed locally and cached for ~55
 //! minutes (1h TTL with a 5-minute refresh margin).
 

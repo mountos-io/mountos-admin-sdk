@@ -1,6 +1,6 @@
 package sdk
 
-// Provider type constants — stable string identifiers accepted by the
+// Provider type constants - stable string identifiers accepted by the
 // admin storage API for Storage.providerType / CreateStorageRequest.providerType.
 const (
 	ProviderTypeS3              = "s3"

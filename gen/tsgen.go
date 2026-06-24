@@ -653,7 +653,7 @@ func writeTSQueryMethod(w *strings.Builder, methodName string, ep Endpoint, full
 	qsCall := "queryString({ " + strings.Join(qsArgs, ", ") + " })"
 
 	pathExpr := tsPathExpr(fullPath, allPathParams)
-	// Strip outer quotes/backticks — we need raw content for template literal with query string
+	// Strip outer quotes/backticks - we need raw content for template literal with query string
 	pathInner := pathExpr[1 : len(pathExpr)-1]
 
 	fmt.Fprintf(w, "  %s(%s): Promise<%s> {\n", methodName, params, retType)

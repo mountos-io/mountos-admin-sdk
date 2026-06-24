@@ -127,8 +127,8 @@ try {
 ## Auth
 
 The `privateKey` accepts a base64-encoded Ed25519 key in either format:
-- **32 bytes** (seed only) — standard format, e.g. from `openssl genpkey`
-- **64 bytes** (seed + public key concatenated) — Go's `ed25519.PrivateKey` format
+- **32 bytes** (seed only) - standard format, e.g. from `openssl genpkey`
+- **64 bytes** (seed + public key concatenated) - Go's `ed25519.PrivateKey` format
 
 JWT tokens are auto-generated and cached for ~55 minutes (1h TTL with 5min refresh margin).
 
@@ -136,9 +136,9 @@ JWT tokens are auto-generated and cached for ~55 minutes (1h TTL with 5min refre
 
 The published package bundles, alongside `dist/`:
 
-- **`api.yaml`** — the source spec the SDK is generated from; use it to port the API to another language.
-- **`api.md`** — language-neutral REST reference: every endpoint, request/response shape, query params, error codes, and the JWT claim contract.
-- **`SKILL.md`** — an agent skill describing how to use this SDK (TS/Go usage, auth, resources). AI coding agents can load it for accurate, up-to-date guidance.
+- **`api.yaml`** - the source spec the SDK is generated from; use it to port the API to another language.
+- **`api.md`** - language-neutral REST reference: every endpoint, request/response shape, query params, error codes, and the JWT claim contract.
+- **`SKILL.md`** - an agent skill describing how to use this SDK (TS/Go usage, auth, resources). AI coding agents can load it for accurate, up-to-date guidance.
 
 Resolve their on-disk paths from the package root:
 

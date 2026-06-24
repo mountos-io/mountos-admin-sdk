@@ -23,10 +23,10 @@ errorCodes:
   - { code: 10902, name: DATABASE_ERROR }
 
 # Field notation:
-#   "name: type"   — present (model/response) or optional (request)
-#   "name: type!"  — required (request only)
-#   "name: type?"  — optional/omitempty
-#   "name: type=X" — query param with default value X
+#   "name: type"   - present (model/response) or optional (request)
+#   "name: type!"  - required (request only)
+#   "name: type?"  - optional/omitempty
+#   "name: type=X" - query param with default value X
 # Types: string, int64, int32, int, bool, datetime, object, json, EnumName, TypeName[]
 
 enums:
