@@ -429,8 +429,13 @@ func writeRustArrayMethod(w *strings.Builder, methodName string, ep Endpoint, fu
 		parts = append(parts, rustFieldName(f.Name)+": "+rustQueryParamType(f))
 	}
 	fmt.Fprintf(w, "    pub async fn %s(&self%s) -> Result<%s, Error> {\n", methodName, rustSig(parts), retType)
-	writeRustQueryBuild(w, ep.Query)
-	fmt.Fprintf(w, "        self.inner.get(%s, &query).await\n", pathExpr)
+	if len(ep.Query) == 0 {
+		// No query params: pass an empty slice directly (avoids an unused `mut query`).
+		fmt.Fprintf(w, "        self.inner.get(%s, &[]).await\n", pathExpr)
+	} else {
+		writeRustQueryBuild(w, ep.Query)
+		fmt.Fprintf(w, "        self.inner.get(%s, &query).await\n", pathExpr)
+	}
 	w.WriteString("    }\n")
 }
 

@@ -138,6 +138,32 @@ pub struct AuditLog {
 }
 ```
 
+### `BlockMember`
+
+```rust
+pub struct BlockMember {
+    pub name: Option<String>,
+    pub region_cluster_id: i64,
+}
+```
+
+### `BlockVolume`
+
+```rust
+pub struct BlockVolume {
+    pub id: String,
+    pub name: Option<String>,
+    pub cluster_name: Option<String>,
+    pub cluster_uuid: Option<String>,
+    pub shard_id: i64,
+    pub region_cluster_id: i64,
+    pub cluster_ready: bool,
+    pub is_active: bool,
+    pub created_at: String,
+    pub updated_at: String,
+}
+```
+
 ### `ClientSession`
 
 ```rust
@@ -502,7 +528,6 @@ pub struct Storage {
     pub description: Option<String>,
     pub storage_type: String,
     pub provider_type: String,
-    pub block_type: Option<String>,
     pub endpoint: String,
     pub region: Option<String>,
     pub bucket: Option<String>,
@@ -550,6 +575,7 @@ pub struct Volume {
     pub name: String,
     pub description: Option<String>,
     pub volume_type: String,
+    pub storage_type: Option<String>,
     pub encryption: bool,
     pub quota_limit: i64,
     pub live_volume: i64,
@@ -897,10 +923,8 @@ pub struct CreateStorageRequest {
     pub bucket: Option<String>,
     pub base: Option<String>,
     pub block_region: Option<String>,
-    pub block_type: Option<String>,
     pub block_size: Option<i32>,
-    pub storage_mode: Option<String>,
-    pub availability_zones: Option<Vec<String>>,
+    pub members: Option<Vec<BlockMember>>,
     pub access_key: Option<String>,
     pub secret_key: Option<String>,
 }
@@ -916,6 +940,12 @@ pub async fn list(&self, opts: Option<&StorageListOptions>) -> Result<PaginatedR
 
 ```rust
 pub async fn get(&self, storage_id: i64) -> Result<Storage, Error>
+```
+
+#### `list_block_volumes` — GET /api/v1/storages/:storageId/block-volumes
+
+```rust
+pub async fn list_block_volumes(&self, storage_id: i64) -> Result<Vec<BlockVolume>, Error>
 ```
 
 #### `edit` — PUT /api/v1/storages/:storageId/edit

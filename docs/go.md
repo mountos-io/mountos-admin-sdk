@@ -153,6 +153,32 @@ type AuditLog struct {
 }
 ```
 
+### `BlockMember`
+
+```go
+type BlockMember struct {
+    Name                     string                   `json:"name,omitempty"`
+    RegionClusterID          int64                    `json:"regionClusterId"`
+}
+```
+
+### `BlockVolume`
+
+```go
+type BlockVolume struct {
+    ID                       string                   `json:"id"`
+    Name                     string                   `json:"name,omitempty"`
+    ClusterName              string                   `json:"clusterName,omitempty"`
+    ClusterUUID              string                   `json:"clusterUuid,omitempty"`
+    ShardID                  int64                    `json:"shardId"`
+    RegionClusterID          int64                    `json:"regionClusterId"`
+    ClusterReady             bool                     `json:"clusterReady"`
+    IsActive                 bool                     `json:"isActive"`
+    CreatedAt                string                   `json:"createdAt"`
+    UpdatedAt                string                   `json:"updatedAt"`
+}
+```
+
 ### `ClientSession`
 
 ```go
@@ -517,7 +543,6 @@ type Storage struct {
     Description              string                   `json:"description,omitempty"`
     StorageType              string                   `json:"storageType"`
     ProviderType             string                   `json:"providerType"`
-    BlockType                string                   `json:"blockType,omitempty"`
     Endpoint                 string                   `json:"endpoint"`
     Region                   string                   `json:"region,omitempty"`
     Bucket                   string                   `json:"bucket,omitempty"`
@@ -565,6 +590,7 @@ type Volume struct {
     Name                     string                   `json:"name"`
     Description              string                   `json:"description,omitempty"`
     VolumeType               string                   `json:"volumeType"`
+    StorageType              string                   `json:"storageType,omitempty"`
     Encryption               bool                     `json:"encryption"`
     QuotaLimit               int64                    `json:"quotaLimit"`
     LiveVolume               int64                    `json:"liveVolume"`
@@ -954,10 +980,8 @@ type CreateStorageRequest struct {
     Bucket                   string                   `json:"bucket,omitempty"`
     Base                     string                   `json:"base,omitempty"`
     BlockRegion              string                   `json:"blockRegion,omitempty"`
-    BlockType                string                   `json:"blockType,omitempty"`
     BlockSize                int32                    `json:"blockSize,omitempty"`
-    StorageMode              string                   `json:"storageMode,omitempty"`
-    AvailabilityZones        []string                 `json:"availabilityZones,omitempty"`
+    Members                  []BlockMember            `json:"members,omitempty"`
     AccessKey                string                   `json:"accessKey,omitempty"`
     SecretKey                string                   `json:"secretKey,omitempty"`
 }
@@ -988,6 +1012,12 @@ type ListStorageOptions struct {
 
 ```go
 func (s *StoragesService) Get(ctx context.Context, storageID int64) (*Storage, error)
+```
+
+#### `ListBlockVolumes` — GET /api/v1/storages/:storageId/block-volumes
+
+```go
+func (s *StoragesService) ListBlockVolumes(ctx context.Context, storageID int64) ([]BlockVolume, error)
 ```
 
 #### `Edit` — PUT /api/v1/storages/:storageId/edit

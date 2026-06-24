@@ -168,8 +168,6 @@ pub struct Storage {
     pub storage_type: String,
     #[serde(rename = "providerType")]
     pub provider_type: String,
-    #[serde(rename = "blockType", skip_serializing_if = "Option::is_none")]
-    pub block_type: Option<String>,
     pub endpoint: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub region: Option<String>,
@@ -181,6 +179,29 @@ pub struct Storage {
     pub block_region: Option<String>,
     #[serde(rename = "blockSize", skip_serializing_if = "Option::is_none")]
     pub block_size: Option<i32>,
+    #[serde(rename = "isActive")]
+    pub is_active: bool,
+    #[serde(rename = "createdAt")]
+    pub created_at: String,
+    #[serde(rename = "updatedAt")]
+    pub updated_at: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BlockVolume {
+    pub id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    #[serde(rename = "clusterName", skip_serializing_if = "Option::is_none")]
+    pub cluster_name: Option<String>,
+    #[serde(rename = "clusterUuid", skip_serializing_if = "Option::is_none")]
+    pub cluster_uuid: Option<String>,
+    #[serde(rename = "shardId")]
+    pub shard_id: i64,
+    #[serde(rename = "regionClusterId")]
+    pub region_cluster_id: i64,
+    #[serde(rename = "clusterReady")]
+    pub cluster_ready: bool,
     #[serde(rename = "isActive")]
     pub is_active: bool,
     #[serde(rename = "createdAt")]
@@ -202,6 +223,8 @@ pub struct Volume {
     pub description: Option<String>,
     #[serde(rename = "volumeType")]
     pub volume_type: String,
+    #[serde(rename = "storageType", skip_serializing_if = "Option::is_none")]
+    pub storage_type: Option<String>,
     pub encryption: bool,
     #[serde(rename = "quotaLimit")]
     pub quota_limit: i64,
@@ -570,6 +593,14 @@ pub struct RegionAlert {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BlockMember {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    #[serde(rename = "regionClusterId")]
+    pub region_cluster_id: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DashboardUser {
     pub id: String,
     pub name: String,
@@ -832,14 +863,10 @@ pub struct CreateStorageRequest {
     pub base: Option<String>,
     #[serde(rename = "blockRegion", skip_serializing_if = "Option::is_none")]
     pub block_region: Option<String>,
-    #[serde(rename = "blockType", skip_serializing_if = "Option::is_none")]
-    pub block_type: Option<String>,
     #[serde(rename = "blockSize", skip_serializing_if = "Option::is_none")]
     pub block_size: Option<i32>,
-    #[serde(rename = "storageMode", skip_serializing_if = "Option::is_none")]
-    pub storage_mode: Option<String>,
-    #[serde(rename = "availabilityZones", skip_serializing_if = "Option::is_none")]
-    pub availability_zones: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub members: Option<Vec<BlockMember>>,
     #[serde(rename = "accessKey", skip_serializing_if = "Option::is_none")]
     pub access_key: Option<String>,
     #[serde(rename = "secretKey", skip_serializing_if = "Option::is_none")]

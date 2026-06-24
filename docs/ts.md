@@ -127,6 +127,32 @@ interface AuditLog {
 }
 ```
 
+### `BlockMember`
+
+```typescript
+interface BlockMember {
+  name?: string;
+  regionClusterId: number;
+}
+```
+
+### `BlockVolume`
+
+```typescript
+interface BlockVolume {
+  id: string;
+  name?: string;
+  clusterName?: string;
+  clusterUuid?: string;
+  shardId: number;
+  regionClusterId: number;
+  clusterReady: boolean;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+```
+
 ### `ClientSession`
 
 ```typescript
@@ -491,7 +517,6 @@ interface Storage {
   description?: string;
   storageType: string;
   providerType: string;
-  blockType?: string;
   endpoint: string;
   region?: string;
   bucket?: string;
@@ -539,6 +564,7 @@ interface Volume {
   name: string;
   description?: string;
   volumeType: string;
+  storageType?: string;
   encryption: boolean;
   quotaLimit: number;
   liveVolume: number;
@@ -980,10 +1006,8 @@ client.storages.create(body: {
     bucket?: string;
     base?: string;
     blockRegion?: string;
-    blockType?: string;
     blockSize?: number;
-    storageMode?: string;
-    availabilityZones?: string[];
+    members?: BlockMember[];
     accessKey?: string;
     secretKey?: string;
   }): Promise<{ id: number; blockVolumeIds: string[] }>;
@@ -1004,10 +1028,8 @@ Request body:
   bucket?: string;
   base?: string;
   blockRegion?: string;
-  blockType?: string;
   blockSize?: number;
-  storageMode?: string;
-  availabilityZones?: string[];
+  members?: BlockMember[];
   accessKey?: string;
   secretKey?: string;
 }
@@ -1047,6 +1069,12 @@ Query params:
 
 ```typescript
 client.storages.get(storageID: number): Promise<Storage>;
+```
+
+#### `listBlockVolumes` — GET /api/v1/storages/:storageId/block-volumes
+
+```typescript
+client.storages.listBlockVolumes(storageID: number): Promise<BlockVolume[]>;
 ```
 
 #### `edit` — PUT /api/v1/storages/:storageId/edit

@@ -101,13 +101,25 @@ export interface Storage {
   description?: string
   storageType: string
   providerType: string
-  blockType?: string
   endpoint: string
   region?: string
   bucket?: string
   base?: string
   blockRegion?: string
   blockSize?: number
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface BlockVolume {
+  id: string
+  name?: string
+  clusterName?: string
+  clusterUuid?: string
+  shardId: number
+  regionClusterId: number
+  clusterReady: boolean
   isActive: boolean
   createdAt: string
   updatedAt: string
@@ -122,6 +134,7 @@ export interface Volume {
   name: string
   description?: string
   volumeType: string
+  storageType?: string
   encryption: boolean
   quotaLimit: number
   liveVolume: number
@@ -351,6 +364,11 @@ export interface RegionAlert {
   createdAt?: string
 }
 
+export interface BlockMember {
+  name?: string
+  regionClusterId: number
+}
+
 export interface DashboardUser {
   id: string
   name: string
@@ -523,10 +541,8 @@ export interface CreateStorageRequest {
   bucket?: string
   base?: string
   blockRegion?: string
-  blockType?: string
   blockSize?: number
-  storageMode?: string
-  availabilityZones?: string[]
+  members?: BlockMember[]
   accessKey?: string
   secretKey?: string
 }

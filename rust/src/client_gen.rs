@@ -286,6 +286,10 @@ impl StoragesService {
         self.inner.get(&format!("/api/v1/storages/{}", storage_id), &[]).await
     }
 
+    pub async fn list_block_volumes(&self, storage_id: i64) -> Result<Vec<BlockVolume>, Error> {
+        self.inner.get(&format!("/api/v1/storages/{}/block-volumes", storage_id), &[]).await
+    }
+
     pub async fn edit(&self, storage_id: i64, req: &EditStorageRequest) -> Result<IdResponse, Error> {
         self.inner.put(&format!("/api/v1/storages/{}/edit", storage_id), req).await
     }

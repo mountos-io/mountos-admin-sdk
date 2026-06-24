@@ -6,10 +6,11 @@ import type {
   UpdateAccountQuotaRequest, AddUserRequest, User, UserListOptions, BulkUserRequest, 
   UserLite, EditUserRequest, CreateRegionRequest, Region, RegionListOptions, 
   EditRegionRequest, CreateRegionClusterRequest, RegionCluster, RegionClusterListOptions, 
-  EditRegionClusterRequest, SetRegionClusterReadyRequest, CreateStorageRequest, Storage, 
-  StorageListOptions, EditStorageRequest, TestStorageBucketRequest, CreateVolumeRequest, 
-  Volume, VolumeListOptions, EditVolumeRequest, MoveVolumeClusterRequest, 
-  DeactivateVolumeRequest, GenerateVolumeAPIKeysRequest, RevokeVolumeAPIKeyRequest, 
+  EditRegionClusterRequest, SetRegionClusterReadyRequest, CreateStorageRequest, 
+  BlockMember, Storage, StorageListOptions, BlockVolume, EditStorageRequest, 
+  TestStorageBucketRequest, CreateVolumeRequest, Volume, VolumeListOptions, 
+  EditVolumeRequest, MoveVolumeClusterRequest, DeactivateVolumeRequest, 
+  GenerateVolumeAPIKeysRequest, RevokeVolumeAPIKeyRequest, 
   RevokeVolumeAPIKeysByUserRequest, UpdateVolumeQuotaRequest, VolumeSizePoint, 
   CreateVolumeForkRequest, Fork, DeleteVolumeForkRequest, RestoreVolumeForkRequest, 
   ForkTreeEntry, VolumeForkTreeListOptions, ForkEntryDetail, ForkEntryVersion, 
@@ -232,6 +233,10 @@ export class StoragesResource {
 
   get(storageId: number, signal?: AbortSignal): Promise<Storage> {
     return this.client.request('GET', `/api/v1/storages/${storageId}`, undefined, signal)
+  }
+
+  listBlockVolumes(storageId: number, signal?: AbortSignal): Promise<BlockVolume[]> {
+    return this.client.request('GET', `/api/v1/storages/${storageId}/block-volumes`, undefined, signal)
   }
 
   edit(storageId: number, req: EditStorageRequest, signal?: AbortSignal): Promise<{ id: number }> {

@@ -132,13 +132,32 @@ types:
     - "description: string?"
     - "storageType: string"
     - "providerType: string"
-    - "blockType: string?"
     - "endpoint: string"
     - "region: string?"
     - "bucket: string?"
     - "base: string?"
     - "blockRegion: string?"
     - "blockSize: int32?"
+    - "isActive: bool"
+    - "createdAt: datetime"
+    - "updatedAt: datetime"
+
+  # One block-volume member of a block storage on create: a region-cluster placement
+  # and an optional operator-facing name tag. 1 originator + up to 2 HA members.
+  BlockMember:
+    - "name: string?"
+    - "regionClusterId: int64"
+
+  # A provisioned block-volume member. id is the BLOCK_VOLUME_ID env value and
+  # clusterUuid the REGION_CLUSTER_ID env value an operator gives its blockserv.
+  BlockVolume:
+    - "id: string"
+    - "name: string?"
+    - "clusterName: string?"
+    - "clusterUuid: string?"
+    - "shardId: int64"
+    - "regionClusterId: int64"
+    - "clusterReady: bool"
     - "isActive: bool"
     - "createdAt: datetime"
     - "updatedAt: datetime"
@@ -158,6 +177,9 @@ types:
     # not mountable as a regular filesystem; engines must use the lake
     # REST + S3 endpoints instead.
     - "volumeType: string"
+    # Backing storage kind ("object" | "block"), derived from the volume's
+    # storage. Empty/absent when the storage row is unavailable.
+    - "storageType: string?"
     - "encryption: bool"
     - "quotaLimit: int64"
     - "liveVolume: int64"
@@ -685,10 +707,8 @@ resources:
           - "bucket: string"
           - "base: string"
           - "blockRegion: string"
-          - "blockType: string"
           - "blockSize: int32"
-          - "storageMode: string"
-          - "availabilityZones: string[]"
+          - "members: BlockMember[]"
           - "accessKey: string"
           - "secretKey: string"
         response:
@@ -714,6 +734,12 @@ resources:
         method: GET
         path: /:storageId
         responseType: Storage
+
+      - action: listBlockVolumes
+        method: GET
+        path: /:storageId/block-volumes
+        responseType: BlockVolume
+        responseArray: true
 
       - action: edit
         method: PUT

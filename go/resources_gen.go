@@ -315,6 +315,18 @@ func (s *StoragesService) Get(ctx context.Context, storageID int64) (*Storage, e
 	return decodeJSON[Storage](data)
 }
 
+func (s *StoragesService) ListBlockVolumes(ctx context.Context, storageID int64) ([]BlockVolume, error) {
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/storages/%s/block-volumes", strconv.FormatInt(storageID, 10)))
+	if err != nil {
+		return nil, err
+	}
+	result, err := decodeJSON[[]BlockVolume](data)
+	if err != nil {
+		return nil, err
+	}
+	return *result, nil
+}
+
 func (s *StoragesService) Edit(ctx context.Context, storageID int64, req *EditStorageRequest) (*IDResponse, error) {
 	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/storages/%s/edit", strconv.FormatInt(storageID, 10)), req)
 	if err != nil {

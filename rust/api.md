@@ -322,10 +322,8 @@ Request:
   "bucket"?: string,
   "base"?: string,
   "blockRegion"?: string,
-  "blockType"?: string,
   "blockSize"?: int32,
-  "storageMode"?: string,
-  "availabilityZones"?: string[],
+  "members"?: BlockMember[],
   "accessKey"?: string,
   "secretKey"?: string
 }
@@ -339,6 +337,10 @@ Response data: `{ "items": Storage[], "pagination": PaginationMeta }`
 ### GET /api/v1/storages/:storageId
 Param: `storageId`
 Response data: `Storage`
+
+### GET /api/v1/storages/:storageId/block-volumes
+Param: `storageId`
+Response data: `BlockVolume[]`
 
 ### PUT /api/v1/storages/:storageId/edit
 Param: `storageId`
@@ -386,7 +388,6 @@ Response data: `{ "bucketExists": bool, "list": bool, "write": bool, "read": boo
   "description"?: string,
   "storageType": string,
   "providerType": string,
-  "blockType"?: string,
   "endpoint": string,
   "region"?: string,
   "bucket"?: string,
@@ -586,6 +587,7 @@ Response data: `Fork`
   "name": string,
   "description"?: string,
   "volumeType": string,
+  "storageType"?: string,
   "encryption": bool,
   "quotaLimit": int64,
   "liveVolume": int64,
