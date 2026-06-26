@@ -193,7 +193,7 @@ Request:
 Response data: `{ "id": int64 }`
 
 ### GET /api/v1/regions/list
-Query: `isActive=bool`, `page=int(default 1)`, `limit=int(default 10)`
+Query: `accountId=int64(required)`, `isActive=bool`, `page=int(default 1)`, `limit=int(default 10)`
 Response data: `{ "items": Region[], "pagination": PaginationMeta }`
 
 ### GET /api/v1/regions/:regionId
@@ -717,7 +717,7 @@ Response data: `{ "items": ForkTreeMatch[], "nextCursor": int64|null }`
 ## AuditLogs
 
 ### GET /api/v1/audit-logs/list
-Query: `accountId=int64`, `regionId=int64`, `regionClusterId=int64`, `cursor=int64`, `limit=int(default 20)`, `subject=string`
+Query: `accountId=int64(required)`, `regionId=int64`, `regionClusterId=int64`, `cursor=int64`, `limit=int(default 20)`, `subject=string`
 Response data: `{ "items": AuditLog[], "nextCursor": int64|null }`
 
 ### AuditLog Type
@@ -832,7 +832,7 @@ Response data: `ServiceNode[]`
 ## ClientSessions
 
 ### GET /api/v1/client-sessions/list
-Query: `accountId=int64`, `regionId=int64`, `regionClusterId=int64`, `volumeId=int64`, `userId=int64`, `clientType=string`, `status=ClientSessionStatus`, `isActive=string`, `osName=string`, `platform=string`, `search=string`, `page=int(default 1)`, `limit=int(default 20)`
+Query: `accountId=int64(required)`, `regionId=int64`, `regionClusterId=int64`, `volumeId=int64`, `userId=int64`, `clientType=string`, `status=ClientSessionStatus`, `isActive=string`, `osName=string`, `platform=string`, `search=string`, `page=int(default 1)`, `limit=int(default 20)`
 Response data: `{ "items": ClientSession[], "pagination": PaginationMeta }`
 
 ### GET /api/v1/client-sessions/:sessionId
@@ -840,7 +840,7 @@ Param: `sessionId`
 Response data: `ClientSession`
 
 ### GET /api/v1/client-sessions/summary
-Query: `accountId=int64`, `regionId=int64`, `regionClusterId=int64`, `volumeId=int64`, `userId=int64`
+Query: `accountId=int64(required)`, `regionId=int64`, `regionClusterId=int64`, `volumeId=int64`, `userId=int64`
 Response data: `SessionSummary`
 
 ### ClientSession Type

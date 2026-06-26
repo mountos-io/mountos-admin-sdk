@@ -507,6 +507,7 @@ export interface EditRegionRequest {
 }
 
 export interface RegionListOptions extends ListOptions {
+  accountId: number
   isActive?: boolean
 }
 
@@ -696,7 +697,7 @@ export interface VolumeForkSearchListOptions {
 // AuditLogs
 
 export interface AuditLogListOptions {
-  accountId?: number
+  accountId: number
   regionId?: number
   regionClusterId?: number
   cursor?: number
@@ -721,7 +722,7 @@ export interface RegionAuditLogListOptions {
 // ClientSessions
 
 export interface ClientSessionListOptions extends ListOptions {
-  accountId?: number
+  accountId: number
   regionId?: number
   regionClusterId?: number
   volumeId?: number

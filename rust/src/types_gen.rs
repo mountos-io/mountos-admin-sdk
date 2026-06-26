@@ -805,6 +805,7 @@ pub struct EditRegionRequest {
 
 #[derive(Debug, Clone, Default)]
 pub struct RegionListOptions {
+    pub account_id: i64,
     pub is_active: Option<bool>,
     pub page: Option<i64>,
     pub limit: Option<i64>,
@@ -1169,7 +1170,7 @@ pub struct VolumeForkSearchListOptions {
 
 #[derive(Debug, Clone, Default)]
 pub struct AuditLogListOptions {
-    pub account_id: Option<i64>,
+    pub account_id: i64,
     pub region_id: Option<i64>,
     pub region_cluster_id: Option<i64>,
     pub cursor: Option<i64>,
@@ -1196,7 +1197,7 @@ pub struct RegionAuditLogListOptions {
 
 #[derive(Debug, Clone, Default)]
 pub struct ClientSessionListOptions {
-    pub account_id: Option<i64>,
+    pub account_id: i64,
     pub region_id: Option<i64>,
     pub region_cluster_id: Option<i64>,
     pub volume_id: Option<i64>,

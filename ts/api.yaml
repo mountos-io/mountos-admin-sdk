@@ -609,6 +609,7 @@ resources:
         path: /list
         pagination: page
         query:
+          - "accountId: int64!"
           - "isActive: bool"
           - "page: int=1"
           - "limit: int=10"
@@ -1087,7 +1088,7 @@ resources:
         path: /list
         pagination: cursor
         query:
-          - "accountId: int64"
+          - "accountId: int64!"
           - "regionId: int64"
           - "regionClusterId: int64"
           - "cursor: int64"
@@ -1153,7 +1154,7 @@ resources:
         path: /list
         pagination: page
         query:
-          - "accountId: int64"
+          - "accountId: int64!"
           - "regionId: int64"
           - "regionClusterId: int64"
           - "volumeId: int64"
@@ -1177,7 +1178,7 @@ resources:
         method: GET
         path: /summary
         query:
-          - "accountId: int64"
+          - "accountId: int64!"
           - "regionId: int64"
           - "regionClusterId: int64"
           - "volumeId: int64"

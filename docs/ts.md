@@ -850,6 +850,7 @@ Request body:
 
 ```typescript
 client.regions.list(params: {
+    accountId: number;
     isActive?: boolean;
     page?: number;
     limit?: number;
@@ -860,6 +861,7 @@ Query params:
 
 ```typescript
 {
+  accountId: number;
   isActive?: boolean;
   page?: number;  // default: 1
   limit?: number;  // default: 10
@@ -1622,7 +1624,7 @@ Accessor: `client.auditLogs`
 
 ```typescript
 client.auditLogs.list(params: {
-    accountId?: number;
+    accountId: number;
     regionId?: number;
     regionClusterId?: number;
     cursor?: number;
@@ -1635,7 +1637,7 @@ Query params:
 
 ```typescript
 {
-  accountId?: number;
+  accountId: number;
   regionId?: number;
   regionClusterId?: number;
   cursor?: number;
@@ -1738,7 +1740,7 @@ Accessor: `client.clientSessions`
 
 ```typescript
 client.clientSessions.list(params: {
-    accountId?: number;
+    accountId: number;
     regionId?: number;
     regionClusterId?: number;
     volumeId?: number;
@@ -1758,7 +1760,7 @@ Query params:
 
 ```typescript
 {
-  accountId?: number;
+  accountId: number;
   regionId?: number;
   regionClusterId?: number;
   volumeId?: number;
@@ -1784,7 +1786,7 @@ client.clientSessions.get(sessionID: number): Promise<ClientSession>;
 
 ```typescript
 client.clientSessions.summary(params: {
-    accountId?: number;
+    accountId: number;
     regionId?: number;
     regionClusterId?: number;
     volumeId?: number;
@@ -1796,7 +1798,7 @@ Query params:
 
 ```typescript
 {
-  accountId?: number;
+  accountId: number;
   regionId?: number;
   regionClusterId?: number;
   volumeId?: number;

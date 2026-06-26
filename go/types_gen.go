@@ -543,9 +543,10 @@ type EditRegionRequest struct {
 }
 
 type RegionListOptions struct {
-	IsActive *bool
-	Page     int
-	Limit    int
+	AccountID int64
+	IsActive  *bool
+	Page      int
+	Limit     int
 }
 
 // Clusters
@@ -803,7 +804,7 @@ type VolumeForkSearchListOptions struct {
 // AuditLogs
 
 type AuditLogListOptions struct {
-	AccountID       *int64
+	AccountID       int64
 	RegionID        *int64
 	RegionClusterID *int64
 	Cursor          int64
@@ -828,7 +829,7 @@ type RegionAuditLogListOptions struct {
 // ClientSessions
 
 type ClientSessionListOptions struct {
-	AccountID       *int64
+	AccountID       int64
 	RegionID        *int64
 	RegionClusterID *int64
 	VolumeID        *int64

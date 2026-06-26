@@ -842,6 +842,7 @@ Query params:
 
 ```go
 type ListRegionOptions struct {
+    AccountID            int64        `url:"accountId"`
     IsActive             bool         `url:"isActive"`
     Page                 int          `url:"page"` // default: 1
     Limit                int          `url:"limit"` // default: 10

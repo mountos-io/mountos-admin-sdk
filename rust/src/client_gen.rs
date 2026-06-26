@@ -122,22 +122,20 @@ impl UsersService {
         self.inner.post("/api/v1/users/add", req).await
     }
 
-    pub async fn list(&self, opts: Option<&UserListOptions>) -> Result<PaginatedResponse<User>, Error> {
+    pub async fn list(&self, opts: &UserListOptions) -> Result<PaginatedResponse<User>, Error> {
         let mut query: Vec<(&str, String)> = Vec::new();
-        if let Some(opts) = opts {
-            query.push(("accountId", opts.account_id.to_string()));
-            if let Some(v) = &opts.search {
-                query.push(("search", v.to_string()));
-            }
-            if let Some(v) = &opts.is_active {
-                query.push(("isActive", v.to_string()));
-            }
-            if let Some(v) = &opts.page {
-                query.push(("page", v.to_string()));
-            }
-            if let Some(v) = &opts.limit {
-                query.push(("limit", v.to_string()));
-            }
+        query.push(("accountId", opts.account_id.to_string()));
+        if let Some(v) = &opts.search {
+            query.push(("search", v.to_string()));
+        }
+        if let Some(v) = &opts.is_active {
+            query.push(("isActive", v.to_string()));
+        }
+        if let Some(v) = &opts.page {
+            query.push(("page", v.to_string()));
+        }
+        if let Some(v) = &opts.limit {
+            query.push(("limit", v.to_string()));
         }
         self.inner.get("/api/v1/users/list", &query).await
     }
@@ -169,18 +167,17 @@ impl RegionsService {
         self.inner.post("/api/v1/regions/create", req).await
     }
 
-    pub async fn list(&self, opts: Option<&RegionListOptions>) -> Result<PaginatedResponse<Region>, Error> {
+    pub async fn list(&self, opts: &RegionListOptions) -> Result<PaginatedResponse<Region>, Error> {
         let mut query: Vec<(&str, String)> = Vec::new();
-        if let Some(opts) = opts {
-            if let Some(v) = &opts.is_active {
-                query.push(("isActive", v.to_string()));
-            }
-            if let Some(v) = &opts.page {
-                query.push(("page", v.to_string()));
-            }
-            if let Some(v) = &opts.limit {
-                query.push(("limit", v.to_string()));
-            }
+        query.push(("accountId", opts.account_id.to_string()));
+        if let Some(v) = &opts.is_active {
+            query.push(("isActive", v.to_string()));
+        }
+        if let Some(v) = &opts.page {
+            query.push(("page", v.to_string()));
+        }
+        if let Some(v) = &opts.limit {
+            query.push(("limit", v.to_string()));
         }
         self.inner.get("/api/v1/regions/list", &query).await
     }
@@ -204,22 +201,20 @@ pub struct ClustersService {
 }
 
 impl ClustersService {
-    pub async fn list(&self, opts: Option<&ClusterListOptions>) -> Result<PaginatedResponse<RegionCluster>, Error> {
+    pub async fn list(&self, opts: &ClusterListOptions) -> Result<PaginatedResponse<RegionCluster>, Error> {
         let mut query: Vec<(&str, String)> = Vec::new();
-        if let Some(opts) = opts {
-            query.push(("accountId", opts.account_id.to_string()));
-            if let Some(v) = &opts.region_id {
-                query.push(("regionId", v.to_string()));
-            }
-            if let Some(v) = &opts.is_active {
-                query.push(("isActive", v.to_string()));
-            }
-            if let Some(v) = &opts.page {
-                query.push(("page", v.to_string()));
-            }
-            if let Some(v) = &opts.limit {
-                query.push(("limit", v.to_string()));
-            }
+        query.push(("accountId", opts.account_id.to_string()));
+        if let Some(v) = &opts.region_id {
+            query.push(("regionId", v.to_string()));
+        }
+        if let Some(v) = &opts.is_active {
+            query.push(("isActive", v.to_string()));
+        }
+        if let Some(v) = &opts.page {
+            query.push(("page", v.to_string()));
+        }
+        if let Some(v) = &opts.limit {
+            query.push(("limit", v.to_string()));
         }
         self.inner.get("/api/v1/clusters/list", &query).await
     }
@@ -282,31 +277,29 @@ impl StoragesService {
         self.inner.post("/api/v1/storages/create", req).await
     }
 
-    pub async fn list(&self, opts: Option<&StorageListOptions>) -> Result<PaginatedResponse<Storage>, Error> {
+    pub async fn list(&self, opts: &StorageListOptions) -> Result<PaginatedResponse<Storage>, Error> {
         let mut query: Vec<(&str, String)> = Vec::new();
-        if let Some(opts) = opts {
-            query.push(("accountId", opts.account_id.to_string()));
-            if let Some(v) = &opts.search {
-                query.push(("search", v.to_string()));
-            }
-            if let Some(v) = &opts.region_id {
-                query.push(("regionId", v.to_string()));
-            }
-            if let Some(v) = &opts.storage_type {
-                query.push(("storageType", v.to_string()));
-            }
-            if let Some(v) = &opts.provider_type {
-                query.push(("providerType", v.to_string()));
-            }
-            if let Some(v) = &opts.is_active {
-                query.push(("isActive", v.to_string()));
-            }
-            if let Some(v) = &opts.page {
-                query.push(("page", v.to_string()));
-            }
-            if let Some(v) = &opts.limit {
-                query.push(("limit", v.to_string()));
-            }
+        query.push(("accountId", opts.account_id.to_string()));
+        if let Some(v) = &opts.search {
+            query.push(("search", v.to_string()));
+        }
+        if let Some(v) = &opts.region_id {
+            query.push(("regionId", v.to_string()));
+        }
+        if let Some(v) = &opts.storage_type {
+            query.push(("storageType", v.to_string()));
+        }
+        if let Some(v) = &opts.provider_type {
+            query.push(("providerType", v.to_string()));
+        }
+        if let Some(v) = &opts.is_active {
+            query.push(("isActive", v.to_string()));
+        }
+        if let Some(v) = &opts.page {
+            query.push(("page", v.to_string()));
+        }
+        if let Some(v) = &opts.limit {
+            query.push(("limit", v.to_string()));
         }
         self.inner.get("/api/v1/storages/list", &query).await
     }
@@ -346,34 +339,32 @@ impl VolumesService {
         self.inner.post("/api/v1/volumes/create", req).await
     }
 
-    pub async fn list(&self, opts: Option<&VolumeListOptions>) -> Result<PaginatedResponse<Volume>, Error> {
+    pub async fn list(&self, opts: &VolumeListOptions) -> Result<PaginatedResponse<Volume>, Error> {
         let mut query: Vec<(&str, String)> = Vec::new();
-        if let Some(opts) = opts {
-            query.push(("accountId", opts.account_id.to_string()));
-            if let Some(v) = &opts.region_id {
-                query.push(("regionId", v.to_string()));
-            }
-            if let Some(v) = &opts.region_cluster_id {
-                query.push(("regionClusterId", v.to_string()));
-            }
-            if let Some(v) = &opts.storage_id {
-                query.push(("storageId", v.to_string()));
-            }
-            if let Some(v) = &opts.volume_type {
-                query.push(("volumeType", v.to_string()));
-            }
-            if let Some(v) = &opts.locked {
-                query.push(("locked", v.to_string()));
-            }
-            if let Some(v) = &opts.is_active {
-                query.push(("isActive", v.to_string()));
-            }
-            if let Some(v) = &opts.page {
-                query.push(("page", v.to_string()));
-            }
-            if let Some(v) = &opts.limit {
-                query.push(("limit", v.to_string()));
-            }
+        query.push(("accountId", opts.account_id.to_string()));
+        if let Some(v) = &opts.region_id {
+            query.push(("regionId", v.to_string()));
+        }
+        if let Some(v) = &opts.region_cluster_id {
+            query.push(("regionClusterId", v.to_string()));
+        }
+        if let Some(v) = &opts.storage_id {
+            query.push(("storageId", v.to_string()));
+        }
+        if let Some(v) = &opts.volume_type {
+            query.push(("volumeType", v.to_string()));
+        }
+        if let Some(v) = &opts.locked {
+            query.push(("locked", v.to_string()));
+        }
+        if let Some(v) = &opts.is_active {
+            query.push(("isActive", v.to_string()));
+        }
+        if let Some(v) = &opts.page {
+            query.push(("page", v.to_string()));
+        }
+        if let Some(v) = &opts.limit {
+            query.push(("limit", v.to_string()));
         }
         self.inner.get("/api/v1/volumes/list", &query).await
     }
@@ -576,27 +567,23 @@ pub struct AuditLogsService {
 }
 
 impl AuditLogsService {
-    pub async fn list(&self, opts: Option<&AuditLogListOptions>) -> Result<CursorPaginatedResponse<AuditLog>, Error> {
+    pub async fn list(&self, opts: &AuditLogListOptions) -> Result<CursorPaginatedResponse<AuditLog>, Error> {
         let mut query: Vec<(&str, String)> = Vec::new();
-        if let Some(opts) = opts {
-            if let Some(v) = &opts.account_id {
-                query.push(("accountId", v.to_string()));
-            }
-            if let Some(v) = &opts.region_id {
-                query.push(("regionId", v.to_string()));
-            }
-            if let Some(v) = &opts.region_cluster_id {
-                query.push(("regionClusterId", v.to_string()));
-            }
-            if let Some(v) = &opts.cursor {
-                query.push(("cursor", v.to_string()));
-            }
-            if let Some(v) = &opts.limit {
-                query.push(("limit", v.to_string()));
-            }
-            if let Some(v) = &opts.subject {
-                query.push(("subject", v.to_string()));
-            }
+        query.push(("accountId", opts.account_id.to_string()));
+        if let Some(v) = &opts.region_id {
+            query.push(("regionId", v.to_string()));
+        }
+        if let Some(v) = &opts.region_cluster_id {
+            query.push(("regionClusterId", v.to_string()));
+        }
+        if let Some(v) = &opts.cursor {
+            query.push(("cursor", v.to_string()));
+        }
+        if let Some(v) = &opts.limit {
+            query.push(("limit", v.to_string()));
+        }
+        if let Some(v) = &opts.subject {
+            query.push(("subject", v.to_string()));
         }
         self.inner.get("/api/v1/audit-logs/list", &query).await
     }
@@ -687,48 +674,44 @@ pub struct ClientSessionsService {
 }
 
 impl ClientSessionsService {
-    pub async fn list(&self, opts: Option<&ClientSessionListOptions>) -> Result<PaginatedResponse<ClientSession>, Error> {
+    pub async fn list(&self, opts: &ClientSessionListOptions) -> Result<PaginatedResponse<ClientSession>, Error> {
         let mut query: Vec<(&str, String)> = Vec::new();
-        if let Some(opts) = opts {
-            if let Some(v) = &opts.account_id {
-                query.push(("accountId", v.to_string()));
-            }
-            if let Some(v) = &opts.region_id {
-                query.push(("regionId", v.to_string()));
-            }
-            if let Some(v) = &opts.region_cluster_id {
-                query.push(("regionClusterId", v.to_string()));
-            }
-            if let Some(v) = &opts.volume_id {
-                query.push(("volumeId", v.to_string()));
-            }
-            if let Some(v) = &opts.user_id {
-                query.push(("userId", v.to_string()));
-            }
-            if let Some(v) = &opts.client_type {
-                query.push(("clientType", v.to_string()));
-            }
-            if let Some(v) = &opts.status {
-                query.push(("status", v.to_string()));
-            }
-            if let Some(v) = &opts.is_active {
-                query.push(("isActive", v.to_string()));
-            }
-            if let Some(v) = &opts.os_name {
-                query.push(("osName", v.to_string()));
-            }
-            if let Some(v) = &opts.platform {
-                query.push(("platform", v.to_string()));
-            }
-            if let Some(v) = &opts.search {
-                query.push(("search", v.to_string()));
-            }
-            if let Some(v) = &opts.page {
-                query.push(("page", v.to_string()));
-            }
-            if let Some(v) = &opts.limit {
-                query.push(("limit", v.to_string()));
-            }
+        query.push(("accountId", opts.account_id.to_string()));
+        if let Some(v) = &opts.region_id {
+            query.push(("regionId", v.to_string()));
+        }
+        if let Some(v) = &opts.region_cluster_id {
+            query.push(("regionClusterId", v.to_string()));
+        }
+        if let Some(v) = &opts.volume_id {
+            query.push(("volumeId", v.to_string()));
+        }
+        if let Some(v) = &opts.user_id {
+            query.push(("userId", v.to_string()));
+        }
+        if let Some(v) = &opts.client_type {
+            query.push(("clientType", v.to_string()));
+        }
+        if let Some(v) = &opts.status {
+            query.push(("status", v.to_string()));
+        }
+        if let Some(v) = &opts.is_active {
+            query.push(("isActive", v.to_string()));
+        }
+        if let Some(v) = &opts.os_name {
+            query.push(("osName", v.to_string()));
+        }
+        if let Some(v) = &opts.platform {
+            query.push(("platform", v.to_string()));
+        }
+        if let Some(v) = &opts.search {
+            query.push(("search", v.to_string()));
+        }
+        if let Some(v) = &opts.page {
+            query.push(("page", v.to_string()));
+        }
+        if let Some(v) = &opts.limit {
+            query.push(("limit", v.to_string()));
         }
         self.inner.get("/api/v1/client-sessions/list", &query).await
     }
@@ -737,11 +720,9 @@ impl ClientSessionsService {
         self.inner.get(&format!("/api/v1/client-sessions/{}", session_id), &[]).await
     }
 
-    pub async fn summary(&self, account_id: Option<i64>, region_id: Option<i64>, region_cluster_id: Option<i64>, volume_id: Option<i64>, user_id: Option<i64>) -> Result<SessionSummary, Error> {
+    pub async fn summary(&self, account_id: i64, region_id: Option<i64>, region_cluster_id: Option<i64>, volume_id: Option<i64>, user_id: Option<i64>) -> Result<SessionSummary, Error> {
         let mut query: Vec<(&str, String)> = Vec::new();
-        if let Some(v) = account_id {
-            query.push(("accountId", v.to_string()));
-        }
+        query.push(("accountId", account_id.to_string()));
         if let Some(v) = region_id {
             query.push(("regionId", v.to_string()));
         }

@@ -160,16 +160,13 @@ func (s *RegionsService) Create(ctx context.Context, req *CreateRegionRequest) (
 func (s *RegionsService) List(ctx context.Context, opts *RegionListOptions) (*PaginatedResponse[Region], error) {
 	q := url.Values{}
 	if opts != nil {
+		q.Set("accountId", strconv.FormatInt(opts.AccountID, 10))
 		if opts.IsActive != nil {
 			q.Set("isActive", strconv.FormatBool(*opts.IsActive))
 		}
 		addPagination(q, opts.Page, opts.Limit)
 	}
-	path := "/api/v1/regions/list"
-	if qs := q.Encode(); qs != "" {
-		path += "?" + qs
-	}
-	data, err := s.c.get(ctx, path)
+	data, err := s.c.get(ctx, "/api/v1/regions/list"+"?"+q.Encode())
 	if err != nil {
 		return nil, err
 	}
@@ -713,9 +710,7 @@ type AuditLogsService struct{ c *Client }
 func (s *AuditLogsService) List(ctx context.Context, opts *AuditLogListOptions) (*CursorPaginatedResponse[AuditLog], error) {
 	q := url.Values{}
 	if opts != nil {
-		if opts.AccountID != nil {
-			q.Set("accountId", strconv.FormatInt(*opts.AccountID, 10))
-		}
+		q.Set("accountId", strconv.FormatInt(opts.AccountID, 10))
 		if opts.RegionID != nil {
 			q.Set("regionId", strconv.FormatInt(*opts.RegionID, 10))
 		}
@@ -850,9 +845,7 @@ type ClientSessionsService struct{ c *Client }
 func (s *ClientSessionsService) List(ctx context.Context, opts *ClientSessionListOptions) (*PaginatedResponse[ClientSession], error) {
 	q := url.Values{}
 	if opts != nil {
-		if opts.AccountID != nil {
-			q.Set("accountId", strconv.FormatInt(*opts.AccountID, 10))
-		}
+		q.Set("accountId", strconv.FormatInt(opts.AccountID, 10))
 		if opts.RegionID != nil {
 			q.Set("regionId", strconv.FormatInt(*opts.RegionID, 10))
 		}
@@ -885,11 +878,7 @@ func (s *ClientSessionsService) List(ctx context.Context, opts *ClientSessionLis
 		}
 		addPagination(q, opts.Page, opts.Limit)
 	}
-	path := "/api/v1/client-sessions/list"
-	if qs := q.Encode(); qs != "" {
-		path += "?" + qs
-	}
-	data, err := s.c.get(ctx, path)
+	data, err := s.c.get(ctx, "/api/v1/client-sessions/list"+"?"+q.Encode())
 	if err != nil {
 		return nil, err
 	}
@@ -904,11 +893,9 @@ func (s *ClientSessionsService) Get(ctx context.Context, sessionID int64) (*Clie
 	return decodeJSON[ClientSession](data)
 }
 
-func (s *ClientSessionsService) Summary(ctx context.Context, accountID *int64, regionID *int64, regionClusterID *int64, volumeID *int64, userID *int64) (*SessionSummary, error) {
+func (s *ClientSessionsService) Summary(ctx context.Context, accountID int64, regionID *int64, regionClusterID *int64, volumeID *int64, userID *int64) (*SessionSummary, error) {
 	q := url.Values{}
-	if accountID != nil {
-		q.Set("accountId", strconv.FormatInt(*accountID, 10))
-	}
+	q.Set("accountId", strconv.FormatInt(accountID, 10))
 	if regionID != nil {
 		q.Set("regionId", strconv.FormatInt(*regionID, 10))
 	}

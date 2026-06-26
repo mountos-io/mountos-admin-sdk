@@ -174,8 +174,8 @@ export class RegionsResource {
     return this.client.request('POST', '/api/v1/regions/create', req, signal)
   }
 
-  list(opts?: RegionListOptions, signal?: AbortSignal): Promise<PaginatedResponse<Region>> {
-    return this.client.request('GET', `/api/v1/regions/list${queryString({ isActive: opts?.isActive, page: opts?.page, limit: opts?.limit })}`, undefined, signal)
+  list(opts: RegionListOptions, signal?: AbortSignal): Promise<PaginatedResponse<Region>> {
+    return this.client.request('GET', `/api/v1/regions/list${queryString({ accountId: opts.accountId, isActive: opts.isActive, page: opts.page, limit: opts.limit })}`, undefined, signal)
   }
 
   get(regionId: number, signal?: AbortSignal): Promise<Region> {
@@ -401,14 +401,14 @@ export class VolumeForkSearchesResource {
 export class AuditLogsResource {
   constructor(private client: Client) {}
 
-  list(opts?: AuditLogListOptions, signal?: AbortSignal): Promise<CursorPaginatedResponse<AuditLog>> {
+  list(opts: AuditLogListOptions, signal?: AbortSignal): Promise<CursorPaginatedResponse<AuditLog>> {
     return this.client.request('GET', `/api/v1/audit-logs/list${queryString({
-      accountId: opts?.accountId,
-      regionId: opts?.regionId,
-      regionClusterId: opts?.regionClusterId,
-      cursor: opts?.cursor,
-      limit: opts?.limit,
-      subject: opts?.subject,
+      accountId: opts.accountId,
+      regionId: opts.regionId,
+      regionClusterId: opts.regionClusterId,
+      cursor: opts.cursor,
+      limit: opts.limit,
+      subject: opts.subject,
     })}`, undefined, signal)
   }
 }
@@ -450,15 +450,15 @@ export class NodesResource {
 export class ClientSessionsResource {
   constructor(private client: Client) {}
 
-  list(opts?: ClientSessionListOptions, signal?: AbortSignal): Promise<PaginatedResponse<ClientSession>> {
-    return this.client.request('GET', `/api/v1/client-sessions/list${queryString({ accountId: opts?.accountId, regionId: opts?.regionId, regionClusterId: opts?.regionClusterId, volumeId: opts?.volumeId, userId: opts?.userId, clientType: opts?.clientType, status: opts?.status, isActive: opts?.isActive, osName: opts?.osName, platform: opts?.platform, search: opts?.search, page: opts?.page, limit: opts?.limit })}`, undefined, signal)
+  list(opts: ClientSessionListOptions, signal?: AbortSignal): Promise<PaginatedResponse<ClientSession>> {
+    return this.client.request('GET', `/api/v1/client-sessions/list${queryString({ accountId: opts.accountId, regionId: opts.regionId, regionClusterId: opts.regionClusterId, volumeId: opts.volumeId, userId: opts.userId, clientType: opts.clientType, status: opts.status, isActive: opts.isActive, osName: opts.osName, platform: opts.platform, search: opts.search, page: opts.page, limit: opts.limit })}`, undefined, signal)
   }
 
   get(sessionId: number, signal?: AbortSignal): Promise<ClientSession> {
     return this.client.request('GET', `/api/v1/client-sessions/${sessionId}`, undefined, signal)
   }
 
-  summary(accountId?: number, regionId?: number, regionClusterId?: number, volumeId?: number, userId?: number, signal?: AbortSignal): Promise<SessionSummary> {
+  summary(accountId: number, regionId?: number, regionClusterId?: number, volumeId?: number, userId?: number, signal?: AbortSignal): Promise<SessionSummary> {
     return this.client.request('GET', `/api/v1/client-sessions/summary${queryString({ accountId: accountId, regionId: regionId, regionClusterId: regionClusterId, volumeId: volumeId, userId: userId })}`, undefined, signal)
   }
 }

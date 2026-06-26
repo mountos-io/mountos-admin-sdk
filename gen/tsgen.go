@@ -185,7 +185,11 @@ func writeTSListOptions(w *strings.Builder, name string, query []string, extends
 		w.WriteString("export interface " + name + " {\n")
 		for _, s := range query {
 			f := parseField(s)
-			fmt.Fprintf(w, "  %s?: %s\n", f.Name, tsType(f.Type))
+			optional := "?"
+			if f.Required {
+				optional = ""
+			}
+			fmt.Fprintf(w, "  %s%s: %s\n", f.Name, optional, tsType(f.Type))
 		}
 	}
 	w.WriteString("}\n")
@@ -597,17 +601,25 @@ func writeTSCursorListMethod(w *strings.Builder, methodName string, ep Endpoint,
 	retType := "CursorPaginatedResponse<" + ep.ResponseType + ">"
 
 	params := tsParams(allPathParams, pt)
+	optsOptional := "?"
+	if hasRequiredQueryParam(ep.Query) {
+		optsOptional = ""
+	}
 	sig := ""
 	if params != "" {
 		sig = params + ", "
 	}
-	sig += "opts?: " + optsType + ", signal?: AbortSignal"
+	sig += "opts" + optsOptional + ": " + optsType + ", signal?: AbortSignal"
 
 	// Build queryString call
+	optRef := "opts"
+	if optsOptional == "?" {
+		optRef = "opts?"
+	}
 	var qsArgs []string
 	for _, qs := range ep.Query {
 		f := parseField(qs)
-		qsArgs = append(qsArgs, f.Name+": opts?."+f.Name)
+		qsArgs = append(qsArgs, f.Name+": "+optRef+"."+f.Name)
 	}
 	qsCall := "queryString({\n      " + strings.Join(qsArgs, ",\n      ") + ",\n    })"
 

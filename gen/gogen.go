@@ -945,7 +945,8 @@ func writeGoCursorListMethod(w *strings.Builder, svcType, methodName string, ep 
 		f := parseField(qs)
 		goName := goFieldName(f.Name)
 		isPagination := f.Name == "cursor" || f.Name == "limit"
-		if isPagination {
+		switch {
+		case isPagination:
 			switch f.Type {
 			case "int64":
 				fmt.Fprintf(w, "\t\tif opts.%s > 0 {\n", goName)
@@ -956,7 +957,22 @@ func writeGoCursorListMethod(w *strings.Builder, svcType, methodName string, ep 
 				fmt.Fprintf(w, "\t\t\tq.Set(%q, strconv.Itoa(opts.%s))\n", f.Name, goName)
 				w.WriteString("\t\t}\n")
 			}
-		} else {
+		case f.Required:
+			// Required query params are value (non-pointer) fields, so set them
+			// unconditionally rather than nil-checking like optionals.
+			switch f.Type {
+			case "int64":
+				fmt.Fprintf(w, "\t\tq.Set(%q, strconv.FormatInt(opts.%s, 10))\n", f.Name, goName)
+			case "int":
+				fmt.Fprintf(w, "\t\tq.Set(%q, strconv.Itoa(opts.%s))\n", f.Name, goName)
+			case "int32":
+				fmt.Fprintf(w, "\t\tq.Set(%q, strconv.FormatInt(int64(opts.%s), 10))\n", f.Name, goName)
+			case "bool":
+				fmt.Fprintf(w, "\t\tq.Set(%q, strconv.FormatBool(opts.%s))\n", f.Name, goName)
+			default:
+				fmt.Fprintf(w, "\t\tq.Set(%q, opts.%s)\n", f.Name, goName)
+			}
+		default:
 			writeGoOptionalQuerySet(w, f, goName)
 		}
 	}

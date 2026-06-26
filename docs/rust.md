@@ -1345,7 +1345,7 @@ pub async fn get(&self, session_id: i64) -> Result<ClientSession, Error>
 #### `summary` - GET /api/v1/client-sessions/summary
 
 ```rust
-pub async fn summary(&self, account_id: Option<i64>, region_id: Option<i64>, region_cluster_id: Option<i64>, volume_id: Option<i64>, user_id: Option<i64>) -> Result<SessionSummary, Error>
+pub async fn summary(&self, account_id: i64, region_id: Option<i64>, region_cluster_id: Option<i64>, volume_id: Option<i64>, user_id: Option<i64>) -> Result<SessionSummary, Error>
 ```
 
 ### Discover

@@ -448,9 +448,10 @@ func writeRustPageListMethod(w *strings.Builder, methodName string, ep Endpoint,
 		optsType = listOptionsTypeName(resName)
 	}
 
-	parts := append(rustPathParamParts(allPathParams, pt), "opts: Option<&"+optsType+">")
+	optsParam, optsRequired := rustOptsParam(optsType, ep.Query)
+	parts := append(rustPathParamParts(allPathParams, pt), optsParam)
 	fmt.Fprintf(w, "    pub async fn %s(&self%s) -> Result<%s, Error> {\n", methodName, rustSig(parts), retType)
-	writeRustOptsQueryBuild(w, ep.Query)
+	writeRustOptsQueryBuild(w, ep.Query, optsRequired)
 	fmt.Fprintf(w, "        self.inner.get(%s, &query).await\n", pathExpr)
 	w.WriteString("    }\n")
 }
@@ -459,9 +460,10 @@ func writeRustCursorListMethod(w *strings.Builder, methodName string, ep Endpoin
 	pathExpr := rustPathExpr(fullPath, allPathParams, pt)
 	retType := "CursorPaginatedResponse<" + rustType(ep.ResponseType) + ">"
 
-	parts := append(rustPathParamParts(allPathParams, pt), "opts: Option<&"+listOptionsTypeName(resName)+">")
+	optsParam, optsRequired := rustOptsParam(listOptionsTypeName(resName), ep.Query)
+	parts := append(rustPathParamParts(allPathParams, pt), optsParam)
 	fmt.Fprintf(w, "    pub async fn %s(&self%s) -> Result<%s, Error> {\n", methodName, rustSig(parts), retType)
-	writeRustOptsQueryBuild(w, ep.Query)
+	writeRustOptsQueryBuild(w, ep.Query, optsRequired)
 	fmt.Fprintf(w, "        self.inner.get(%s, &query).await\n", pathExpr)
 	w.WriteString("    }\n")
 }
@@ -517,15 +519,31 @@ func writeRustQueryBuild(w *strings.Builder, query []string) {
 	}
 }
 
-// writeRustOptsQueryBuild emits the `let mut query` block sourced from an
-// optional `opts` struct (page/cursor list methods).
-func writeRustOptsQueryBuild(w *strings.Builder, query []string) {
+// writeRustOptsQueryBuild emits the `let mut query` block sourced from an `opts`
+// struct (page/cursor list methods). When optsRequired, opts is a borrowed value
+// (&T) used directly; otherwise it is an Option guarded with `if let Some`.
+func writeRustOptsQueryBuild(w *strings.Builder, query []string, optsRequired bool) {
 	w.WriteString("        let mut query: Vec<(&str, String)> = Vec::new();\n")
+	if optsRequired {
+		for _, qs := range query {
+			writeRustOptsPush(w, parseField(qs), "        ")
+		}
+		return
+	}
 	w.WriteString("        if let Some(opts) = opts {\n")
 	for _, qs := range query {
 		writeRustOptsPush(w, parseField(qs), "            ")
 	}
 	w.WriteString("        }\n")
+}
+
+// rustOptsParam renders the opts argument type, required (&T) when the endpoint
+// has a required query param, otherwise Option<&T>.
+func rustOptsParam(optsType string, query []string) (string, bool) {
+	if hasRequiredQueryParam(query) {
+		return "opts: &" + optsType, true
+	}
+	return "opts: Option<&" + optsType + ">", false
 }
 
 // writeRustOptsPush emits a push from an `opts` struct field (list options).
