@@ -829,6 +829,23 @@ func writeGoArrayMethod(w *strings.Builder, svcType, methodName string, ep Endpo
 		for _, qs := range ep.Query {
 			f := parseField(qs)
 			paramName := goParamName(":" + f.Name)
+			if f.Required {
+				// Required params are set unconditionally; a zero/empty value
+				// is still a legitimate value (e.g. accountId 0 = system).
+				switch f.Type {
+				case "int64":
+					fmt.Fprintf(w, "\tq.Set(%q, strconv.FormatInt(%s, 10))\n", f.Name, paramName)
+				case "int32":
+					fmt.Fprintf(w, "\tq.Set(%q, strconv.FormatInt(int64(%s), 10))\n", f.Name, paramName)
+				case "int":
+					fmt.Fprintf(w, "\tq.Set(%q, strconv.Itoa(%s))\n", f.Name, paramName)
+				case "bool":
+					fmt.Fprintf(w, "\tq.Set(%q, strconv.FormatBool(%s))\n", f.Name, paramName)
+				default:
+					fmt.Fprintf(w, "\tq.Set(%q, %s)\n", f.Name, paramName)
+				}
+				continue
+			}
 			switch f.Type {
 			case "int64":
 				fmt.Fprintf(w, "\tif %s != 0 {\n\t\tq.Set(%q, strconv.FormatInt(%s, 10))\n\t}\n", paramName, f.Name, paramName)
@@ -876,12 +893,23 @@ func writeGoPageListMethod(w *strings.Builder, svcType, methodName string, ep En
 		optsType = "ListOptions"
 	}
 
-	sig += ", opts *" + optsType
+	// A required query param makes opts mandatory: pass by value so a nil cannot
+	// silently drop it (matches the TS/Rust required-opts contract).
+	optsRequired := hasRequiredQueryParam(ep.Query)
+	if optsRequired {
+		sig += ", opts " + optsType
+	} else {
+		sig += ", opts *" + optsType
+	}
 	pathExpr := goPathExpr(fullPath, allPathParams, pt)
 
 	fmt.Fprintf(w, "func (s *%s) %s(%s) (*PaginatedResponse[%s], error) {\n", svcType, methodName, sig, ep.ResponseType)
 	w.WriteString("\tq := url.Values{}\n")
-	w.WriteString("\tif opts != nil {\n")
+	if optsRequired {
+		w.WriteString("\t{\n")
+	} else {
+		w.WriteString("\tif opts != nil {\n")
+	}
 
 	if hasCustomOpts {
 		for _, qs := range ep.Query {
@@ -935,11 +963,22 @@ func writeGoCursorListMethod(w *strings.Builder, svcType, methodName string, ep 
 	if pathParams != "" {
 		sig += ", " + pathParams
 	}
-	sig += ", opts *" + optsType
+	// A required query param makes opts mandatory: pass by value so a nil cannot
+	// silently drop it (matches the TS/Rust required-opts contract).
+	optsRequired := hasRequiredQueryParam(ep.Query)
+	if optsRequired {
+		sig += ", opts " + optsType
+	} else {
+		sig += ", opts *" + optsType
+	}
 
 	fmt.Fprintf(w, "func (s *%s) %s(%s) (*CursorPaginatedResponse[%s], error) {\n", svcType, methodName, sig, ep.ResponseType)
 	w.WriteString("\tq := url.Values{}\n")
-	w.WriteString("\tif opts != nil {\n")
+	if optsRequired {
+		w.WriteString("\t{\n")
+	} else {
+		w.WriteString("\tif opts != nil {\n")
+	}
 
 	for _, qs := range ep.Query {
 		f := parseField(qs)

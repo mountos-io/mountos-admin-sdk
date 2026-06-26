@@ -96,9 +96,9 @@ func (s *UsersService) Add(ctx context.Context, req *AddUserRequest) (*IDRespons
 	return decodeJSON[IDResponse](data)
 }
 
-func (s *UsersService) List(ctx context.Context, opts *UserListOptions) (*PaginatedResponse[User], error) {
+func (s *UsersService) List(ctx context.Context, opts UserListOptions) (*PaginatedResponse[User], error) {
 	q := url.Values{}
-	if opts != nil {
+	{
 		q.Set("accountId", strconv.FormatInt(opts.AccountID, 10))
 		if opts.Search != "" {
 			q.Set("search", opts.Search)
@@ -157,9 +157,9 @@ func (s *RegionsService) Create(ctx context.Context, req *CreateRegionRequest) (
 	return decodeJSON[IDResponse](data)
 }
 
-func (s *RegionsService) List(ctx context.Context, opts *RegionListOptions) (*PaginatedResponse[Region], error) {
+func (s *RegionsService) List(ctx context.Context, opts RegionListOptions) (*PaginatedResponse[Region], error) {
 	q := url.Values{}
-	if opts != nil {
+	{
 		q.Set("accountId", strconv.FormatInt(opts.AccountID, 10))
 		if opts.IsActive != nil {
 			q.Set("isActive", strconv.FormatBool(*opts.IsActive))
@@ -199,9 +199,9 @@ func (s *RegionsService) Deactivate(ctx context.Context, regionID int64) (*IDRes
 
 type ClustersService struct{ c *Client }
 
-func (s *ClustersService) List(ctx context.Context, opts *ClusterListOptions) (*PaginatedResponse[RegionCluster], error) {
+func (s *ClustersService) List(ctx context.Context, opts ClusterListOptions) (*PaginatedResponse[RegionCluster], error) {
 	q := url.Values{}
-	if opts != nil {
+	{
 		q.Set("accountId", strconv.FormatInt(opts.AccountID, 10))
 		if opts.RegionID != nil {
 			q.Set("regionId", strconv.FormatInt(*opts.RegionID, 10))
@@ -297,9 +297,9 @@ func (s *StoragesService) Create(ctx context.Context, req *CreateStorageRequest)
 	return decodeJSON[CreateStorageResponse](data)
 }
 
-func (s *StoragesService) List(ctx context.Context, opts *StorageListOptions) (*PaginatedResponse[Storage], error) {
+func (s *StoragesService) List(ctx context.Context, opts StorageListOptions) (*PaginatedResponse[Storage], error) {
 	q := url.Values{}
-	if opts != nil {
+	{
 		q.Set("accountId", strconv.FormatInt(opts.AccountID, 10))
 		if opts.Search != "" {
 			q.Set("search", opts.Search)
@@ -387,9 +387,9 @@ func (s *VolumesService) Create(ctx context.Context, req *CreateVolumeRequest) (
 	return decodeJSON[CreateVolumeResponse](data)
 }
 
-func (s *VolumesService) List(ctx context.Context, opts *VolumeListOptions) (*PaginatedResponse[Volume], error) {
+func (s *VolumesService) List(ctx context.Context, opts VolumeListOptions) (*PaginatedResponse[Volume], error) {
 	q := url.Values{}
-	if opts != nil {
+	{
 		q.Set("accountId", strconv.FormatInt(opts.AccountID, 10))
 		if opts.RegionID != nil {
 			q.Set("regionId", strconv.FormatInt(*opts.RegionID, 10))
@@ -707,9 +707,9 @@ func (s *VolumeForkSearchesService) Find(ctx context.Context, volumeID int64, fo
 
 type AuditLogsService struct{ c *Client }
 
-func (s *AuditLogsService) List(ctx context.Context, opts *AuditLogListOptions) (*CursorPaginatedResponse[AuditLog], error) {
+func (s *AuditLogsService) List(ctx context.Context, opts AuditLogListOptions) (*CursorPaginatedResponse[AuditLog], error) {
 	q := url.Values{}
-	if opts != nil {
+	{
 		q.Set("accountId", strconv.FormatInt(opts.AccountID, 10))
 		if opts.RegionID != nil {
 			q.Set("regionId", strconv.FormatInt(*opts.RegionID, 10))
@@ -813,9 +813,7 @@ type NodesService struct{ c *Client }
 
 func (s *NodesService) ListAll(ctx context.Context, accountID int64, serviceType string, status string, inactiveHours int) ([]ServiceNode, error) {
 	q := url.Values{}
-	if accountID != 0 {
-		q.Set("accountId", strconv.FormatInt(accountID, 10))
-	}
+	q.Set("accountId", strconv.FormatInt(accountID, 10))
 	if serviceType != "" {
 		q.Set("serviceType", serviceType)
 	}
@@ -842,9 +840,9 @@ func (s *NodesService) ListAll(ctx context.Context, accountID int64, serviceType
 
 type ClientSessionsService struct{ c *Client }
 
-func (s *ClientSessionsService) List(ctx context.Context, opts *ClientSessionListOptions) (*PaginatedResponse[ClientSession], error) {
+func (s *ClientSessionsService) List(ctx context.Context, opts ClientSessionListOptions) (*PaginatedResponse[ClientSession], error) {
 	q := url.Values{}
-	if opts != nil {
+	{
 		q.Set("accountId", strconv.FormatInt(opts.AccountID, 10))
 		if opts.RegionID != nil {
 			q.Set("regionId", strconv.FormatInt(*opts.RegionID, 10))
