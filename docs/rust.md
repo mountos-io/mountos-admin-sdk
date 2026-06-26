@@ -829,6 +829,16 @@ pub struct EditRegionRequest {
 pub async fn deactivate(&self, region_id: i64) -> Result<IdResponse, Error>
 ```
 
+### Clusters
+
+Accessor: `client.clusters`
+
+#### `list` - GET /api/v1/clusters/list
+
+```rust
+pub async fn list(&self, opts: Option<&ClusterListOptions>) -> Result<PaginatedResponse<RegionCluster>, Error>
+```
+
 ### RegionClusters
 
 Accessor: `client.region_clusters`
@@ -1313,7 +1323,7 @@ Accessor: `client.nodes`
 #### `list_all` - GET /api/v1/nodes
 
 ```rust
-pub async fn list_all(&self, service_type: Option<&str>, status: Option<&str>, inactive_hours: Option<i64>) -> Result<Vec<ServiceNode>, Error>
+pub async fn list_all(&self, account_id: i64, service_type: Option<&str>, status: Option<&str>, inactive_hours: Option<i64>) -> Result<Vec<ServiceNode>, Error>
 ```
 
 ### ClientSessions

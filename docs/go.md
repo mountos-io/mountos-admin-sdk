@@ -876,6 +876,28 @@ type EditRegionRequest struct {
 func (s *RegionsService) Deactivate(ctx context.Context, regionID int64) (*IDResponse, error)
 ```
 
+### Clusters
+
+Accessor: `client.Clusters`
+
+#### `List` - GET /api/v1/clusters/list
+
+```go
+func (s *ClustersService) List(ctx context.Context, opts *ListClusterOptions) (*PaginatedResponse[RegionCluster], error)
+```
+
+Query params:
+
+```go
+type ListClusterOptions struct {
+    AccountID            int64        `url:"accountId"`
+    RegionID             int64        `url:"regionId"`
+    IsActive             bool         `url:"isActive"`
+    Page                 int          `url:"page"` // default: 1
+    Limit                int          `url:"limit"` // default: 100
+}
+```
+
 ### RegionClusters
 
 Accessor: `client.RegionClusters`
@@ -1516,6 +1538,7 @@ Query params:
 
 ```go
 type ListAllNodeOptions struct {
+    AccountID            int64        `url:"accountId"`
     ServiceType          string       `url:"serviceType"`
     Status               string       `url:"status"`
     InactiveHours        int          `url:"inactiveHours"`

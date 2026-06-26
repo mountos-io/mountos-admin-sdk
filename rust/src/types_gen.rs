@@ -810,6 +810,17 @@ pub struct RegionListOptions {
     pub limit: Option<i64>,
 }
 
+// Clusters
+
+#[derive(Debug, Clone, Default)]
+pub struct ClusterListOptions {
+    pub account_id: i64,
+    pub region_id: Option<i64>,
+    pub is_active: Option<bool>,
+    pub page: Option<i64>,
+    pub limit: Option<i64>,
+}
+
 // RegionClusters
 
 #[derive(Debug, Clone, Serialize)]

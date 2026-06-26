@@ -11,6 +11,7 @@ pub struct Client {
     pub accounts: AccountsService,
     pub users: UsersService,
     pub regions: RegionsService,
+    pub clusters: ClustersService,
     pub region_clusters: RegionClustersService,
     pub storages: StoragesService,
     pub volumes: VolumesService,
@@ -38,6 +39,7 @@ impl Client {
             accounts: AccountsService { inner: Arc::clone(&inner) },
             users: UsersService { inner: Arc::clone(&inner) },
             regions: RegionsService { inner: Arc::clone(&inner) },
+            clusters: ClustersService { inner: Arc::clone(&inner) },
             region_clusters: RegionClustersService { inner: Arc::clone(&inner) },
             storages: StoragesService { inner: Arc::clone(&inner) },
             volumes: VolumesService { inner: Arc::clone(&inner) },
@@ -193,6 +195,33 @@ impl RegionsService {
 
     pub async fn deactivate(&self, region_id: i64) -> Result<IdResponse, Error> {
         self.inner.post_empty(&format!("/api/v1/regions/{}/deactivate", region_id)).await
+    }
+}
+
+/// Operations on the `Clusters` resource.
+pub struct ClustersService {
+    inner: Arc<ClientInner>,
+}
+
+impl ClustersService {
+    pub async fn list(&self, opts: Option<&ClusterListOptions>) -> Result<PaginatedResponse<RegionCluster>, Error> {
+        let mut query: Vec<(&str, String)> = Vec::new();
+        if let Some(opts) = opts {
+            query.push(("accountId", opts.account_id.to_string()));
+            if let Some(v) = &opts.region_id {
+                query.push(("regionId", v.to_string()));
+            }
+            if let Some(v) = &opts.is_active {
+                query.push(("isActive", v.to_string()));
+            }
+            if let Some(v) = &opts.page {
+                query.push(("page", v.to_string()));
+            }
+            if let Some(v) = &opts.limit {
+                query.push(("limit", v.to_string()));
+            }
+        }
+        self.inner.get("/api/v1/clusters/list", &query).await
     }
 }
 
@@ -636,8 +665,9 @@ pub struct NodesService {
 }
 
 impl NodesService {
-    pub async fn list_all(&self, service_type: Option<&str>, status: Option<&str>, inactive_hours: Option<i64>) -> Result<Vec<ServiceNode>, Error> {
+    pub async fn list_all(&self, account_id: i64, service_type: Option<&str>, status: Option<&str>, inactive_hours: Option<i64>) -> Result<Vec<ServiceNode>, Error> {
         let mut query: Vec<(&str, String)> = Vec::new();
+        query.push(("accountId", account_id.to_string()));
         if let Some(v) = service_type {
             query.push(("serviceType", v.to_string()));
         }

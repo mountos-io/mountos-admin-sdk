@@ -548,6 +548,16 @@ type RegionListOptions struct {
 	Limit    int
 }
 
+// Clusters
+
+type ClusterListOptions struct {
+	AccountID int64
+	RegionID  *int64
+	IsActive  *bool
+	Page      int
+	Limit     int
+}
+
 // RegionClusters
 
 type CreateRegionClusterRequest struct {

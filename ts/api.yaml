@@ -635,6 +635,21 @@ resources:
         response:
           - "id: int64"
 
+  - name: Clusters
+    path: /clusters
+    endpoints:
+      - action: list
+        method: GET
+        path: /list
+        pagination: page
+        query:
+          - "accountId: int64!"
+          - "regionId: int64"
+          - "isActive: bool"
+          - "page: int=1"
+          - "limit: int=100"
+        responseType: RegionCluster
+
   - name: RegionClusters
     path: /regions/:regionId/clusters
     endpoints:
@@ -1123,6 +1138,7 @@ resources:
         method: GET
         path: /
         query:
+          - "accountId: int64!"
           - "serviceType: string"
           - "status: string"
           - "inactiveHours: int"

@@ -5,11 +5,11 @@ import type {
   CreateAccountRequest, Account, AccountListOptions, EditAccountRequest, 
   UpdateAccountQuotaRequest, AddUserRequest, User, UserListOptions, BulkUserRequest, 
   UserLite, EditUserRequest, CreateRegionRequest, Region, RegionListOptions, 
-  EditRegionRequest, CreateRegionClusterRequest, RegionCluster, RegionClusterListOptions, 
-  EditRegionClusterRequest, SetRegionClusterReadyRequest, CreateStorageRequest, 
-  BlockMember, Storage, StorageListOptions, BlockVolume, EditStorageRequest, 
-  TestStorageBucketRequest, CreateVolumeRequest, Volume, VolumeListOptions, 
-  EditVolumeRequest, MoveVolumeClusterRequest, DeactivateVolumeRequest, 
+  EditRegionRequest, RegionCluster, ClusterListOptions, CreateRegionClusterRequest, 
+  RegionClusterListOptions, EditRegionClusterRequest, SetRegionClusterReadyRequest, 
+  CreateStorageRequest, BlockMember, Storage, StorageListOptions, BlockVolume, 
+  EditStorageRequest, TestStorageBucketRequest, CreateVolumeRequest, Volume, 
+  VolumeListOptions, EditVolumeRequest, MoveVolumeClusterRequest, DeactivateVolumeRequest, 
   GenerateVolumeAPIKeysRequest, RevokeVolumeAPIKeyRequest, 
   RevokeVolumeAPIKeysByUserRequest, UpdateVolumeQuotaRequest, VolumeSizePoint, 
   CreateVolumeForkRequest, Fork, DeleteVolumeForkRequest, RestoreVolumeForkRequest, 
@@ -35,6 +35,7 @@ export interface AdminClient {
   readonly accounts: AccountsResource
   readonly users: UsersResource
   readonly regions: RegionsResource
+  readonly clusters: ClustersResource
   readonly regionClusters: RegionClustersResource
   readonly storages: StoragesResource
   readonly volumes: VolumesResource
@@ -59,6 +60,7 @@ export function createClient(request: RequestFn): AdminClient {
   let _accounts: AccountsResource | undefined
   let _users: UsersResource | undefined
   let _regions: RegionsResource | undefined
+  let _clusters: ClustersResource | undefined
   let _regionClusters: RegionClustersResource | undefined
   let _storages: StoragesResource | undefined
   let _volumes: VolumesResource | undefined
@@ -80,6 +82,7 @@ export function createClient(request: RequestFn): AdminClient {
     get accounts() { return _accounts ??= new AccountsResource(client) },
     get users() { return _users ??= new UsersResource(client) },
     get regions() { return _regions ??= new RegionsResource(client) },
+    get clusters() { return _clusters ??= new ClustersResource(client) },
     get regionClusters() { return _regionClusters ??= new RegionClustersResource(client) },
     get storages() { return _storages ??= new StoragesResource(client) },
     get volumes() { return _volumes ??= new VolumesResource(client) },
@@ -185,6 +188,14 @@ export class RegionsResource {
 
   deactivate(regionId: number, signal?: AbortSignal): Promise<{ id: number }> {
     return this.client.request('POST', `/api/v1/regions/${regionId}/deactivate`, undefined, signal)
+  }
+}
+
+export class ClustersResource {
+  constructor(private client: Client) {}
+
+  list(opts: ClusterListOptions, signal?: AbortSignal): Promise<PaginatedResponse<RegionCluster>> {
+    return this.client.request('GET', `/api/v1/clusters/list${queryString({ accountId: opts.accountId, regionId: opts.regionId, isActive: opts.isActive, page: opts.page, limit: opts.limit })}`, undefined, signal)
   }
 }
 
@@ -431,8 +442,8 @@ export class ServiceNodesResource {
 export class NodesResource {
   constructor(private client: Client) {}
 
-  listAll(serviceType?: string, status?: string, inactiveHours?: number, signal?: AbortSignal): Promise<ServiceNode[]> {
-    return this.client.request('GET', `/api/v1/nodes${queryString({ serviceType: serviceType, status: status, inactiveHours: inactiveHours })}`, undefined, signal)
+  listAll(accountId: number, serviceType?: string, status?: string, inactiveHours?: number, signal?: AbortSignal): Promise<ServiceNode[]> {
+    return this.client.request('GET', `/api/v1/nodes${queryString({ accountId: accountId, serviceType: serviceType, status: status, inactiveHours: inactiveHours })}`, undefined, signal)
   }
 }
 

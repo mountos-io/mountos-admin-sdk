@@ -898,6 +898,34 @@ Request body:
 client.regions.deactivate(regionID: number): Promise<{ id: number }>;
 ```
 
+### Clusters
+
+Accessor: `client.clusters`
+
+#### `list` - GET /api/v1/clusters/list
+
+```typescript
+client.clusters.list(params: {
+    accountId: number;
+    regionId?: number;
+    isActive?: boolean;
+    page?: number;
+    limit?: number;
+  }): Promise<PaginatedResponse<RegionCluster>>;
+```
+
+Query params:
+
+```typescript
+{
+  accountId: number;
+  regionId?: number;
+  isActive?: boolean;
+  page?: number;  // default: 1
+  limit?: number;  // default: 100
+}
+```
+
 ### RegionClusters
 
 Accessor: `client.regionClusters`
@@ -1684,6 +1712,7 @@ Accessor: `client.nodes`
 
 ```typescript
 client.nodes.listAll(params: {
+    accountId: number;
     serviceType?: string;
     status?: string;
     inactiveHours?: number;
@@ -1694,6 +1723,7 @@ Query params:
 
 ```typescript
 {
+  accountId: number;
   serviceType?: string;
   status?: string;
   inactiveHours?: number;

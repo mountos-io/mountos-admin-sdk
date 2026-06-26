@@ -234,6 +234,29 @@ Response data: `{ "id": int64 }`
 
 ---
 
+## Clusters
+
+### GET /api/v1/clusters/list
+Query: `accountId=int64(required)`, `regionId=int64`, `isActive=bool`, `page=int(default 1)`, `limit=int(default 100)`
+Response data: `{ "items": RegionCluster[], "pagination": PaginationMeta }`
+
+### RegionCluster Type
+```
+{
+  "id": int64,
+  "exportId": string,
+  "regionId": int64,
+  "name": string,
+  "defaultCluster": bool,
+  "isReady": bool,
+  "isActive": bool,
+  "createdAt": RFC3339,
+  "updatedAt": RFC3339
+}
+```
+
+---
+
 ## RegionClusters
 
 ### POST /api/v1/regions/:regionId/clusters/create
@@ -782,7 +805,7 @@ Response data: `string`
 ## Nodes
 
 ### GET /api/v1/nodes
-Query: `serviceType=string`, `status=string`, `inactiveHours=int`
+Query: `accountId=int64(required)`, `serviceType=string`, `status=string`, `inactiveHours=int`
 Response data: `ServiceNode[]`
 
 ### ServiceNode Type

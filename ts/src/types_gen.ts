@@ -510,6 +510,14 @@ export interface RegionListOptions extends ListOptions {
   isActive?: boolean
 }
 
+// Clusters
+
+export interface ClusterListOptions extends ListOptions {
+  accountId: number
+  regionId?: number
+  isActive?: boolean
+}
+
 // RegionClusters
 
 export interface CreateRegionClusterRequest {

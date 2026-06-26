@@ -200,6 +200,27 @@ func (s *RegionsService) Deactivate(ctx context.Context, regionID int64) (*IDRes
 	return decodeJSON[IDResponse](data)
 }
 
+type ClustersService struct{ c *Client }
+
+func (s *ClustersService) List(ctx context.Context, opts *ClusterListOptions) (*PaginatedResponse[RegionCluster], error) {
+	q := url.Values{}
+	if opts != nil {
+		q.Set("accountId", strconv.FormatInt(opts.AccountID, 10))
+		if opts.RegionID != nil {
+			q.Set("regionId", strconv.FormatInt(*opts.RegionID, 10))
+		}
+		if opts.IsActive != nil {
+			q.Set("isActive", strconv.FormatBool(*opts.IsActive))
+		}
+		addPagination(q, opts.Page, opts.Limit)
+	}
+	data, err := s.c.get(ctx, "/api/v1/clusters/list"+"?"+q.Encode())
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[PaginatedResponse[RegionCluster]](data)
+}
+
 type RegionClustersService struct{ c *Client }
 
 func (s *RegionClustersService) Create(ctx context.Context, regionID int64, req *CreateRegionClusterRequest) (*IDResponse, error) {
@@ -795,8 +816,11 @@ func (s *ServiceNodesService) Stats(ctx context.Context, regionID int64, nodeID 
 
 type NodesService struct{ c *Client }
 
-func (s *NodesService) ListAll(ctx context.Context, serviceType string, status string, inactiveHours int) ([]ServiceNode, error) {
+func (s *NodesService) ListAll(ctx context.Context, accountID int64, serviceType string, status string, inactiveHours int) ([]ServiceNode, error) {
 	q := url.Values{}
+	if accountID != 0 {
+		q.Set("accountId", strconv.FormatInt(accountID, 10))
+	}
 	if serviceType != "" {
 		q.Set("serviceType", serviceType)
 	}
