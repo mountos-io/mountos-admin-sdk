@@ -126,6 +126,7 @@ types:
 
   Storage:
     - "id: int64"
+    - "uuid: string"
     - "account: Ref"
     - "regionInfo: Ref"
     - "name: string"

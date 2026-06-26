@@ -158,6 +158,7 @@ pub struct RegionCluster {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Storage {
     pub id: i64,
+    pub uuid: String,
     pub account: Ref,
     #[serde(rename = "regionInfo")]
     pub region_info: Ref,

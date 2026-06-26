@@ -382,6 +382,7 @@ Response data: `{ "bucketExists": bool, "list": bool, "write": bool, "read": boo
 ```
 {
   "id": int64,
+  "uuid": string,
   "account": Ref,
   "regionInfo": Ref,
   "name": string,

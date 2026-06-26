@@ -123,6 +123,7 @@ type RegionCluster struct {
 
 type Storage struct {
 	ID           int64  `json:"id"`
+	UUID         string `json:"uuid"`
 	Account      Ref    `json:"account"`
 	RegionInfo   Ref    `json:"regionInfo"`
 	Name         string `json:"name"`

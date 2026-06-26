@@ -511,6 +511,7 @@ interface SessionSummaryStatusEntry {
 ```typescript
 interface Storage {
   id: number;
+  uuid: string;
   account: Ref;
   regionInfo: Ref;
   name: string;

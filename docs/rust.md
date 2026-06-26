@@ -522,6 +522,7 @@ pub struct SessionSummaryStatusEntry {
 ```rust
 pub struct Storage {
     pub id: i64,
+    pub uuid: String,
     pub account: Ref,
     pub region_info: Ref,
     pub name: String,

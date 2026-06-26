@@ -95,6 +95,7 @@ export interface RegionCluster {
 
 export interface Storage {
   id: number
+  uuid: string
   account: Ref
   regionInfo: Ref
   name: string
