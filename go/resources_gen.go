@@ -955,6 +955,22 @@ func (s *LicenseService) Terms(ctx context.Context) (*LicenseTerms, error) {
 	return decodeJSON[LicenseTerms](data)
 }
 
+func (s *LicenseService) Load(ctx context.Context, req *LoadLicenseRequest) (*LicenseLoadResult, error) {
+	data, err := s.c.post(ctx, "/api/v1/license/load", req)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[LicenseLoadResult](data)
+}
+
+func (s *LicenseService) List(ctx context.Context) (*LicenseList, error) {
+	data, err := s.c.get(ctx, "/api/v1/license/list")
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[LicenseList](data)
+}
+
 type AlertsService struct{ c *Client }
 
 func (s *AlertsService) List(ctx context.Context, opts *AlertListOptions) (*PaginatedResponse[ServiceAlert], error) {

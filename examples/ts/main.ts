@@ -107,6 +107,29 @@ async function main() {
     }
   }
 
+  // --- License ---
+  const license = await client.license.get()
+  console.log(`License: ${license.licensee} (${license.status})`)
+
+  // Upload signed payloads; the HUB verifies each and rejects the batch if any is invalid.
+  try {
+    const { loaded, ignored } = await client.license.load({
+      payloads: [process.env.MOUNTOS_LICENSE_PAYLOAD || ''],
+    })
+    console.log(`License loaded: ${loaded} new, ${ignored} ignored`)
+  } catch (err) {
+    if (err instanceof MountOSError) {
+      console.log(`License load rejected: ${err.message} (status=${err.status})`)
+    }
+  }
+
+  const { items: licenses } = await client.license.list()
+  console.log(`Stored license payloads: ${licenses.length}`)
+  for (const r of licenses) {
+    // active is the newest non-expired payload for its license id; expiry retires it.
+    console.log(`  ${r.key}: ${r.licensee} (${r.status}, active=${r.active})`)
+  }
+
   // --- Vault ---
   try {
     await client.vault.resync()

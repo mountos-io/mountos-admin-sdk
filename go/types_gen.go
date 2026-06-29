@@ -354,6 +354,15 @@ type LicenseTerms struct {
 	Terms string `json:"terms"`
 }
 
+type LicenseLoadResult struct {
+	Loaded  int `json:"loaded"`
+	Ignored int `json:"ignored"`
+}
+
+type LicenseList struct {
+	Items []LicenseRecord `json:"items"`
+}
+
 type ServiceAlert struct {
 	ID          int64  `json:"id"`
 	AlertID     string `json:"alertId"`
@@ -422,6 +431,16 @@ type LicenseQuota struct {
 	TotalVolume        int64             `json:"totalVolume"`
 	Generation         int64             `json:"generation"`
 	LastTransitionAtMs int64             `json:"lastTransitionAtMs"`
+}
+
+type LicenseRecord struct {
+	Key             string        `json:"key"`
+	Licensee        string        `json:"licensee"`
+	Status          LicenseStatus `json:"status"`
+	IssuedAt        string        `json:"issuedAt"`
+	ExpiresAt       string        `json:"expiresAt"`
+	MaxStorageBytes int64         `json:"maxStorageBytes"`
+	InsertedAt      string        `json:"insertedAt"`
 }
 
 type Ref struct {
@@ -849,6 +868,10 @@ type ClientSessionListOptions struct {
 // Dashboard
 
 // License
+
+type LoadLicenseRequest struct {
+	Payloads []string `json:"payloads"`
+}
 
 // Alerts
 

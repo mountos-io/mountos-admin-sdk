@@ -366,6 +366,23 @@ type LicenseDetails struct {
 }
 ```
 
+### `LicenseList`
+
+```go
+type LicenseList struct {
+    Items                    []LicenseRecord          `json:"items"`
+}
+```
+
+### `LicenseLoadResult`
+
+```go
+type LicenseLoadResult struct {
+    Loaded                   int                      `json:"loaded"`
+    Ignored                  int                      `json:"ignored"`
+}
+```
+
 ### `LicenseQuota`
 
 ```go
@@ -375,6 +392,20 @@ type LicenseQuota struct {
     TotalVolume              int64                    `json:"totalVolume"`
     Generation               int64                    `json:"generation"`
     LastTransitionAtMs       int64                    `json:"lastTransitionAtMs"`
+}
+```
+
+### `LicenseRecord`
+
+```go
+type LicenseRecord struct {
+    Key                      string                   `json:"key"`
+    Licensee                 string                   `json:"licensee"`
+    Status                   LicenseStatus            `json:"status"`
+    IssuedAt                 string                   `json:"issuedAt"`
+    ExpiresAt                string                   `json:"expiresAt"`
+    MaxStorageBytes          int64                    `json:"maxStorageBytes"`
+    InsertedAt               string                   `json:"insertedAt"`
 }
 ```
 
@@ -1650,6 +1681,26 @@ func (s *LicenseService) Get(ctx context.Context) (*LicenseDetails, error)
 
 ```go
 func (s *LicenseService) Terms(ctx context.Context) (*LicenseTerms, error)
+```
+
+#### `Load` - POST /api/v1/license/load
+
+```go
+func (s *LicenseService) Load(ctx context.Context, req *LoadLicenseRequest) (*LicenseLoadResult, error)
+```
+
+Request body:
+
+```go
+type LoadLicenseRequest struct {
+    Payloads                 []string                 `json:"payloads"`
+}
+```
+
+#### `List` - GET /api/v1/license/list
+
+```go
+func (s *LicenseService) List(ctx context.Context) (*LicenseList, error)
 ```
 
 ### Alerts

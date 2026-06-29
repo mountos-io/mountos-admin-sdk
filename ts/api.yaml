@@ -456,6 +456,25 @@ types:
   LicenseTerms:
     - "terms: string"
 
+  # One stored license payload in the admin database, keyed by the SHA1 of its
+  # verified body. status reflects the payload's own expiry (valid, expiring,
+  # grace, expired_access, expired).
+  LicenseRecord:
+    - "key: string"
+    - "licensee: string"
+    - "status: LicenseStatus"
+    - "issuedAt: string"
+    - "expiresAt: string"
+    - "maxStorageBytes: int64"
+    - "insertedAt: datetime"
+
+  LicenseList:
+    - "items: LicenseRecord[]"
+
+  LicenseLoadResult:
+    - "loaded: int"
+    - "ignored: int"
+
 resources:
   - name: Accounts
     path: /accounts
@@ -1216,6 +1235,19 @@ resources:
         method: GET
         path: /terms
         responseType: LicenseTerms
+      # Upload an array of signed payloads. The HUB verifies each, stores them
+      # in the admin licenses table keyed by SHA1, and rejects the whole batch
+      # if any payload is invalid. Duplicate payloads are ignored.
+      - action: load
+        method: POST
+        path: /load
+        request:
+          - "payloads: string[]!"
+        responseType: LicenseLoadResult
+      - action: list
+        method: GET
+        path: /list
+        responseType: LicenseList
 
   - name: Alerts
     path: /alerts

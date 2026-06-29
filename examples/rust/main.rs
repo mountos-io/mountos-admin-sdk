@@ -8,8 +8,8 @@ use std::env;
 
 use mountos_admin_sdk::{
     AccountListOptions, AddUserRequest, AuditLogListOptions, Client, Config, CreateAccountRequest,
-    CreateRegionRequest, CreateStorageRequest, Error, UpdateVolumeQuotaRequest, UserListOptions,
-    serde_json,
+    CreateRegionRequest, CreateStorageRequest, Error, LoadLicenseRequest,
+    UpdateVolumeQuotaRequest, UserListOptions, serde_json,
 };
 
 #[tokio::main]
@@ -24,6 +24,31 @@ async fn main() -> Result<(), Error> {
     // --- License ---
     let license = client.license.get().await?;
     println!("License: {} ({})", license.licensee, license.status);
+
+    // Upload signed payloads; the HUB verifies each and rejects the batch if any is invalid.
+    match client
+        .license
+        .load(&LoadLicenseRequest {
+            payloads: vec![env::var("MOUNTOS_LICENSE_PAYLOAD").unwrap_or_default()],
+        })
+        .await
+    {
+        Ok(result) => println!(
+            "License loaded: {} new, {} ignored",
+            result.loaded, result.ignored
+        ),
+        Err(Error::Api { message, status, .. }) => {
+            println!("License load rejected: {message} (status={status})")
+        }
+        Err(e) => return Err(e),
+    }
+
+    let records = client.license.list().await?;
+    println!("Stored license payloads: {}", records.items.len());
+    for r in &records.items {
+        // active is the newest non-expired payload for its license id; expiry retires it.
+        println!("  {}: {} ({:?}, active={})", r.key, r.licensee, r.status, r.active);
+    }
 
     // --- Accounts ---
     let created = client

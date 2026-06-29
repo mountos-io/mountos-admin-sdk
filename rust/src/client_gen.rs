@@ -778,6 +778,14 @@ impl LicenseService {
     pub async fn terms(&self) -> Result<LicenseTerms, Error> {
         self.inner.get("/api/v1/license/terms", &[]).await
     }
+
+    pub async fn load(&self, req: &LoadLicenseRequest) -> Result<LicenseLoadResult, Error> {
+        self.inner.post("/api/v1/license/load", req).await
+    }
+
+    pub async fn list(&self) -> Result<LicenseList, Error> {
+        self.inner.get("/api/v1/license/list", &[]).await
+    }
 }
 
 /// Operations on the `Alerts` resource.

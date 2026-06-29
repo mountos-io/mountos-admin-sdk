@@ -17,8 +17,8 @@ import type {
   VolumeForkEntryListOptions, ForkTreeMatch, VolumeForkSearchListOptions, AuditLog, 
   AuditLogListOptions, RegionAuditLogListOptions, ServiceNode, ClientSession, 
   ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, DashboardStats, 
-  LicenseDetails, LicenseTerms, ServiceAlert, AlertListOptions, AlertCountResponse, 
-  RegionAlert, RegionAlertListOptions,
+  LicenseDetails, LicenseTerms, LoadLicenseRequest, LicenseLoadResult, LicenseList, 
+  ServiceAlert, AlertListOptions, AlertCountResponse, RegionAlert, RegionAlertListOptions,
 } from './types_gen.js'
 
 export type RequestFn = <T>(method: string, path: string, body?: unknown, signal?: AbortSignal) => Promise<T>
@@ -488,6 +488,14 @@ export class LicenseResource {
 
   terms(signal?: AbortSignal): Promise<LicenseTerms> {
     return this.client.request('GET', '/api/v1/license/terms', undefined, signal)
+  }
+
+  load(req: LoadLicenseRequest, signal?: AbortSignal): Promise<LicenseLoadResult> {
+    return this.client.request('POST', '/api/v1/license/load', req, signal)
+  }
+
+  list(signal?: AbortSignal): Promise<LicenseList> {
+    return this.client.request('GET', '/api/v1/license/list', undefined, signal)
   }
 }
 

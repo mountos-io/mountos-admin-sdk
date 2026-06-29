@@ -326,6 +326,15 @@ export interface LicenseTerms {
   terms: string
 }
 
+export interface LicenseLoadResult {
+  loaded: number
+  ignored: number
+}
+
+export interface LicenseList {
+  items: LicenseRecord[]
+}
+
 export interface ServiceAlert {
   id: number
   alertId: string
@@ -394,6 +403,16 @@ export interface LicenseQuota {
   totalVolume: number
   generation: number
   lastTransitionAtMs: number
+}
+
+export interface LicenseRecord {
+  key: string
+  licensee: string
+  status: LicenseStatus
+  issuedAt: string
+  expiresAt: string
+  maxStorageBytes: number
+  insertedAt: string
 }
 
 export interface Ref {
@@ -740,6 +759,10 @@ export interface ClientSessionListOptions extends ListOptions {
 // Dashboard
 
 // License
+
+export interface LoadLicenseRequest {
+  payloads: string[]
+}
 
 // Alerts
 

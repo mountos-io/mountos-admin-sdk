@@ -153,6 +153,37 @@ func main() {
     }
   }
 
+  // --- License ---
+  details, err := client.License.Get(ctx)
+  if err != nil {
+    fmt.Println("License get:", err)
+  } else {
+    fmt.Printf("License: %s (%s)\n", details.Licensee, details.Status)
+  }
+
+  // Upload signed payloads; the HUB verifies each and rejects the batch if any is invalid.
+  if loaded, err := client.License.Load(ctx, &sdk.LoadLicenseRequest{
+    Payloads: []string{os.Getenv("MOUNTOS_LICENSE_PAYLOAD")},
+  }); err != nil {
+    var sdkErr *sdk.Error
+    if errors.As(err, &sdkErr) {
+      fmt.Printf("License load rejected: %s (status=%d)\n", sdkErr.Message, sdkErr.Status)
+    }
+  } else {
+    fmt.Printf("License loaded: %d new, %d ignored\n", loaded.Loaded, loaded.Ignored)
+  }
+
+  records, err := client.License.List(ctx)
+  if err != nil {
+    fmt.Println("License list:", err)
+  } else {
+    fmt.Printf("Stored license payloads: %d\n", len(records.Items))
+    for _, r := range records.Items {
+      // active is the newest non-expired payload for its license id; expiry retires it.
+      fmt.Printf("  %s: %s (%s, active=%t)\n", r.Key, r.Licensee, r.Status, r.Active)
+    }
+  }
+
   // --- Vault ---
   if err := client.Vault.Resync(ctx); err != nil {
     fmt.Println("Vault resync:", err)

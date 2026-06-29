@@ -534,6 +534,17 @@ pub struct LicenseTerms {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LicenseLoadResult {
+    pub loaded: i64,
+    pub ignored: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LicenseList {
+    pub items: Vec<LicenseRecord>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ServiceAlert {
     pub id: i64,
     #[serde(rename = "alertId")]
@@ -638,6 +649,21 @@ pub struct LicenseQuota {
     pub generation: i64,
     #[serde(rename = "lastTransitionAtMs")]
     pub last_transition_at_ms: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LicenseRecord {
+    pub key: String,
+    pub licensee: String,
+    pub status: LicenseStatus,
+    #[serde(rename = "issuedAt")]
+    pub issued_at: String,
+    #[serde(rename = "expiresAt")]
+    pub expires_at: String,
+    #[serde(rename = "maxStorageBytes")]
+    pub max_storage_bytes: i64,
+    #[serde(rename = "insertedAt")]
+    pub inserted_at: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -1217,6 +1243,11 @@ pub struct ClientSessionListOptions {
 // Dashboard
 
 // License
+
+#[derive(Debug, Clone, Serialize)]
+pub struct LoadLicenseRequest {
+    pub payloads: Vec<String>,
+}
 
 // Alerts
 

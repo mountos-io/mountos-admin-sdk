@@ -351,6 +351,23 @@ pub struct LicenseDetails {
 }
 ```
 
+### `LicenseList`
+
+```rust
+pub struct LicenseList {
+    pub items: Vec<LicenseRecord>,
+}
+```
+
+### `LicenseLoadResult`
+
+```rust
+pub struct LicenseLoadResult {
+    pub loaded: i64,
+    pub ignored: i64,
+}
+```
+
 ### `LicenseQuota`
 
 ```rust
@@ -360,6 +377,20 @@ pub struct LicenseQuota {
     pub total_volume: i64,
     pub generation: i64,
     pub last_transition_at_ms: i64,
+}
+```
+
+### `LicenseRecord`
+
+```rust
+pub struct LicenseRecord {
+    pub key: String,
+    pub licensee: String,
+    pub status: LicenseStatus,
+    pub issued_at: String,
+    pub expires_at: String,
+    pub max_storage_bytes: i64,
+    pub inserted_at: String,
 }
 ```
 
@@ -1382,6 +1413,26 @@ pub async fn get(&self) -> Result<LicenseDetails, Error>
 
 ```rust
 pub async fn terms(&self) -> Result<LicenseTerms, Error>
+```
+
+#### `load` - POST /api/v1/license/load
+
+```rust
+pub async fn load(&self, req: &LoadLicenseRequest) -> Result<LicenseLoadResult, Error>
+```
+
+Request body:
+
+```rust
+pub struct LoadLicenseRequest {
+    pub payloads: Vec<String>,
+}
+```
+
+#### `list` - GET /api/v1/license/list
+
+```rust
+pub async fn list(&self) -> Result<LicenseList, Error>
 ```
 
 ### Alerts

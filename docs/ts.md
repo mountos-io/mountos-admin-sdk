@@ -340,6 +340,23 @@ interface LicenseDetails {
 }
 ```
 
+### `LicenseList`
+
+```typescript
+interface LicenseList {
+  items: LicenseRecord[];
+}
+```
+
+### `LicenseLoadResult`
+
+```typescript
+interface LicenseLoadResult {
+  loaded: number;
+  ignored: number;
+}
+```
+
 ### `LicenseQuota`
 
 ```typescript
@@ -349,6 +366,20 @@ interface LicenseQuota {
   totalVolume: number;
   generation: number;
   lastTransitionAtMs: number;
+}
+```
+
+### `LicenseRecord`
+
+```typescript
+interface LicenseRecord {
+  key: string;
+  licensee: string;
+  status: LicenseStatus;
+  issuedAt: string;
+  expiresAt: string;
+  maxStorageBytes: number;
+  insertedAt: string;
 }
 ```
 
@@ -1860,6 +1891,28 @@ client.license.get(): Promise<LicenseDetails>;
 
 ```typescript
 client.license.terms(): Promise<LicenseTerms>;
+```
+
+#### `load` - POST /api/v1/license/load
+
+```typescript
+client.license.load(body: {
+    payloads: string[];
+  }): Promise<LicenseLoadResult>;
+```
+
+Request body:
+
+```typescript
+{
+  payloads: string[];
+}
+```
+
+#### `list` - GET /api/v1/license/list
+
+```typescript
+client.license.list(): Promise<LicenseList>;
 ```
 
 ### Alerts

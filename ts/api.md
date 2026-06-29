@@ -898,6 +898,18 @@ Response data: `LicenseDetails`
 ### GET /api/v1/license/terms
 Response data: `LicenseTerms`
 
+### POST /api/v1/license/load
+Request:
+```
+{
+  "payloads": string[](required)
+}
+```
+Response data: `LicenseLoadResult`
+
+### GET /api/v1/license/list
+Response data: `LicenseList`
+
 ### LicenseDetails Type
 ```
 {
