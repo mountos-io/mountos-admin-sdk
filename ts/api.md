@@ -354,7 +354,7 @@ Request:
 Response data: `{ "id": int64, "blockVolumeIds": string[] }`
 
 ### GET /api/v1/storages/list
-Query: `accountId=int64(required)`, `search=string`, `regionId=int64`, `storageType=string`, `providerType=string`, `isActive=bool`, `page=int(default 1)`, `limit=int(default 10)`
+Query: `accountId=int64(required)`, `search=string`, `regionId=int64`, `storageType=string`, `providerType=string`, `isActive=bool`, `directAccess=bool`, `page=int(default 1)`, `limit=int(default 10)`
 Response data: `{ "items": Storage[], "pagination": PaginationMeta }`
 
 ### GET /api/v1/storages/:storageId
@@ -374,7 +374,8 @@ Request:
   "description"?: string,
   "endpoint"?: string,
   "accessKey"?: string,
-  "secretKey"?: string
+  "secretKey"?: string,
+  "directAccess"?: bool
 }
 ```
 Response data: `{ "id": int64 }`
@@ -418,6 +419,7 @@ Response data: `{ "bucketExists": bool, "list": bool, "write": bool, "read": boo
   "base"?: string,
   "blockRegion"?: string,
   "blockSize"?: int32,
+  "directAccess"?: bool,
   "isActive": bool,
   "createdAt": RFC3339,
   "updatedAt": RFC3339

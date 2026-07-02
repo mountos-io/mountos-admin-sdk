@@ -239,7 +239,7 @@ export class StoragesResource {
   }
 
   list(opts: StorageListOptions, signal?: AbortSignal): Promise<PaginatedResponse<Storage>> {
-    return this.client.request('GET', `/api/v1/storages/list${queryString({ accountId: opts.accountId, search: opts.search, regionId: opts.regionId, storageType: opts.storageType, providerType: opts.providerType, isActive: opts.isActive, page: opts.page, limit: opts.limit })}`, undefined, signal)
+    return this.client.request('GET', `/api/v1/storages/list${queryString({ accountId: opts.accountId, search: opts.search, regionId: opts.regionId, storageType: opts.storageType, providerType: opts.providerType, isActive: opts.isActive, directAccess: opts.directAccess, page: opts.page, limit: opts.limit })}`, undefined, signal)
   }
 
   get(storageId: number, signal?: AbortSignal): Promise<Storage> {

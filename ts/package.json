@@ -19,7 +19,8 @@
   ],
   "scripts": {
     "build": "tsc",
-    "check": "tsc --noEmit"
+    "check": "tsc --noEmit",
+    "test": "tsc && node --test \"test/**/*.test.ts\""
   },
   "engines": {
     "node": ">=18"

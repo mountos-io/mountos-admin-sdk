@@ -566,6 +566,7 @@ pub struct Storage {
     pub base: Option<String>,
     pub block_region: Option<String>,
     pub block_size: Option<i32>,
+    pub direct_access: Option<bool>,
     pub is_active: bool,
     pub created_at: String,
     pub updated_at: String,
@@ -1005,6 +1006,7 @@ pub struct EditStorageRequest {
     pub endpoint: Option<String>,
     pub access_key: Option<String>,
     pub secret_key: Option<String>,
+    pub direct_access: Option<bool>,
 }
 ```
 

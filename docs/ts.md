@@ -555,6 +555,7 @@ interface Storage {
   base?: string;
   blockRegion?: string;
   blockSize?: number;
+  directAccess?: boolean;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -1107,6 +1108,7 @@ client.storages.list(params: {
     storageType?: string;
     providerType?: string;
     isActive?: boolean;
+    directAccess?: boolean;
     page?: number;
     limit?: number;
   }): Promise<PaginatedResponse<Storage>>;
@@ -1122,6 +1124,7 @@ Query params:
   storageType?: string;
   providerType?: string;
   isActive?: boolean;
+  directAccess?: boolean;
   page?: number;  // default: 1
   limit?: number;  // default: 10
 }
@@ -1148,6 +1151,7 @@ client.storages.edit(storageID: number, body: {
     endpoint?: string;
     accessKey?: string;
     secretKey?: string;
+    directAccess?: boolean;
   }): Promise<{ id: number }>;
 ```
 
@@ -1160,6 +1164,7 @@ Request body:
   endpoint?: string;
   accessKey?: string;
   secretKey?: string;
+  directAccess?: boolean;
 }
 ```
 

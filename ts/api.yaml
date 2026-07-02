@@ -139,6 +139,9 @@ types:
     - "base: string?"
     - "blockRegion: string?"
     - "blockSize: int32?"
+    # direct_access ("maintenance mode"): when true a block storage bypasses blockserv and
+    # reads/writes its backing object store directly, so blockserv can be stopped/upgraded.
+    - "directAccess: bool?"
     - "isActive: bool"
     - "createdAt: datetime"
     - "updatedAt: datetime"
@@ -762,6 +765,8 @@ resources:
           - "storageType: string"
           - "providerType: string"
           - "isActive: bool"
+          # Maintenance (direct-access) filter: true = in maintenance, false = normal, unset = all.
+          - "directAccess: bool"
           - "page: int=1"
           - "limit: int=10"
         responseType: Storage
@@ -786,6 +791,8 @@ resources:
           - "endpoint: string"
           - "accessKey: string"
           - "secretKey: string"
+          # Toggle maintenance mode (direct object-store access) on a block storage.
+          - "directAccess: bool"
         response:
           - "id: int64"
 

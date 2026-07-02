@@ -180,6 +180,8 @@ pub struct Storage {
     pub block_region: Option<String>,
     #[serde(rename = "blockSize", skip_serializing_if = "Option::is_none")]
     pub block_size: Option<i32>,
+    #[serde(rename = "directAccess", skip_serializing_if = "Option::is_none")]
+    pub direct_access: Option<bool>,
     #[serde(rename = "isActive")]
     pub is_active: bool,
     #[serde(rename = "createdAt")]
@@ -930,6 +932,8 @@ pub struct EditStorageRequest {
     pub access_key: Option<String>,
     #[serde(rename = "secretKey", skip_serializing_if = "Option::is_none")]
     pub secret_key: Option<String>,
+    #[serde(rename = "directAccess", skip_serializing_if = "Option::is_none")]
+    pub direct_access: Option<bool>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -976,6 +980,7 @@ pub struct StorageListOptions {
     pub storage_type: Option<String>,
     pub provider_type: Option<String>,
     pub is_active: Option<bool>,
+    pub direct_access: Option<bool>,
     pub page: Option<i64>,
     pub limit: Option<i64>,
 }

@@ -295,6 +295,9 @@ impl StoragesService {
         if let Some(v) = &opts.is_active {
             query.push(("isActive", v.to_string()));
         }
+        if let Some(v) = &opts.direct_access {
+            query.push(("directAccess", v.to_string()));
+        }
         if let Some(v) = &opts.page {
             query.push(("page", v.to_string()));
         }

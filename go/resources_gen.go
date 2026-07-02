@@ -316,6 +316,9 @@ func (s *StoragesService) List(ctx context.Context, opts StorageListOptions) (*P
 		if opts.IsActive != nil {
 			q.Set("isActive", strconv.FormatBool(*opts.IsActive))
 		}
+		if opts.DirectAccess != nil {
+			q.Set("directAccess", strconv.FormatBool(*opts.DirectAccess))
+		}
 		addPagination(q, opts.Page, opts.Limit)
 	}
 	data, err := s.c.get(ctx, "/api/v1/storages/list"+"?"+q.Encode())

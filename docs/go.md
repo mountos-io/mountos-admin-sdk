@@ -581,6 +581,7 @@ type Storage struct {
     Base                     string                   `json:"base,omitempty"`
     BlockRegion              string                   `json:"blockRegion,omitempty"`
     BlockSize                int32                    `json:"blockSize,omitempty"`
+    DirectAccess             bool                     `json:"directAccess,omitempty"`
     IsActive                 bool                     `json:"isActive"`
     CreatedAt                string                   `json:"createdAt"`
     UpdatedAt                string                   `json:"updatedAt"`
@@ -1058,6 +1059,7 @@ type ListStorageOptions struct {
     StorageType          string       `url:"storageType"`
     ProviderType         string       `url:"providerType"`
     IsActive             bool         `url:"isActive"`
+    DirectAccess         bool         `url:"directAccess"`
     Page                 int          `url:"page"` // default: 1
     Limit                int          `url:"limit"` // default: 10
 }
@@ -1090,6 +1092,7 @@ type EditStorageRequest struct {
     Endpoint                 string                   `json:"endpoint,omitempty"`
     AccessKey                string                   `json:"accessKey,omitempty"`
     SecretKey                string                   `json:"secretKey,omitempty"`
+    DirectAccess             bool                     `json:"directAccess,omitempty"`
 }
 ```
 

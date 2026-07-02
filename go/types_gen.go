@@ -136,6 +136,7 @@ type Storage struct {
 	Base         string `json:"base,omitempty"`
 	BlockRegion  string `json:"blockRegion,omitempty"`
 	BlockSize    int32  `json:"blockSize,omitempty"`
+	DirectAccess bool   `json:"directAccess,omitempty"`
 	IsActive     bool   `json:"isActive"`
 	CreatedAt    string `json:"createdAt"`
 	UpdatedAt    string `json:"updatedAt"`
@@ -629,11 +630,12 @@ type CreateStorageResponse struct {
 }
 
 type EditStorageRequest struct {
-	Name        string `json:"name"`
-	Description string `json:"description,omitempty"`
-	Endpoint    string `json:"endpoint,omitempty"`
-	AccessKey   string `json:"accessKey,omitempty"`
-	SecretKey   string `json:"secretKey,omitempty"`
+	Name         string `json:"name"`
+	Description  string `json:"description,omitempty"`
+	Endpoint     string `json:"endpoint,omitempty"`
+	AccessKey    string `json:"accessKey,omitempty"`
+	SecretKey    string `json:"secretKey,omitempty"`
+	DirectAccess bool   `json:"directAccess,omitempty"`
 }
 
 type TestStorageBucketRequest struct {
@@ -670,6 +672,7 @@ type StorageListOptions struct {
 	StorageType  string
 	ProviderType string
 	IsActive     *bool
+	DirectAccess *bool
 	Page         int
 	Limit        int
 }

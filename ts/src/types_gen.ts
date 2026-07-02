@@ -108,6 +108,7 @@ export interface Storage {
   base?: string
   blockRegion?: string
   blockSize?: number
+  directAccess?: boolean
   isActive: boolean
   createdAt: string
   updatedAt: string
@@ -582,6 +583,7 @@ export interface EditStorageRequest {
   endpoint?: string
   accessKey?: string
   secretKey?: string
+  directAccess?: boolean
 }
 
 export interface TestStorageBucketRequest {
@@ -600,6 +602,7 @@ export interface StorageListOptions extends ListOptions {
   storageType?: string
   providerType?: string
   isActive?: boolean
+  directAccess?: boolean
 }
 
 // Volumes
