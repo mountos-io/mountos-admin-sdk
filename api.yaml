@@ -405,6 +405,17 @@ types:
     - "totalVolumeUsed: int64"
     - "totalQuotaLimit: int64"
 
+  # Optional operator identity, HMAC-signed into the X-MountOS-Dashboard-User
+  # header (see SignDashboardUser). Access-control contract:
+  #   - Opt-in: absent header => appserv treats the caller as unrestricted admin.
+  #   - appserv/hub understands ONE role string: "user". For role="user" it
+  #     confines the caller to their own accountId/volumeId and uses userId for
+  #     audit + volume file-op attribution. Any other role => admin.
+  #   - appserv does NOT enforce which operations/fields a role may use. That
+  #     access-level policy is the caller's responsibility (the reference admin
+  #     dashboard backend implements it, open-source; fork or replace it).
+  #   - If sent, it must be well-formed or appserv rejects (403), never falling
+  #     back to admin: role required; role="user" must set accountId + userId.
   DashboardUser:
     - "id: string"
     - "name: string"

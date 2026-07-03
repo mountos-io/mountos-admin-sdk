@@ -25,6 +25,25 @@ func deriveDashboardHMACKey(secret string) []byte {
 // Sets exp to now + 10 minutes. hmacSecret is the dedicated dashboard-user HMAC
 // secret shared with appserv (DASHBOARD_USER_HMAC_KEY).
 // Format: base64url(json).base64url(hmac-sha256(base64url(json), derived_key))
+//
+// Access-control contract (what appserv does with this header):
+//   - The header is OPT-IN. If you never send it, appserv treats the caller as
+//     an unrestricted admin.
+//   - appserv/hub understands exactly ONE role string: "user". For role="user"
+//     it confines the caller to their own AccountID / VolumeID and uses UserID
+//     for audit + volume file-operation attribution. It does NOT enforce which
+//     operations or fields a role may use. Any other role value is admin.
+//   - ALL access-level policy (role->capability, forbidden fields, per-endpoint
+//     rules) is YOUR responsibility as the caller/integrator. The reference
+//     admin dashboard implements it in its backend proxy (open-source); you may
+//     fork or replace that policy. appserv only guarantees account/volume
+//     scoping + attribution for role="user".
+//
+// If you DO send the header it must be well-formed, or appserv rejects the
+// request (403) rather than falling back to admin: Role must be non-empty, and
+// role="user" must set both AccountID and UserID (the fields it is scoped and
+// attributed by). A signed-but-malformed identity is treated as an attempted
+// bypass. Any other non-empty Role is accepted as an admin.
 func SignDashboardUser(user *DashboardUser, hmacSecret string) (string, error) {
 	if hmacSecret == "" {
 		return "", fmt.Errorf("mountos: dashboard HMAC secret is required to sign a dashboard user header")
