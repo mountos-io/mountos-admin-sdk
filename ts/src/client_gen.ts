@@ -10,7 +10,7 @@ import type {
   CreateStorageRequest, BlockMember, Storage, StorageListOptions, BlockVolume, 
   EditStorageRequest, TestStorageBucketRequest, CreateVolumeRequest, Volume, 
   VolumeListOptions, EditVolumeRequest, MoveVolumeClusterRequest, DeactivateVolumeRequest, 
-  GenerateVolumeAPIKeysRequest, RevokeVolumeAPIKeyRequest, 
+  GenerateVolumeAPIKeysRequest, VolumeApiKey, RevokeVolumeAPIKeyRequest, 
   RevokeVolumeAPIKeysByUserRequest, UpdateVolumeQuotaRequest, VolumeSizePoint, 
   CreateVolumeForkRequest, Fork, DeleteVolumeForkRequest, RestoreVolumeForkRequest, 
   ForkTreeEntry, VolumeForkTreeListOptions, ForkEntryDetail, ForkEntryVersion, 
@@ -306,8 +306,12 @@ export class VolumesResource {
     return this.client.request('POST', `/api/v1/volumes/${volumeId}/activate`, undefined, signal)
   }
 
-  generateAPIKeys(volumeId: number, req: GenerateVolumeAPIKeysRequest, signal?: AbortSignal): Promise<{ apiKey: string; apiSecret: string }> {
+  generateAPIKeys(volumeId: number, req: GenerateVolumeAPIKeysRequest, signal?: AbortSignal): Promise<{ apiKey: string; apiSecret: string; evictedApiKeys?: string[] }> {
     return this.client.request('POST', `/api/v1/volumes/${volumeId}/api-keys/generate`, req, signal)
+  }
+
+  listAPIKeys(volumeId: number, signal?: AbortSignal): Promise<{ keys: VolumeApiKey[] }> {
+    return this.client.request('GET', `/api/v1/volumes/${volumeId}/api-keys`, undefined, signal)
   }
 
   revokeAPIKey(volumeId: number, req: RevokeVolumeAPIKeyRequest, signal?: AbortSignal): Promise<void> {

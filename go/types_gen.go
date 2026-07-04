@@ -474,6 +474,13 @@ type UserLite struct {
 	Name     string `json:"name"`
 }
 
+type VolumeApiKey struct {
+	APIKey     string `json:"apiKey"`
+	Name       string `json:"name,omitempty"`
+	CreatedAt  string `json:"createdAt,omitempty"`
+	LastUsedAt string `json:"lastUsedAt,omitempty"`
+}
+
 type VolumeRef struct {
 	ID   int64  `json:"id"`
 	Name string `json:"name"`
@@ -728,12 +735,18 @@ type DeactivateVolumeRequest struct {
 }
 
 type GenerateVolumeAPIKeysRequest struct {
-	UserID int64 `json:"userId"`
+	UserID int64  `json:"userId"`
+	Name   string `json:"name,omitempty"`
 }
 
 type GenerateAPIKeysVolumeResponse struct {
-	APIKey    string `json:"apiKey"`
-	APISecret string `json:"apiSecret"`
+	APIKey         string   `json:"apiKey"`
+	APISecret      string   `json:"apiSecret"`
+	EvictedAPIKeys []string `json:"evictedApiKeys,omitempty"`
+}
+
+type ListAPIKeysVolumeResponse struct {
+	Keys []VolumeApiKey `json:"keys"`
 }
 
 type RevokeVolumeAPIKeyRequest struct {

@@ -404,6 +404,10 @@ impl VolumesService {
         self.inner.post(&format!("/api/v1/volumes/{}/api-keys/generate", volume_id), req).await
     }
 
+    pub async fn list_api_keys(&self, volume_id: i64) -> Result<ListAPIKeysVolumeResponse, Error> {
+        self.inner.get(&format!("/api/v1/volumes/{}/api-keys", volume_id), &[]).await
+    }
+
     pub async fn revoke_api_key(&self, volume_id: i64, req: &RevokeVolumeAPIKeyRequest) -> Result<(), Error> {
         self.inner.post::<serde_json::Value, _>(&format!("/api/v1/volumes/{}/api-keys/revoke", volume_id), req).await.map(|_| ())
     }

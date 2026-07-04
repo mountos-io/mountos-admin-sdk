@@ -514,10 +514,15 @@ Param: `volumeId`
 Request:
 ```
 {
-  "userId": int64(required)
+  "userId": int64(required),
+  "name"?: string
 }
 ```
-Response data: `{ "apiKey": string, "apiSecret": string }`
+Response data: `{ "apiKey": string, "apiSecret": string, "evictedApiKeys": string[] }`
+
+### GET /api/v1/volumes/:volumeId/api-keys
+Param: `volumeId`
+Response data: `{ "keys": VolumeApiKey[] }`
 
 ### POST /api/v1/volumes/:volumeId/api-keys/revoke
 Param: `volumeId`

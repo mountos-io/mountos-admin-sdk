@@ -710,6 +710,18 @@ pub struct UserLite {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct VolumeApiKey {
+    #[serde(rename = "apiKey")]
+    pub api_key: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
+    #[serde(rename = "lastUsedAt", skip_serializing_if = "Option::is_none")]
+    pub last_used_at: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VolumeRef {
     pub id: i64,
     pub name: String,
@@ -1072,6 +1084,8 @@ pub struct DeactivateVolumeRequest {
 pub struct GenerateVolumeAPIKeysRequest {
     #[serde(rename = "userId")]
     pub user_id: i64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -1080,6 +1094,13 @@ pub struct GenerateAPIKeysVolumeResponse {
     pub api_key: String,
     #[serde(rename = "apiSecret")]
     pub api_secret: String,
+    #[serde(rename = "evictedApiKeys", skip_serializing_if = "Option::is_none")]
+    pub evicted_api_keys: Option<Vec<String>>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ListAPIKeysVolumeResponse {
+    pub keys: Vec<VolumeApiKey>,
 }
 
 #[derive(Debug, Clone, Serialize)]

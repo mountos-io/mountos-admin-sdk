@@ -446,6 +446,13 @@ export interface UserLite {
   name: string
 }
 
+export interface VolumeApiKey {
+  apiKey: string
+  name?: string
+  createdAt?: string
+  lastUsedAt?: string
+}
+
 export interface VolumeRef {
   id: number
   name: string
@@ -645,6 +652,7 @@ export interface DeactivateVolumeRequest {
 
 export interface GenerateVolumeAPIKeysRequest {
   userId: number
+  name?: string
 }
 
 export interface RevokeVolumeAPIKeyRequest {

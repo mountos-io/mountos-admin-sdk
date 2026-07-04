@@ -644,6 +644,17 @@ type Volume struct {
 }
 ```
 
+### `VolumeApiKey`
+
+```go
+type VolumeApiKey struct {
+    APIKey                   string                   `json:"apiKey"`
+    Name                     string                   `json:"name,omitempty"`
+    CreatedAt                string                   `json:"createdAt,omitempty"`
+    LastUsedAt               string                   `json:"lastUsedAt,omitempty"`
+}
+```
+
 ### `VolumeRef`
 
 ```go
@@ -1256,7 +1267,7 @@ func (s *VolumesService) Activate(ctx context.Context, volumeID int64) (*IDRespo
 #### `GenerateAPIKeys` - POST /api/v1/volumes/:volumeId/api-keys/generate
 
 ```go
-func (s *VolumesService) GenerateAPIKeys(ctx context.Context, volumeID int64, req *GenerateAPIKeysVolumeRequest) (*struct { APIKey string; APISecret string }, error)
+func (s *VolumesService) GenerateAPIKeys(ctx context.Context, volumeID int64, req *GenerateAPIKeysVolumeRequest) (*struct { APIKey string; APISecret string; EvictedAPIKeys []string }, error)
 ```
 
 Request body:
@@ -1264,7 +1275,14 @@ Request body:
 ```go
 type GenerateAPIKeysVolumeRequest struct {
     UserID                   int64                    `json:"userId"`
+    Name                     string                   `json:"name,omitempty"`
 }
+```
+
+#### `ListAPIKeys` - GET /api/v1/volumes/:volumeId/api-keys
+
+```go
+func (s *VolumesService) ListAPIKeys(ctx context.Context, volumeID int64) (*struct { Keys []VolumeApiKey }, error)
 ```
 
 #### `RevokeAPIKey` - POST /api/v1/volumes/:volumeId/api-keys/revoke

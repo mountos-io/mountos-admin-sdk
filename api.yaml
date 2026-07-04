@@ -209,6 +209,16 @@ types:
     - "pendingVolume: int64"
     - "liveInactiveVolume: int64"
 
+  # An entry in a user's active API key list on a volume (metadata only, never
+  # the secret). Users hold up to 2 active keys per volume for rotation.
+  # lastUsedAt is best-effort, advanced asynchronously on authentication and
+  # validation events, so it can trail live traffic by cache TTLs.
+  VolumeApiKey:
+    - "apiKey: string"
+    - "name: string?"
+    - "createdAt: datetime?"
+    - "lastUsedAt: datetime?"
+
   Fork:
     - "fid: int32"
     - "name: string"
@@ -952,14 +962,26 @@ resources:
         response:
           - "id: int64"
 
+      # Each user may hold up to 2 active keys per volume; generating past the
+      # limit evicts the oldest key (returned in evictedApiKeys, already
+      # revoked server-side).
       - action: generateApiKeys
         method: POST
         path: /:volumeId/api-keys/generate
         request:
           - "userId: int64!"
+          - "name: string?"
         response:
           - "apiKey: string"
           - "apiSecret: string"
+          - "evictedApiKeys: string[]?"
+
+      # Active keys of the calling user on this volume; never returns secrets.
+      - action: listApiKeys
+        method: GET
+        path: /:volumeId/api-keys
+        response:
+          - "keys: VolumeApiKey[]"
 
       - action: revokeApiKey
         method: POST

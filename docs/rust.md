@@ -629,6 +629,17 @@ pub struct Volume {
 }
 ```
 
+### `VolumeApiKey`
+
+```rust
+pub struct VolumeApiKey {
+    pub api_key: String,
+    pub name: Option<String>,
+    pub created_at: Option<String>,
+    pub last_used_at: Option<String>,
+}
+```
+
 ### `VolumeRef`
 
 ```rust
@@ -1162,7 +1173,14 @@ Request body:
 ```rust
 pub struct GenerateVolumeAPIKeysRequest {
     pub user_id: i64,
+    pub name: Option<String>,
 }
+```
+
+#### `list_api_keys` - GET /api/v1/volumes/:volumeId/api-keys
+
+```rust
+pub async fn list_api_keys(&self, volume_id: i64) -> Result<ListAPIKeysVolumeResponse, Error>
 ```
 
 #### `revoke_api_key` - POST /api/v1/volumes/:volumeId/api-keys/revoke

@@ -618,6 +618,17 @@ interface Volume {
 }
 ```
 
+### `VolumeApiKey`
+
+```typescript
+interface VolumeApiKey {
+  apiKey: string;
+  name?: string;
+  createdAt?: string;
+  lastUsedAt?: string;
+}
+```
+
 ### `VolumeRef`
 
 ```typescript
@@ -1375,7 +1386,8 @@ client.volumes.activate(volumeID: number): Promise<{ id: number }>;
 ```typescript
 client.volumes.generateAPIKeys(volumeID: number, body: {
     userId: number;
-  }): Promise<{ apiKey: string; apiSecret: string }>;
+    name?: string;
+  }): Promise<{ apiKey: string; apiSecret: string; evictedApiKeys: string[] }>;
 ```
 
 Request body:
@@ -1383,7 +1395,14 @@ Request body:
 ```typescript
 {
   userId: number;
+  name?: string;
 }
+```
+
+#### `listAPIKeys` - GET /api/v1/volumes/:volumeId/api-keys
+
+```typescript
+client.volumes.listAPIKeys(volumeID: number): Promise<{ keys: VolumeApiKey[] }>;
 ```
 
 #### `revokeAPIKey` - POST /api/v1/volumes/:volumeId/api-keys/revoke

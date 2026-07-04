@@ -485,6 +485,14 @@ func (s *VolumesService) GenerateAPIKeys(ctx context.Context, volumeID int64, re
 	return decodeJSON[GenerateAPIKeysVolumeResponse](data)
 }
 
+func (s *VolumesService) ListAPIKeys(ctx context.Context, volumeID int64) (*ListAPIKeysVolumeResponse, error) {
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/volumes/%s/api-keys", strconv.FormatInt(volumeID, 10)))
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[ListAPIKeysVolumeResponse](data)
+}
+
 func (s *VolumesService) RevokeAPIKey(ctx context.Context, volumeID int64, req *RevokeVolumeAPIKeyRequest) error {
 	_, err := s.c.post(ctx, fmt.Sprintf("/api/v1/volumes/%s/api-keys/revoke", strconv.FormatInt(volumeID, 10)), req)
 	return err
