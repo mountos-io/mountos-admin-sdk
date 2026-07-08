@@ -4,11 +4,11 @@ Provider-facing SDK for the mountOS Admin API. Wraps the appserv provider API (`
 
 ## SDKs
 
-| Language                     | Path    | Package                                      | Reference                    |
-| ---------------------------- | ------- | -------------------------------------------- | ---------------------------- |
-| [TypeScript](ts/README.md)   | `ts/`   | `@mountos-io/admin-sdk` (npm)                | [docs/ts.md](docs/ts.md)     |
-| [Go](go/README.md)           | `go/`   | `github.com/mountos-io/mountos-admin-sdk/go` | [docs/go.md](docs/go.md)     |
-| [Rust](rust/README.md)       | `rust/` | `mountos-admin-sdk` (crates.io)              | [docs/rust.md](docs/rust.md) |
+| Language                   | Path    | Package                                      | Reference                    |
+| -------------------------- | ------- | -------------------------------------------- | ---------------------------- |
+| [TypeScript](ts/README.md) | `ts/`   | `@mountos-io/admin-sdk` (npm)                | [docs/ts.md](docs/ts.md)     |
+| [Go](go/README.md)         | `go/`   | `github.com/mountos-io/mountos-admin-sdk/go` | [docs/go.md](docs/go.md)     |
+| [Rust](rust/README.md)     | `rust/` | `mountos-admin-sdk` (crates.io)              | [docs/rust.md](docs/rust.md) |
 
 ## Examples
 
@@ -38,6 +38,10 @@ appserv does **not** enforce which operations or fields a role may use (the role
 ## For AI Agents
 
 [SKILL.md](SKILL.md) is an agent skill covering TS/Go usage, ED25519/JWT auth, and the full resource set. It ships in the npm package (next to `api.md` and `api.yaml`) so coding agents can load accurate, version-matched guidance.
+
+## 0.x versions
+
+0.x versions are pre-release versions which may have breaking changes intentionally.
 
 ## Porting to Other Languages
 
