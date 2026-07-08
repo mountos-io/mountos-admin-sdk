@@ -1116,6 +1116,24 @@ pub struct RevokeVolumeAPIKeysByUserRequest {
 }
 
 #[derive(Debug, Clone, Serialize)]
+pub struct GenerateVolumeSttKeyRequest {
+    #[serde(rename = "userId", skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<i64>,
+    #[serde(rename = "expirySeconds")]
+    pub expiry_seconds: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GenerateSttKeyVolumeResponse {
+    #[serde(rename = "apiKey")]
+    pub api_key: String,
+    #[serde(rename = "apiSecret")]
+    pub api_secret: String,
+    #[serde(rename = "expiresAt")]
+    pub expires_at: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
 pub struct UpdateVolumeQuotaRequest {
     #[serde(rename = "quotaLimit")]
     pub quota_limit: i64,

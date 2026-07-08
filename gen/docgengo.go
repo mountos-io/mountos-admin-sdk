@@ -38,9 +38,18 @@ func generateDocGo(spec *Spec, outDir string) {
 	w.WriteString("    Items      []T            `json:\"items\"`\n")
 	w.WriteString("    Pagination PaginationMeta `json:\"pagination\"`\n")
 	w.WriteString("}\n\n")
-	w.WriteString("type CursorResponse[T any] struct {\n")
+	w.WriteString("type PaginationMeta struct {\n")
+	w.WriteString("    Page       int   `json:\"page\"`\n")
+	w.WriteString("    Limit      int   `json:\"limit\"`\n")
+	w.WriteString("    Total      int64 `json:\"total\"`\n")
+	w.WriteString("    TotalPages int64 `json:\"totalPages\"`\n")
+	w.WriteString("}\n\n")
+	w.WriteString("type CursorPaginatedResponse[T any] struct {\n")
 	w.WriteString("    Items      []T    `json:\"items\"`\n")
 	w.WriteString("    NextCursor *int64 `json:\"nextCursor\"`\n")
+	w.WriteString("}\n\n")
+	w.WriteString("type IDResponse struct {\n")
+	w.WriteString("    ID int64 `json:\"id\"`\n")
 	w.WriteString("}\n")
 	w.WriteString("```\n\n")
 
@@ -59,7 +68,10 @@ func generateDocGo(spec *Spec, outDir string) {
 			values := spec.Enums[name]
 			fmt.Fprintf(&w, "### `%s`\n\n", name)
 			w.WriteString("```go\n")
-			fmt.Fprintf(&w, "type %s string\n\n", name)
+			// Alias ("= string"), not a defined type, matching gogen.go's
+			// actual "type %s = string" -- a defined type would require
+			// explicit conversion to/from string, which the real SDK doesn't.
+			fmt.Fprintf(&w, "type %s = string\n\n", name)
 			w.WriteString("const (\n")
 			for _, v := range values {
 				fmt.Fprintf(&w, "    %s%s %s = %q\n", name, pascalCase(v), name, v)
@@ -82,8 +94,12 @@ func generateDocGo(spec *Spec, outDir string) {
 				if f.Optional {
 					tag += ",omitempty"
 				}
+				// spec.Types are general model structs, never request bodies
+				// (gogen.go's writeGoStruct always renders them with
+				// isRequest=false) -- never pointer-wrap here, regardless of
+				// optionality, to match what's actually emitted.
 				fmt.Fprintf(&w, "    %-24s %-24s `json:%q`\n",
-					goFieldName(f.Name), goDocType(f.Type, f.Optional), tag)
+					goFieldName(f.Name), goDocType(f.Type, false), tag)
 			}
 			w.WriteString("}\n```\n\n")
 		}
@@ -114,22 +130,105 @@ func generateDocGo(spec *Spec, outDir string) {
 				args = append(args, name+" "+typ)
 			}
 
-			reqType := ""
-			if len(ep.Request) > 0 {
-				reqType = inferGoRequestType(res, ep, "Request")
+			// Mirrors writeGoMethod's dispatch in gogen.go case-for-case (same
+			// conditions, same order) so the documented signature can never
+			// drift from the real one: reuses the same naming/shape helpers
+			// (requestTypeName, listOptionsTypeName, responseIsIDOnly,
+			// customResponseTypeName, goOptionalQueryType) instead of a
+			// parallel, divergent heuristic.
+			var (
+				reqType   string // request body struct name, when the real method takes one
+				optsType  string // query-options struct name, when the real method takes one
+				printOpts bool   // whether optsType is a real, doc-worthy struct (not the shared ListOptions)
+				retType   string // data return type, e.g. "*Foo", "[]Foo", "*PaginatedResponse[Foo]"
+				isVoid    bool   // true when the real method returns only error, no data
+			)
+
+			switch {
+			case ep.ResponseArray:
+				for _, qs := range ep.Query {
+					f := parseField(qs)
+					paramName := goParamName(":" + f.Name)
+					args = append(args, paramName+" "+goDocType(f.Type, false))
+				}
+				retType = "[]" + goDocType(ep.ResponseType, false)
+
+			case ep.Pagination == "page":
+				optsType = "ListOptions"
+				if hasExtraQueryParam(ep.Query) {
+					optsType = listOptionsTypeName(res.Name)
+					printOpts = true
+				}
+				if hasRequiredQueryParam(ep.Query) {
+					args = append(args, "opts "+optsType)
+				} else {
+					args = append(args, "opts *"+optsType)
+				}
+				retType = "*PaginatedResponse[" + ep.ResponseType + "]"
+
+			case ep.Pagination == "cursor":
+				optsType = listOptionsTypeName(res.Name)
+				printOpts = true
+				if hasRequiredQueryParam(ep.Query) {
+					args = append(args, "opts "+optsType)
+				} else {
+					args = append(args, "opts *"+optsType)
+				}
+				retType = "*CursorPaginatedResponse[" + ep.ResponseType + "]"
+
+			case len(ep.Query) > 0 && ep.Pagination == "":
+				for _, qs := range ep.Query {
+					f := parseField(qs)
+					paramName := goParamName(":" + f.Name)
+					args = append(args, paramName+" "+goOptionalQueryType(f))
+				}
+				switch {
+				case ep.ResponseType != "":
+					retType = "*" + ep.ResponseType
+				case len(ep.Response) > 0:
+					retType = "*" + goDocDataResponseType(res, ep)
+				default:
+					isVoid = true
+				}
+
+			// ResponseType before the ad-hoc Response field list -- mirrors
+			// writeGoMethod's real precedence (gogen.go), which itself
+			// matches TS/Rust, so all three languages and this doc agree on
+			// which shape wins for a hypothetical endpoint spec'ing both.
+			case len(ep.Request) > 0 && ep.ResponseType != "":
+				reqType = requestTypeName(res.Name, ep.Action)
 				args = append(args, "req *"+reqType)
-			} else if len(ep.Query) > 0 {
-				reqType = inferGoRequestType(res, ep, "Options")
-				args = append(args, "opts *"+reqType)
+				retType = "*" + ep.ResponseType
+
+			case len(ep.Request) > 0 && len(ep.Response) > 0:
+				reqType = requestTypeName(res.Name, ep.Action)
+				args = append(args, "req *"+reqType)
+				retType = "*" + goDocDataResponseType(res, ep)
+
+			case len(ep.Request) > 0:
+				reqType = requestTypeName(res.Name, ep.Action)
+				args = append(args, "req *"+reqType)
+				isVoid = true
+
+			case ep.ResponseType != "":
+				retType = "*" + ep.ResponseType
+
+			case len(ep.Response) > 0:
+				retType = "*" + goDocDataResponseType(res, ep)
+
+			default:
+				isVoid = true
 			}
 
-			retType := goReturnType(ep)
-
 			w.WriteString("```go\n")
-			fmt.Fprintf(&w, "func (s *%sService) %s(%s) (%s, error)\n", res.Name, actionFn, strings.Join(args, ", "), retType)
+			if isVoid {
+				fmt.Fprintf(&w, "func (s *%sService) %s(%s) error\n", res.Name, actionFn, strings.Join(args, ", "))
+			} else {
+				fmt.Fprintf(&w, "func (s *%sService) %s(%s) (%s, error)\n", res.Name, actionFn, strings.Join(args, ", "), retType)
+			}
 			w.WriteString("```\n\n")
 
-			if len(ep.Request) > 0 {
+			if reqType != "" && len(ep.Request) > 0 {
 				w.WriteString("Request body:\n\n")
 				w.WriteString("```go\n")
 				fmt.Fprintf(&w, "type %s struct {\n", reqType)
@@ -139,23 +238,53 @@ func generateDocGo(spec *Spec, outDir string) {
 					if !f.Required {
 						tag += ",omitempty"
 					}
+					// Matches writeGoStruct's real condition: !f.Required
+					// (both the "?" tier and bare/unmarked fields), so Go's
+					// docs agree with TS/Rust on which fields can carry an
+					// explicit falsy/zero value.
 					fmt.Fprintf(&w, "    %-24s %-24s `json:%q`\n",
 						goFieldName(f.Name), goDocType(f.Type, !f.Required), tag)
 				}
 				w.WriteString("}\n```\n\n")
 			}
-			if len(ep.Query) > 0 {
+			if printOpts && len(ep.Query) > 0 {
 				w.WriteString("Query params:\n\n")
 				w.WriteString("```go\n")
-				fmt.Fprintf(&w, "type %s struct {\n", reqType)
+				fmt.Fprintf(&w, "type %s struct {\n", optsType)
 				for _, fs := range ep.Query {
 					f := parseField(fs)
 					comment := ""
 					if f.Default != "" {
 						comment = " // default: " + f.Default
 					}
+					// Reuses the real goOptionalQueryType (not goDocType):
+					// query params pointer-wrap on !Required (bare fields
+					// included), a different condition from request bodies
+					// (which gate on Optional only) -- a second, divergent
+					// reimplementation here is exactly what caused earlier
+					// bugs in this file.
 					fmt.Fprintf(&w, "    %-20s %-12s `url:%q`%s\n",
-						goFieldName(f.Name), goDocType(f.Type, false), f.Name, comment)
+						goFieldName(f.Name), goOptionalQueryType(f), f.Name, comment)
+				}
+				w.WriteString("}\n```\n\n")
+			}
+			// Response body: only for a named custom response struct (not
+			// IDResponse, and not a primitive/array/paginated return, all of
+			// which are already fully visible in the signature itself).
+			if !ep.ResponseArray && ep.Pagination == "" && ep.ResponseType == "" &&
+				len(ep.Response) > 0 && !responseIsIDOnly(ep.Response) {
+				respType := goDocDataResponseType(res, ep)
+				w.WriteString("Response body:\n\n")
+				w.WriteString("```go\n")
+				fmt.Fprintf(&w, "type %s struct {\n", respType)
+				for _, fs := range ep.Response {
+					f := parseField(fs)
+					tag := f.Name
+					if f.Optional {
+						tag += ",omitempty"
+					}
+					fmt.Fprintf(&w, "    %-24s %-24s `json:%q`\n",
+						goFieldName(f.Name), goDocType(f.Type, false), tag)
 				}
 				w.WriteString("}\n```\n\n")
 			}
@@ -165,72 +294,30 @@ func generateDocGo(spec *Spec, outDir string) {
 	writeFile(filepath.Join(outDir, "go.md"), w.String())
 }
 
+// goDocType maps a spec type through the real generator's goType. When ptr is
+// set (request-body fields with !f.Required), it pointer-wraps under
+// writeGoStruct's exact condition (only bool/int spec types) so the documented
+// field type can't diverge from the emitted one.
 func goDocType(t string, ptr bool) string {
-	if strings.HasSuffix(t, "[]") {
-		return "[]" + goDocType(strings.TrimSuffix(t, "[]"), false)
-	}
-	base := ""
-	switch t {
-	case "string", "datetime":
-		base = "string"
-	case "int":
-		base = "int"
-	case "int32":
-		base = "int32"
-	case "int64":
-		base = "int64"
-	case "bool":
-		base = "bool"
-	case "object":
-		base = "map[string]any"
-	case "json":
-		base = "json.RawMessage"
-	default:
-		base = t
-	}
-	if ptr && base != "" && base != "string" && !strings.HasPrefix(base, "[]") && !strings.HasPrefix(base, "map[") {
-		// keep simple - only pointer-wrap scalar struct-ish enum names
+	base := goType(t)
+	if ptr {
+		switch t {
+		case "bool", "int", "int32", "int64":
+			return "*" + base
+		}
 	}
 	return base
 }
 
-func goReturnType(ep Endpoint) string {
-	if ep.ResponseType != "" {
-		base := ep.ResponseType
-		if ep.ResponseArray {
-			return "[]" + base
-		}
-		switch ep.Pagination {
-		case "page":
-			return "*PaginatedResponse[" + base + "]"
-		case "cursor":
-			return "*CursorResponse[" + base + "]"
-		}
-		return "*" + base
+// goDocDataResponseType names the data type for an endpoint whose response is
+// a plain field list (ep.Response, not ep.ResponseType). Delegates to the real
+// generator's naming rules (responseIsIDOnly / customResponseTypeName) instead
+// of inventing an anonymous struct, so it can't drift from what gogen.go's
+// writeGoBodyResponseMethod / writeGoToggleMethod / writeGoQueryMethod
+// actually emit (always a named IDResponse or "<Action><Resource>Response").
+func goDocDataResponseType(res Resource, ep Endpoint) string {
+	if responseIsIDOnly(ep.Response) {
+		return "IDResponse"
 	}
-	if len(ep.Response) > 0 {
-		// Heuristic: single id field → *IDResponse, otherwise anonymous struct.
-		if len(ep.Response) == 1 {
-			f := parseField(ep.Response[0])
-			if f.Name == "id" && f.Type == "int64" {
-				return "*IDResponse"
-			}
-		}
-		var parts []string
-		for _, rs := range ep.Response {
-			f := parseField(rs)
-			parts = append(parts, goFieldName(f.Name)+" "+goDocType(f.Type, false))
-		}
-		return "*struct { " + strings.Join(parts, "; ") + " }"
-	}
-	return "*StandardResponse[any]"
-}
-
-// inferGoRequestType picks a stable per-endpoint type name (Action + ResourceSingular + suffix).
-func inferGoRequestType(res Resource, ep Endpoint, suffix string) string {
-	singular := strings.TrimSuffix(res.Name, "s")
-	if strings.HasSuffix(res.Name, "ies") {
-		singular = strings.TrimSuffix(res.Name, "ies") + "y"
-	}
-	return pascalCase(ep.Action) + singular + suffix
+	return customResponseTypeName(res.Name, ep.Action)
 }

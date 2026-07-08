@@ -663,6 +663,11 @@ export interface RevokeVolumeAPIKeysByUserRequest {
   userId: number
 }
 
+export interface GenerateVolumeSttKeyRequest {
+  userId?: number
+  expirySeconds: number
+}
+
 export interface UpdateVolumeQuotaRequest {
   quotaLimit: number
 }

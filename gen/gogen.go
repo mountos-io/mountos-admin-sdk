@@ -72,19 +72,22 @@ func actionName(action string) string {
 
 // requestTypeName builds e.g. "CreateAccountRequest", "AddUserRequest", "UpdateVolumeQuotaRequest"
 // For multi-word actions, inserts the resource after the first word.
+// Also called directly by the doc generator (docgengo.go) so both stay in
+// lockstep instead of maintaining a second, divergent naming rule.
 func requestTypeName(resourceName, action string) string {
+	const suffix = "Request"
 	words := splitWords(action)
 	singular := singularize(resourceName)
 	if len(words) <= 1 {
-		return actionName(action) + singular + "Request"
+		return actionName(action) + singular + suffix
 	}
-	// verb + Resource + rest, e.g. Update + Volume + Quota + Request
+	// verb + Resource + rest, e.g. Update + Volume + Quota + <suffix>
 	verb := pascalCase(words[0])
 	var rest strings.Builder
 	for _, w := range words[1:] {
 		rest.WriteString(pascalCase(w))
 	}
-	return verb + singular + rest.String() + "Request"
+	return verb + singular + rest.String() + suffix
 }
 
 // singularize strips trailing 's' for simple plurals.
@@ -329,10 +332,14 @@ func writeGoStruct(w *strings.Builder, name string, fields []string, isRequest b
 		f := parseField(s)
 		gn := goFieldName(f.Name)
 		gt := goType(f.Type)
-		// Request body fields marked optional ("?") on bool/int types get a
-		// pointer so callers can distinguish "not set" from zero - mirrors
-		// goOptionalQueryType for query params.
-		if isRequest && f.Optional {
+		// Request body fields that aren't required (both the explicit "?"
+		// tier and bare/unmarked fields) get a pointer on bool/int types so
+		// callers can distinguish "not set" from zero - mirrors
+		// goOptionalQueryType for query params, and matches TS (writeTSInterface,
+		// !f.Required) and Rust (writeRustStruct, !f.Required) so all three
+		// languages can express an explicit falsy/zero value on the same
+		// fields instead of only Go silently dropping it via omitempty.
+		if isRequest && !f.Required {
 			switch f.Type {
 			case "bool", "int", "int32", "int64":
 				gt = "*" + gt
@@ -580,10 +587,16 @@ func writeGoMethod(w *strings.Builder, res Resource, ep Endpoint, svcType, fullB
 		writeGoCursorListMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name, pt)
 	case len(ep.Query) > 0 && ep.Pagination == "":
 		writeGoQueryMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name, pt)
-	case len(ep.Request) > 0 && len(ep.Response) > 0:
-		writeGoBodyResponseMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name, pt)
+	// ResponseType is checked before the ad-hoc Response field list (matches
+	// TS's tsReturnType and Rust's writeRustBodyMethod, and this switch's own
+	// no-request branches below) so all three languages agree on which shape
+	// wins for a hypothetical endpoint spec'ing both -- no live endpoint does
+	// today, but silently differing precedence per language is exactly the
+	// kind of drift this generator has otherwise been hardened against.
 	case len(ep.Request) > 0 && ep.ResponseType != "":
 		writeGoBodyResponseTypeMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name, pt)
+	case len(ep.Request) > 0 && len(ep.Response) > 0:
+		writeGoBodyResponseMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name, pt)
 	case len(ep.Request) > 0:
 		writeGoBodyVoidMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name, pt)
 	case ep.ResponseType != "":

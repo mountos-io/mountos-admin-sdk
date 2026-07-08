@@ -36,9 +36,9 @@ func generateDocTS(spec *Spec, outDir string) {
 	w.WriteString("  data?: T;\n")
 	w.WriteString("  errorCode?: number;\n")
 	w.WriteString("};\n\n")
-	w.WriteString("type PaginatedResponse<T> = { items: T[]; pagination: PaginationMeta };\n")
-	w.WriteString("type CursorResponse<T>   = { items: T[]; nextCursor: number | null };\n")
-	w.WriteString("type PaginationMeta      = { page: number; limit: number; total: number; totalPages: number };\n")
+	w.WriteString("type PaginatedResponse<T>       = { items: T[]; pagination: PaginationMeta };\n")
+	w.WriteString("type CursorPaginatedResponse<T> = { items: T[]; nextCursor: number | null };\n")
+	w.WriteString("type PaginationMeta             = { page: number; limit: number; total: number; totalPages: number };\n")
 	w.WriteString("```\n\n")
 
 	w.WriteString("## Error Codes\n\n")
@@ -83,7 +83,7 @@ func generateDocTS(spec *Spec, outDir string) {
 				if f.Optional {
 					suffix = "?"
 				}
-				fmt.Fprintf(&w, "  %s%s: %s;\n", f.Name, suffix, tsDocType(f.Type))
+				fmt.Fprintf(&w, "  %s%s: %s;\n", f.Name, suffix, tsType(f.Type))
 			}
 			w.WriteString("}\n```\n\n")
 		}
@@ -103,89 +103,156 @@ func generateDocTS(spec *Spec, outDir string) {
 
 			fmt.Fprintf(&w, "#### `%s` - %s %s\n\n", actionFn, ep.Method, fullPath)
 
-			// Path params
+			// Reuses the real tsParams/tsQueryParamName/tsType/tsReturnType
+			// (tsgen.go) and mirrors writeTSMethod's dispatch case-for-case
+			// (same conditions, same order) so the documented signature can
+			// never drift from what client_gen.ts actually emits: named
+			// request/opts types where the real method takes one, individual
+			// positional params where it doesn't, no arg at all where the
+			// real method has neither.
 			pathParams := extractPathParams(fullPath)
-			pathArgs := make([]string, 0, len(pathParams))
-			for _, p := range pathParams {
-				name := camelCase(strings.TrimPrefix(p, ":"))
-				typ := "number"
-				if res.PathParamTypes != nil {
-					if t, ok := res.PathParamTypes[strings.TrimPrefix(p, ":")]; ok {
-						typ = tsDocType(t)
+			pathArgs := tsParams(pathParams, res.PathParamTypes)
+
+			var sig, retType, reqSection, querySection string
+
+			switch {
+			case ep.ResponseArray:
+				params := pathArgs
+				for _, qs := range ep.Query {
+					f := parseField(qs)
+					paramName := tsQueryParamName(f.Name)
+					if params != "" {
+						params += ", "
 					}
+					opt := "?"
+					if f.Required {
+						opt = ""
+					}
+					params += paramName + opt + ": " + tsType(f.Type)
 				}
-				pathArgs = append(pathArgs, name+": "+typ)
+				if params != "" {
+					params += ", "
+				}
+				sig = params + "signal?: AbortSignal"
+				retType = tsType(ep.ResponseType) + "[]"
+				if len(ep.Query) > 0 {
+					querySection = tsBlockObject(ep.Query)
+				}
+
+			case ep.Pagination == "page":
+				optsType := "ListOptions"
+				printOpts := false
+				if hasExtraQueryParam(ep.Query) {
+					optsType = listOptionsTypeName(res.Name)
+					printOpts = true
+				}
+				optsOptional := "?"
+				if hasRequiredQueryParam(ep.Query) {
+					optsOptional = ""
+				}
+				params := pathArgs
+				if params != "" {
+					params += ", "
+				}
+				sig = params + "opts" + optsOptional + ": " + optsType + ", signal?: AbortSignal"
+				retType = "PaginatedResponse<" + ep.ResponseType + ">"
+				if printOpts {
+					querySection = tsBlockObject(ep.Query)
+				}
+
+			case ep.Pagination == "cursor":
+				optsType := listOptionsTypeName(res.Name)
+				optsOptional := "?"
+				if hasRequiredQueryParam(ep.Query) {
+					optsOptional = ""
+				}
+				params := pathArgs
+				if params != "" {
+					params += ", "
+				}
+				sig = params + "opts" + optsOptional + ": " + optsType + ", signal?: AbortSignal"
+				retType = "CursorPaginatedResponse<" + ep.ResponseType + ">"
+				querySection = tsBlockObject(ep.Query)
+
+			case len(ep.Query) > 0 && ep.Pagination == "":
+				params := pathArgs
+				for _, qs := range ep.Query {
+					f := parseField(qs)
+					paramName := tsQueryParamName(f.Name)
+					if params != "" {
+						params += ", "
+					}
+					opt := "?"
+					if f.Required {
+						opt = ""
+					}
+					params += paramName + opt + ": " + tsType(f.Type)
+				}
+				if params != "" {
+					params += ", "
+				}
+				sig = params + "signal?: AbortSignal"
+				retType = tsReturnType(ep)
+				querySection = tsBlockObject(ep.Query)
+
+			case len(ep.Request) > 0:
+				reqType := requestTypeName(res.Name, ep.Action)
+				params := pathArgs
+				if params != "" {
+					params += ", "
+				}
+				sig = params + "req: " + reqType + ", signal?: AbortSignal"
+				retType = tsReturnType(ep)
+				reqSection = tsBlockObject(ep.Request)
+
+			case ep.ResponseType != "":
+				params := pathArgs
+				if params != "" {
+					params += ", "
+				}
+				sig = params + "signal?: AbortSignal"
+				retType = ep.ResponseType
+
+			case len(ep.Response) > 0:
+				params := pathArgs
+				if params != "" {
+					params += ", "
+				}
+				sig = params + "signal?: AbortSignal"
+				// Inline, matching writeTSToggleMethod/tsInlineResponseType --
+				// TS's return type already shows the shape, unlike Go/Rust
+				// which reference a named type and need a separate section.
+				retType = tsInlineResponseType(ep.Response)
+
+			default:
+				params := pathArgs
+				if params != "" {
+					params += ", "
+				}
+				sig = params + "signal?: AbortSignal"
+				retType = "void"
 			}
 
-			// Body / query arg
-			bodyArg := ""
-			if len(ep.Request) > 0 {
-				bodyArg = "body: " + tsInlineObject(ep.Request, "  ")
-			} else if len(ep.Query) > 0 {
-				bodyArg = "params: " + tsInlineObject(ep.Query, "  ")
-			}
-
-			// Return type
-			retType := tsDocReturnType(ep)
-
-			// Signature
 			w.WriteString("```typescript\n")
-			args := pathArgs
-			if bodyArg != "" {
-				args = append(args, bodyArg)
-			}
-			fmt.Fprintf(&w, "client.%s.%s(%s): Promise<%s>;\n", accessor, actionFn, strings.Join(args, ", "), retType)
+			fmt.Fprintf(&w, "client.%s.%s(%s): Promise<%s>;\n", accessor, actionFn, sig, retType)
 			w.WriteString("```\n\n")
 
-			if len(ep.Request) > 0 {
+			if reqSection != "" {
 				w.WriteString("Request body:\n\n")
 				w.WriteString("```typescript\n")
-				w.WriteString(tsBlockObject(ep.Request))
+				w.WriteString(reqSection)
 				w.WriteString("```\n\n")
 			}
-			if len(ep.Query) > 0 {
+			if querySection != "" {
 				w.WriteString("Query params:\n\n")
 				w.WriteString("```typescript\n")
-				w.WriteString(tsBlockObject(ep.Query))
+				w.WriteString(querySection)
 				w.WriteString("```\n\n")
 			}
 		}
 	}
 
 	writeFile(filepath.Join(outDir, "ts.md"), w.String())
-}
-
-func tsDocType(t string) string {
-	if strings.HasSuffix(t, "[]") {
-		return tsDocType(strings.TrimSuffix(t, "[]")) + "[]"
-	}
-	switch t {
-	case "string", "datetime":
-		return "string"
-	case "int", "int32", "int64":
-		return "number"
-	case "bool":
-		return "boolean"
-	case "object", "json":
-		return "Record<string, unknown>"
-	default:
-		return t
-	}
-}
-
-func tsInlineObject(fields []string, indent string) string {
-	var sb strings.Builder
-	sb.WriteString("{\n")
-	for _, fs := range fields {
-		f := parseField(fs)
-		suffix := ""
-		if !f.Required {
-			suffix = "?"
-		}
-		fmt.Fprintf(&sb, "%s  %s%s: %s;\n", indent, f.Name, suffix, tsDocType(f.Type))
-	}
-	fmt.Fprintf(&sb, "%s}", indent)
-	return sb.String()
 }
 
 func tsBlockObject(fields []string) string {
@@ -201,35 +268,10 @@ func tsBlockObject(fields []string) string {
 		if f.Default != "" {
 			comment = "  // default: " + f.Default
 		}
-		fmt.Fprintf(&sb, "  %s%s: %s;%s\n", f.Name, suffix, tsDocType(f.Type), comment)
+		fmt.Fprintf(&sb, "  %s%s: %s;%s\n", f.Name, suffix, tsType(f.Type), comment)
 	}
 	sb.WriteString("}\n")
 	return sb.String()
-}
-
-func tsDocReturnType(ep Endpoint) string {
-	if ep.ResponseType != "" {
-		base := ep.ResponseType
-		if ep.ResponseArray {
-			return base + "[]"
-		}
-		switch ep.Pagination {
-		case "page":
-			return "PaginatedResponse<" + base + ">"
-		case "cursor":
-			return "CursorResponse<" + base + ">"
-		}
-		return base
-	}
-	if len(ep.Response) > 0 {
-		var parts []string
-		for _, rs := range ep.Response {
-			f := parseField(rs)
-			parts = append(parts, f.Name+": "+tsDocType(f.Type))
-		}
-		return "{ " + strings.Join(parts, "; ") + " }"
-	}
-	return "void"
 }
 
 func sortedKeys[V any](m map[string]V) []string {

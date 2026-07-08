@@ -503,6 +503,14 @@ func (s *VolumesService) RevokeAPIKeysByUser(ctx context.Context, volumeID int64
 	return err
 }
 
+func (s *VolumesService) GenerateSttKey(ctx context.Context, volumeID int64, req *GenerateVolumeSttKeyRequest) (*GenerateSttKeyVolumeResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/volumes/%s/stt-key/generate", strconv.FormatInt(volumeID, 10)), req)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[GenerateSttKeyVolumeResponse](data)
+}
+
 func (s *VolumesService) UpdateQuota(ctx context.Context, volumeID int64, req *UpdateVolumeQuotaRequest) (*IDResponse, error) {
 	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/volumes/%s/quota", strconv.FormatInt(volumeID, 10)), req)
 	if err != nil {

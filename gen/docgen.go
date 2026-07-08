@@ -38,7 +38,24 @@ func generateDoc(spec *Spec, outDir string) {
 	}
 	w.WriteString("\n---\n")
 
+	// Enums (referenced by name in Query/Response type positions below; the
+	// language SDKs render these as go.md/ts.md/rust.md const blocks, but this
+	// language-agnostic doc must spell out the accepted values itself).
+	if len(spec.Enums) > 0 {
+		w.WriteString("\n## Enums\n\n")
+		for _, name := range sortedKeys(spec.Enums) {
+			values := spec.Enums[name]
+			quoted := make([]string, len(values))
+			for i, v := range values {
+				quoted[i] = "\"" + v + "\""
+			}
+			fmt.Fprintf(&w, "`%s`: %s\n\n", name, strings.Join(quoted, " | "))
+		}
+		w.WriteString("---\n")
+	}
+
 	// Resources
+	renderedTypes := map[string]bool{}
 	for _, res := range spec.Resources {
 		w.WriteString("\n## " + res.Name + "\n")
 		fullBasePath := spec.BasePath + res.Path
@@ -101,7 +118,16 @@ func generateDoc(spec *Spec, outDir string) {
 				parts := make([]string, len(ep.Response))
 				for i, rs := range ep.Response {
 					f := parseField(rs)
-					parts[i] = fmt.Sprintf("\"%s\": %s", f.Name, docType(f.Type))
+					// Response fields are model fields, not request bodies: only
+					// the Optional ("?") tier is ever absent from the payload
+					// (matches Go's omitempty, TS's "?", Rust's Option<T> for
+					// response structs) -- a bare or Required field is always
+					// present, so it gets no "?" here.
+					name := f.Name
+					if f.Optional {
+						name += "?"
+					}
+					parts[i] = fmt.Sprintf("\"%s\": %s", name, docType(f.Type))
 				}
 				fmt.Fprintf(&w, "Response data: `{ %s }`\n", strings.Join(parts, ", "))
 			} else if ep.ResponseType != "" {
@@ -117,26 +143,33 @@ func generateDoc(spec *Spec, outDir string) {
 			}
 		}
 
-		// Type definition if resource has a responseType referencing a type
+		// Primary type definition next to the resource that owns it. Deduped
+		// because several resources share one type (AuditLogs/RegionAuditLogs
+		// both return AuditLog); a reference doc defines each type once.
 		typeName := findResourceType(res)
-		if typeName != "" {
+		if typeName != "" && !renderedTypes[typeName] {
 			if fields, ok := spec.Types[typeName]; ok {
-				w.WriteString("\n### " + typeName + " Type\n")
-				w.WriteString("```\n{\n")
-				for i, fs := range fields {
-					f := parseField(fs)
-					line := "  \"" + f.Name + "\""
-					if f.Optional {
-						line += "?"
-					}
-					line += ": " + docFieldType(f.Type)
-					if i < len(fields)-1 {
-						line += ","
-					}
-					w.WriteString(line + "\n")
-				}
-				w.WriteString("}\n```\n")
+				renderedTypes[typeName] = true
+				writeDocTypeBlock(&w, typeName, fields)
 			}
+		}
+		w.WriteString("\n---\n")
+	}
+
+	// Remaining named types no resource section claimed (nested field types
+	// like Ref, and responses of secondary endpoints like Fork). Every type
+	// name referenced above must be defined somewhere in this doc, the same
+	// rule the Enums section enforces for enum names.
+	var restTypes []string
+	for _, name := range sortedKeys(spec.Types) {
+		if !renderedTypes[name] {
+			restTypes = append(restTypes, name)
+		}
+	}
+	if len(restTypes) > 0 {
+		w.WriteString("\n## Types\n")
+		for _, name := range restTypes {
+			writeDocTypeBlock(&w, name, spec.Types[name])
 		}
 		w.WriteString("\n---\n")
 	}
@@ -168,6 +201,26 @@ func generateDoc(spec *Spec, outDir string) {
 	w.WriteString("```\n")
 
 	writeFile(filepath.Join(outDir, "api.md"), w.String())
+}
+
+// writeDocTypeBlock renders one named type as a "### <Name> Type" section
+// with a JSON-shaped field block.
+func writeDocTypeBlock(w *strings.Builder, name string, fields []string) {
+	w.WriteString("\n### " + name + " Type\n")
+	w.WriteString("```\n{\n")
+	for i, fs := range fields {
+		f := parseField(fs)
+		line := "  \"" + f.Name + "\""
+		if f.Optional {
+			line += "?"
+		}
+		line += ": " + docFieldType(f.Type)
+		if i < len(fields)-1 {
+			line += ","
+		}
+		w.WriteString(line + "\n")
+	}
+	w.WriteString("}\n```\n")
 }
 
 func docType(t string) string {

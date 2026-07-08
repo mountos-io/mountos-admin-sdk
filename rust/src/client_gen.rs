@@ -416,6 +416,10 @@ impl VolumesService {
         self.inner.post::<serde_json::Value, _>(&format!("/api/v1/volumes/{}/api-keys/revoke-by-user", volume_id), req).await.map(|_| ())
     }
 
+    pub async fn generate_stt_key(&self, volume_id: i64, req: &GenerateVolumeSttKeyRequest) -> Result<GenerateSttKeyVolumeResponse, Error> {
+        self.inner.post(&format!("/api/v1/volumes/{}/stt-key/generate", volume_id), req).await
+    }
+
     pub async fn update_quota(&self, volume_id: i64, req: &UpdateVolumeQuotaRequest) -> Result<IdResponse, Error> {
         self.inner.put(&format!("/api/v1/volumes/{}/quota", volume_id), req).await
     }

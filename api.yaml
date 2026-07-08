@@ -995,6 +995,23 @@ resources:
         request:
           - "userId: int64!"
 
+      # Short-term-token (STT): a self-verifying, DB-less key/secret pair
+      # that authorizes only a mount bootstrap, not an ongoing session.
+      # userId 0 (omitted) means "no user" (system/service mount); a
+      # user-role caller may only request their own userId, an admin caller
+      # may request any userId including 0. expirySeconds is capped
+      # server-side (currently 300s).
+      - action: generateSttKey
+        method: POST
+        path: /:volumeId/stt-key/generate
+        request:
+          - "userId: int64?"
+          - "expirySeconds: int64!"
+        response:
+          - "apiKey: string"
+          - "apiSecret: string"
+          - "expiresAt: string"
+
       - action: updateQuota
         method: PUT
         path: /:volumeId/quota

@@ -32,6 +32,27 @@ pub enum Error {
     Serde(serde_json::Error),
     Key(String),
 }
+
+pub struct PaginatedResponse<T> {
+    pub items: Vec<T>,
+    pub pagination: PaginationMeta,
+}
+
+pub struct PaginationMeta {
+    pub page: i64,
+    pub limit: i64,
+    pub total: i64,
+    pub total_pages: i64,
+}
+
+pub struct CursorPaginatedResponse<T> {
+    pub items: Vec<T>,
+    pub next_cursor: Option<i64>,
+}
+
+pub struct IdResponse {
+    pub id: i64,
+}
 ```
 
 ## Error Codes
@@ -691,6 +712,16 @@ pub struct CreateAccountRequest {
 pub async fn list(&self, opts: Option<&AccountListOptions>) -> Result<PaginatedResponse<Account>, Error>
 ```
 
+Query params:
+
+```rust
+pub struct AccountListOptions {
+    pub is_active: Option<bool>,
+    pub page: Option<i64>,
+    pub limit: Option<i64>,
+}
+```
+
 #### `get` - GET /api/v1/accounts/:accountId
 
 ```rust
@@ -772,7 +803,19 @@ pub struct AddUserRequest {
 #### `list` - GET /api/v1/users/list
 
 ```rust
-pub async fn list(&self, opts: Option<&UserListOptions>) -> Result<PaginatedResponse<User>, Error>
+pub async fn list(&self, opts: &UserListOptions) -> Result<PaginatedResponse<User>, Error>
+```
+
+Query params:
+
+```rust
+pub struct UserListOptions {
+    pub account_id: i64,
+    pub search: Option<String>,
+    pub is_active: Option<bool>,
+    pub page: Option<i64>,
+    pub limit: Option<i64>,
+}
 ```
 
 #### `get` - GET /api/v1/users/:userId
@@ -792,6 +835,14 @@ Request body:
 ```rust
 pub struct BulkUserRequest {
     pub ids: Vec<i64>,
+}
+```
+
+Response body:
+
+```rust
+pub struct BulkUserResponse {
+    pub users: Vec<UserLite>,
 }
 ```
 
@@ -841,7 +892,18 @@ pub struct CreateRegionRequest {
 #### `list` - GET /api/v1/regions/list
 
 ```rust
-pub async fn list(&self, opts: Option<&RegionListOptions>) -> Result<PaginatedResponse<Region>, Error>
+pub async fn list(&self, opts: &RegionListOptions) -> Result<PaginatedResponse<Region>, Error>
+```
+
+Query params:
+
+```rust
+pub struct RegionListOptions {
+    pub account_id: i64,
+    pub is_active: Option<bool>,
+    pub page: Option<i64>,
+    pub limit: Option<i64>,
+}
 ```
 
 #### `get` - GET /api/v1/regions/:regionId
@@ -879,7 +941,19 @@ Accessor: `client.clusters`
 #### `list` - GET /api/v1/clusters/list
 
 ```rust
-pub async fn list(&self, opts: Option<&ClusterListOptions>) -> Result<PaginatedResponse<RegionCluster>, Error>
+pub async fn list(&self, opts: &ClusterListOptions) -> Result<PaginatedResponse<RegionCluster>, Error>
+```
+
+Query params:
+
+```rust
+pub struct ClusterListOptions {
+    pub account_id: i64,
+    pub region_id: Option<i64>,
+    pub is_active: Option<bool>,
+    pub page: Option<i64>,
+    pub limit: Option<i64>,
+}
 ```
 
 ### RegionClusters
@@ -904,6 +978,16 @@ pub struct CreateRegionClusterRequest {
 
 ```rust
 pub async fn list(&self, region_id: i64, opts: Option<&RegionClusterListOptions>) -> Result<PaginatedResponse<RegionCluster>, Error>
+```
+
+Query params:
+
+```rust
+pub struct RegionClusterListOptions {
+    pub is_active: Option<bool>,
+    pub page: Option<i64>,
+    pub limit: Option<i64>,
+}
 ```
 
 #### `get` - GET /api/v1/regions/:regionId/clusters/:clusterId
@@ -946,6 +1030,15 @@ pub struct SetRegionClusterReadyRequest {
 }
 ```
 
+Response body:
+
+```rust
+pub struct SetReadyRegionClusterResponse {
+    pub id: i64,
+    pub ready: bool,
+}
+```
+
 #### `deactivate` - POST /api/v1/regions/:regionId/clusters/:clusterId/deactivate
 
 ```rust
@@ -984,10 +1077,35 @@ pub struct CreateStorageRequest {
 }
 ```
 
+Response body:
+
+```rust
+pub struct CreateStorageResponse {
+    pub id: i64,
+    pub block_volume_ids: Option<Vec<String>>,
+}
+```
+
 #### `list` - GET /api/v1/storages/list
 
 ```rust
-pub async fn list(&self, opts: Option<&StorageListOptions>) -> Result<PaginatedResponse<Storage>, Error>
+pub async fn list(&self, opts: &StorageListOptions) -> Result<PaginatedResponse<Storage>, Error>
+```
+
+Query params:
+
+```rust
+pub struct StorageListOptions {
+    pub account_id: i64,
+    pub search: Option<String>,
+    pub region_id: Option<i64>,
+    pub storage_type: Option<String>,
+    pub provider_type: Option<String>,
+    pub is_active: Option<bool>,
+    pub direct_access: Option<bool>,
+    pub page: Option<i64>,
+    pub limit: Option<i64>,
+}
 ```
 
 #### `get` - GET /api/v1/storages/:storageId
@@ -1046,10 +1164,36 @@ pub struct TestStorageBucketRequest {
 }
 ```
 
+Response body:
+
+```rust
+pub struct TestBucketStorageResponse {
+    pub bucket_exists: bool,
+    pub list: bool,
+    pub write: bool,
+    pub read: bool,
+    pub delete: bool,
+    pub multipart: bool,
+}
+```
+
 #### `test_storage_bucket` - POST /api/v1/storages/:storageId/test-bucket
 
 ```rust
 pub async fn test_storage_bucket(&self, storage_id: i64) -> Result<TestStorageBucketStorageResponse, Error>
+```
+
+Response body:
+
+```rust
+pub struct TestStorageBucketStorageResponse {
+    pub bucket_exists: bool,
+    pub list: bool,
+    pub write: bool,
+    pub read: bool,
+    pub delete: bool,
+    pub multipart: bool,
+}
 ```
 
 ### Volumes
@@ -1083,10 +1227,35 @@ pub struct CreateVolumeRequest {
 }
 ```
 
+Response body:
+
+```rust
+pub struct CreateVolumeResponse {
+    pub id: i64,
+    pub encryption_key: Option<String>,
+}
+```
+
 #### `list` - GET /api/v1/volumes/list
 
 ```rust
-pub async fn list(&self, opts: Option<&VolumeListOptions>) -> Result<PaginatedResponse<Volume>, Error>
+pub async fn list(&self, opts: &VolumeListOptions) -> Result<PaginatedResponse<Volume>, Error>
+```
+
+Query params:
+
+```rust
+pub struct VolumeListOptions {
+    pub account_id: i64,
+    pub region_id: Option<i64>,
+    pub region_cluster_id: Option<i64>,
+    pub storage_id: Option<i64>,
+    pub volume_type: Option<String>,
+    pub locked: Option<bool>,
+    pub is_active: Option<bool>,
+    pub page: Option<i64>,
+    pub limit: Option<i64>,
+}
 ```
 
 #### `get` - GET /api/v1/volumes/:volumeId
@@ -1140,6 +1309,17 @@ pub struct MoveVolumeClusterRequest {
 }
 ```
 
+Response body:
+
+```rust
+pub struct MoveClusterVolumeResponse {
+    pub id: i64,
+    pub source_cluster_id: i64,
+    pub target_cluster_id: i64,
+    pub handover_until: i64,
+}
+```
+
 #### `deactivate` - POST /api/v1/volumes/:volumeId/deactivate
 
 ```rust
@@ -1177,10 +1357,28 @@ pub struct GenerateVolumeAPIKeysRequest {
 }
 ```
 
+Response body:
+
+```rust
+pub struct GenerateAPIKeysVolumeResponse {
+    pub api_key: String,
+    pub api_secret: String,
+    pub evicted_api_keys: Option<Vec<String>>,
+}
+```
+
 #### `list_api_keys` - GET /api/v1/volumes/:volumeId/api-keys
 
 ```rust
 pub async fn list_api_keys(&self, volume_id: i64) -> Result<ListAPIKeysVolumeResponse, Error>
+```
+
+Response body:
+
+```rust
+pub struct ListAPIKeysVolumeResponse {
+    pub keys: Vec<VolumeApiKey>,
+}
 ```
 
 #### `revoke_api_key` - POST /api/v1/volumes/:volumeId/api-keys/revoke
@@ -1211,6 +1409,31 @@ pub struct RevokeVolumeAPIKeysByUserRequest {
 }
 ```
 
+#### `generate_stt_key` - POST /api/v1/volumes/:volumeId/stt-key/generate
+
+```rust
+pub async fn generate_stt_key(&self, volume_id: i64, req: &GenerateVolumeSttKeyRequest) -> Result<GenerateSttKeyVolumeResponse, Error>
+```
+
+Request body:
+
+```rust
+pub struct GenerateVolumeSttKeyRequest {
+    pub user_id: Option<i64>,
+    pub expiry_seconds: i64,
+}
+```
+
+Response body:
+
+```rust
+pub struct GenerateSttKeyVolumeResponse {
+    pub api_key: String,
+    pub api_secret: String,
+    pub expires_at: String,
+}
+```
+
 #### `update_quota` - PUT /api/v1/volumes/:volumeId/quota
 
 ```rust
@@ -1231,10 +1454,30 @@ pub struct UpdateVolumeQuotaRequest {
 pub async fn stats(&self, volume_id: i64) -> Result<StatsVolumeResponse, Error>
 ```
 
+Response body:
+
+```rust
+pub struct StatsVolumeResponse {
+    pub volume_id: String,
+    pub live_volume: i64,
+    pub total_volume: i64,
+    pub pending_volume: i64,
+    pub live_inactive_volume: i64,
+}
+```
+
 #### `size_history` - GET /api/v1/volumes/:volumeId/size-history
 
 ```rust
 pub async fn size_history(&self, volume_id: i64, from: Option<&str>, to: Option<&str>) -> Result<SizeHistoryVolumeResponse, Error>
+```
+
+Response body:
+
+```rust
+pub struct SizeHistoryVolumeResponse {
+    pub points: Vec<VolumeSizePoint>,
+}
 ```
 
 #### `create_fork` - POST /api/v1/volumes/:volumeId/forks/create
@@ -1281,6 +1524,14 @@ pub struct DeleteVolumeForkRequest {
 }
 ```
 
+Response body:
+
+```rust
+pub struct DeleteForkVolumeResponse {
+    pub inactivated_fids: Vec<i32>,
+}
+```
+
 #### `restore_fork` - POST /api/v1/volumes/:volumeId/forks/:forkName/restore
 
 ```rust
@@ -1305,6 +1556,19 @@ Accessor: `client.volume_fork_trees`
 pub async fn list(&self, volume_id: i64, fork_name: &str, opts: Option<&VolumeForkTreeListOptions>) -> Result<CursorPaginatedResponse<ForkTreeEntry>, Error>
 ```
 
+Query params:
+
+```rust
+pub struct VolumeForkTreeListOptions {
+    pub path: Option<String>,
+    pub as_of: Option<i64>,
+    pub cursor: Option<i64>,
+    pub limit: Option<i64>,
+    pub sort: Option<String>,
+    pub kind: Option<String>,
+}
+```
+
 ### VolumeForkEntries
 
 Accessor: `client.volume_fork_entries`
@@ -1321,6 +1585,16 @@ pub async fn get(&self, volume_id: i64, fork_name: &str, path: Option<&str>, ino
 pub async fn versions(&self, volume_id: i64, fork_name: &str, opts: Option<&VolumeForkEntryListOptions>) -> Result<CursorPaginatedResponse<ForkEntryVersion>, Error>
 ```
 
+Query params:
+
+```rust
+pub struct VolumeForkEntryListOptions {
+    pub path: Option<String>,
+    pub cursor: Option<i64>,
+    pub limit: Option<i64>,
+}
+```
+
 ### VolumeForkSearches
 
 Accessor: `client.volume_fork_searches`
@@ -1331,6 +1605,20 @@ Accessor: `client.volume_fork_searches`
 pub async fn find(&self, volume_id: i64, fork_name: &str, opts: Option<&VolumeForkSearchListOptions>) -> Result<CursorPaginatedResponse<ForkTreeMatch>, Error>
 ```
 
+Query params:
+
+```rust
+pub struct VolumeForkSearchListOptions {
+    pub q: Option<String>,
+    pub path: Option<String>,
+    pub as_of: Option<i64>,
+    pub exact: Option<bool>,
+    pub cursor: Option<i64>,
+    pub limit: Option<i64>,
+    pub kind: Option<String>,
+}
+```
+
 ### AuditLogs
 
 Accessor: `client.audit_logs`
@@ -1338,7 +1626,20 @@ Accessor: `client.audit_logs`
 #### `list` - GET /api/v1/audit-logs/list
 
 ```rust
-pub async fn list(&self, opts: Option<&AuditLogListOptions>) -> Result<CursorPaginatedResponse<AuditLog>, Error>
+pub async fn list(&self, opts: &AuditLogListOptions) -> Result<CursorPaginatedResponse<AuditLog>, Error>
+```
+
+Query params:
+
+```rust
+pub struct AuditLogListOptions {
+    pub account_id: i64,
+    pub region_id: Option<i64>,
+    pub region_cluster_id: Option<i64>,
+    pub cursor: Option<i64>,
+    pub limit: Option<i64>,
+    pub subject: Option<String>,
+}
 ```
 
 ### RegionAuditLogs
@@ -1349,6 +1650,18 @@ Accessor: `client.region_audit_logs`
 
 ```rust
 pub async fn list(&self, region_id: i64, opts: Option<&RegionAuditLogListOptions>) -> Result<CursorPaginatedResponse<AuditLog>, Error>
+```
+
+Query params:
+
+```rust
+pub struct RegionAuditLogListOptions {
+    pub region_cluster_id: Option<i64>,
+    pub cursor: Option<i64>,
+    pub limit: Option<i64>,
+    pub subject: Option<String>,
+    pub node: Option<String>,
+}
 ```
 
 ### ServiceNodes
@@ -1364,7 +1677,7 @@ pub async fn list(&self, region_id: i64, service_type: Option<&str>, status: Opt
 #### `stats` - GET /api/v1/regions/:regionId/nodes/:nodeId/stats
 
 ```rust
-pub async fn stats(&self, region_id: i64, node_id: &str) -> Result<string, Error>
+pub async fn stats(&self, region_id: i64, node_id: &str) -> Result<String, Error>
 ```
 
 ### Nodes
@@ -1384,7 +1697,27 @@ Accessor: `client.client_sessions`
 #### `list` - GET /api/v1/client-sessions/list
 
 ```rust
-pub async fn list(&self, opts: Option<&ClientSessionListOptions>) -> Result<PaginatedResponse<ClientSession>, Error>
+pub async fn list(&self, opts: &ClientSessionListOptions) -> Result<PaginatedResponse<ClientSession>, Error>
+```
+
+Query params:
+
+```rust
+pub struct ClientSessionListOptions {
+    pub account_id: i64,
+    pub region_id: Option<i64>,
+    pub region_cluster_id: Option<i64>,
+    pub volume_id: Option<i64>,
+    pub user_id: Option<i64>,
+    pub client_type: Option<String>,
+    pub status: Option<ClientSessionStatus>,
+    pub is_active: Option<String>,
+    pub os_name: Option<String>,
+    pub platform: Option<String>,
+    pub search: Option<String>,
+    pub page: Option<i64>,
+    pub limit: Option<i64>,
+}
 ```
 
 #### `get` - GET /api/v1/client-sessions/:sessionId
@@ -1465,6 +1798,21 @@ Accessor: `client.alerts`
 pub async fn list(&self, opts: Option<&AlertListOptions>) -> Result<PaginatedResponse<ServiceAlert>, Error>
 ```
 
+Query params:
+
+```rust
+pub struct AlertListOptions {
+    pub active: Option<bool>,
+    pub account_id: Option<i64>,
+    pub region_id: Option<i64>,
+    pub severity: Option<i64>,
+    pub category: Option<String>,
+    pub since: Option<String>,
+    pub page: Option<i64>,
+    pub limit: Option<i64>,
+}
+```
+
 #### `count` - GET /api/v1/alerts/count
 
 ```rust
@@ -1485,6 +1833,21 @@ Accessor: `client.region_alerts`
 
 ```rust
 pub async fn list(&self, region_id: i64, opts: Option<&RegionAlertListOptions>) -> Result<PaginatedResponse<RegionAlert>, Error>
+```
+
+Query params:
+
+```rust
+pub struct RegionAlertListOptions {
+    pub active: Option<bool>,
+    pub severity: Option<i64>,
+    pub category: Option<String>,
+    pub node_id: Option<String>,
+    pub region_cluster_id: Option<i64>,
+    pub since: Option<String>,
+    pub page: Option<i64>,
+    pub limit: Option<i64>,
+}
 ```
 
 #### `count` - GET /api/v1/regions/:regionId/alerts/count

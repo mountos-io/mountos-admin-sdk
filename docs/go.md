@@ -36,9 +36,20 @@ type PaginatedResponse[T any] struct {
     Pagination PaginationMeta `json:"pagination"`
 }
 
-type CursorResponse[T any] struct {
+type PaginationMeta struct {
+    Page       int   `json:"page"`
+    Limit      int   `json:"limit"`
+    Total      int64 `json:"total"`
+    TotalPages int64 `json:"totalPages"`
+}
+
+type CursorPaginatedResponse[T any] struct {
     Items      []T    `json:"items"`
     NextCursor *int64 `json:"nextCursor"`
+}
+
+type IDResponse struct {
+    ID int64 `json:"id"`
 }
 ```
 
@@ -62,7 +73,7 @@ type CursorResponse[T any] struct {
 ### `ClientSessionStatus`
 
 ```go
-type ClientSessionStatus string
+type ClientSessionStatus = string
 
 const (
     ClientSessionStatusConnected ClientSessionStatus = "connected"
@@ -77,7 +88,7 @@ const (
 ### `LicenseQuotaState`
 
 ```go
-type LicenseQuotaState string
+type LicenseQuotaState = string
 
 const (
     LicenseQuotaStateOk LicenseQuotaState = "ok"
@@ -88,7 +99,7 @@ const (
 ### `LicenseStatus`
 
 ```go
-type LicenseStatus string
+type LicenseStatus = string
 
 const (
     LicenseStatusValid LicenseStatus = "valid"
@@ -525,7 +536,7 @@ type ServiceNode struct {
     Status                   string                   `json:"status"`
     LastHeartbeat            int64                    `json:"lastHeartbeat,omitempty"`
     IsActive                 bool                     `json:"isActive"`
-    MemUsage                 float                    `json:"memUsage,omitempty"`
+    MemUsage                 float64                  `json:"memUsage,omitempty"`
     SysLoad                  int                      `json:"sysLoad,omitempty"`
 }
 ```
@@ -703,14 +714,14 @@ type CreateAccountRequest struct {
 #### `List` - GET /api/v1/accounts/list
 
 ```go
-func (s *AccountsService) List(ctx context.Context, opts *ListAccountOptions) (*PaginatedResponse[Account], error)
+func (s *AccountsService) List(ctx context.Context, opts *AccountListOptions) (*PaginatedResponse[Account], error)
 ```
 
 Query params:
 
 ```go
-type ListAccountOptions struct {
-    IsActive             bool         `url:"isActive"`
+type AccountListOptions struct {
+    IsActive             *bool        `url:"isActive"`
     Page                 int          `url:"page"` // default: 1
     Limit                int          `url:"limit"` // default: 10
 }
@@ -760,15 +771,15 @@ func (s *AccountsService) Deactivate(ctx context.Context, accountID int64) (*IDR
 #### `UpdateQuota` - PUT /api/v1/accounts/:accountId/quota
 
 ```go
-func (s *AccountsService) UpdateQuota(ctx context.Context, accountID int64, req *UpdateQuotaAccountRequest) (*IDResponse, error)
+func (s *AccountsService) UpdateQuota(ctx context.Context, accountID int64, req *UpdateAccountQuotaRequest) (*IDResponse, error)
 ```
 
 Request body:
 
 ```go
-type UpdateQuotaAccountRequest struct {
+type UpdateAccountQuotaRequest struct {
     QuotaLimit               int64                    `json:"quotaLimit"`
-    QuotaExcessPct           int32                    `json:"quotaExcessPct,omitempty"`
+    QuotaExcessPct           *int32                   `json:"quotaExcessPct,omitempty"`
 }
 ```
 
@@ -797,16 +808,16 @@ type AddUserRequest struct {
 #### `List` - GET /api/v1/users/list
 
 ```go
-func (s *UsersService) List(ctx context.Context, opts *ListUserOptions) (*PaginatedResponse[User], error)
+func (s *UsersService) List(ctx context.Context, opts UserListOptions) (*PaginatedResponse[User], error)
 ```
 
 Query params:
 
 ```go
-type ListUserOptions struct {
+type UserListOptions struct {
     AccountID            int64        `url:"accountId"`
     Search               string       `url:"search"`
-    IsActive             bool         `url:"isActive"`
+    IsActive             *bool        `url:"isActive"`
     Page                 int          `url:"page"` // default: 1
     Limit                int          `url:"limit"` // default: 10
 }
@@ -821,7 +832,7 @@ func (s *UsersService) Get(ctx context.Context, userID int64) (*User, error)
 #### `Bulk` - POST /api/v1/users/bulk
 
 ```go
-func (s *UsersService) Bulk(ctx context.Context, req *BulkUserRequest) (*struct { Users []UserLite }, error)
+func (s *UsersService) Bulk(ctx context.Context, req *BulkUserRequest) (*BulkUserResponse, error)
 ```
 
 Request body:
@@ -829,6 +840,14 @@ Request body:
 ```go
 type BulkUserRequest struct {
     Ids                      []int64                  `json:"ids"`
+}
+```
+
+Response body:
+
+```go
+type BulkUserResponse struct {
+    Users                    []UserLite               `json:"users"`
 }
 ```
 
@@ -878,15 +897,15 @@ type CreateRegionRequest struct {
 #### `List` - GET /api/v1/regions/list
 
 ```go
-func (s *RegionsService) List(ctx context.Context, opts *ListRegionOptions) (*PaginatedResponse[Region], error)
+func (s *RegionsService) List(ctx context.Context, opts RegionListOptions) (*PaginatedResponse[Region], error)
 ```
 
 Query params:
 
 ```go
-type ListRegionOptions struct {
+type RegionListOptions struct {
     AccountID            int64        `url:"accountId"`
-    IsActive             bool         `url:"isActive"`
+    IsActive             *bool        `url:"isActive"`
     Page                 int          `url:"page"` // default: 1
     Limit                int          `url:"limit"` // default: 10
 }
@@ -927,16 +946,16 @@ Accessor: `client.Clusters`
 #### `List` - GET /api/v1/clusters/list
 
 ```go
-func (s *ClustersService) List(ctx context.Context, opts *ListClusterOptions) (*PaginatedResponse[RegionCluster], error)
+func (s *ClustersService) List(ctx context.Context, opts ClusterListOptions) (*PaginatedResponse[RegionCluster], error)
 ```
 
 Query params:
 
 ```go
-type ListClusterOptions struct {
+type ClusterListOptions struct {
     AccountID            int64        `url:"accountId"`
-    RegionID             int64        `url:"regionId"`
-    IsActive             bool         `url:"isActive"`
+    RegionID             *int64       `url:"regionId"`
+    IsActive             *bool        `url:"isActive"`
     Page                 int          `url:"page"` // default: 1
     Limit                int          `url:"limit"` // default: 100
 }
@@ -963,14 +982,14 @@ type CreateRegionClusterRequest struct {
 #### `List` - GET /api/v1/regions/:regionId/clusters/list
 
 ```go
-func (s *RegionClustersService) List(ctx context.Context, regionID int64, opts *ListRegionClusterOptions) (*PaginatedResponse[RegionCluster], error)
+func (s *RegionClustersService) List(ctx context.Context, regionID int64, opts *RegionClusterListOptions) (*PaginatedResponse[RegionCluster], error)
 ```
 
 Query params:
 
 ```go
-type ListRegionClusterOptions struct {
-    IsActive             bool         `url:"isActive"`
+type RegionClusterListOptions struct {
+    IsActive             *bool        `url:"isActive"`
     Page                 int          `url:"page"` // default: 1
     Limit                int          `url:"limit"` // default: 20
 }
@@ -1005,13 +1024,22 @@ func (s *RegionClustersService) SetDefault(ctx context.Context, regionID int64, 
 #### `SetReady` - POST /api/v1/regions/:regionId/clusters/:clusterId/set-ready
 
 ```go
-func (s *RegionClustersService) SetReady(ctx context.Context, regionID int64, clusterID int64, req *SetReadyRegionClusterRequest) (*struct { ID int64; Ready bool }, error)
+func (s *RegionClustersService) SetReady(ctx context.Context, regionID int64, clusterID int64, req *SetRegionClusterReadyRequest) (*SetReadyRegionClusterResponse, error)
 ```
 
 Request body:
 
 ```go
-type SetReadyRegionClusterRequest struct {
+type SetRegionClusterReadyRequest struct {
+    Ready                    bool                     `json:"ready"`
+}
+```
+
+Response body:
+
+```go
+type SetReadyRegionClusterResponse struct {
+    ID                       int64                    `json:"id"`
     Ready                    bool                     `json:"ready"`
 }
 ```
@@ -1029,7 +1057,7 @@ Accessor: `client.Storages`
 #### `Create` - POST /api/v1/storages/create
 
 ```go
-func (s *StoragesService) Create(ctx context.Context, req *CreateStorageRequest) (*struct { ID int64; BlockVolumeIds []string }, error)
+func (s *StoragesService) Create(ctx context.Context, req *CreateStorageRequest) (*CreateStorageResponse, error)
 ```
 
 Request body:
@@ -1047,30 +1075,39 @@ type CreateStorageRequest struct {
     Bucket                   string                   `json:"bucket,omitempty"`
     Base                     string                   `json:"base,omitempty"`
     BlockRegion              string                   `json:"blockRegion,omitempty"`
-    BlockSize                int32                    `json:"blockSize,omitempty"`
+    BlockSize                *int32                   `json:"blockSize,omitempty"`
     Members                  []BlockMember            `json:"members,omitempty"`
     AccessKey                string                   `json:"accessKey,omitempty"`
     SecretKey                string                   `json:"secretKey,omitempty"`
 }
 ```
 
+Response body:
+
+```go
+type CreateStorageResponse struct {
+    ID                       int64                    `json:"id"`
+    BlockVolumeIds           []string                 `json:"blockVolumeIds,omitempty"`
+}
+```
+
 #### `List` - GET /api/v1/storages/list
 
 ```go
-func (s *StoragesService) List(ctx context.Context, opts *ListStorageOptions) (*PaginatedResponse[Storage], error)
+func (s *StoragesService) List(ctx context.Context, opts StorageListOptions) (*PaginatedResponse[Storage], error)
 ```
 
 Query params:
 
 ```go
-type ListStorageOptions struct {
+type StorageListOptions struct {
     AccountID            int64        `url:"accountId"`
     Search               string       `url:"search"`
-    RegionID             int64        `url:"regionId"`
+    RegionID             *int64       `url:"regionId"`
     StorageType          string       `url:"storageType"`
     ProviderType         string       `url:"providerType"`
-    IsActive             bool         `url:"isActive"`
-    DirectAccess         bool         `url:"directAccess"`
+    IsActive             *bool        `url:"isActive"`
+    DirectAccess         *bool        `url:"directAccess"`
     Page                 int          `url:"page"` // default: 1
     Limit                int          `url:"limit"` // default: 10
 }
@@ -1103,7 +1140,7 @@ type EditStorageRequest struct {
     Endpoint                 string                   `json:"endpoint,omitempty"`
     AccessKey                string                   `json:"accessKey,omitempty"`
     SecretKey                string                   `json:"secretKey,omitempty"`
-    DirectAccess             bool                     `json:"directAccess,omitempty"`
+    DirectAccess             *bool                    `json:"directAccess,omitempty"`
 }
 ```
 
@@ -1116,13 +1153,13 @@ func (s *StoragesService) Deactivate(ctx context.Context, storageID int64) (*IDR
 #### `TestBucket` - POST /api/v1/storages/test-bucket
 
 ```go
-func (s *StoragesService) TestBucket(ctx context.Context, req *TestBucketStorageRequest) (*struct { BucketExists bool; List bool; Write bool; Read bool; Delete bool; Multipart bool }, error)
+func (s *StoragesService) TestBucket(ctx context.Context, req *TestStorageBucketRequest) (*TestBucketStorageResponse, error)
 ```
 
 Request body:
 
 ```go
-type TestBucketStorageRequest struct {
+type TestStorageBucketRequest struct {
     Endpoint                 string                   `json:"endpoint"`
     Region                   string                   `json:"region,omitempty"`
     Bucket                   string                   `json:"bucket"`
@@ -1132,10 +1169,36 @@ type TestBucketStorageRequest struct {
 }
 ```
 
+Response body:
+
+```go
+type TestBucketStorageResponse struct {
+    BucketExists             bool                     `json:"bucketExists"`
+    List                     bool                     `json:"list"`
+    Write                    bool                     `json:"write"`
+    Read                     bool                     `json:"read"`
+    Delete                   bool                     `json:"delete"`
+    Multipart                bool                     `json:"multipart"`
+}
+```
+
 #### `TestStorageBucket` - POST /api/v1/storages/:storageId/test-bucket
 
 ```go
-func (s *StoragesService) TestStorageBucket(ctx context.Context, storageID int64) (*struct { BucketExists bool; List bool; Write bool; Read bool; Delete bool; Multipart bool }, error)
+func (s *StoragesService) TestStorageBucket(ctx context.Context, storageID int64) (*TestStorageBucketStorageResponse, error)
+```
+
+Response body:
+
+```go
+type TestStorageBucketStorageResponse struct {
+    BucketExists             bool                     `json:"bucketExists"`
+    List                     bool                     `json:"list"`
+    Write                    bool                     `json:"write"`
+    Read                     bool                     `json:"read"`
+    Delete                   bool                     `json:"delete"`
+    Multipart                bool                     `json:"multipart"`
+}
 ```
 
 ### Volumes
@@ -1145,7 +1208,7 @@ Accessor: `client.Volumes`
 #### `Create` - POST /api/v1/volumes/create
 
 ```go
-func (s *VolumesService) Create(ctx context.Context, req *CreateVolumeRequest) (*struct { ID int64; EncryptionKey string }, error)
+func (s *VolumesService) Create(ctx context.Context, req *CreateVolumeRequest) (*CreateVolumeResponse, error)
 ```
 
 Request body:
@@ -1157,35 +1220,44 @@ type CreateVolumeRequest struct {
     Name                     string                   `json:"name"`
     Description              string                   `json:"description,omitempty"`
     VolumeType               string                   `json:"volumeType"`
-    Encryption               bool                     `json:"encryption,omitempty"`
+    Encryption               *bool                    `json:"encryption,omitempty"`
     EncryptionKey            string                   `json:"encryptionKey,omitempty"`
-    RetentionPeriod          int32                    `json:"retentionPeriod,omitempty"`
-    GracePeriod              int32                    `json:"gracePeriod,omitempty"`
-    ForkGracePeriod          int32                    `json:"forkGracePeriod,omitempty"`
-    EventLogRetentionPeriod  int32                    `json:"eventLogRetentionPeriod,omitempty"`
-    QuotaLimit               int64                    `json:"quotaLimit,omitempty"`
-    RegionClusterID          int64                    `json:"regionClusterId,omitempty"`
+    RetentionPeriod          *int32                   `json:"retentionPeriod,omitempty"`
+    GracePeriod              *int32                   `json:"gracePeriod,omitempty"`
+    ForkGracePeriod          *int32                   `json:"forkGracePeriod,omitempty"`
+    EventLogRetentionPeriod  *int32                   `json:"eventLogRetentionPeriod,omitempty"`
+    QuotaLimit               *int64                   `json:"quotaLimit,omitempty"`
+    RegionClusterID          *int64                   `json:"regionClusterId,omitempty"`
     RegionClusterUUID        string                   `json:"regionClusterUuid,omitempty"`
+}
+```
+
+Response body:
+
+```go
+type CreateVolumeResponse struct {
+    ID                       int64                    `json:"id"`
+    EncryptionKey            string                   `json:"encryptionKey,omitempty"`
 }
 ```
 
 #### `List` - GET /api/v1/volumes/list
 
 ```go
-func (s *VolumesService) List(ctx context.Context, opts *ListVolumeOptions) (*PaginatedResponse[Volume], error)
+func (s *VolumesService) List(ctx context.Context, opts VolumeListOptions) (*PaginatedResponse[Volume], error)
 ```
 
 Query params:
 
 ```go
-type ListVolumeOptions struct {
+type VolumeListOptions struct {
     AccountID            int64        `url:"accountId"`
-    RegionID             int64        `url:"regionId"`
-    RegionClusterID      int64        `url:"regionClusterId"`
-    StorageID            int64        `url:"storageId"`
+    RegionID             *int64       `url:"regionId"`
+    RegionClusterID      *int64       `url:"regionClusterId"`
+    StorageID            *int64       `url:"storageId"`
     VolumeType           string       `url:"volumeType"`
-    Locked               bool         `url:"locked"`
-    IsActive             bool         `url:"isActive"`
+    Locked               *bool        `url:"locked"`
+    IsActive             *bool        `url:"isActive"`
     Page                 int          `url:"page"` // default: 1
     Limit                int          `url:"limit"` // default: 10
 }
@@ -1208,10 +1280,10 @@ Request body:
 ```go
 type EditVolumeRequest struct {
     Description              string                   `json:"description,omitempty"`
-    RetentionPeriod          int32                    `json:"retentionPeriod,omitempty"`
-    GracePeriod              int32                    `json:"gracePeriod,omitempty"`
-    ForkGracePeriod          int32                    `json:"forkGracePeriod,omitempty"`
-    EventLogRetentionPeriod  int32                    `json:"eventLogRetentionPeriod,omitempty"`
+    RetentionPeriod          *int32                   `json:"retentionPeriod,omitempty"`
+    GracePeriod              *int32                   `json:"gracePeriod,omitempty"`
+    ForkGracePeriod          *int32                   `json:"forkGracePeriod,omitempty"`
+    EventLogRetentionPeriod  *int32                   `json:"eventLogRetentionPeriod,omitempty"`
 }
 ```
 
@@ -1230,15 +1302,26 @@ func (s *VolumesService) Unlock(ctx context.Context, volumeID int64) (*IDRespons
 #### `MoveCluster` - POST /api/v1/volumes/:volumeId/move-cluster
 
 ```go
-func (s *VolumesService) MoveCluster(ctx context.Context, volumeID int64, req *MoveClusterVolumeRequest) (*struct { ID int64; SourceClusterID int64; TargetClusterID int64; HandoverUntil int64 }, error)
+func (s *VolumesService) MoveCluster(ctx context.Context, volumeID int64, req *MoveVolumeClusterRequest) (*MoveClusterVolumeResponse, error)
 ```
 
 Request body:
 
 ```go
-type MoveClusterVolumeRequest struct {
-    TargetClusterID          int64                    `json:"targetClusterId,omitempty"`
+type MoveVolumeClusterRequest struct {
+    TargetClusterID          *int64                   `json:"targetClusterId,omitempty"`
     TargetClusterUUID        string                   `json:"targetClusterUuid,omitempty"`
+}
+```
+
+Response body:
+
+```go
+type MoveClusterVolumeResponse struct {
+    ID                       int64                    `json:"id"`
+    SourceClusterID          int64                    `json:"sourceClusterId"`
+    TargetClusterID          int64                    `json:"targetClusterId"`
+    HandoverUntil            int64                    `json:"handoverUntil"`
 }
 ```
 
@@ -1252,9 +1335,9 @@ Request body:
 
 ```go
 type DeactivateVolumeRequest struct {
-    IsCleanupMetaEnabled     bool                     `json:"isCleanupMetaEnabled,omitempty"`
-    IsCleanupStorageEnabled  bool                     `json:"isCleanupStorageEnabled,omitempty"`
-    IsCleanupVaultEnabled    bool                     `json:"isCleanupVaultEnabled,omitempty"`
+    IsCleanupMetaEnabled     *bool                    `json:"isCleanupMetaEnabled,omitempty"`
+    IsCleanupStorageEnabled  *bool                    `json:"isCleanupStorageEnabled,omitempty"`
+    IsCleanupVaultEnabled    *bool                    `json:"isCleanupVaultEnabled,omitempty"`
 }
 ```
 
@@ -1267,34 +1350,52 @@ func (s *VolumesService) Activate(ctx context.Context, volumeID int64) (*IDRespo
 #### `GenerateAPIKeys` - POST /api/v1/volumes/:volumeId/api-keys/generate
 
 ```go
-func (s *VolumesService) GenerateAPIKeys(ctx context.Context, volumeID int64, req *GenerateAPIKeysVolumeRequest) (*struct { APIKey string; APISecret string; EvictedAPIKeys []string }, error)
+func (s *VolumesService) GenerateAPIKeys(ctx context.Context, volumeID int64, req *GenerateVolumeAPIKeysRequest) (*GenerateAPIKeysVolumeResponse, error)
 ```
 
 Request body:
 
 ```go
-type GenerateAPIKeysVolumeRequest struct {
+type GenerateVolumeAPIKeysRequest struct {
     UserID                   int64                    `json:"userId"`
     Name                     string                   `json:"name,omitempty"`
+}
+```
+
+Response body:
+
+```go
+type GenerateAPIKeysVolumeResponse struct {
+    APIKey                   string                   `json:"apiKey"`
+    APISecret                string                   `json:"apiSecret"`
+    EvictedAPIKeys           []string                 `json:"evictedApiKeys,omitempty"`
 }
 ```
 
 #### `ListAPIKeys` - GET /api/v1/volumes/:volumeId/api-keys
 
 ```go
-func (s *VolumesService) ListAPIKeys(ctx context.Context, volumeID int64) (*struct { Keys []VolumeApiKey }, error)
+func (s *VolumesService) ListAPIKeys(ctx context.Context, volumeID int64) (*ListAPIKeysVolumeResponse, error)
+```
+
+Response body:
+
+```go
+type ListAPIKeysVolumeResponse struct {
+    Keys                     []VolumeApiKey           `json:"keys"`
+}
 ```
 
 #### `RevokeAPIKey` - POST /api/v1/volumes/:volumeId/api-keys/revoke
 
 ```go
-func (s *VolumesService) RevokeAPIKey(ctx context.Context, volumeID int64, req *RevokeAPIKeyVolumeRequest) (*StandardResponse[any], error)
+func (s *VolumesService) RevokeAPIKey(ctx context.Context, volumeID int64, req *RevokeVolumeAPIKeyRequest) error
 ```
 
 Request body:
 
 ```go
-type RevokeAPIKeyVolumeRequest struct {
+type RevokeVolumeAPIKeyRequest struct {
     APIKey                   string                   `json:"apiKey"`
 }
 ```
@@ -1302,27 +1403,52 @@ type RevokeAPIKeyVolumeRequest struct {
 #### `RevokeAPIKeysByUser` - POST /api/v1/volumes/:volumeId/api-keys/revoke-by-user
 
 ```go
-func (s *VolumesService) RevokeAPIKeysByUser(ctx context.Context, volumeID int64, req *RevokeAPIKeysByUserVolumeRequest) (*StandardResponse[any], error)
+func (s *VolumesService) RevokeAPIKeysByUser(ctx context.Context, volumeID int64, req *RevokeVolumeAPIKeysByUserRequest) error
 ```
 
 Request body:
 
 ```go
-type RevokeAPIKeysByUserVolumeRequest struct {
+type RevokeVolumeAPIKeysByUserRequest struct {
     UserID                   int64                    `json:"userId"`
+}
+```
+
+#### `GenerateSttKey` - POST /api/v1/volumes/:volumeId/stt-key/generate
+
+```go
+func (s *VolumesService) GenerateSttKey(ctx context.Context, volumeID int64, req *GenerateVolumeSttKeyRequest) (*GenerateSttKeyVolumeResponse, error)
+```
+
+Request body:
+
+```go
+type GenerateVolumeSttKeyRequest struct {
+    UserID                   *int64                   `json:"userId,omitempty"`
+    ExpirySeconds            int64                    `json:"expirySeconds"`
+}
+```
+
+Response body:
+
+```go
+type GenerateSttKeyVolumeResponse struct {
+    APIKey                   string                   `json:"apiKey"`
+    APISecret                string                   `json:"apiSecret"`
+    ExpiresAt                string                   `json:"expiresAt"`
 }
 ```
 
 #### `UpdateQuota` - PUT /api/v1/volumes/:volumeId/quota
 
 ```go
-func (s *VolumesService) UpdateQuota(ctx context.Context, volumeID int64, req *UpdateQuotaVolumeRequest) (*IDResponse, error)
+func (s *VolumesService) UpdateQuota(ctx context.Context, volumeID int64, req *UpdateVolumeQuotaRequest) (*IDResponse, error)
 ```
 
 Request body:
 
 ```go
-type UpdateQuotaVolumeRequest struct {
+type UpdateVolumeQuotaRequest struct {
     QuotaLimit               int64                    `json:"quotaLimit"`
 }
 ```
@@ -1330,37 +1456,48 @@ type UpdateQuotaVolumeRequest struct {
 #### `Stats` - GET /api/v1/volumes/:volumeId/stats
 
 ```go
-func (s *VolumesService) Stats(ctx context.Context, volumeID int64) (*struct { VolumeID string; LiveVolume int64; TotalVolume int64; PendingVolume int64; LiveInactiveVolume int64 }, error)
+func (s *VolumesService) Stats(ctx context.Context, volumeID int64) (*StatsVolumeResponse, error)
+```
+
+Response body:
+
+```go
+type StatsVolumeResponse struct {
+    VolumeID                 string                   `json:"volumeId"`
+    LiveVolume               int64                    `json:"liveVolume"`
+    TotalVolume              int64                    `json:"totalVolume"`
+    PendingVolume            int64                    `json:"pendingVolume"`
+    LiveInactiveVolume       int64                    `json:"liveInactiveVolume"`
+}
 ```
 
 #### `SizeHistory` - GET /api/v1/volumes/:volumeId/size-history
 
 ```go
-func (s *VolumesService) SizeHistory(ctx context.Context, volumeID int64, opts *SizeHistoryVolumeOptions) (*struct { Points []VolumeSizePoint }, error)
+func (s *VolumesService) SizeHistory(ctx context.Context, volumeID int64, from string, to string) (*SizeHistoryVolumeResponse, error)
 ```
 
-Query params:
+Response body:
 
 ```go
-type SizeHistoryVolumeOptions struct {
-    From                 string       `url:"from"`
-    To                   string       `url:"to"`
+type SizeHistoryVolumeResponse struct {
+    Points                   []VolumeSizePoint        `json:"points"`
 }
 ```
 
 #### `CreateFork` - POST /api/v1/volumes/:volumeId/forks/create
 
 ```go
-func (s *VolumesService) CreateFork(ctx context.Context, volumeID int64, req *CreateForkVolumeRequest) (*Fork, error)
+func (s *VolumesService) CreateFork(ctx context.Context, volumeID int64, req *CreateVolumeForkRequest) (*Fork, error)
 ```
 
 Request body:
 
 ```go
-type CreateForkVolumeRequest struct {
+type CreateVolumeForkRequest struct {
     Name                     string                   `json:"name"`
     ParentName               string                   `json:"parentName,omitempty"`
-    AsOf                     int64                    `json:"asOf,omitempty"`
+    AsOf                     *int64                   `json:"asOf,omitempty"`
     VolumeType               string                   `json:"volumeType,omitempty"`
 }
 ```
@@ -1368,56 +1505,48 @@ type CreateForkVolumeRequest struct {
 #### `ListForks` - GET /api/v1/volumes/:volumeId/forks
 
 ```go
-func (s *VolumesService) ListForks(ctx context.Context, volumeID int64, opts *ListForksVolumeOptions) ([]Fork, error)
-```
-
-Query params:
-
-```go
-type ListForksVolumeOptions struct {
-    VolumeType           string       `url:"volumeType"`
-}
+func (s *VolumesService) ListForks(ctx context.Context, volumeID int64, volumeType string) ([]Fork, error)
 ```
 
 #### `ListAllForks` - GET /api/v1/volumes/:volumeId/forks?include_inactive=true
 
 ```go
-func (s *VolumesService) ListAllForks(ctx context.Context, volumeID int64, opts *ListAllForksVolumeOptions) ([]Fork, error)
-```
-
-Query params:
-
-```go
-type ListAllForksVolumeOptions struct {
-    VolumeType           string       `url:"volumeType"`
-}
+func (s *VolumesService) ListAllForks(ctx context.Context, volumeID int64, volumeType string) ([]Fork, error)
 ```
 
 #### `DeleteFork` - POST /api/v1/volumes/:volumeId/forks/:forkName/delete
 
 ```go
-func (s *VolumesService) DeleteFork(ctx context.Context, volumeID int64, forkName string, req *DeleteForkVolumeRequest) (*struct { InactivatedFids []int32 }, error)
+func (s *VolumesService) DeleteFork(ctx context.Context, volumeID int64, forkName string, req *DeleteVolumeForkRequest) (*DeleteForkVolumeResponse, error)
 ```
 
 Request body:
 
 ```go
-type DeleteForkVolumeRequest struct {
-    Force                    bool                     `json:"force,omitempty"`
+type DeleteVolumeForkRequest struct {
+    Force                    *bool                    `json:"force,omitempty"`
     VolumeType               string                   `json:"volumeType,omitempty"`
+}
+```
+
+Response body:
+
+```go
+type DeleteForkVolumeResponse struct {
+    InactivatedFids          []int32                  `json:"inactivatedFids"`
 }
 ```
 
 #### `RestoreFork` - POST /api/v1/volumes/:volumeId/forks/:forkName/restore
 
 ```go
-func (s *VolumesService) RestoreFork(ctx context.Context, volumeID int64, forkName string, req *RestoreForkVolumeRequest) (*Fork, error)
+func (s *VolumesService) RestoreFork(ctx context.Context, volumeID int64, forkName string, req *RestoreVolumeForkRequest) (*Fork, error)
 ```
 
 Request body:
 
 ```go
-type RestoreForkVolumeRequest struct {
+type RestoreVolumeForkRequest struct {
     VolumeType               string                   `json:"volumeType,omitempty"`
 }
 ```
@@ -1429,15 +1558,15 @@ Accessor: `client.VolumeForkTrees`
 #### `List` - GET /api/v1/volumes/:volumeId/forks/:forkName/tree
 
 ```go
-func (s *VolumeForkTreesService) List(ctx context.Context, volumeID int64, forkName string, opts *ListVolumeForkTreeOptions) (*CursorResponse[ForkTreeEntry], error)
+func (s *VolumeForkTreesService) List(ctx context.Context, volumeID int64, forkName string, opts *VolumeForkTreeListOptions) (*CursorPaginatedResponse[ForkTreeEntry], error)
 ```
 
 Query params:
 
 ```go
-type ListVolumeForkTreeOptions struct {
+type VolumeForkTreeListOptions struct {
     Path                 string       `url:"path"`
-    AsOf                 int64        `url:"asOf"`
+    AsOf                 *int64       `url:"asOf"`
     Cursor               int64        `url:"cursor"`
     Limit                int          `url:"limit"` // default: 20
     Sort                 string       `url:"sort"`
@@ -1452,29 +1581,19 @@ Accessor: `client.VolumeForkEntries`
 #### `Get` - GET /api/v1/volumes/:volumeId/forks/:forkName/entry
 
 ```go
-func (s *VolumeForkEntriesService) Get(ctx context.Context, volumeID int64, forkName string, opts *GetVolumeForkEntryOptions) (*ForkEntryDetail, error)
-```
-
-Query params:
-
-```go
-type GetVolumeForkEntryOptions struct {
-    Path                 string       `url:"path"`
-    Inode                int64        `url:"inode"`
-    AsOf                 int64        `url:"asOf"`
-}
+func (s *VolumeForkEntriesService) Get(ctx context.Context, volumeID int64, forkName string, path string, inode *int64, asOf *int64) (*ForkEntryDetail, error)
 ```
 
 #### `Versions` - GET /api/v1/volumes/:volumeId/forks/:forkName/entry/versions
 
 ```go
-func (s *VolumeForkEntriesService) Versions(ctx context.Context, volumeID int64, forkName string, opts *VersionsVolumeForkEntryOptions) (*CursorResponse[ForkEntryVersion], error)
+func (s *VolumeForkEntriesService) Versions(ctx context.Context, volumeID int64, forkName string, opts *VolumeForkEntryListOptions) (*CursorPaginatedResponse[ForkEntryVersion], error)
 ```
 
 Query params:
 
 ```go
-type VersionsVolumeForkEntryOptions struct {
+type VolumeForkEntryListOptions struct {
     Path                 string       `url:"path"`
     Cursor               int64        `url:"cursor"`
     Limit                int          `url:"limit"` // default: 20
@@ -1488,17 +1607,17 @@ Accessor: `client.VolumeForkSearches`
 #### `Find` - GET /api/v1/volumes/:volumeId/forks/:forkName/search
 
 ```go
-func (s *VolumeForkSearchesService) Find(ctx context.Context, volumeID int64, forkName string, opts *FindVolumeForkSearcheOptions) (*CursorResponse[ForkTreeMatch], error)
+func (s *VolumeForkSearchesService) Find(ctx context.Context, volumeID int64, forkName string, opts *VolumeForkSearchListOptions) (*CursorPaginatedResponse[ForkTreeMatch], error)
 ```
 
 Query params:
 
 ```go
-type FindVolumeForkSearcheOptions struct {
+type VolumeForkSearchListOptions struct {
     Q                    string       `url:"q"`
     Path                 string       `url:"path"`
-    AsOf                 int64        `url:"asOf"`
-    Exact                bool         `url:"exact"`
+    AsOf                 *int64       `url:"asOf"`
+    Exact                *bool        `url:"exact"`
     Cursor               int64        `url:"cursor"`
     Limit                int          `url:"limit"` // default: 20
     Kind                 string       `url:"kind"`
@@ -1512,16 +1631,16 @@ Accessor: `client.AuditLogs`
 #### `List` - GET /api/v1/audit-logs/list
 
 ```go
-func (s *AuditLogsService) List(ctx context.Context, opts *ListAuditLogOptions) (*CursorResponse[AuditLog], error)
+func (s *AuditLogsService) List(ctx context.Context, opts AuditLogListOptions) (*CursorPaginatedResponse[AuditLog], error)
 ```
 
 Query params:
 
 ```go
-type ListAuditLogOptions struct {
+type AuditLogListOptions struct {
     AccountID            int64        `url:"accountId"`
-    RegionID             int64        `url:"regionId"`
-    RegionClusterID      int64        `url:"regionClusterId"`
+    RegionID             *int64       `url:"regionId"`
+    RegionClusterID      *int64       `url:"regionClusterId"`
     Cursor               int64        `url:"cursor"`
     Limit                int          `url:"limit"` // default: 20
     Subject              string       `url:"subject"`
@@ -1535,14 +1654,14 @@ Accessor: `client.RegionAuditLogs`
 #### `List` - GET /api/v1/regions/:regionId/audit-logs/list
 
 ```go
-func (s *RegionAuditLogsService) List(ctx context.Context, regionID int64, opts *ListRegionAuditLogOptions) (*CursorResponse[AuditLog], error)
+func (s *RegionAuditLogsService) List(ctx context.Context, regionID int64, opts *RegionAuditLogListOptions) (*CursorPaginatedResponse[AuditLog], error)
 ```
 
 Query params:
 
 ```go
-type ListRegionAuditLogOptions struct {
-    RegionClusterID      int64        `url:"regionClusterId"`
+type RegionAuditLogListOptions struct {
+    RegionClusterID      *int64       `url:"regionClusterId"`
     Cursor               int64        `url:"cursor"`
     Limit                int          `url:"limit"` // default: 20
     Subject              string       `url:"subject"`
@@ -1557,18 +1676,7 @@ Accessor: `client.ServiceNodes`
 #### `List` - GET /api/v1/regions/:regionId/nodes
 
 ```go
-func (s *ServiceNodesService) List(ctx context.Context, regionID int64, opts *ListServiceNodeOptions) ([]ServiceNode, error)
-```
-
-Query params:
-
-```go
-type ListServiceNodeOptions struct {
-    ServiceType          string       `url:"serviceType"`
-    Status               string       `url:"status"`
-    InactiveHours        int          `url:"inactiveHours"`
-    RegionClusterID      int64        `url:"regionClusterId"`
-}
+func (s *ServiceNodesService) List(ctx context.Context, regionID int64, serviceType string, status string, inactiveHours int, regionClusterID int64) ([]ServiceNode, error)
 ```
 
 #### `Stats` - GET /api/v1/regions/:regionId/nodes/:nodeId/stats
@@ -1584,18 +1692,7 @@ Accessor: `client.Nodes`
 #### `ListAll` - GET /api/v1/nodes
 
 ```go
-func (s *NodesService) ListAll(ctx context.Context, opts *ListAllNodeOptions) ([]ServiceNode, error)
-```
-
-Query params:
-
-```go
-type ListAllNodeOptions struct {
-    AccountID            int64        `url:"accountId"`
-    ServiceType          string       `url:"serviceType"`
-    Status               string       `url:"status"`
-    InactiveHours        int          `url:"inactiveHours"`
-}
+func (s *NodesService) ListAll(ctx context.Context, accountID int64, serviceType string, status string, inactiveHours int) ([]ServiceNode, error)
 ```
 
 ### ClientSessions
@@ -1605,18 +1702,18 @@ Accessor: `client.ClientSessions`
 #### `List` - GET /api/v1/client-sessions/list
 
 ```go
-func (s *ClientSessionsService) List(ctx context.Context, opts *ListClientSessionOptions) (*PaginatedResponse[ClientSession], error)
+func (s *ClientSessionsService) List(ctx context.Context, opts ClientSessionListOptions) (*PaginatedResponse[ClientSession], error)
 ```
 
 Query params:
 
 ```go
-type ListClientSessionOptions struct {
+type ClientSessionListOptions struct {
     AccountID            int64        `url:"accountId"`
-    RegionID             int64        `url:"regionId"`
-    RegionClusterID      int64        `url:"regionClusterId"`
-    VolumeID             int64        `url:"volumeId"`
-    UserID               int64        `url:"userId"`
+    RegionID             *int64       `url:"regionId"`
+    RegionClusterID      *int64       `url:"regionClusterId"`
+    VolumeID             *int64       `url:"volumeId"`
+    UserID               *int64       `url:"userId"`
     ClientType           string       `url:"clientType"`
     Status               ClientSessionStatus `url:"status"`
     IsActive             string       `url:"isActive"`
@@ -1637,19 +1734,7 @@ func (s *ClientSessionsService) Get(ctx context.Context, sessionID int64) (*Clie
 #### `Summary` - GET /api/v1/client-sessions/summary
 
 ```go
-func (s *ClientSessionsService) Summary(ctx context.Context, opts *SummaryClientSessionOptions) (*SessionSummary, error)
-```
-
-Query params:
-
-```go
-type SummaryClientSessionOptions struct {
-    AccountID            int64        `url:"accountId"`
-    RegionID             int64        `url:"regionId"`
-    RegionClusterID      int64        `url:"regionClusterId"`
-    VolumeID             int64        `url:"volumeId"`
-    UserID               int64        `url:"userId"`
-}
+func (s *ClientSessionsService) Summary(ctx context.Context, accountID int64, regionID *int64, regionClusterID *int64, volumeID *int64, userID *int64) (*SessionSummary, error)
 ```
 
 ### Discover
@@ -1659,15 +1744,7 @@ Accessor: `client.Discover`
 #### `Meta` - GET /api/v1/discover/meta
 
 ```go
-func (s *DiscoverService) Meta(ctx context.Context, opts *MetaDiscoverOptions) (*DiscoverMetaResponse, error)
-```
-
-Query params:
-
-```go
-type MetaDiscoverOptions struct {
-    AccessKeyID          string       `url:"access_key_id"`
-}
+func (s *DiscoverService) Meta(ctx context.Context, accessKeyID string) (*DiscoverMetaResponse, error)
 ```
 
 ### Dashboard
@@ -1677,15 +1754,7 @@ Accessor: `client.Dashboard`
 #### `Stats` - GET /api/v1/dashboard/stats
 
 ```go
-func (s *DashboardService) Stats(ctx context.Context, opts *StatsDashboardOptions) (*DashboardStats, error)
-```
-
-Query params:
-
-```go
-type StatsDashboardOptions struct {
-    AccountID            int64        `url:"accountId"`
-}
+func (s *DashboardService) Stats(ctx context.Context, accountID int64) (*DashboardStats, error)
 ```
 
 ### License
@@ -1731,17 +1800,17 @@ Accessor: `client.Alerts`
 #### `List` - GET /api/v1/alerts/list
 
 ```go
-func (s *AlertsService) List(ctx context.Context, opts *ListAlertOptions) (*PaginatedResponse[ServiceAlert], error)
+func (s *AlertsService) List(ctx context.Context, opts *AlertListOptions) (*PaginatedResponse[ServiceAlert], error)
 ```
 
 Query params:
 
 ```go
-type ListAlertOptions struct {
-    Active               bool         `url:"active"` // default: true
-    AccountID            int64        `url:"accountId"`
-    RegionID             int64        `url:"regionId"`
-    Severity             int          `url:"severity"`
+type AlertListOptions struct {
+    Active               *bool        `url:"active"` // default: true
+    AccountID            *int64       `url:"accountId"`
+    RegionID             *int64       `url:"regionId"`
+    Severity             *int         `url:"severity"`
     Category             string       `url:"category"`
     Since                string       `url:"since"`
     Page                 int          `url:"page"` // default: 1
@@ -1758,7 +1827,7 @@ func (s *AlertsService) Count(ctx context.Context) (*AlertCountResponse, error)
 #### `Resolve` - POST /api/v1/alerts/:alertId/resolve
 
 ```go
-func (s *AlertsService) Resolve(ctx context.Context, alertID string) (*StandardResponse[any], error)
+func (s *AlertsService) Resolve(ctx context.Context, alertID string) error
 ```
 
 ### RegionAlerts
@@ -1768,18 +1837,18 @@ Accessor: `client.RegionAlerts`
 #### `List` - GET /api/v1/regions/:regionId/alerts/list
 
 ```go
-func (s *RegionAlertsService) List(ctx context.Context, regionID int64, opts *ListRegionAlertOptions) (*PaginatedResponse[RegionAlert], error)
+func (s *RegionAlertsService) List(ctx context.Context, regionID int64, opts *RegionAlertListOptions) (*PaginatedResponse[RegionAlert], error)
 ```
 
 Query params:
 
 ```go
-type ListRegionAlertOptions struct {
-    Active               bool         `url:"active"` // default: true
-    Severity             int          `url:"severity"`
+type RegionAlertListOptions struct {
+    Active               *bool        `url:"active"` // default: true
+    Severity             *int         `url:"severity"`
     Category             string       `url:"category"`
     NodeID               string       `url:"nodeId"`
-    RegionClusterID      int64        `url:"regionClusterId"`
+    RegionClusterID      *int64       `url:"regionClusterId"`
     Since                string       `url:"since"`
     Page                 int          `url:"page"` // default: 1
     Limit                int          `url:"limit"` // default: 20
@@ -1789,21 +1858,13 @@ type ListRegionAlertOptions struct {
 #### `Count` - GET /api/v1/regions/:regionId/alerts/count
 
 ```go
-func (s *RegionAlertsService) Count(ctx context.Context, regionID int64, opts *CountRegionAlertOptions) (*AlertCountResponse, error)
-```
-
-Query params:
-
-```go
-type CountRegionAlertOptions struct {
-    RegionClusterID      int64        `url:"regionClusterId"`
-}
+func (s *RegionAlertsService) Count(ctx context.Context, regionID int64, regionClusterID *int64) (*AlertCountResponse, error)
 ```
 
 #### `Resolve` - POST /api/v1/regions/:regionId/alerts/:alertId/resolve
 
 ```go
-func (s *RegionAlertsService) Resolve(ctx context.Context, regionID int64, alertID string) (*StandardResponse[any], error)
+func (s *RegionAlertsService) Resolve(ctx context.Context, regionID int64, alertID string) error
 ```
 
 ### Vault
@@ -1813,6 +1874,6 @@ Accessor: `client.Vault`
 #### `Resync` - POST /api/v1/vault/resync
 
 ```go
-func (s *VaultService) Resync(ctx context.Context) (*StandardResponse[any], error)
+func (s *VaultService) Resync(ctx context.Context) error
 ```
 

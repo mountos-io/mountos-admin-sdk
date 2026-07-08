@@ -37,6 +37,23 @@ func generateDocRust(spec *Spec, outDir string) {
 	w.WriteString("    Http(reqwest::Error),\n")
 	w.WriteString("    Serde(serde_json::Error),\n")
 	w.WriteString("    Key(String),\n")
+	w.WriteString("}\n\n")
+	w.WriteString("pub struct PaginatedResponse<T> {\n")
+	w.WriteString("    pub items: Vec<T>,\n")
+	w.WriteString("    pub pagination: PaginationMeta,\n")
+	w.WriteString("}\n\n")
+	w.WriteString("pub struct PaginationMeta {\n")
+	w.WriteString("    pub page: i64,\n")
+	w.WriteString("    pub limit: i64,\n")
+	w.WriteString("    pub total: i64,\n")
+	w.WriteString("    pub total_pages: i64,\n")
+	w.WriteString("}\n\n")
+	w.WriteString("pub struct CursorPaginatedResponse<T> {\n")
+	w.WriteString("    pub items: Vec<T>,\n")
+	w.WriteString("    pub next_cursor: Option<i64>,\n")
+	w.WriteString("}\n\n")
+	w.WriteString("pub struct IdResponse {\n")
+	w.WriteString("    pub id: i64,\n")
 	w.WriteString("}\n")
 	w.WriteString("```\n\n")
 
@@ -93,6 +110,30 @@ func generateDocRust(spec *Spec, outDir string) {
 				writeRustDocStruct(&w, requestTypeName(res.Name, ep.Action), ep.Request, true)
 				w.WriteString("```\n\n")
 			}
+			// Query params: only when the real signature takes a
+			// resource-specific *ListOptions (not the shared ListOptions),
+			// mirroring rustDocArgs's own hasExtraQueryParam gate -- the
+			// method signature already names this type, so its shape
+			// belongs here rather than nowhere.
+			switch {
+			case ep.Pagination == "page" && hasExtraQueryParam(ep.Query):
+				w.WriteString("Query params:\n\n```rust\n")
+				writeRustDocStruct(&w, listOptionsTypeName(res.Name), ep.Query, true)
+				w.WriteString("```\n\n")
+			case ep.Pagination == "cursor":
+				w.WriteString("Query params:\n\n```rust\n")
+				writeRustDocStruct(&w, listOptionsTypeName(res.Name), ep.Query, true)
+				w.WriteString("```\n\n")
+			}
+			// Response body: only for a named custom response struct (not
+			// IdResponse, and not a primitive/array/paginated return, all of
+			// which are already fully visible in the signature itself).
+			if !ep.ResponseArray && ep.Pagination == "" && ep.ResponseType == "" &&
+				len(ep.Response) > 0 && !responseIsIDOnly(ep.Response) {
+				w.WriteString("Response body:\n\n```rust\n")
+				writeRustDocStruct(&w, customResponseTypeName(res.Name, ep.Action), ep.Response, false)
+				w.WriteString("```\n\n")
+			}
 		}
 	}
 
@@ -135,9 +176,11 @@ func rustDocArgs(res Resource, ep Endpoint, fullPath string) string {
 		if hasExtraQueryParam(ep.Query) {
 			optsType = listOptionsTypeName(res.Name)
 		}
-		args = append(args, "opts: Option<&"+optsType+">")
+		optsParam, _ := rustOptsParam(optsType, ep.Query)
+		args = append(args, optsParam)
 	case ep.Pagination == "cursor":
-		args = append(args, "opts: Option<&"+listOptionsTypeName(res.Name)+">")
+		optsParam, _ := rustOptsParam(listOptionsTypeName(res.Name), ep.Query)
+		args = append(args, optsParam)
 	case len(ep.Request) > 0:
 		args = append(args, "req: &"+requestTypeName(res.Name, ep.Action))
 	}
@@ -151,13 +194,13 @@ func rustDocArgs(res Resource, ep Endpoint, fullPath string) string {
 func rustDocReturn(ep Endpoint, resName string) string {
 	switch {
 	case ep.ResponseArray:
-		return "Vec<" + ep.ResponseType + ">"
+		return "Vec<" + rustType(ep.ResponseType) + ">"
 	case ep.Pagination == "page":
-		return "PaginatedResponse<" + ep.ResponseType + ">"
+		return "PaginatedResponse<" + rustType(ep.ResponseType) + ">"
 	case ep.Pagination == "cursor":
-		return "CursorPaginatedResponse<" + ep.ResponseType + ">"
+		return "CursorPaginatedResponse<" + rustType(ep.ResponseType) + ">"
 	case ep.ResponseType != "":
-		return ep.ResponseType
+		return rustType(ep.ResponseType)
 	case len(ep.Response) > 0:
 		return rustReturnResponseType(ep, resName)
 	default:

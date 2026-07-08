@@ -37,6 +37,16 @@ Cursor-paginated responses nest in `data`:
 
 ---
 
+## Enums
+
+`ClientSessionStatus`: "connected" | "active" | "unhealthy" | "disconnected" | "expired" | "unknown"
+
+`LicenseQuotaState`: "ok" | "exceeded"
+
+`LicenseStatus`: "valid" | "expiring" | "grace" | "expired_access" | "expired"
+
+---
+
 ## Accounts
 
 ### POST /api/v1/accounts/create
@@ -311,21 +321,6 @@ Param: `regionId`
 Param: `clusterId`
 Response data: `{ "id": int64 }`
 
-### RegionCluster Type
-```
-{
-  "id": int64,
-  "exportId": string,
-  "regionId": int64,
-  "name": string,
-  "defaultCluster": bool,
-  "isReady": bool,
-  "isActive": bool,
-  "createdAt": RFC3339,
-  "updatedAt": RFC3339
-}
-```
-
 ---
 
 ## Storages
@@ -351,7 +346,7 @@ Request:
   "secretKey"?: string
 }
 ```
-Response data: `{ "id": int64, "blockVolumeIds": string[] }`
+Response data: `{ "id": int64, "blockVolumeIds?": string[] }`
 
 ### GET /api/v1/storages/list
 Query: `accountId=int64(required)`, `search=string`, `regionId=int64`, `storageType=string`, `providerType=string`, `isActive=bool`, `directAccess=bool`, `page=int(default 1)`, `limit=int(default 10)`
@@ -450,7 +445,7 @@ Request:
   "regionClusterUuid"?: string
 }
 ```
-Response data: `{ "id": int64, "encryptionKey": string }`
+Response data: `{ "id": int64, "encryptionKey?": string }`
 
 ### GET /api/v1/volumes/list
 Query: `accountId=int64(required)`, `regionId=int64`, `regionClusterId=int64`, `storageId=int64`, `volumeType=string`, `locked=bool`, `isActive=bool`, `page=int(default 1)`, `limit=int(default 10)`
@@ -518,7 +513,7 @@ Request:
   "name"?: string
 }
 ```
-Response data: `{ "apiKey": string, "apiSecret": string, "evictedApiKeys": string[] }`
+Response data: `{ "apiKey": string, "apiSecret": string, "evictedApiKeys?": string[] }`
 
 ### GET /api/v1/volumes/:volumeId/api-keys
 Param: `volumeId`
@@ -541,6 +536,17 @@ Request:
   "userId": int64(required)
 }
 ```
+
+### POST /api/v1/volumes/:volumeId/stt-key/generate
+Param: `volumeId`
+Request:
+```
+{
+  "userId"?: int64,
+  "expirySeconds": int64(required)
+}
+```
+Response data: `{ "apiKey": string, "apiSecret": string, "expiresAt": string }`
 
 ### PUT /api/v1/volumes/:volumeId/quota
 Param: `volumeId`
@@ -755,25 +761,6 @@ Param: `regionId`
 Query: `regionClusterId=int64`, `cursor=int64`, `limit=int(default 20)`, `subject=string`, `node=string`
 Response data: `{ "items": AuditLog[], "nextCursor": int64|null }`
 
-### AuditLog Type
-```
-{
-  "id": int64,
-  "title": string,
-  "description"?: string,
-  "subject"?: string,
-  "success": bool,
-  "data"?: object,
-  "createdBy"?: string,
-  "node"?: string,
-  "accountId"?: int64,
-  "regionId"?: int64,
-  "regionClusterId"?: int64,
-  "createdAt"?: RFC3339,
-  "updatedAt"?: RFC3339
-}
-```
-
 ---
 
 ## ServiceNodes
@@ -814,25 +801,6 @@ Response data: `string`
 ### GET /api/v1/nodes
 Query: `accountId=int64(required)`, `serviceType=string`, `status=string`, `inactiveHours=int`
 Response data: `ServiceNode[]`
-
-### ServiceNode Type
-```
-{
-  "id": int64,
-  "regionId": int64,
-  "regionClusterId"?: int64,
-  "serviceType": string,
-  "nodeId": string,
-  "advertiseAddr": string,
-  "rpcAddr"?: string,
-  "metadata"?: object,
-  "status": string,
-  "lastHeartbeat"?: int64,
-  "isActive": bool,
-  "memUsage"?: float,
-  "sysLoad"?: int
-}
-```
 
 ---
 
@@ -1018,6 +986,255 @@ Param: `alertId`
 ## Vault
 
 ### POST /api/v1/vault/resync
+
+---
+
+## Types
+
+### AlertCountResponse Type
+```
+{
+  "active": int64,
+  "recent": int64,
+  "infoCount": int64,
+  "warningCount": int64,
+  "criticalCount": int64
+}
+```
+
+### BlockMember Type
+```
+{
+  "name"?: string,
+  "regionClusterId": int64
+}
+```
+
+### BlockVolume Type
+```
+{
+  "id": string,
+  "name"?: string,
+  "clusterName"?: string,
+  "clusterUuid"?: string,
+  "shardId": int64,
+  "regionClusterId": int64,
+  "clusterReady": bool,
+  "isActive": bool,
+  "createdAt": RFC3339,
+  "updatedAt": RFC3339
+}
+```
+
+### DashboardStats Type
+```
+{
+  "userCount": int64,
+  "volumeCount": int64,
+  "regionCount": int64,
+  "storageCount": int64,
+  "totalVolumeUsed": int64,
+  "totalQuotaLimit": int64,
+  "activeSessionCount": int64,
+  "regionBreakdown": RegionVolumeMetrics[]
+}
+```
+
+### DashboardUser Type
+```
+{
+  "id": string,
+  "name": string,
+  "email"?: string,
+  "role": string,
+  "username"?: string,
+  "accountId"?: int64,
+  "userId"?: int64,
+  "volumeId"?: int64,
+  "exp"?: int64
+}
+```
+
+### DiscoverEndpoint Type
+```
+{
+  "nodeId": string,
+  "addr": string,
+  "status": string
+}
+```
+
+### DiscoverMetaResponse Type
+```
+{
+  "regionId": int64,
+  "region": string,
+  "endpoints": DiscoverEndpoint[]
+}
+```
+
+### Fork Type
+```
+{
+  "fid": int32,
+  "name": string,
+  "parentFid": int32,
+  "parentName": string,
+  "snapshotTs": int64,
+  "createdBy"?: int64,
+  "createdAt": int64,
+  "childrenCount": int32,
+  "inactive"?: bool,
+  "inactiveAt"?: int64,
+  "status": string,
+  "size": int64
+}
+```
+
+### ForkEntryVersion Type
+```
+{
+  "generation": int64,
+  "size": int64,
+  "mtime": int64,
+  "updaterId"?: int64,
+  "contentHash"?: string
+}
+```
+
+### LicenseList Type
+```
+{
+  "items": LicenseRecord[]
+}
+```
+
+### LicenseLoadResult Type
+```
+{
+  "loaded": int,
+  "ignored": int
+}
+```
+
+### LicenseQuota Type
+```
+{
+  "state": LicenseQuotaState,
+  "liveVolume": int64,
+  "totalVolume": int64,
+  "generation": int64,
+  "lastTransitionAtMs": int64
+}
+```
+
+### LicenseRecord Type
+```
+{
+  "key": string,
+  "licensee": string,
+  "status": LicenseStatus,
+  "issuedAt": string,
+  "expiresAt": string,
+  "maxStorageBytes": int64,
+  "insertedAt": RFC3339
+}
+```
+
+### LicenseTerms Type
+```
+{
+  "terms": string
+}
+```
+
+### Ref Type
+```
+{
+  "id": int64,
+  "name": string
+}
+```
+
+### RegionVolumeMetrics Type
+```
+{
+  "regionId": int64,
+  "regionName": string,
+  "volumeCount": int64,
+  "totalVolumeUsed": int64,
+  "totalQuotaLimit": int64
+}
+```
+
+### SessionSummary Type
+```
+{
+  "byStatus": SessionSummaryStatusEntry[],
+  "byPlatform": SessionSummaryFacet[],
+  "byOsName": SessionSummaryFacet[],
+  "regionCount": int64,
+  "volumeCount": int64,
+  "hostCount": int64,
+  "unhealthyCount": int64
+}
+```
+
+### SessionSummaryFacet Type
+```
+{
+  "label": string,
+  "count": int64
+}
+```
+
+### SessionSummaryStatusEntry Type
+```
+{
+  "clientType": string,
+  "status": string,
+  "count": int64
+}
+```
+
+### UserLite Type
+```
+{
+  "id": int64,
+  "username": string,
+  "name": string
+}
+```
+
+### VolumeApiKey Type
+```
+{
+  "apiKey": string,
+  "name"?: string,
+  "createdAt"?: RFC3339,
+  "lastUsedAt"?: RFC3339
+}
+```
+
+### VolumeRef Type
+```
+{
+  "id": int64,
+  "name": string,
+  "type"?: string
+}
+```
+
+### VolumeSizePoint Type
+```
+{
+  "bucketEnd": RFC3339,
+  "liveVolume": int64,
+  "totalVolume": int64,
+  "pendingVolume": int64,
+  "liveInactiveVolume": int64
+}
+```
 
 ---
 

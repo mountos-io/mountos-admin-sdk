@@ -61,7 +61,7 @@ func main() {
   }
   fmt.Println("Added user ID:", user.ID)
 
-  users, err := client.Users.List(ctx, &sdk.UserListOptions{AccountID: acct.ID, Page: 1, Limit: 20})
+  users, err := client.Users.List(ctx, sdk.UserListOptions{AccountID: acct.ID, Page: 1, Limit: 20})
   if err != nil {
     log.Fatal("list users:", err)
   }
@@ -112,7 +112,7 @@ func main() {
     fmt.Println("Created storage ID:", storage.ID)
   }
 
-  storages, _ := client.Storages.List(ctx, &sdk.StorageListOptions{AccountID: acct.ID})
+  storages, _ := client.Storages.List(ctx, sdk.StorageListOptions{AccountID: acct.ID})
   for _, s := range storages.Items {
     fmt.Printf("  Storage: %s (type=%s, active=%v)\n", s.Name, s.StorageType, s.IsActive)
   }
@@ -130,8 +130,8 @@ func main() {
   }
 
   // --- Audit Logs ---
-  logs, err := client.AuditLogs.List(ctx, &sdk.AuditLogListOptions{
-    AccountID: &acct.ID,
+  logs, err := client.AuditLogs.List(ctx, sdk.AuditLogListOptions{
+    AccountID: acct.ID,
     Limit:     5,
   })
   if err != nil {
@@ -179,8 +179,7 @@ func main() {
   } else {
     fmt.Printf("Stored license payloads: %d\n", len(records.Items))
     for _, r := range records.Items {
-      // active is the newest non-expired payload for its license id; expiry retires it.
-      fmt.Printf("  %s: %s (%s, active=%t)\n", r.Key, r.Licensee, r.Status, r.Active)
+      fmt.Printf("  %s: %s (%s, expires %s)\n", r.Key, r.Licensee, r.Status, r.ExpiresAt)
     }
   }
 

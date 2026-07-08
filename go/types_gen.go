@@ -512,8 +512,8 @@ type EditAccountRequest struct {
 }
 
 type UpdateAccountQuotaRequest struct {
-	QuotaLimit     int64 `json:"quotaLimit"`
-	QuotaExcessPct int32 `json:"quotaExcessPct,omitempty"`
+	QuotaLimit     int64  `json:"quotaLimit"`
+	QuotaExcessPct *int32 `json:"quotaExcessPct,omitempty"`
 }
 
 type AccountListOptions struct {
@@ -625,7 +625,7 @@ type CreateStorageRequest struct {
 	Bucket       string        `json:"bucket,omitempty"`
 	Base         string        `json:"base,omitempty"`
 	BlockRegion  string        `json:"blockRegion,omitempty"`
-	BlockSize    int32         `json:"blockSize,omitempty"`
+	BlockSize    *int32        `json:"blockSize,omitempty"`
 	Members      []BlockMember `json:"members,omitempty"`
 	AccessKey    string        `json:"accessKey,omitempty"`
 	SecretKey    string        `json:"secretKey,omitempty"`
@@ -642,7 +642,7 @@ type EditStorageRequest struct {
 	Endpoint     string `json:"endpoint,omitempty"`
 	AccessKey    string `json:"accessKey,omitempty"`
 	SecretKey    string `json:"secretKey,omitempty"`
-	DirectAccess bool   `json:"directAccess,omitempty"`
+	DirectAccess *bool  `json:"directAccess,omitempty"`
 }
 
 type TestStorageBucketRequest struct {
@@ -692,14 +692,14 @@ type CreateVolumeRequest struct {
 	Name                    string `json:"name"`
 	Description             string `json:"description,omitempty"`
 	VolumeType              string `json:"volumeType"`
-	Encryption              bool   `json:"encryption,omitempty"`
+	Encryption              *bool  `json:"encryption,omitempty"`
 	EncryptionKey           string `json:"encryptionKey,omitempty"`
-	RetentionPeriod         int32  `json:"retentionPeriod,omitempty"`
-	GracePeriod             int32  `json:"gracePeriod,omitempty"`
+	RetentionPeriod         *int32 `json:"retentionPeriod,omitempty"`
+	GracePeriod             *int32 `json:"gracePeriod,omitempty"`
 	ForkGracePeriod         *int32 `json:"forkGracePeriod,omitempty"`
 	EventLogRetentionPeriod *int32 `json:"eventLogRetentionPeriod,omitempty"`
-	QuotaLimit              int64  `json:"quotaLimit,omitempty"`
-	RegionClusterID         int64  `json:"regionClusterId,omitempty"`
+	QuotaLimit              *int64 `json:"quotaLimit,omitempty"`
+	RegionClusterID         *int64 `json:"regionClusterId,omitempty"`
 	RegionClusterUUID       string `json:"regionClusterUuid,omitempty"`
 }
 
@@ -710,14 +710,14 @@ type CreateVolumeResponse struct {
 
 type EditVolumeRequest struct {
 	Description             string `json:"description,omitempty"`
-	RetentionPeriod         int32  `json:"retentionPeriod,omitempty"`
-	GracePeriod             int32  `json:"gracePeriod,omitempty"`
+	RetentionPeriod         *int32 `json:"retentionPeriod,omitempty"`
+	GracePeriod             *int32 `json:"gracePeriod,omitempty"`
 	ForkGracePeriod         *int32 `json:"forkGracePeriod,omitempty"`
 	EventLogRetentionPeriod *int32 `json:"eventLogRetentionPeriod,omitempty"`
 }
 
 type MoveVolumeClusterRequest struct {
-	TargetClusterID   int64  `json:"targetClusterId,omitempty"`
+	TargetClusterID   *int64 `json:"targetClusterId,omitempty"`
 	TargetClusterUUID string `json:"targetClusterUuid,omitempty"`
 }
 
@@ -729,9 +729,9 @@ type MoveClusterVolumeResponse struct {
 }
 
 type DeactivateVolumeRequest struct {
-	IsCleanupMetaEnabled    bool `json:"isCleanupMetaEnabled,omitempty"`
-	IsCleanupStorageEnabled bool `json:"isCleanupStorageEnabled,omitempty"`
-	IsCleanupVaultEnabled   bool `json:"isCleanupVaultEnabled,omitempty"`
+	IsCleanupMetaEnabled    *bool `json:"isCleanupMetaEnabled,omitempty"`
+	IsCleanupStorageEnabled *bool `json:"isCleanupStorageEnabled,omitempty"`
+	IsCleanupVaultEnabled   *bool `json:"isCleanupVaultEnabled,omitempty"`
 }
 
 type GenerateVolumeAPIKeysRequest struct {
@@ -755,6 +755,17 @@ type RevokeVolumeAPIKeyRequest struct {
 
 type RevokeVolumeAPIKeysByUserRequest struct {
 	UserID int64 `json:"userId"`
+}
+
+type GenerateVolumeSttKeyRequest struct {
+	UserID        *int64 `json:"userId,omitempty"`
+	ExpirySeconds int64  `json:"expirySeconds"`
+}
+
+type GenerateSttKeyVolumeResponse struct {
+	APIKey    string `json:"apiKey"`
+	APISecret string `json:"apiSecret"`
+	ExpiresAt string `json:"expiresAt"`
 }
 
 type UpdateVolumeQuotaRequest struct {
@@ -781,7 +792,7 @@ type CreateVolumeForkRequest struct {
 }
 
 type DeleteVolumeForkRequest struct {
-	Force      bool   `json:"force,omitempty"`
+	Force      *bool  `json:"force,omitempty"`
 	VolumeType string `json:"volumeType,omitempty"`
 }
 

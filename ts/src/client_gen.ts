@@ -11,11 +11,11 @@ import type {
   EditStorageRequest, TestStorageBucketRequest, CreateVolumeRequest, Volume, 
   VolumeListOptions, EditVolumeRequest, MoveVolumeClusterRequest, DeactivateVolumeRequest, 
   GenerateVolumeAPIKeysRequest, VolumeApiKey, RevokeVolumeAPIKeyRequest, 
-  RevokeVolumeAPIKeysByUserRequest, UpdateVolumeQuotaRequest, VolumeSizePoint, 
-  CreateVolumeForkRequest, Fork, DeleteVolumeForkRequest, RestoreVolumeForkRequest, 
-  ForkTreeEntry, VolumeForkTreeListOptions, ForkEntryDetail, ForkEntryVersion, 
-  VolumeForkEntryListOptions, ForkTreeMatch, VolumeForkSearchListOptions, AuditLog, 
-  AuditLogListOptions, RegionAuditLogListOptions, ServiceNode, ClientSession, 
+  RevokeVolumeAPIKeysByUserRequest, GenerateVolumeSttKeyRequest, UpdateVolumeQuotaRequest, 
+  VolumeSizePoint, CreateVolumeForkRequest, Fork, DeleteVolumeForkRequest, 
+  RestoreVolumeForkRequest, ForkTreeEntry, VolumeForkTreeListOptions, ForkEntryDetail, 
+  ForkEntryVersion, VolumeForkEntryListOptions, ForkTreeMatch, VolumeForkSearchListOptions, 
+  AuditLog, AuditLogListOptions, RegionAuditLogListOptions, ServiceNode, ClientSession, 
   ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, DashboardStats, 
   LicenseDetails, LicenseTerms, LoadLicenseRequest, LicenseLoadResult, LicenseList, 
   ServiceAlert, AlertListOptions, AlertCountResponse, RegionAlert, RegionAlertListOptions,
@@ -320,6 +320,10 @@ export class VolumesResource {
 
   revokeAPIKeysByUser(volumeId: number, req: RevokeVolumeAPIKeysByUserRequest, signal?: AbortSignal): Promise<void> {
     return this.client.request('POST', `/api/v1/volumes/${volumeId}/api-keys/revoke-by-user`, req, signal)
+  }
+
+  generateSttKey(volumeId: number, req: GenerateVolumeSttKeyRequest, signal?: AbortSignal): Promise<{ apiKey: string; apiSecret: string; expiresAt: string }> {
+    return this.client.request('POST', `/api/v1/volumes/${volumeId}/stt-key/generate`, req, signal)
   }
 
   updateQuota(volumeId: number, req: UpdateVolumeQuotaRequest, signal?: AbortSignal): Promise<{ id: number }> {
