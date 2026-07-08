@@ -775,6 +775,11 @@ Param: `regionId`
 Param: `nodeId`
 Response data: `string`
 
+### GET /api/v1/regions/:regionId/nodes/:nodeId/stats/history
+Param: `regionId`
+Param: `nodeId`
+Response data: `{ "intervalMs": int64, "samples": NodeStatsSample[] }`
+
 ### ServiceNode Type
 ```
 {
@@ -1145,6 +1150,25 @@ Param: `alertId`
 ```
 {
   "terms": string
+}
+```
+
+### NodeStatsSample Type
+```
+{
+  "timestampMs": int64,
+  "intervalMs": int64,
+  "loadAvg1": float,
+  "loadAvg5": float,
+  "loadAvg15": float,
+  "memUsage": float,
+  "readIops": float,
+  "writeIops": float,
+  "netRxBytesPerSec": float,
+  "netTxBytesPerSec": float,
+  "processCount": int,
+  "diskUsedBytes"?: int64,
+  "diskTotalBytes"?: int64
 }
 ```
 

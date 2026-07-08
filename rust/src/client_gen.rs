@@ -655,6 +655,10 @@ impl ServiceNodesService {
     pub async fn stats(&self, region_id: i64, node_id: &str) -> Result<String, Error> {
         self.inner.get(&format!("/api/v1/regions/{}/nodes/{}/stats", region_id, crate::http::encode_segment(node_id)), &[]).await
     }
+
+    pub async fn stats_history(&self, region_id: i64, node_id: &str) -> Result<StatsHistoryServiceNodeResponse, Error> {
+        self.inner.get(&format!("/api/v1/regions/{}/nodes/{}/stats/history", region_id, crate::http::encode_segment(node_id)), &[]).await
+    }
 }
 
 /// Operations on the `Nodes` resource.

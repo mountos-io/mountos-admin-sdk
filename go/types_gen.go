@@ -444,6 +444,22 @@ type LicenseRecord struct {
 	InsertedAt      string        `json:"insertedAt"`
 }
 
+type NodeStatsSample struct {
+	TimestampMs      int64   `json:"timestampMs"`
+	IntervalMs       int64   `json:"intervalMs"`
+	LoadAvg1         float64 `json:"loadAvg1"`
+	LoadAvg5         float64 `json:"loadAvg5"`
+	LoadAvg15        float64 `json:"loadAvg15"`
+	MemUsage         float64 `json:"memUsage"`
+	ReadIops         float64 `json:"readIops"`
+	WriteIops        float64 `json:"writeIops"`
+	NetRxBytesPerSec float64 `json:"netRxBytesPerSec"`
+	NetTxBytesPerSec float64 `json:"netTxBytesPerSec"`
+	ProcessCount     int     `json:"processCount"`
+	DiskUsedBytes    int64   `json:"diskUsedBytes,omitempty"`
+	DiskTotalBytes   int64   `json:"diskTotalBytes,omitempty"`
+}
+
 type Ref struct {
 	ID   int64  `json:"id"`
 	Name string `json:"name"`
@@ -869,6 +885,11 @@ type RegionAuditLogListOptions struct {
 }
 
 // ServiceNodes
+
+type StatsHistoryServiceNodeResponse struct {
+	IntervalMs int64             `json:"intervalMs"`
+	Samples    []NodeStatsSample `json:"samples"`
+}
 
 // Nodes
 

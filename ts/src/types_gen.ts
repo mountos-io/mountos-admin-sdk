@@ -416,6 +416,22 @@ export interface LicenseRecord {
   insertedAt: string
 }
 
+export interface NodeStatsSample {
+  timestampMs: number
+  intervalMs: number
+  loadAvg1: number
+  loadAvg5: number
+  loadAvg15: number
+  memUsage: number
+  readIops: number
+  writeIops: number
+  netRxBytesPerSec: number
+  netTxBytesPerSec: number
+  processCount: number
+  diskUsedBytes?: number
+  diskTotalBytes?: number
+}
+
 export interface Ref {
   id: number
   name: string

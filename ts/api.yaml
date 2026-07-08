@@ -355,6 +355,21 @@ types:
     - "memUsage: float?"
     - "sysLoad: int?"
 
+  NodeStatsSample:
+    - "timestampMs: int64"
+    - "intervalMs: int64"
+    - "loadAvg1: float"
+    - "loadAvg5: float"
+    - "loadAvg15: float"
+    - "memUsage: float"
+    - "readIops: float"
+    - "writeIops: float"
+    - "netRxBytesPerSec: float"
+    - "netTxBytesPerSec: float"
+    - "processCount: int"
+    - "diskUsedBytes: int64?"
+    - "diskTotalBytes: int64?"
+
   ClientSession:
     - "id: int64"
     - "account: Ref"
@@ -1207,6 +1222,13 @@ resources:
         method: GET
         path: /:nodeId/stats
         responseType: string
+
+      - action: statsHistory
+        method: GET
+        path: /:nodeId/stats/history
+        response:
+          - "intervalMs: int64"
+          - "samples: NodeStatsSample[]"
 
   - name: Nodes
     path: /nodes

@@ -428,6 +428,26 @@ type LicenseTerms struct {
 }
 ```
 
+### `NodeStatsSample`
+
+```go
+type NodeStatsSample struct {
+    TimestampMs              int64                    `json:"timestampMs"`
+    IntervalMs               int64                    `json:"intervalMs"`
+    LoadAvg1                 float64                  `json:"loadAvg1"`
+    LoadAvg5                 float64                  `json:"loadAvg5"`
+    LoadAvg15                float64                  `json:"loadAvg15"`
+    MemUsage                 float64                  `json:"memUsage"`
+    ReadIops                 float64                  `json:"readIops"`
+    WriteIops                float64                  `json:"writeIops"`
+    NetRxBytesPerSec         float64                  `json:"netRxBytesPerSec"`
+    NetTxBytesPerSec         float64                  `json:"netTxBytesPerSec"`
+    ProcessCount             int                      `json:"processCount"`
+    DiskUsedBytes            int64                    `json:"diskUsedBytes,omitempty"`
+    DiskTotalBytes           int64                    `json:"diskTotalBytes,omitempty"`
+}
+```
+
 ### `Ref`
 
 ```go
@@ -1683,6 +1703,21 @@ func (s *ServiceNodesService) List(ctx context.Context, regionID int64, serviceT
 
 ```go
 func (s *ServiceNodesService) Stats(ctx context.Context, regionID int64, nodeID string) (*string, error)
+```
+
+#### `StatsHistory` - GET /api/v1/regions/:regionId/nodes/:nodeId/stats/history
+
+```go
+func (s *ServiceNodesService) StatsHistory(ctx context.Context, regionID int64, nodeID string) (*StatsHistoryServiceNodeResponse, error)
+```
+
+Response body:
+
+```go
+type StatsHistoryServiceNodeResponse struct {
+    IntervalMs               int64                    `json:"intervalMs"`
+    Samples                  []NodeStatsSample        `json:"samples"`
+}
 ```
 
 ### Nodes

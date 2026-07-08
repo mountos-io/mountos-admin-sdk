@@ -15,10 +15,11 @@ import type {
   VolumeSizePoint, CreateVolumeForkRequest, Fork, DeleteVolumeForkRequest, 
   RestoreVolumeForkRequest, ForkTreeEntry, VolumeForkTreeListOptions, ForkEntryDetail, 
   ForkEntryVersion, VolumeForkEntryListOptions, ForkTreeMatch, VolumeForkSearchListOptions, 
-  AuditLog, AuditLogListOptions, RegionAuditLogListOptions, ServiceNode, ClientSession, 
-  ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, DashboardStats, 
-  LicenseDetails, LicenseTerms, LoadLicenseRequest, LicenseLoadResult, LicenseList, 
-  ServiceAlert, AlertListOptions, AlertCountResponse, RegionAlert, RegionAlertListOptions,
+  AuditLog, AuditLogListOptions, RegionAuditLogListOptions, ServiceNode, NodeStatsSample, 
+  ClientSession, ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, 
+  DashboardStats, LicenseDetails, LicenseTerms, LoadLicenseRequest, LicenseLoadResult, 
+  LicenseList, ServiceAlert, AlertListOptions, AlertCountResponse, RegionAlert, 
+  RegionAlertListOptions,
 } from './types_gen.js'
 
 export type RequestFn = <T>(method: string, path: string, body?: unknown, signal?: AbortSignal) => Promise<T>
@@ -444,6 +445,10 @@ export class ServiceNodesResource {
 
   stats(regionId: number, nodeId: string, signal?: AbortSignal): Promise<string> {
     return this.client.request('GET', `/api/v1/regions/${regionId}/nodes/${encodeURIComponent(nodeId)}/stats`, undefined, signal)
+  }
+
+  statsHistory(regionId: number, nodeId: string, signal?: AbortSignal): Promise<{ intervalMs: number; samples: NodeStatsSample[] }> {
+    return this.client.request('GET', `/api/v1/regions/${regionId}/nodes/${encodeURIComponent(nodeId)}/stats/history`, undefined, signal)
   }
 }
 

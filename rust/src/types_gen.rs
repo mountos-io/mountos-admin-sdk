@@ -669,6 +669,36 @@ pub struct LicenseRecord {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct NodeStatsSample {
+    #[serde(rename = "timestampMs")]
+    pub timestamp_ms: i64,
+    #[serde(rename = "intervalMs")]
+    pub interval_ms: i64,
+    #[serde(rename = "loadAvg1")]
+    pub load_avg1: f64,
+    #[serde(rename = "loadAvg5")]
+    pub load_avg5: f64,
+    #[serde(rename = "loadAvg15")]
+    pub load_avg15: f64,
+    #[serde(rename = "memUsage")]
+    pub mem_usage: f64,
+    #[serde(rename = "readIops")]
+    pub read_iops: f64,
+    #[serde(rename = "writeIops")]
+    pub write_iops: f64,
+    #[serde(rename = "netRxBytesPerSec")]
+    pub net_rx_bytes_per_sec: f64,
+    #[serde(rename = "netTxBytesPerSec")]
+    pub net_tx_bytes_per_sec: f64,
+    #[serde(rename = "processCount")]
+    pub process_count: i64,
+    #[serde(rename = "diskUsedBytes", skip_serializing_if = "Option::is_none")]
+    pub disk_used_bytes: Option<i64>,
+    #[serde(rename = "diskTotalBytes", skip_serializing_if = "Option::is_none")]
+    pub disk_total_bytes: Option<i64>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Ref {
     pub id: i64,
     pub name: String,
@@ -1260,6 +1290,13 @@ pub struct RegionAuditLogListOptions {
 }
 
 // ServiceNodes
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StatsHistoryServiceNodeResponse {
+    #[serde(rename = "intervalMs")]
+    pub interval_ms: i64,
+    pub samples: Vec<NodeStatsSample>,
+}
 
 // Nodes
 

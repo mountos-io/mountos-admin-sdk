@@ -423,6 +423,26 @@ pub struct LicenseTerms {
 }
 ```
 
+### `NodeStatsSample`
+
+```rust
+pub struct NodeStatsSample {
+    pub timestamp_ms: i64,
+    pub interval_ms: i64,
+    pub load_avg1: f64,
+    pub load_avg5: f64,
+    pub load_avg15: f64,
+    pub mem_usage: f64,
+    pub read_iops: f64,
+    pub write_iops: f64,
+    pub net_rx_bytes_per_sec: f64,
+    pub net_tx_bytes_per_sec: f64,
+    pub process_count: i64,
+    pub disk_used_bytes: Option<i64>,
+    pub disk_total_bytes: Option<i64>,
+}
+```
+
 ### `Ref`
 
 ```rust
@@ -1678,6 +1698,21 @@ pub async fn list(&self, region_id: i64, service_type: Option<&str>, status: Opt
 
 ```rust
 pub async fn stats(&self, region_id: i64, node_id: &str) -> Result<String, Error>
+```
+
+#### `stats_history` - GET /api/v1/regions/:regionId/nodes/:nodeId/stats/history
+
+```rust
+pub async fn stats_history(&self, region_id: i64, node_id: &str) -> Result<StatsHistoryServiceNodeResponse, Error>
+```
+
+Response body:
+
+```rust
+pub struct StatsHistoryServiceNodeResponse {
+    pub interval_ms: i64,
+    pub samples: Vec<NodeStatsSample>,
+}
 ```
 
 ### Nodes

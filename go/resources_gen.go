@@ -828,6 +828,14 @@ func (s *ServiceNodesService) Stats(ctx context.Context, regionID int64, nodeID 
 	return decodeJSON[string](data)
 }
 
+func (s *ServiceNodesService) StatsHistory(ctx context.Context, regionID int64, nodeID string) (*StatsHistoryServiceNodeResponse, error) {
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/regions/%s/nodes/%s/stats/history", strconv.FormatInt(regionID, 10), url.PathEscape(nodeID)))
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[StatsHistoryServiceNodeResponse](data)
+}
+
 type NodesService struct{ c *Client }
 
 func (s *NodesService) ListAll(ctx context.Context, accountID int64, serviceType string, status string, inactiveHours int) ([]ServiceNode, error) {

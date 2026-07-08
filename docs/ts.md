@@ -391,6 +391,26 @@ interface LicenseTerms {
 }
 ```
 
+### `NodeStatsSample`
+
+```typescript
+interface NodeStatsSample {
+  timestampMs: number;
+  intervalMs: number;
+  loadAvg1: number;
+  loadAvg5: number;
+  loadAvg15: number;
+  memUsage: number;
+  readIops: number;
+  writeIops: number;
+  netRxBytesPerSec: number;
+  netTxBytesPerSec: number;
+  processCount: number;
+  diskUsedBytes?: number;
+  diskTotalBytes?: number;
+}
+```
+
 ### `Ref`
 
 ```typescript
@@ -1564,6 +1584,12 @@ Query params:
 
 ```typescript
 client.serviceNodes.stats(regionId: number, nodeId: string, signal?: AbortSignal): Promise<string>;
+```
+
+#### `statsHistory` - GET /api/v1/regions/:regionId/nodes/:nodeId/stats/history
+
+```typescript
+client.serviceNodes.statsHistory(regionId: number, nodeId: string, signal?: AbortSignal): Promise<{ intervalMs: number; samples: NodeStatsSample[] }>;
 ```
 
 ### Nodes
