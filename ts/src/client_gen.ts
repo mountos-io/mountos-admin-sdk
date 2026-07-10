@@ -8,18 +8,19 @@ import type {
   EditRegionRequest, RegionCluster, ClusterListOptions, CreateRegionClusterRequest, 
   RegionClusterListOptions, EditRegionClusterRequest, SetRegionClusterReadyRequest, 
   CreateStorageRequest, BlockMember, Storage, StorageListOptions, BlockVolume, 
-  EditStorageRequest, TestStorageBucketRequest, CreateVolumeRequest, Volume, 
-  VolumeListOptions, EditVolumeRequest, MoveVolumeClusterRequest, DeactivateVolumeRequest, 
-  GenerateVolumeAPIKeysRequest, VolumeApiKey, RevokeVolumeAPIKeyRequest, 
-  RevokeVolumeAPIKeysByUserRequest, GenerateVolumeSttKeyRequest, UpdateVolumeQuotaRequest, 
-  VolumeSizePoint, CreateVolumeForkRequest, Fork, DeleteVolumeForkRequest, 
-  RestoreVolumeForkRequest, ForkTreeEntry, VolumeForkTreeListOptions, ForkEntryDetail, 
-  ForkEntryVersion, VolumeForkEntryListOptions, ForkTreeMatch, VolumeForkSearchListOptions, 
-  AuditLog, AuditLogListOptions, RegionAuditLogListOptions, ServiceNode, NodeStatsSample, 
-  ClientSession, ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, 
-  DashboardStats, LicenseDetails, LicenseTerms, LoadLicenseRequest, LicenseLoadResult, 
-  LicenseList, ServiceAlert, AlertListOptions, AlertCountResponse, RegionAlert, 
-  RegionAlertListOptions,
+  EditStorageRequest, TestStorageBucketRequest, CompatibleStorage, 
+  MoveStorageVolumesRequest, MoveVolumeFailure, BackfillFailure, CreateVolumeRequest, 
+  Volume, VolumeListOptions, EditVolumeRequest, MoveVolumeClusterRequest, 
+  DeactivateVolumeRequest, GenerateVolumeAPIKeysRequest, VolumeApiKey, 
+  RevokeVolumeAPIKeyRequest, RevokeVolumeAPIKeysByUserRequest, GenerateVolumeSttKeyRequest, 
+  UpdateVolumeQuotaRequest, VolumeSizePoint, CreateVolumeForkRequest, Fork, 
+  DeleteVolumeForkRequest, RestoreVolumeForkRequest, ForkTreeEntry, 
+  VolumeForkTreeListOptions, ForkEntryDetail, ForkEntryVersion, VolumeForkEntryListOptions, 
+  ForkTreeMatch, VolumeForkSearchListOptions, AuditLog, AuditLogListOptions, 
+  RegionAuditLogListOptions, ServiceNode, NodeStatsSample, ClientSession, 
+  ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, DashboardStats, 
+  LicenseDetails, LicenseTerms, LoadLicenseRequest, LicenseLoadResult, LicenseList, 
+  ServiceAlert, AlertListOptions, AlertCountResponse, RegionAlert, RegionAlertListOptions,
 } from './types_gen.js'
 
 export type RequestFn = <T>(method: string, path: string, body?: unknown, signal?: AbortSignal) => Promise<T>
@@ -265,6 +266,18 @@ export class StoragesResource {
 
   testStorageBucket(storageId: number, signal?: AbortSignal): Promise<{ bucketExists: boolean; list: boolean; write: boolean; read: boolean; delete: boolean; multipart: boolean }> {
     return this.client.request('POST', `/api/v1/storages/${storageId}/test-bucket`, undefined, signal)
+  }
+
+  listCompatible(storageId: number, signal?: AbortSignal): Promise<{ storages: CompatibleStorage[] }> {
+    return this.client.request('GET', `/api/v1/storages/${storageId}/compatible`, undefined, signal)
+  }
+
+  moveVolumes(storageId: number, req: MoveStorageVolumesRequest, signal?: AbortSignal): Promise<{ moved: string[]; failures: MoveVolumeFailure[] }> {
+    return this.client.request('POST', `/api/v1/storages/${storageId}/move-volumes`, req, signal)
+  }
+
+  backfillFingerprints(signal?: AbortSignal): Promise<{ scanned: number; updated: number; failures: BackfillFailure[]; hasMore: boolean }> {
+    return this.client.request('POST', '/api/v1/storages/backfill-fingerprints', undefined, signal)
   }
 }
 

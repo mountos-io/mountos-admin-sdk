@@ -137,6 +137,11 @@ types:
     - "region: string?"
     - "bucket: string?"
     - "base: string?"
+    # SHA1(endpoint, region, bucket, base): identifies the physical backing bucket/prefix.
+    # Read-only, empty until backfilled. Storages sharing this value address the same
+    # bytes, so volumes can be moved between them as a pure metadata pointer flip
+    # (see storages/{id}/compatible and storages/{id}/move-volumes).
+    - "physicalFingerprint: string?"
     - "blockRegion: string?"
     - "blockSize: int32?"
     # direct_access ("maintenance mode"): when true a block storage bypasses blockserv and
@@ -165,6 +170,30 @@ types:
     - "isActive: bool"
     - "createdAt: datetime"
     - "updatedAt: datetime"
+
+  # A volume currently sitting on a compatible (same physicalFingerprint) storage,
+  # eligible to move onto the storage being viewed.
+  CompatibleVolume:
+    - "id: string"
+    - "name: string"
+
+  # A storage sharing physicalFingerprint with the one being viewed, with its
+  # current volumes (move-volumes candidates).
+  CompatibleStorage:
+    - "id: int64"
+    - "uuid: string"
+    - "name: string"
+    - "storageType: string"
+    - "providerType: string"
+    - "volumes: CompatibleVolume[]"
+
+  MoveVolumeFailure:
+    - "volumeId: string"
+    - "error: string"
+
+  BackfillFailure:
+    - "shardId: int64"
+    - "error: string"
 
   Volume:
     - "id: int64"
@@ -866,6 +895,39 @@ resources:
           - "read: bool"
           - "delete: bool"
           - "multipart: bool"
+
+      # Other storages sharing this one's physicalFingerprint (same account+region),
+      # each with its current volumes — the move-volumes candidate picker.
+      - action: listCompatible
+        method: GET
+        path: /:storageId/compatible
+        response:
+          - "storages: CompatibleStorage[]"
+
+      # Moves one or more volumes onto this storage from wherever they currently sit
+      # (a same-fingerprint storage). Pure metadata pointer flip: storage_id (the
+      # actual S3 key-namespace token) is never touched. A block storage source
+      # moving to an object target must already be in maintenance (directAccess=true)
+      # and fully drained; see edit's directAccess toggle.
+      - action: moveVolumes
+        method: POST
+        path: /:storageId/move-volumes
+        request:
+          - "volumeIds: string[]!"
+        response:
+          - "moved: string[]"
+          - "failures: MoveVolumeFailure[]"
+
+      # One-time migration helper: computes physicalFingerprint for storages
+      # created before the column existed. Platform-admin only, not per-account.
+      - action: backfillFingerprints
+        method: POST
+        path: /backfill-fingerprints
+        response:
+          - "scanned: int32"
+          - "updated: int32"
+          - "failures: BackfillFailure[]"
+          - "hasMore: bool"
 
   - name: Volumes
     path: /volumes

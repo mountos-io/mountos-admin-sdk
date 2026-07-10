@@ -380,6 +380,30 @@ func (s *StoragesService) TestStorageBucket(ctx context.Context, storageID int64
 	return decodeJSON[TestStorageBucketStorageResponse](data)
 }
 
+func (s *StoragesService) ListCompatible(ctx context.Context, storageID int64) (*ListCompatibleStorageResponse, error) {
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/storages/%s/compatible", strconv.FormatInt(storageID, 10)))
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[ListCompatibleStorageResponse](data)
+}
+
+func (s *StoragesService) MoveVolumes(ctx context.Context, storageID int64, req *MoveStorageVolumesRequest) (*MoveVolumesStorageResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/move-volumes", strconv.FormatInt(storageID, 10)), req)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[MoveVolumesStorageResponse](data)
+}
+
+func (s *StoragesService) BackfillFingerprints(ctx context.Context) (*BackfillFingerprintsStorageResponse, error) {
+	data, err := s.c.post(ctx, "/api/v1/storages/backfill-fingerprints", nil)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[BackfillFingerprintsStorageResponse](data)
+}
+
 type VolumesService struct{ c *Client }
 
 func (s *VolumesService) Create(ctx context.Context, req *CreateVolumeRequest) (*CreateVolumeResponse, error) {

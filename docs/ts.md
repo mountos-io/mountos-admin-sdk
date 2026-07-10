@@ -127,6 +127,15 @@ interface AuditLog {
 }
 ```
 
+### `BackfillFailure`
+
+```typescript
+interface BackfillFailure {
+  shardId: number;
+  error: string;
+}
+```
+
 ### `BlockMember`
 
 ```typescript
@@ -180,6 +189,28 @@ interface ClientSession {
   connectedAt?: number;
   disconnectedAt?: number;
   isActive: boolean;
+}
+```
+
+### `CompatibleStorage`
+
+```typescript
+interface CompatibleStorage {
+  id: number;
+  uuid: string;
+  name: string;
+  storageType: string;
+  providerType: string;
+  volumes: CompatibleVolume[];
+}
+```
+
+### `CompatibleVolume`
+
+```typescript
+interface CompatibleVolume {
+  id: string;
+  name: string;
 }
 ```
 
@@ -391,6 +422,15 @@ interface LicenseTerms {
 }
 ```
 
+### `MoveVolumeFailure`
+
+```typescript
+interface MoveVolumeFailure {
+  volumeId: string;
+  error: string;
+}
+```
+
 ### `NodeStatsSample`
 
 ```typescript
@@ -573,6 +613,7 @@ interface Storage {
   region?: string;
   bucket?: string;
   base?: string;
+  physicalFingerprint?: string;
   blockRegion?: string;
   blockSize?: number;
   directAccess?: boolean;
@@ -1130,6 +1171,32 @@ Request body:
 
 ```typescript
 client.storages.testStorageBucket(storageId: number, signal?: AbortSignal): Promise<{ bucketExists: boolean; list: boolean; write: boolean; read: boolean; delete: boolean; multipart: boolean }>;
+```
+
+#### `listCompatible` - GET /api/v1/storages/:storageId/compatible
+
+```typescript
+client.storages.listCompatible(storageId: number, signal?: AbortSignal): Promise<{ storages: CompatibleStorage[] }>;
+```
+
+#### `moveVolumes` - POST /api/v1/storages/:storageId/move-volumes
+
+```typescript
+client.storages.moveVolumes(storageId: number, req: MoveStorageVolumesRequest, signal?: AbortSignal): Promise<{ moved: string[]; failures: MoveVolumeFailure[] }>;
+```
+
+Request body:
+
+```typescript
+{
+  volumeIds: string[];
+}
+```
+
+#### `backfillFingerprints` - POST /api/v1/storages/backfill-fingerprints
+
+```typescript
+client.storages.backfillFingerprints(signal?: AbortSignal): Promise<{ scanned: number; updated: number; failures: BackfillFailure[]; hasMore: boolean }>;
 ```
 
 ### Volumes

@@ -397,6 +397,23 @@ Response data: `{ "bucketExists": bool, "list": bool, "write": bool, "read": boo
 Param: `storageId`
 Response data: `{ "bucketExists": bool, "list": bool, "write": bool, "read": bool, "delete": bool, "multipart": bool }`
 
+### GET /api/v1/storages/:storageId/compatible
+Param: `storageId`
+Response data: `{ "storages": CompatibleStorage[] }`
+
+### POST /api/v1/storages/:storageId/move-volumes
+Param: `storageId`
+Request:
+```
+{
+  "volumeIds": string[](required)
+}
+```
+Response data: `{ "moved": string[], "failures": MoveVolumeFailure[] }`
+
+### POST /api/v1/storages/backfill-fingerprints
+Response data: `{ "scanned": int32, "updated": int32, "failures": BackfillFailure[], "hasMore": bool }`
+
 ### Storage Type
 ```
 {
@@ -412,6 +429,7 @@ Response data: `{ "bucketExists": bool, "list": bool, "write": bool, "read": boo
   "region"?: string,
   "bucket"?: string,
   "base"?: string,
+  "physicalFingerprint"?: string,
   "blockRegion"?: string,
   "blockSize"?: int32,
   "directAccess"?: bool,
@@ -1007,6 +1025,14 @@ Param: `alertId`
 }
 ```
 
+### BackfillFailure Type
+```
+{
+  "shardId": int64,
+  "error": string
+}
+```
+
 ### BlockMember Type
 ```
 {
@@ -1028,6 +1054,26 @@ Param: `alertId`
   "isActive": bool,
   "createdAt": RFC3339,
   "updatedAt": RFC3339
+}
+```
+
+### CompatibleStorage Type
+```
+{
+  "id": int64,
+  "uuid": string,
+  "name": string,
+  "storageType": string,
+  "providerType": string,
+  "volumes": CompatibleVolume[]
+}
+```
+
+### CompatibleVolume Type
+```
+{
+  "id": string,
+  "name": string
 }
 ```
 
@@ -1150,6 +1196,14 @@ Param: `alertId`
 ```
 {
   "terms": string
+}
+```
+
+### MoveVolumeFailure Type
+```
+{
+  "volumeId": string,
+  "error": string
 }
 ```
 

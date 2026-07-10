@@ -176,6 +176,8 @@ pub struct Storage {
     pub bucket: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub base: Option<String>,
+    #[serde(rename = "physicalFingerprint", skip_serializing_if = "Option::is_none")]
+    pub physical_fingerprint: Option<String>,
     #[serde(rename = "blockRegion", skip_serializing_if = "Option::is_none")]
     pub block_region: Option<String>,
     #[serde(rename = "blockSize", skip_serializing_if = "Option::is_none")]
@@ -607,11 +609,36 @@ pub struct RegionAlert {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BackfillFailure {
+    #[serde(rename = "shardId")]
+    pub shard_id: i64,
+    pub error: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BlockMember {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[serde(rename = "regionClusterId")]
     pub region_cluster_id: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CompatibleStorage {
+    pub id: i64,
+    pub uuid: String,
+    pub name: String,
+    #[serde(rename = "storageType")]
+    pub storage_type: String,
+    #[serde(rename = "providerType")]
+    pub provider_type: String,
+    pub volumes: Vec<CompatibleVolume>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CompatibleVolume {
+    pub id: String,
+    pub name: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -666,6 +693,13 @@ pub struct LicenseRecord {
     pub max_storage_bytes: i64,
     #[serde(rename = "insertedAt")]
     pub inserted_at: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MoveVolumeFailure {
+    #[serde(rename = "volumeId")]
+    pub volume_id: String,
+    pub error: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -1012,6 +1046,32 @@ pub struct TestStorageBucketStorageResponse {
     pub read: bool,
     pub delete: bool,
     pub multipart: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ListCompatibleStorageResponse {
+    pub storages: Vec<CompatibleStorage>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct MoveStorageVolumesRequest {
+    #[serde(rename = "volumeIds")]
+    pub volume_ids: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MoveVolumesStorageResponse {
+    pub moved: Vec<String>,
+    pub failures: Vec<MoveVolumeFailure>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BackfillFingerprintsStorageResponse {
+    pub scanned: i32,
+    pub updated: i32,
+    pub failures: Vec<BackfillFailure>,
+    #[serde(rename = "hasMore")]
+    pub has_more: bool,
 }
 
 #[derive(Debug, Clone, Default)]

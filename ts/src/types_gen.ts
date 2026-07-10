@@ -106,6 +106,7 @@ export interface Storage {
   region?: string
   bucket?: string
   base?: string
+  physicalFingerprint?: string
   blockRegion?: string
   blockSize?: number
   directAccess?: boolean
@@ -375,9 +376,28 @@ export interface RegionAlert {
   createdAt?: string
 }
 
+export interface BackfillFailure {
+  shardId: number
+  error: string
+}
+
 export interface BlockMember {
   name?: string
   regionClusterId: number
+}
+
+export interface CompatibleStorage {
+  id: number
+  uuid: string
+  name: string
+  storageType: string
+  providerType: string
+  volumes: CompatibleVolume[]
+}
+
+export interface CompatibleVolume {
+  id: string
+  name: string
 }
 
 export interface DashboardUser {
@@ -414,6 +434,11 @@ export interface LicenseRecord {
   expiresAt: string
   maxStorageBytes: number
   insertedAt: string
+}
+
+export interface MoveVolumeFailure {
+  volumeId: string
+  error: string
 }
 
 export interface NodeStatsSample {
@@ -616,6 +641,10 @@ export interface TestStorageBucketRequest {
   accessKey: string
   secretKey: string
   providerType?: string
+}
+
+export interface MoveStorageVolumesRequest {
+  volumeIds: string[]
 }
 
 export interface StorageListOptions extends ListOptions {

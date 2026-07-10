@@ -164,6 +164,15 @@ type AuditLog struct {
 }
 ```
 
+### `BackfillFailure`
+
+```go
+type BackfillFailure struct {
+    ShardID                  int64                    `json:"shardId"`
+    Error                    string                   `json:"error"`
+}
+```
+
 ### `BlockMember`
 
 ```go
@@ -217,6 +226,28 @@ type ClientSession struct {
     ConnectedAt              int64                    `json:"connectedAt,omitempty"`
     DisconnectedAt           int64                    `json:"disconnectedAt,omitempty"`
     IsActive                 bool                     `json:"isActive"`
+}
+```
+
+### `CompatibleStorage`
+
+```go
+type CompatibleStorage struct {
+    ID                       int64                    `json:"id"`
+    UUID                     string                   `json:"uuid"`
+    Name                     string                   `json:"name"`
+    StorageType              string                   `json:"storageType"`
+    ProviderType             string                   `json:"providerType"`
+    Volumes                  []CompatibleVolume       `json:"volumes"`
+}
+```
+
+### `CompatibleVolume`
+
+```go
+type CompatibleVolume struct {
+    ID                       string                   `json:"id"`
+    Name                     string                   `json:"name"`
 }
 ```
 
@@ -428,6 +459,15 @@ type LicenseTerms struct {
 }
 ```
 
+### `MoveVolumeFailure`
+
+```go
+type MoveVolumeFailure struct {
+    VolumeID                 string                   `json:"volumeId"`
+    Error                    string                   `json:"error"`
+}
+```
+
 ### `NodeStatsSample`
 
 ```go
@@ -610,6 +650,7 @@ type Storage struct {
     Region                   string                   `json:"region,omitempty"`
     Bucket                   string                   `json:"bucket,omitempty"`
     Base                     string                   `json:"base,omitempty"`
+    PhysicalFingerprint      string                   `json:"physicalFingerprint,omitempty"`
     BlockRegion              string                   `json:"blockRegion,omitempty"`
     BlockSize                int32                    `json:"blockSize,omitempty"`
     DirectAccess             bool                     `json:"directAccess,omitempty"`
@@ -1218,6 +1259,60 @@ type TestStorageBucketStorageResponse struct {
     Read                     bool                     `json:"read"`
     Delete                   bool                     `json:"delete"`
     Multipart                bool                     `json:"multipart"`
+}
+```
+
+#### `ListCompatible` - GET /api/v1/storages/:storageId/compatible
+
+```go
+func (s *StoragesService) ListCompatible(ctx context.Context, storageID int64) (*ListCompatibleStorageResponse, error)
+```
+
+Response body:
+
+```go
+type ListCompatibleStorageResponse struct {
+    Storages                 []CompatibleStorage      `json:"storages"`
+}
+```
+
+#### `MoveVolumes` - POST /api/v1/storages/:storageId/move-volumes
+
+```go
+func (s *StoragesService) MoveVolumes(ctx context.Context, storageID int64, req *MoveStorageVolumesRequest) (*MoveVolumesStorageResponse, error)
+```
+
+Request body:
+
+```go
+type MoveStorageVolumesRequest struct {
+    VolumeIds                []string                 `json:"volumeIds"`
+}
+```
+
+Response body:
+
+```go
+type MoveVolumesStorageResponse struct {
+    Moved                    []string                 `json:"moved"`
+    Failures                 []MoveVolumeFailure      `json:"failures"`
+}
+```
+
+#### `BackfillFingerprints` - POST /api/v1/storages/backfill-fingerprints
+
+```go
+func (s *StoragesService) BackfillFingerprints(ctx context.Context) (*BackfillFingerprintsStorageResponse, error)
+```
+
+Response body:
+
+```go
+type BackfillFingerprintsStorageResponse struct {
+    Scanned                  int32                    `json:"scanned"`
+    Updated                  int32                    `json:"updated"`
+    Failures                 []BackfillFailure        `json:"failures"`
+    HasMore                  bool                     `json:"hasMore"`
 }
 ```
 

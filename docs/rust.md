@@ -159,6 +159,15 @@ pub struct AuditLog {
 }
 ```
 
+### `BackfillFailure`
+
+```rust
+pub struct BackfillFailure {
+    pub shard_id: i64,
+    pub error: String,
+}
+```
+
 ### `BlockMember`
 
 ```rust
@@ -212,6 +221,28 @@ pub struct ClientSession {
     pub connected_at: Option<i64>,
     pub disconnected_at: Option<i64>,
     pub is_active: bool,
+}
+```
+
+### `CompatibleStorage`
+
+```rust
+pub struct CompatibleStorage {
+    pub id: i64,
+    pub uuid: String,
+    pub name: String,
+    pub storage_type: String,
+    pub provider_type: String,
+    pub volumes: Vec<CompatibleVolume>,
+}
+```
+
+### `CompatibleVolume`
+
+```rust
+pub struct CompatibleVolume {
+    pub id: String,
+    pub name: String,
 }
 ```
 
@@ -423,6 +454,15 @@ pub struct LicenseTerms {
 }
 ```
 
+### `MoveVolumeFailure`
+
+```rust
+pub struct MoveVolumeFailure {
+    pub volume_id: String,
+    pub error: String,
+}
+```
+
 ### `NodeStatsSample`
 
 ```rust
@@ -605,6 +645,7 @@ pub struct Storage {
     pub region: Option<String>,
     pub bucket: Option<String>,
     pub base: Option<String>,
+    pub physical_fingerprint: Option<String>,
     pub block_region: Option<String>,
     pub block_size: Option<i32>,
     pub direct_access: Option<bool>,
@@ -1213,6 +1254,60 @@ pub struct TestStorageBucketStorageResponse {
     pub read: bool,
     pub delete: bool,
     pub multipart: bool,
+}
+```
+
+#### `list_compatible` - GET /api/v1/storages/:storageId/compatible
+
+```rust
+pub async fn list_compatible(&self, storage_id: i64) -> Result<ListCompatibleStorageResponse, Error>
+```
+
+Response body:
+
+```rust
+pub struct ListCompatibleStorageResponse {
+    pub storages: Vec<CompatibleStorage>,
+}
+```
+
+#### `move_volumes` - POST /api/v1/storages/:storageId/move-volumes
+
+```rust
+pub async fn move_volumes(&self, storage_id: i64, req: &MoveStorageVolumesRequest) -> Result<MoveVolumesStorageResponse, Error>
+```
+
+Request body:
+
+```rust
+pub struct MoveStorageVolumesRequest {
+    pub volume_ids: Vec<String>,
+}
+```
+
+Response body:
+
+```rust
+pub struct MoveVolumesStorageResponse {
+    pub moved: Vec<String>,
+    pub failures: Vec<MoveVolumeFailure>,
+}
+```
+
+#### `backfill_fingerprints` - POST /api/v1/storages/backfill-fingerprints
+
+```rust
+pub async fn backfill_fingerprints(&self) -> Result<BackfillFingerprintsStorageResponse, Error>
+```
+
+Response body:
+
+```rust
+pub struct BackfillFingerprintsStorageResponse {
+    pub scanned: i32,
+    pub updated: i32,
+    pub failures: Vec<BackfillFailure>,
+    pub has_more: bool,
 }
 ```
 

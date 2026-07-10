@@ -122,24 +122,25 @@ type RegionCluster struct {
 }
 
 type Storage struct {
-	ID           int64  `json:"id"`
-	UUID         string `json:"uuid"`
-	Account      Ref    `json:"account"`
-	RegionInfo   Ref    `json:"regionInfo"`
-	Name         string `json:"name"`
-	Description  string `json:"description,omitempty"`
-	StorageType  string `json:"storageType"`
-	ProviderType string `json:"providerType"`
-	Endpoint     string `json:"endpoint"`
-	Region       string `json:"region,omitempty"`
-	Bucket       string `json:"bucket,omitempty"`
-	Base         string `json:"base,omitempty"`
-	BlockRegion  string `json:"blockRegion,omitempty"`
-	BlockSize    int32  `json:"blockSize,omitempty"`
-	DirectAccess bool   `json:"directAccess,omitempty"`
-	IsActive     bool   `json:"isActive"`
-	CreatedAt    string `json:"createdAt"`
-	UpdatedAt    string `json:"updatedAt"`
+	ID                  int64  `json:"id"`
+	UUID                string `json:"uuid"`
+	Account             Ref    `json:"account"`
+	RegionInfo          Ref    `json:"regionInfo"`
+	Name                string `json:"name"`
+	Description         string `json:"description,omitempty"`
+	StorageType         string `json:"storageType"`
+	ProviderType        string `json:"providerType"`
+	Endpoint            string `json:"endpoint"`
+	Region              string `json:"region,omitempty"`
+	Bucket              string `json:"bucket,omitempty"`
+	Base                string `json:"base,omitempty"`
+	PhysicalFingerprint string `json:"physicalFingerprint,omitempty"`
+	BlockRegion         string `json:"blockRegion,omitempty"`
+	BlockSize           int32  `json:"blockSize,omitempty"`
+	DirectAccess        bool   `json:"directAccess,omitempty"`
+	IsActive            bool   `json:"isActive"`
+	CreatedAt           string `json:"createdAt"`
+	UpdatedAt           string `json:"updatedAt"`
 }
 
 type BlockVolume struct {
@@ -403,9 +404,28 @@ type RegionAlert struct {
 	CreatedAt       string `json:"createdAt,omitempty"`
 }
 
+type BackfillFailure struct {
+	ShardID int64  `json:"shardId"`
+	Error   string `json:"error"`
+}
+
 type BlockMember struct {
 	Name            string `json:"name,omitempty"`
 	RegionClusterID int64  `json:"regionClusterId"`
+}
+
+type CompatibleStorage struct {
+	ID           int64              `json:"id"`
+	UUID         string             `json:"uuid"`
+	Name         string             `json:"name"`
+	StorageType  string             `json:"storageType"`
+	ProviderType string             `json:"providerType"`
+	Volumes      []CompatibleVolume `json:"volumes"`
+}
+
+type CompatibleVolume struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
 type DashboardUser struct {
@@ -442,6 +462,11 @@ type LicenseRecord struct {
 	ExpiresAt       string        `json:"expiresAt"`
 	MaxStorageBytes int64         `json:"maxStorageBytes"`
 	InsertedAt      string        `json:"insertedAt"`
+}
+
+type MoveVolumeFailure struct {
+	VolumeID string `json:"volumeId"`
+	Error    string `json:"error"`
 }
 
 type NodeStatsSample struct {
@@ -686,6 +711,26 @@ type TestStorageBucketStorageResponse struct {
 	Read         bool `json:"read"`
 	Delete       bool `json:"delete"`
 	Multipart    bool `json:"multipart"`
+}
+
+type ListCompatibleStorageResponse struct {
+	Storages []CompatibleStorage `json:"storages"`
+}
+
+type MoveStorageVolumesRequest struct {
+	VolumeIds []string `json:"volumeIds"`
+}
+
+type MoveVolumesStorageResponse struct {
+	Moved    []string            `json:"moved"`
+	Failures []MoveVolumeFailure `json:"failures"`
+}
+
+type BackfillFingerprintsStorageResponse struct {
+	Scanned  int32             `json:"scanned"`
+	Updated  int32             `json:"updated"`
+	Failures []BackfillFailure `json:"failures"`
+	HasMore  bool              `json:"hasMore"`
 }
 
 type StorageListOptions struct {

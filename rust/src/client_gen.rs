@@ -330,6 +330,18 @@ impl StoragesService {
     pub async fn test_storage_bucket(&self, storage_id: i64) -> Result<TestStorageBucketStorageResponse, Error> {
         self.inner.post_empty(&format!("/api/v1/storages/{}/test-bucket", storage_id)).await
     }
+
+    pub async fn list_compatible(&self, storage_id: i64) -> Result<ListCompatibleStorageResponse, Error> {
+        self.inner.get(&format!("/api/v1/storages/{}/compatible", storage_id), &[]).await
+    }
+
+    pub async fn move_volumes(&self, storage_id: i64, req: &MoveStorageVolumesRequest) -> Result<MoveVolumesStorageResponse, Error> {
+        self.inner.post(&format!("/api/v1/storages/{}/move-volumes", storage_id), req).await
+    }
+
+    pub async fn backfill_fingerprints(&self) -> Result<BackfillFingerprintsStorageResponse, Error> {
+        self.inner.post_empty("/api/v1/storages/backfill-fingerprints").await
+    }
 }
 
 /// Operations on the `Volumes` resource.
