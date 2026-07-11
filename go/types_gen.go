@@ -268,6 +268,8 @@ type ServiceNode struct {
 	AdvertiseAddr   string         `json:"advertiseAddr"`
 	RpcAddr         string         `json:"rpcAddr,omitempty"`
 	Metadata        map[string]any `json:"metadata,omitempty"`
+	InstanceID      string         `json:"instanceId,omitempty"`
+	InstanceInfo    map[string]any `json:"instanceInfo,omitempty"`
 	Status          string         `json:"status"`
 	LastHeartbeat   int64          `json:"lastHeartbeat,omitempty"`
 	IsActive        bool           `json:"isActive"`

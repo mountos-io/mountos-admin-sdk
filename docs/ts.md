@@ -556,6 +556,8 @@ interface ServiceNode {
   advertiseAddr: string;
   rpcAddr?: string;
   metadata?: Record<string, unknown>;
+  instanceId?: string;
+  instanceInfo?: Record<string, unknown>;
   status: string;
   lastHeartbeat?: number;
   isActive: boolean;

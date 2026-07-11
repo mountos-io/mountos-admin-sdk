@@ -588,6 +588,8 @@ pub struct ServiceNode {
     pub advertise_addr: String,
     pub rpc_addr: Option<String>,
     pub metadata: Option<serde_json::Value>,
+    pub instance_id: Option<String>,
+    pub instance_info: Option<serde_json::Value>,
     pub status: String,
     pub last_heartbeat: Option<i64>,
     pub is_active: bool,

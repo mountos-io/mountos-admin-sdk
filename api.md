@@ -809,6 +809,8 @@ Response data: `{ "intervalMs": int64, "samples": NodeStatsSample[] }`
   "advertiseAddr": string,
   "rpcAddr"?: string,
   "metadata"?: object,
+  "instanceId"?: string,
+  "instanceInfo"?: object,
   "status": string,
   "lastHeartbeat"?: int64,
   "isActive": bool,

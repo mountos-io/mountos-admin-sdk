@@ -388,6 +388,10 @@ pub struct ServiceNode {
     pub rpc_addr: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<serde_json::Value>,
+    #[serde(rename = "instanceId", skip_serializing_if = "Option::is_none")]
+    pub instance_id: Option<String>,
+    #[serde(rename = "instanceInfo", skip_serializing_if = "Option::is_none")]
+    pub instance_info: Option<serde_json::Value>,
     pub status: String,
     #[serde(rename = "lastHeartbeat", skip_serializing_if = "Option::is_none")]
     pub last_heartbeat: Option<i64>,
