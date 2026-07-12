@@ -815,7 +815,8 @@ Response data: `{ "intervalMs": int64, "samples": NodeStatsSample[] }`
   "lastHeartbeat"?: int64,
   "isActive": bool,
   "memUsage"?: float,
-  "sysLoad"?: int
+  "sysLoad"?: int,
+  "binaryVersion"?: int32
 }
 ```
 

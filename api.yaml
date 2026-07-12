@@ -385,6 +385,7 @@ types:
     - "isActive: bool"
     - "memUsage: float?"
     - "sysLoad: int?"
+    - "binaryVersion: int32?"
 
   NodeStatsSample:
     - "timestampMs: int64"

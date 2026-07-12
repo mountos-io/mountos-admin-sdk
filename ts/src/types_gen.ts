@@ -247,6 +247,7 @@ export interface ServiceNode {
   isActive: boolean
   memUsage?: number
   sysLoad?: number
+  binaryVersion?: number
 }
 
 export interface ClientSession {

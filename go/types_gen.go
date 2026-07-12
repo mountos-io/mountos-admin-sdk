@@ -275,6 +275,7 @@ type ServiceNode struct {
 	IsActive        bool           `json:"isActive"`
 	MemUsage        float64        `json:"memUsage,omitempty"`
 	SysLoad         int            `json:"sysLoad,omitempty"`
+	BinaryVersion   int32          `json:"binaryVersion,omitempty"`
 }
 
 type ClientSession struct {

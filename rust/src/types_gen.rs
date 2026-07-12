@@ -401,6 +401,8 @@ pub struct ServiceNode {
     pub mem_usage: Option<f64>,
     #[serde(rename = "sysLoad", skip_serializing_if = "Option::is_none")]
     pub sys_load: Option<i64>,
+    #[serde(rename = "binaryVersion", skip_serializing_if = "Option::is_none")]
+    pub binary_version: Option<i32>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

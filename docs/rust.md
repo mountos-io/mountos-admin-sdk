@@ -595,6 +595,7 @@ pub struct ServiceNode {
     pub is_active: bool,
     pub mem_usage: Option<f64>,
     pub sys_load: Option<i64>,
+    pub binary_version: Option<i32>,
 }
 ```
 
