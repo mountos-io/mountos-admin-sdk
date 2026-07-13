@@ -28,6 +28,7 @@ pub struct Client {
     pub license: LicenseService,
     pub alerts: AlertsService,
     pub region_alerts: RegionAlertsService,
+    pub gc_worker_events: GCWorkerEventsService,
     pub vault: VaultService,
 }
 
@@ -56,6 +57,7 @@ impl Client {
             license: LicenseService { inner: Arc::clone(&inner) },
             alerts: AlertsService { inner: Arc::clone(&inner) },
             region_alerts: RegionAlertsService { inner: Arc::clone(&inner) },
+            gc_worker_events: GCWorkerEventsService { inner: Arc::clone(&inner) },
             vault: VaultService { inner: Arc::clone(&inner) },
         })
     }
@@ -908,6 +910,41 @@ impl RegionAlertsService {
 
     pub async fn resolve(&self, region_id: i64, alert_id: &str) -> Result<(), Error> {
         self.inner.post_empty::<serde_json::Value>(&format!("/api/v1/regions/{}/alerts/{}/resolve", region_id, alert_id)).await.map(|_| ())
+    }
+}
+
+/// Operations on the `GCWorkerEvents` resource.
+pub struct GCWorkerEventsService {
+    inner: Arc<ClientInner>,
+}
+
+impl GCWorkerEventsService {
+    pub async fn list(&self, region_id: i64, opts: Option<&GCWorkerEventListOptions>) -> Result<PaginatedResponse<GCWorkerEvent>, Error> {
+        let mut query: Vec<(&str, String)> = Vec::new();
+        if let Some(opts) = opts {
+            if let Some(v) = &opts.node_id {
+                query.push(("nodeId", v.to_string()));
+            }
+            if let Some(v) = &opts.goal {
+                query.push(("goal", v.to_string()));
+            }
+            if let Some(v) = &opts.sid {
+                query.push(("sid", v.to_string()));
+            }
+            if let Some(v) = &opts.region_cluster_id {
+                query.push(("regionClusterId", v.to_string()));
+            }
+            if let Some(v) = &opts.since {
+                query.push(("since", v.to_string()));
+            }
+            if let Some(v) = &opts.page {
+                query.push(("page", v.to_string()));
+            }
+            if let Some(v) = &opts.limit {
+                query.push(("limit", v.to_string()));
+            }
+        }
+        self.inner.get(&format!("/api/v1/regions/{}/gc-worker-events/list", region_id), &query).await
     }
 }
 

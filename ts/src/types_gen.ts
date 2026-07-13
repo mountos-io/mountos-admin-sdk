@@ -325,6 +325,9 @@ export interface LicenseDetails {
   expiredAccessEndsAt: string
   expiredAccessDaysLeft: number
   quota: LicenseQuota
+  distribution?: string
+  distributionRef?: string[]
+  unlimitedStorage?: boolean
 }
 
 export interface LicenseTerms {
@@ -376,6 +379,19 @@ export interface RegionAlert {
   description?: string
   eventTime: string
   resolvedAt?: string
+  createdAt?: string
+}
+
+export interface GCWorkerEvent {
+  id: number
+  nodeId: string
+  regionClusterId?: number
+  goal: string
+  sid?: number
+  subject?: string
+  ops: Record<string, unknown>
+  durationMs: number
+  eventTime: string
   createdAt?: string
 }
 
@@ -846,6 +862,16 @@ export interface RegionAlertListOptions extends ListOptions {
   severity?: number
   category?: string
   nodeId?: string
+  regionClusterId?: number
+  since?: string
+}
+
+// GCWorkerEvents
+
+export interface GCWorkerEventListOptions extends ListOptions {
+  nodeId?: string
+  goal?: string
+  sid?: number
   regionClusterId?: number
   since?: string
 }

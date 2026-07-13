@@ -536,6 +536,12 @@ pub struct LicenseDetails {
     #[serde(rename = "expiredAccessDaysLeft")]
     pub expired_access_days_left: i64,
     pub quota: LicenseQuota,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub distribution: Option<String>,
+    #[serde(rename = "distributionRef", skip_serializing_if = "Option::is_none")]
+    pub distribution_ref: Option<Vec<String>>,
+    #[serde(rename = "unlimitedStorage", skip_serializing_if = "Option::is_none")]
+    pub unlimited_storage: Option<bool>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -610,6 +616,27 @@ pub struct RegionAlert {
     pub event_time: String,
     #[serde(rename = "resolvedAt", skip_serializing_if = "Option::is_none")]
     pub resolved_at: Option<String>,
+    #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GCWorkerEvent {
+    pub id: i64,
+    #[serde(rename = "nodeId")]
+    pub node_id: String,
+    #[serde(rename = "regionClusterId", skip_serializing_if = "Option::is_none")]
+    pub region_cluster_id: Option<i64>,
+    pub goal: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sid: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub subject: Option<String>,
+    pub ops: serde_json::Value,
+    #[serde(rename = "durationMs")]
+    pub duration_ms: i64,
+    #[serde(rename = "eventTime")]
+    pub event_time: String,
     #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
     pub created_at: Option<String>,
 }
@@ -1418,6 +1445,19 @@ pub struct RegionAlertListOptions {
     pub severity: Option<i64>,
     pub category: Option<String>,
     pub node_id: Option<String>,
+    pub region_cluster_id: Option<i64>,
+    pub since: Option<String>,
+    pub page: Option<i64>,
+    pub limit: Option<i64>,
+}
+
+// GCWorkerEvents
+
+#[derive(Debug, Clone, Default)]
+pub struct GCWorkerEventListOptions {
+    pub node_id: Option<String>,
+    pub goal: Option<String>,
+    pub sid: Option<i64>,
     pub region_cluster_id: Option<i64>,
     pub since: Option<String>,
     pub page: Option<i64>,

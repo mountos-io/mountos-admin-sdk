@@ -934,7 +934,10 @@ Response data: `LicenseList`
   "graceDaysLeft": int,
   "expiredAccessEndsAt": string,
   "expiredAccessDaysLeft": int,
-  "quota": LicenseQuota
+  "quota": LicenseQuota,
+  "distribution"?: string,
+  "distributionRef"?: string[],
+  "unlimitedStorage"?: bool
 }
 ```
 
@@ -1003,6 +1006,31 @@ Param: `alertId`
   "description"?: string,
   "eventTime": RFC3339,
   "resolvedAt"?: RFC3339,
+  "createdAt"?: RFC3339
+}
+```
+
+---
+
+## GCWorkerEvents
+
+### GET /api/v1/regions/:regionId/gc-worker-events/list
+Param: `regionId`
+Query: `nodeId=string`, `goal=string`, `sid=int64`, `regionClusterId=int64`, `since=string`, `page=int(default 1)`, `limit=int(default 20)`
+Response data: `{ "items": GCWorkerEvent[], "pagination": PaginationMeta }`
+
+### GCWorkerEvent Type
+```
+{
+  "id": int64,
+  "nodeId": string,
+  "regionClusterId"?: int64,
+  "goal": string,
+  "sid"?: int64,
+  "subject"?: string,
+  "ops": object,
+  "durationMs": int64,
+  "eventTime": RFC3339,
   "createdAt"?: RFC3339
 }
 ```

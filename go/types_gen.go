@@ -353,6 +353,9 @@ type LicenseDetails struct {
 	ExpiredAccessEndsAt   string        `json:"expiredAccessEndsAt"`
 	ExpiredAccessDaysLeft int           `json:"expiredAccessDaysLeft"`
 	Quota                 LicenseQuota  `json:"quota"`
+	Distribution          string        `json:"distribution,omitempty"`
+	DistributionRef       []string      `json:"distributionRef,omitempty"`
+	UnlimitedStorage      bool          `json:"unlimitedStorage,omitempty"`
 }
 
 type LicenseTerms struct {
@@ -405,6 +408,19 @@ type RegionAlert struct {
 	EventTime       string `json:"eventTime"`
 	ResolvedAt      string `json:"resolvedAt,omitempty"`
 	CreatedAt       string `json:"createdAt,omitempty"`
+}
+
+type GCWorkerEvent struct {
+	ID              int64          `json:"id"`
+	NodeID          string         `json:"nodeId"`
+	RegionClusterID int64          `json:"regionClusterId,omitempty"`
+	Goal            string         `json:"goal"`
+	Sid             int64          `json:"sid,omitempty"`
+	Subject         string         `json:"subject,omitempty"`
+	Ops             map[string]any `json:"ops"`
+	DurationMs      int64          `json:"durationMs"`
+	EventTime       string         `json:"eventTime"`
+	CreatedAt       string         `json:"createdAt,omitempty"`
 }
 
 type BackfillFailure struct {
@@ -989,6 +1005,18 @@ type RegionAlertListOptions struct {
 	Severity        *int
 	Category        string
 	NodeID          string
+	RegionClusterID *int64
+	Since           string
+	Page            int
+	Limit           int
+}
+
+// GCWorkerEvents
+
+type GCWorkerEventListOptions struct {
+	NodeID          string
+	Goal            string
+	Sid             *int64
 	RegionClusterID *int64
 	Since           string
 	Page            int

@@ -375,6 +375,23 @@ pub struct ForkTreeMatch {
 }
 ```
 
+### `GCWorkerEvent`
+
+```rust
+pub struct GCWorkerEvent {
+    pub id: i64,
+    pub node_id: String,
+    pub region_cluster_id: Option<i64>,
+    pub goal: String,
+    pub sid: Option<i64>,
+    pub subject: Option<String>,
+    pub ops: serde_json::Value,
+    pub duration_ms: i64,
+    pub event_time: String,
+    pub created_at: Option<String>,
+}
+```
+
 ### `LicenseDetails`
 
 ```rust
@@ -400,6 +417,9 @@ pub struct LicenseDetails {
     pub expired_access_ends_at: String,
     pub expired_access_days_left: i64,
     pub quota: LicenseQuota,
+    pub distribution: Option<String>,
+    pub distribution_ref: Option<Vec<String>>,
+    pub unlimited_storage: Option<bool>,
 }
 ```
 
@@ -1993,6 +2013,30 @@ pub async fn count(&self, region_id: i64, region_cluster_id: Option<i64>) -> Res
 
 ```rust
 pub async fn resolve(&self, region_id: i64, alert_id: &str) -> Result<(), Error>
+```
+
+### GCWorkerEvents
+
+Accessor: `client.gc_worker_events`
+
+#### `list` - GET /api/v1/regions/:regionId/gc-worker-events/list
+
+```rust
+pub async fn list(&self, region_id: i64, opts: Option<&GCWorkerEventListOptions>) -> Result<PaginatedResponse<GCWorkerEvent>, Error>
+```
+
+Query params:
+
+```rust
+pub struct GCWorkerEventListOptions {
+    pub node_id: Option<String>,
+    pub goal: Option<String>,
+    pub sid: Option<i64>,
+    pub region_cluster_id: Option<i64>,
+    pub since: Option<String>,
+    pub page: Option<i64>,
+    pub limit: Option<i64>,
+}
 ```
 
 ### Vault

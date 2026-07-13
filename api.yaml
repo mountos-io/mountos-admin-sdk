@@ -369,6 +369,18 @@ types:
     - "warningCount: int64"
     - "criticalCount: int64"
 
+  GCWorkerEvent:
+    - "id: int64"
+    - "nodeId: string"
+    - "regionClusterId: int64?"
+    - "goal: string"
+    - "sid: int64?"
+    - "subject: string?"
+    - "ops: object"
+    - "durationMs: int64"
+    - "eventTime: datetime"
+    - "createdAt: datetime?"
+
   ServiceNode:
     - "id: int64"
     - "regionId: int64"
@@ -523,6 +535,9 @@ types:
     - "expiredAccessEndsAt: string"
     - "expiredAccessDaysLeft: int"
     - "quota: LicenseQuota"
+    - "distribution: string?"
+    - "distributionRef: string[]?"
+    - "unlimitedStorage: bool?"
 
   LicenseTerms:
     - "terms: string"
@@ -1453,6 +1468,25 @@ resources:
       - action: resolve
         method: POST
         path: /:alertId/resolve
+
+  - name: GCWorkerEvents
+    path: /regions/:regionId/gc-worker-events
+    pathParamTypes:
+      regionId: int64
+    endpoints:
+      - action: list
+        method: GET
+        path: /list
+        pagination: page
+        query:
+          - "nodeId: string"
+          - "goal: string"
+          - "sid: int64"
+          - "regionClusterId: int64"
+          - "since: string"
+          - "page: int=1"
+          - "limit: int=20"
+        responseType: GCWorkerEvent
 
   - name: Vault
     path: /vault

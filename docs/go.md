@@ -380,6 +380,23 @@ type ForkTreeMatch struct {
 }
 ```
 
+### `GCWorkerEvent`
+
+```go
+type GCWorkerEvent struct {
+    ID                       int64                    `json:"id"`
+    NodeID                   string                   `json:"nodeId"`
+    RegionClusterID          int64                    `json:"regionClusterId,omitempty"`
+    Goal                     string                   `json:"goal"`
+    Sid                      int64                    `json:"sid,omitempty"`
+    Subject                  string                   `json:"subject,omitempty"`
+    Ops                      map[string]any           `json:"ops"`
+    DurationMs               int64                    `json:"durationMs"`
+    EventTime                string                   `json:"eventTime"`
+    CreatedAt                string                   `json:"createdAt,omitempty"`
+}
+```
+
 ### `LicenseDetails`
 
 ```go
@@ -405,6 +422,9 @@ type LicenseDetails struct {
     ExpiredAccessEndsAt      string                   `json:"expiredAccessEndsAt"`
     ExpiredAccessDaysLeft    int                      `json:"expiredAccessDaysLeft"`
     Quota                    LicenseQuota             `json:"quota"`
+    Distribution             string                   `json:"distribution,omitempty"`
+    DistributionRef          []string                 `json:"distributionRef,omitempty"`
+    UnlimitedStorage         bool                     `json:"unlimitedStorage,omitempty"`
 }
 ```
 
@@ -1998,6 +2018,30 @@ func (s *RegionAlertsService) Count(ctx context.Context, regionID int64, regionC
 
 ```go
 func (s *RegionAlertsService) Resolve(ctx context.Context, regionID int64, alertID string) error
+```
+
+### GCWorkerEvents
+
+Accessor: `client.GCWorkerEvents`
+
+#### `List` - GET /api/v1/regions/:regionId/gc-worker-events/list
+
+```go
+func (s *GCWorkerEventsService) List(ctx context.Context, regionID int64, opts *GCWorkerEventListOptions) (*PaginatedResponse[GCWorkerEvent], error)
+```
+
+Query params:
+
+```go
+type GCWorkerEventListOptions struct {
+    NodeID               string       `url:"nodeId"`
+    Goal                 string       `url:"goal"`
+    Sid                  *int64       `url:"sid"`
+    RegionClusterID      *int64       `url:"regionClusterId"`
+    Since                string       `url:"since"`
+    Page                 int          `url:"page"` // default: 1
+    Limit                int          `url:"limit"` // default: 20
+}
 ```
 
 ### Vault

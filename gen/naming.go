@@ -21,6 +21,7 @@ var abbreviations = map[string]string{
 	"jwt":  "JWT",
 	"tls":  "TLS",
 	"ssl":  "SSL",
+	"gc":   "GC",
 }
 
 // splitWords splits on camelCase boundaries, hyphens, underscores.

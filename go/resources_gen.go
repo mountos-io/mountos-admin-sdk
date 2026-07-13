@@ -1124,6 +1124,39 @@ func (s *RegionAlertsService) Resolve(ctx context.Context, regionID int64, alert
 	return err
 }
 
+type GCWorkerEventsService struct{ c *Client }
+
+func (s *GCWorkerEventsService) List(ctx context.Context, regionID int64, opts *GCWorkerEventListOptions) (*PaginatedResponse[GCWorkerEvent], error) {
+	q := url.Values{}
+	if opts != nil {
+		if opts.NodeID != "" {
+			q.Set("nodeId", opts.NodeID)
+		}
+		if opts.Goal != "" {
+			q.Set("goal", opts.Goal)
+		}
+		if opts.Sid != nil {
+			q.Set("sid", strconv.FormatInt(*opts.Sid, 10))
+		}
+		if opts.RegionClusterID != nil {
+			q.Set("regionClusterId", strconv.FormatInt(*opts.RegionClusterID, 10))
+		}
+		if opts.Since != "" {
+			q.Set("since", opts.Since)
+		}
+		addPagination(q, opts.Page, opts.Limit)
+	}
+	path := fmt.Sprintf("/api/v1/regions/%s/gc-worker-events/list", strconv.FormatInt(regionID, 10))
+	if qs := q.Encode(); qs != "" {
+		path += "?" + qs
+	}
+	data, err := s.c.get(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[PaginatedResponse[GCWorkerEvent]](data)
+}
+
 type VaultService struct{ c *Client }
 
 func (s *VaultService) Resync(ctx context.Context) error {

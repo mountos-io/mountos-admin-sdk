@@ -20,7 +20,8 @@ import type {
   RegionAuditLogListOptions, ServiceNode, NodeStatsSample, ClientSession, 
   ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, DashboardStats, 
   LicenseDetails, LicenseTerms, LoadLicenseRequest, LicenseLoadResult, LicenseList, 
-  ServiceAlert, AlertListOptions, AlertCountResponse, RegionAlert, RegionAlertListOptions,
+  ServiceAlert, AlertListOptions, AlertCountResponse, RegionAlert, RegionAlertListOptions, 
+  GCWorkerEvent, GCWorkerEventListOptions,
 } from './types_gen.js'
 
 export type RequestFn = <T>(method: string, path: string, body?: unknown, signal?: AbortSignal) => Promise<T>
@@ -54,6 +55,7 @@ export interface AdminClient {
   readonly license: LicenseResource
   readonly alerts: AlertsResource
   readonly regionAlerts: RegionAlertsResource
+  readonly gcWorkerEvents: GCWorkerEventsResource
   readonly vault: VaultResource
 }
 
@@ -79,6 +81,7 @@ export function createClient(request: RequestFn): AdminClient {
   let _license: LicenseResource | undefined
   let _alerts: AlertsResource | undefined
   let _regionAlerts: RegionAlertsResource | undefined
+  let _gcWorkerEvents: GCWorkerEventsResource | undefined
   let _vault: VaultResource | undefined
   return {
     get accounts() { return _accounts ??= new AccountsResource(client) },
@@ -101,6 +104,7 @@ export function createClient(request: RequestFn): AdminClient {
     get license() { return _license ??= new LicenseResource(client) },
     get alerts() { return _alerts ??= new AlertsResource(client) },
     get regionAlerts() { return _regionAlerts ??= new RegionAlertsResource(client) },
+    get gcWorkerEvents() { return _gcWorkerEvents ??= new GCWorkerEventsResource(client) },
     get vault() { return _vault ??= new VaultResource(client) },
   }
 }
@@ -554,6 +558,14 @@ export class RegionAlertsResource {
 
   resolve(regionId: number, alertId: string, signal?: AbortSignal): Promise<void> {
     return this.client.request('POST', `/api/v1/regions/${regionId}/alerts/${alertId}/resolve`, undefined, signal)
+  }
+}
+
+export class GCWorkerEventsResource {
+  constructor(private client: Client) {}
+
+  list(regionId: number, opts?: GCWorkerEventListOptions, signal?: AbortSignal): Promise<PaginatedResponse<GCWorkerEvent>> {
+    return this.client.request('GET', `/api/v1/regions/${regionId}/gc-worker-events/list` + queryString({ nodeId: opts?.nodeId, goal: opts?.goal, sid: opts?.sid, regionClusterId: opts?.regionClusterId, since: opts?.since, page: opts?.page, limit: opts?.limit }), undefined, signal)
   }
 }
 

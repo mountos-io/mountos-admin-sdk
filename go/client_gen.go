@@ -32,6 +32,7 @@ type Client struct {
 	License            *LicenseService
 	Alerts             *AlertsService
 	RegionAlerts       *RegionAlertsService
+	GCWorkerEvents     *GCWorkerEventsService
 	Vault              *VaultService
 }
 
@@ -69,6 +70,7 @@ func NewClient(cfg Config) (*Client, error) {
 	c.License = &LicenseService{c: c}
 	c.Alerts = &AlertsService{c: c}
 	c.RegionAlerts = &RegionAlertsService{c: c}
+	c.GCWorkerEvents = &GCWorkerEventsService{c: c}
 	c.Vault = &VaultService{c: c}
 	return c, nil
 }

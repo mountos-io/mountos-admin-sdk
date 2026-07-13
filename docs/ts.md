@@ -343,6 +343,23 @@ interface ForkTreeMatch {
 }
 ```
 
+### `GCWorkerEvent`
+
+```typescript
+interface GCWorkerEvent {
+  id: number;
+  nodeId: string;
+  regionClusterId?: number;
+  goal: string;
+  sid?: number;
+  subject?: string;
+  ops: Record<string, unknown>;
+  durationMs: number;
+  eventTime: string;
+  createdAt?: string;
+}
+```
+
 ### `LicenseDetails`
 
 ```typescript
@@ -368,6 +385,9 @@ interface LicenseDetails {
   expiredAccessEndsAt: string;
   expiredAccessDaysLeft: number;
   quota: LicenseQuota;
+  distribution?: string;
+  distributionRef?: string[];
+  unlimitedStorage?: boolean;
 }
 ```
 
@@ -1889,6 +1909,30 @@ Query params:
 
 ```typescript
 client.regionAlerts.resolve(regionId: number, alertId: string, signal?: AbortSignal): Promise<void>;
+```
+
+### GCWorkerEvents
+
+Accessor: `client.gcWorkerEvents`
+
+#### `list` - GET /api/v1/regions/:regionId/gc-worker-events/list
+
+```typescript
+client.gcWorkerEvents.list(regionId: number, opts?: GCWorkerEventListOptions, signal?: AbortSignal): Promise<PaginatedResponse<GCWorkerEvent>>;
+```
+
+Query params:
+
+```typescript
+{
+  nodeId?: string;
+  goal?: string;
+  sid?: number;
+  regionClusterId?: number;
+  since?: string;
+  page?: number;  // default: 1
+  limit?: number;  // default: 20
+}
 ```
 
 ### Vault
