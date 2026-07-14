@@ -407,6 +407,14 @@ type GCWorkerEventBucket struct {
 }
 ```
 
+### `GCWorkerEventGoalsResponse`
+
+```go
+type GCWorkerEventGoalsResponse struct {
+    Goals                    []string                 `json:"goals"`
+}
+```
+
 ### `GCWorkerEventHistogramResponse`
 
 ```go
@@ -2066,6 +2074,12 @@ type GCWorkerEventListOptions struct {
 
 ```go
 func (s *GCWorkerEventsService) Histogram(ctx context.Context, regionID int64, nodeID string, goal string, sid *int64, regionClusterID *int64, since string, bucketSeconds *int64) (*GCWorkerEventHistogramResponse, error)
+```
+
+#### `Goals` - GET /api/v1/regions/:regionId/gc-worker-events/goals
+
+```go
+func (s *GCWorkerEventsService) Goals(ctx context.Context, regionID int64, nodeID string) (*GCWorkerEventGoalsResponse, error)
 ```
 
 ### Vault

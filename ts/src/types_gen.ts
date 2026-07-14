@@ -399,6 +399,10 @@ export interface GCWorkerEventHistogramResponse {
   buckets: GCWorkerEventBucket[]
 }
 
+export interface GCWorkerEventGoalsResponse {
+  goals: string[]
+}
+
 export interface BackfillFailure {
   shardId: number
   error: string

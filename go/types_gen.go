@@ -427,6 +427,10 @@ type GCWorkerEventHistogramResponse struct {
 	Buckets []GCWorkerEventBucket `json:"buckets"`
 }
 
+type GCWorkerEventGoalsResponse struct {
+	Goals []string `json:"goals"`
+}
+
 type BackfillFailure struct {
 	ShardID int64  `json:"shardId"`
 	Error   string `json:"error"`

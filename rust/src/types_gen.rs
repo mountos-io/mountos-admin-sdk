@@ -647,6 +647,11 @@ pub struct GCWorkerEventHistogramResponse {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GCWorkerEventGoalsResponse {
+    pub goals: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BackfillFailure {
     #[serde(rename = "shardId")]
     pub shard_id: i64,

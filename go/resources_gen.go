@@ -1184,6 +1184,18 @@ func (s *GCWorkerEventsService) Histogram(ctx context.Context, regionID int64, n
 	return decodeJSON[GCWorkerEventHistogramResponse](data)
 }
 
+func (s *GCWorkerEventsService) Goals(ctx context.Context, regionID int64, nodeID string) (*GCWorkerEventGoalsResponse, error) {
+	q := url.Values{}
+	if nodeID != "" {
+		q.Set("nodeId", nodeID)
+	}
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/regions/%s/gc-worker-events/goals", strconv.FormatInt(regionID, 10))+"?"+q.Encode())
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[GCWorkerEventGoalsResponse](data)
+}
+
 type VaultService struct{ c *Client }
 
 func (s *VaultService) Resync(ctx context.Context) error {

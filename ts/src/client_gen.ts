@@ -21,7 +21,8 @@ import type {
   ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, DashboardStats, 
   LicenseDetails, LicenseTerms, LoadLicenseRequest, LicenseLoadResult, LicenseList, 
   ServiceAlert, AlertListOptions, AlertCountResponse, RegionAlert, RegionAlertListOptions, 
-  GCWorkerEvent, GCWorkerEventListOptions, GCWorkerEventHistogramResponse,
+  GCWorkerEvent, GCWorkerEventListOptions, GCWorkerEventHistogramResponse, 
+  GCWorkerEventGoalsResponse,
 } from './types_gen.js'
 
 export type RequestFn = <T>(method: string, path: string, body?: unknown, signal?: AbortSignal) => Promise<T>
@@ -570,6 +571,10 @@ export class GCWorkerEventsResource {
 
   histogram(regionId: number, nodeId?: string, goal?: string, sid?: number, regionClusterId?: number, since?: string, bucketSeconds?: number, signal?: AbortSignal): Promise<GCWorkerEventHistogramResponse> {
     return this.client.request('GET', `/api/v1/regions/${regionId}/gc-worker-events/histogram${queryString({ nodeId: nodeId, goal: goal, sid: sid, regionClusterId: regionClusterId, since: since, bucketSeconds: bucketSeconds })}`, undefined, signal)
+  }
+
+  goals(regionId: number, nodeId?: string, signal?: AbortSignal): Promise<GCWorkerEventGoalsResponse> {
+    return this.client.request('GET', `/api/v1/regions/${regionId}/gc-worker-events/goals${queryString({ nodeId: nodeId })}`, undefined, signal)
   }
 }
 

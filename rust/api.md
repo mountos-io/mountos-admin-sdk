@@ -1024,6 +1024,11 @@ Param: `regionId`
 Query: `nodeId=string`, `goal=string`, `sid=int64`, `regionClusterId=int64`, `since=string`, `bucketSeconds=int64(default 900)`
 Response data: `GCWorkerEventHistogramResponse`
 
+### GET /api/v1/regions/:regionId/gc-worker-events/goals
+Param: `regionId`
+Query: `nodeId=string`
+Response data: `GCWorkerEventGoalsResponse`
+
 ### GCWorkerEvent Type
 ```
 {
@@ -1195,6 +1200,13 @@ Response data: `GCWorkerEventHistogramResponse`
   "bucketStart": RFC3339,
   "goal": string,
   "count": int64
+}
+```
+
+### GCWorkerEventGoalsResponse Type
+```
+{
+  "goals": string[]
 }
 ```
 

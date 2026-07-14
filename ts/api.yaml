@@ -389,6 +389,9 @@ types:
   GCWorkerEventHistogramResponse:
     - "buckets: GCWorkerEventBucket[]"
 
+  GCWorkerEventGoalsResponse:
+    - "goals: string[]"
+
   ServiceNode:
     - "id: int64"
     - "regionId: int64"
@@ -1507,6 +1510,13 @@ resources:
           - "since: string"
           - "bucketSeconds: int64=900"
         responseType: GCWorkerEventHistogramResponse
+
+      - action: goals
+        method: GET
+        path: /goals
+        query:
+          - "nodeId: string"
+        responseType: GCWorkerEventGoalsResponse
 
   - name: Vault
     path: /vault

@@ -971,6 +971,14 @@ impl GCWorkerEventsService {
         }
         self.inner.get(&format!("/api/v1/regions/{}/gc-worker-events/histogram", region_id), &query).await
     }
+
+    pub async fn goals(&self, region_id: i64, node_id: Option<&str>) -> Result<GCWorkerEventGoalsResponse, Error> {
+        let mut query: Vec<(&str, String)> = Vec::new();
+        if let Some(v) = node_id {
+            query.push(("nodeId", v.to_string()));
+        }
+        self.inner.get(&format!("/api/v1/regions/{}/gc-worker-events/goals", region_id), &query).await
+    }
 }
 
 /// Operations on the `Vault` resource.

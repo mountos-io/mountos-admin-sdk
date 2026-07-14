@@ -370,6 +370,14 @@ interface GCWorkerEventBucket {
 }
 ```
 
+### `GCWorkerEventGoalsResponse`
+
+```typescript
+interface GCWorkerEventGoalsResponse {
+  goals: string[];
+}
+```
+
 ### `GCWorkerEventHistogramResponse`
 
 ```typescript
@@ -1969,6 +1977,20 @@ Query params:
   regionClusterId?: number;
   since?: string;
   bucketSeconds?: number;  // default: 900
+}
+```
+
+#### `goals` - GET /api/v1/regions/:regionId/gc-worker-events/goals
+
+```typescript
+client.gcWorkerEvents.goals(regionId: number, nodeId?: string, signal?: AbortSignal): Promise<GCWorkerEventGoalsResponse>;
+```
+
+Query params:
+
+```typescript
+{
+  nodeId?: string;
 }
 ```
 
