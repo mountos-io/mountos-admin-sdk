@@ -423,6 +423,10 @@ type GCWorkerEvent struct {
 	CreatedAt       string         `json:"createdAt,omitempty"`
 }
 
+type GCWorkerEventHistogramResponse struct {
+	Buckets []GCWorkerEventBucket `json:"buckets"`
+}
+
 type BackfillFailure struct {
 	ShardID int64  `json:"shardId"`
 	Error   string `json:"error"`
@@ -463,6 +467,12 @@ type DiscoverEndpoint struct {
 	NodeID string `json:"nodeId"`
 	Addr   string `json:"addr"`
 	Status string `json:"status"`
+}
+
+type GCWorkerEventBucket struct {
+	BucketStart string `json:"bucketStart"`
+	Goal        string `json:"goal"`
+	Count       int64  `json:"count"`
 }
 
 type LicenseQuota struct {

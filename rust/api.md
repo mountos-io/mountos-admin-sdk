@@ -1019,6 +1019,11 @@ Param: `regionId`
 Query: `nodeId=string`, `goal=string`, `sid=int64`, `regionClusterId=int64`, `since=string`, `page=int(default 1)`, `limit=int(default 20)`
 Response data: `{ "items": GCWorkerEvent[], "pagination": PaginationMeta }`
 
+### GET /api/v1/regions/:regionId/gc-worker-events/histogram
+Param: `regionId`
+Query: `nodeId=string`, `goal=string`, `sid=int64`, `regionClusterId=int64`, `since=string`, `bucketSeconds=int64(default 900)`
+Response data: `GCWorkerEventHistogramResponse`
+
 ### GCWorkerEvent Type
 ```
 {
@@ -1181,6 +1186,22 @@ Response data: `{ "items": GCWorkerEvent[], "pagination": PaginationMeta }`
   "mtime": int64,
   "updaterId"?: int64,
   "contentHash"?: string
+}
+```
+
+### GCWorkerEventBucket Type
+```
+{
+  "bucketStart": RFC3339,
+  "goal": string,
+  "count": int64
+}
+```
+
+### GCWorkerEventHistogramResponse Type
+```
+{
+  "buckets": GCWorkerEventBucket[]
 }
 ```
 

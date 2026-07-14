@@ -360,6 +360,24 @@ interface GCWorkerEvent {
 }
 ```
 
+### `GCWorkerEventBucket`
+
+```typescript
+interface GCWorkerEventBucket {
+  bucketStart: string;
+  goal: string;
+  count: number;
+}
+```
+
+### `GCWorkerEventHistogramResponse`
+
+```typescript
+interface GCWorkerEventHistogramResponse {
+  buckets: GCWorkerEventBucket[];
+}
+```
+
 ### `LicenseDetails`
 
 ```typescript
@@ -1932,6 +1950,25 @@ Query params:
   since?: string;
   page?: number;  // default: 1
   limit?: number;  // default: 20
+}
+```
+
+#### `histogram` - GET /api/v1/regions/:regionId/gc-worker-events/histogram
+
+```typescript
+client.gcWorkerEvents.histogram(regionId: number, nodeId?: string, goal?: string, sid?: number, regionClusterId?: number, since?: string, bucketSeconds?: number, signal?: AbortSignal): Promise<GCWorkerEventHistogramResponse>;
+```
+
+Query params:
+
+```typescript
+{
+  nodeId?: string;
+  goal?: string;
+  sid?: number;
+  regionClusterId?: number;
+  since?: string;
+  bucketSeconds?: number;  // default: 900
 }
 ```
 

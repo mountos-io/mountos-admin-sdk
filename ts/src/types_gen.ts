@@ -395,6 +395,10 @@ export interface GCWorkerEvent {
   createdAt?: string
 }
 
+export interface GCWorkerEventHistogramResponse {
+  buckets: GCWorkerEventBucket[]
+}
+
 export interface BackfillFailure {
   shardId: number
   error: string
@@ -435,6 +439,12 @@ export interface DiscoverEndpoint {
   nodeId: string
   addr: string
   status: string
+}
+
+export interface GCWorkerEventBucket {
+  bucketStart: string
+  goal: string
+  count: number
 }
 
 export interface LicenseQuota {

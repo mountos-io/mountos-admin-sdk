@@ -381,6 +381,14 @@ types:
     - "eventTime: datetime"
     - "createdAt: datetime?"
 
+  GCWorkerEventBucket:
+    - "bucketStart: datetime"
+    - "goal: string"
+    - "count: int64"
+
+  GCWorkerEventHistogramResponse:
+    - "buckets: GCWorkerEventBucket[]"
+
   ServiceNode:
     - "id: int64"
     - "regionId: int64"
@@ -1487,6 +1495,18 @@ resources:
           - "page: int=1"
           - "limit: int=20"
         responseType: GCWorkerEvent
+
+      - action: histogram
+        method: GET
+        path: /histogram
+        query:
+          - "nodeId: string"
+          - "goal: string"
+          - "sid: int64"
+          - "regionClusterId: int64"
+          - "since: string"
+          - "bucketSeconds: int64=900"
+        responseType: GCWorkerEventHistogramResponse
 
   - name: Vault
     path: /vault

@@ -392,6 +392,24 @@ pub struct GCWorkerEvent {
 }
 ```
 
+### `GCWorkerEventBucket`
+
+```rust
+pub struct GCWorkerEventBucket {
+    pub bucket_start: String,
+    pub goal: String,
+    pub count: i64,
+}
+```
+
+### `GCWorkerEventHistogramResponse`
+
+```rust
+pub struct GCWorkerEventHistogramResponse {
+    pub buckets: Vec<GCWorkerEventBucket>,
+}
+```
+
 ### `LicenseDetails`
 
 ```rust
@@ -2037,6 +2055,12 @@ pub struct GCWorkerEventListOptions {
     pub page: Option<i64>,
     pub limit: Option<i64>,
 }
+```
+
+#### `histogram` - GET /api/v1/regions/:regionId/gc-worker-events/histogram
+
+```rust
+pub async fn histogram(&self, region_id: i64, node_id: Option<&str>, goal: Option<&str>, sid: Option<i64>, region_cluster_id: Option<i64>, since: Option<&str>, bucket_seconds: Option<i64>) -> Result<GCWorkerEventHistogramResponse, Error>
 ```
 
 ### Vault

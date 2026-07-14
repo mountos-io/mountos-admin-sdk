@@ -642,6 +642,11 @@ pub struct GCWorkerEvent {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GCWorkerEventHistogramResponse {
+    pub buckets: Vec<GCWorkerEventBucket>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BackfillFailure {
     #[serde(rename = "shardId")]
     pub shard_id: i64,
@@ -699,6 +704,14 @@ pub struct DiscoverEndpoint {
     pub node_id: String,
     pub addr: String,
     pub status: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GCWorkerEventBucket {
+    #[serde(rename = "bucketStart")]
+    pub bucket_start: String,
+    pub goal: String,
+    pub count: i64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

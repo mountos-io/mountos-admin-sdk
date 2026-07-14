@@ -397,6 +397,24 @@ type GCWorkerEvent struct {
 }
 ```
 
+### `GCWorkerEventBucket`
+
+```go
+type GCWorkerEventBucket struct {
+    BucketStart              string                   `json:"bucketStart"`
+    Goal                     string                   `json:"goal"`
+    Count                    int64                    `json:"count"`
+}
+```
+
+### `GCWorkerEventHistogramResponse`
+
+```go
+type GCWorkerEventHistogramResponse struct {
+    Buckets                  []GCWorkerEventBucket    `json:"buckets"`
+}
+```
+
 ### `LicenseDetails`
 
 ```go
@@ -2042,6 +2060,12 @@ type GCWorkerEventListOptions struct {
     Page                 int          `url:"page"` // default: 1
     Limit                int          `url:"limit"` // default: 20
 }
+```
+
+#### `Histogram` - GET /api/v1/regions/:regionId/gc-worker-events/histogram
+
+```go
+func (s *GCWorkerEventsService) Histogram(ctx context.Context, regionID int64, nodeID string, goal string, sid *int64, regionClusterID *int64, since string, bucketSeconds *int64) (*GCWorkerEventHistogramResponse, error)
 ```
 
 ### Vault
