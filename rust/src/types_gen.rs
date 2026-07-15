@@ -93,6 +93,10 @@ pub struct Account {
     pub quota_limit: i64,
     #[serde(rename = "quotaExcessPct")]
     pub quota_excess_pct: i32,
+    #[serde(rename = "metadataRateLimitPerMinute")]
+    pub metadata_rate_limit_per_minute: i32,
+    #[serde(rename = "metadataMaxRequestsPerSecond")]
+    pub metadata_max_requests_per_second: i32,
     #[serde(rename = "isActive")]
     pub is_active: bool,
     pub locked: bool,
@@ -888,6 +892,14 @@ pub struct UpdateAccountQuotaRequest {
     pub quota_limit: i64,
     #[serde(rename = "quotaExcessPct", skip_serializing_if = "Option::is_none")]
     pub quota_excess_pct: Option<i32>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct UpdateAccountMetadataRateLimitRequest {
+    #[serde(rename = "rateLimitPerMinute")]
+    pub rate_limit_per_minute: i32,
+    #[serde(rename = "maxRequestsPerSecond")]
+    pub max_requests_per_second: i32,
 }
 
 #[derive(Debug, Clone, Default)]

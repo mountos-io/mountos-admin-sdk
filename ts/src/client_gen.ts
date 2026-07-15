@@ -3,26 +3,26 @@
 import type {
   ListOptions, PaginatedResponse, CursorPaginatedResponse,
   CreateAccountRequest, Account, AccountListOptions, EditAccountRequest, 
-  UpdateAccountQuotaRequest, AddUserRequest, User, UserListOptions, BulkUserRequest, 
-  UserLite, EditUserRequest, CreateRegionRequest, Region, RegionListOptions, 
-  EditRegionRequest, RegionCluster, ClusterListOptions, CreateRegionClusterRequest, 
-  RegionClusterListOptions, EditRegionClusterRequest, SetRegionClusterReadyRequest, 
-  CreateStorageRequest, BlockMember, Storage, StorageListOptions, BlockVolume, 
-  EditStorageRequest, TestStorageBucketRequest, CompatibleStorage, 
-  MoveStorageVolumesRequest, MoveVolumeFailure, BackfillFailure, CreateVolumeRequest, 
-  Volume, VolumeListOptions, EditVolumeRequest, MoveVolumeClusterRequest, 
-  DeactivateVolumeRequest, GenerateVolumeAPIKeysRequest, VolumeApiKey, 
-  RevokeVolumeAPIKeyRequest, RevokeVolumeAPIKeysByUserRequest, GenerateVolumeSttKeyRequest, 
-  UpdateVolumeQuotaRequest, VolumeSizePoint, CreateVolumeForkRequest, Fork, 
-  DeleteVolumeForkRequest, RestoreVolumeForkRequest, ForkTreeEntry, 
-  VolumeForkTreeListOptions, ForkEntryDetail, ForkEntryVersion, VolumeForkEntryListOptions, 
-  ForkTreeMatch, VolumeForkSearchListOptions, AuditLog, AuditLogListOptions, 
-  RegionAuditLogListOptions, ServiceNode, NodeStatsSample, ClientSession, 
-  ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, DashboardStats, 
-  LicenseDetails, LicenseTerms, LoadLicenseRequest, LicenseLoadResult, LicenseList, 
-  ServiceAlert, AlertListOptions, AlertCountResponse, RegionAlert, RegionAlertListOptions, 
-  GCWorkerEvent, GCWorkerEventListOptions, GCWorkerEventHistogramResponse, 
-  GCWorkerEventGoalsResponse,
+  UpdateAccountQuotaRequest, UpdateAccountMetadataRateLimitRequest, AddUserRequest, User, 
+  UserListOptions, BulkUserRequest, UserLite, EditUserRequest, CreateRegionRequest, Region, 
+  RegionListOptions, EditRegionRequest, RegionCluster, ClusterListOptions, 
+  CreateRegionClusterRequest, RegionClusterListOptions, EditRegionClusterRequest, 
+  SetRegionClusterReadyRequest, CreateStorageRequest, BlockMember, Storage, 
+  StorageListOptions, BlockVolume, EditStorageRequest, TestStorageBucketRequest, 
+  CompatibleStorage, MoveStorageVolumesRequest, MoveVolumeFailure, BackfillFailure, 
+  CreateVolumeRequest, Volume, VolumeListOptions, EditVolumeRequest, 
+  MoveVolumeClusterRequest, DeactivateVolumeRequest, GenerateVolumeAPIKeysRequest, 
+  VolumeApiKey, RevokeVolumeAPIKeyRequest, RevokeVolumeAPIKeysByUserRequest, 
+  GenerateVolumeSttKeyRequest, UpdateVolumeQuotaRequest, VolumeSizePoint, 
+  CreateVolumeForkRequest, Fork, DeleteVolumeForkRequest, RestoreVolumeForkRequest, 
+  ForkTreeEntry, VolumeForkTreeListOptions, ForkEntryDetail, ForkEntryVersion, 
+  VolumeForkEntryListOptions, ForkTreeMatch, VolumeForkSearchListOptions, AuditLog, 
+  AuditLogListOptions, RegionAuditLogListOptions, ServiceNode, NodeStatsSample, 
+  ClientSession, ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, 
+  DashboardStats, LicenseDetails, LicenseTerms, LoadLicenseRequest, LicenseLoadResult, 
+  LicenseList, ServiceAlert, AlertListOptions, AlertCountResponse, RegionAlert, 
+  RegionAlertListOptions, GCWorkerEvent, GCWorkerEventListOptions, 
+  GCWorkerEventHistogramResponse, GCWorkerEventGoalsResponse,
 } from './types_gen.js'
 
 export type RequestFn = <T>(method: string, path: string, body?: unknown, signal?: AbortSignal) => Promise<T>
@@ -143,6 +143,10 @@ export class AccountsResource {
 
   updateQuota(accountId: number, req: UpdateAccountQuotaRequest, signal?: AbortSignal): Promise<{ id: number }> {
     return this.client.request('PUT', `/api/v1/accounts/${accountId}/quota`, req, signal)
+  }
+
+  updateMetadataRateLimit(accountId: number, req: UpdateAccountMetadataRateLimitRequest, signal?: AbortSignal): Promise<{ id: number }> {
+    return this.client.request('PUT', `/api/v1/accounts/${accountId}/metadata-rate-limit`, req, signal)
   }
 }
 

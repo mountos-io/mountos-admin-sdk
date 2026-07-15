@@ -53,6 +53,8 @@ export interface Account {
   totalVolume: number
   quotaLimit: number
   quotaExcessPct: number
+  metadataRateLimitPerMinute: number
+  metadataMaxRequestsPerSecond: number
   isActive: boolean
   locked: boolean
   createdAt: string
@@ -560,6 +562,11 @@ export interface EditAccountRequest {
 export interface UpdateAccountQuotaRequest {
   quotaLimit: number
   quotaExcessPct?: number
+}
+
+export interface UpdateAccountMetadataRateLimitRequest {
+  rateLimitPerMinute: number
+  maxRequestsPerSecond: number
 }
 
 export interface AccountListOptions extends ListOptions {

@@ -114,6 +114,10 @@ impl AccountsService {
     pub async fn update_quota(&self, account_id: i64, req: &UpdateAccountQuotaRequest) -> Result<IdResponse, Error> {
         self.inner.put(&format!("/api/v1/accounts/{}/quota", account_id), req).await
     }
+
+    pub async fn update_metadata_rate_limit(&self, account_id: i64, req: &UpdateAccountMetadataRateLimitRequest) -> Result<IdResponse, Error> {
+        self.inner.put(&format!("/api/v1/accounts/{}/metadata-rate-limit", account_id), req).await
+    }
 }
 
 /// Operations on the `Users` resource.

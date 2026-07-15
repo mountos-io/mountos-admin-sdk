@@ -86,6 +86,14 @@ func (s *AccountsService) UpdateQuota(ctx context.Context, accountID int64, req 
 	return decodeJSON[IDResponse](data)
 }
 
+func (s *AccountsService) UpdateMetadataRateLimit(ctx context.Context, accountID int64, req *UpdateAccountMetadataRateLimitRequest) (*IDResponse, error) {
+	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/accounts/%s/metadata-rate-limit", strconv.FormatInt(accountID, 10)), req)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[IDResponse](data)
+}
+
 type UsersService struct{ c *Client }
 
 func (s *UsersService) Add(ctx context.Context, req *AddUserRequest) (*IDResponse, error) {

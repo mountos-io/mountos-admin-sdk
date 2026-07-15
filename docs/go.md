@@ -125,6 +125,8 @@ type Account struct {
     TotalVolume              int64                    `json:"totalVolume"`
     QuotaLimit               int64                    `json:"quotaLimit"`
     QuotaExcessPct           int32                    `json:"quotaExcessPct"`
+    MetadataRateLimitPerMinute int32                    `json:"metadataRateLimitPerMinute"`
+    MetadataMaxRequestsPerSecond int32                    `json:"metadataMaxRequestsPerSecond"`
     IsActive                 bool                     `json:"isActive"`
     Locked                   bool                     `json:"locked"`
     CreatedAt                string                   `json:"createdAt"`
@@ -890,6 +892,21 @@ Request body:
 type UpdateAccountQuotaRequest struct {
     QuotaLimit               int64                    `json:"quotaLimit"`
     QuotaExcessPct           *int32                   `json:"quotaExcessPct,omitempty"`
+}
+```
+
+#### `UpdateMetadataRateLimit` - PUT /api/v1/accounts/:accountId/metadata-rate-limit
+
+```go
+func (s *AccountsService) UpdateMetadataRateLimit(ctx context.Context, accountID int64, req *UpdateAccountMetadataRateLimitRequest) (*IDResponse, error)
+```
+
+Request body:
+
+```go
+type UpdateAccountMetadataRateLimitRequest struct {
+    RateLimitPerMinute       int32                    `json:"rateLimitPerMinute"`
+    MaxRequestsPerSecond     int32                    `json:"maxRequestsPerSecond"`
 }
 ```
 

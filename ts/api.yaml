@@ -80,6 +80,12 @@ types:
     - "totalVolume: int64"
     - "quotaLimit: int64"
     - "quotaExcessPct: int32"
+    # Metadata request-rate limits (dataserv's TCP protocol only, not
+    # block/data I/O). metadataRateLimitPerMinute: 0 = unlimited.
+    # metadataMaxRequestsPerSecond: -1 = never configured (platform default
+    # applies), 0 = explicitly unlimited, >0 = explicit cap.
+    - "metadataRateLimitPerMinute: int32"
+    - "metadataMaxRequestsPerSecond: int32"
     - "isActive: bool"
     - "locked: bool"
     - "createdAt: datetime"
@@ -642,6 +648,20 @@ resources:
         request:
           - "quotaLimit: int64!"
           - "quotaExcessPct: int32"
+        response:
+          - "id: int64"
+
+      # Metadata request-rate limits -- dataserv's TCP protocol only, not
+      # block/data I/O (a separate service). rateLimitPerMinute caps
+      # metadata requests per (volume, userId) pair within a fixed
+      # one-minute window; maxRequestsPerSecond is the node-wide metadata
+      # backpressure ceiling. Both 0 = unlimited.
+      - action: updateMetadataRateLimit
+        method: PUT
+        path: /:accountId/metadata-rate-limit
+        request:
+          - "rateLimitPerMinute: int32!"
+          - "maxRequestsPerSecond: int32!"
         response:
           - "id: int64"
 
