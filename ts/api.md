@@ -1286,7 +1286,13 @@ Response data: `GCWorkerEventGoalsResponse`
   "netTxBytesPerSec": float,
   "processCount": int,
   "diskUsedBytes"?: int64,
-  "diskTotalBytes"?: int64
+  "diskTotalBytes"?: int64,
+  "dbLatency1mUs"?: float,
+  "dbLatency5mUs"?: float,
+  "dbLatency15mUs"?: float,
+  "dbQueriesPerSec"?: float,
+  "dbConnsInUse"?: int,
+  "dbConnsMax"?: int
 }
 ```
 

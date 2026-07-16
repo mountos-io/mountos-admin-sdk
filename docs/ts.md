@@ -494,6 +494,12 @@ interface NodeStatsSample {
   processCount: number;
   diskUsedBytes?: number;
   diskTotalBytes?: number;
+  dbLatency1mUs?: number;
+  dbLatency5mUs?: number;
+  dbLatency15mUs?: number;
+  dbQueriesPerSec?: number;
+  dbConnsInUse?: number;
+  dbConnsMax?: number;
 }
 ```
 

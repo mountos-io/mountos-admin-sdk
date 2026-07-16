@@ -424,6 +424,15 @@ types:
     - "processCount: int"
     - "diskUsedBytes: int64?"
     - "diskTotalBytes: int64?"
+    # DB metrics, present only on DB-backed services (dataserv/gcserv/appserv).
+    # Latency values are 1m/5m/15m decayed averages (loadavg-style EWMAs) in
+    # microseconds; dbConnsMax is the pool ceiling (max concurrency).
+    - "dbLatency1mUs: float?"
+    - "dbLatency5mUs: float?"
+    - "dbLatency15mUs: float?"
+    - "dbQueriesPerSec: float?"
+    - "dbConnsInUse: int?"
+    - "dbConnsMax: int?"
 
   ClientSession:
     - "id: int64"

@@ -531,6 +531,12 @@ type NodeStatsSample struct {
     ProcessCount             int                      `json:"processCount"`
     DiskUsedBytes            int64                    `json:"diskUsedBytes,omitempty"`
     DiskTotalBytes           int64                    `json:"diskTotalBytes,omitempty"`
+    DbLatency1mUs            float64                  `json:"dbLatency1mUs,omitempty"`
+    DbLatency5mUs            float64                  `json:"dbLatency5mUs,omitempty"`
+    DbLatency15mUs           float64                  `json:"dbLatency15mUs,omitempty"`
+    DbQueriesPerSec          float64                  `json:"dbQueriesPerSec,omitempty"`
+    DbConnsInUse             int                      `json:"dbConnsInUse,omitempty"`
+    DbConnsMax               int                      `json:"dbConnsMax,omitempty"`
 }
 ```
 

@@ -781,6 +781,18 @@ pub struct NodeStatsSample {
     pub disk_used_bytes: Option<i64>,
     #[serde(rename = "diskTotalBytes", skip_serializing_if = "Option::is_none")]
     pub disk_total_bytes: Option<i64>,
+    #[serde(rename = "dbLatency1mUs", skip_serializing_if = "Option::is_none")]
+    pub db_latency1m_us: Option<f64>,
+    #[serde(rename = "dbLatency5mUs", skip_serializing_if = "Option::is_none")]
+    pub db_latency5m_us: Option<f64>,
+    #[serde(rename = "dbLatency15mUs", skip_serializing_if = "Option::is_none")]
+    pub db_latency15m_us: Option<f64>,
+    #[serde(rename = "dbQueriesPerSec", skip_serializing_if = "Option::is_none")]
+    pub db_queries_per_sec: Option<f64>,
+    #[serde(rename = "dbConnsInUse", skip_serializing_if = "Option::is_none")]
+    pub db_conns_in_use: Option<i64>,
+    #[serde(rename = "dbConnsMax", skip_serializing_if = "Option::is_none")]
+    pub db_conns_max: Option<i64>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

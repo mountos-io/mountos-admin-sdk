@@ -526,6 +526,12 @@ pub struct NodeStatsSample {
     pub process_count: i64,
     pub disk_used_bytes: Option<i64>,
     pub disk_total_bytes: Option<i64>,
+    pub db_latency1m_us: Option<f64>,
+    pub db_latency5m_us: Option<f64>,
+    pub db_latency15m_us: Option<f64>,
+    pub db_queries_per_sec: Option<f64>,
+    pub db_conns_in_use: Option<i64>,
+    pub db_conns_max: Option<i64>,
 }
 ```
 
