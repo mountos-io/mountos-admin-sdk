@@ -537,6 +537,11 @@ type NodeStatsSample struct {
     DbQueriesPerSec          float64                  `json:"dbQueriesPerSec,omitempty"`
     DbConnsInUse             int                      `json:"dbConnsInUse,omitempty"`
     DbConnsMax               int                      `json:"dbConnsMax,omitempty"`
+    DbConnsIdle              int                      `json:"dbConnsIdle,omitempty"`
+    DbConnsFree              int                      `json:"dbConnsFree,omitempty"`
+    DbConnsInUse1m           float64                  `json:"dbConnsInUse1m,omitempty"`
+    DbConnsInUse5m           float64                  `json:"dbConnsInUse5m,omitempty"`
+    DbConnsInUse15m          float64                  `json:"dbConnsInUse15m,omitempty"`
 }
 ```
 

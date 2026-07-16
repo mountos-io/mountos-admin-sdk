@@ -500,6 +500,11 @@ interface NodeStatsSample {
   dbQueriesPerSec?: number;
   dbConnsInUse?: number;
   dbConnsMax?: number;
+  dbConnsIdle?: number;
+  dbConnsFree?: number;
+  dbConnsInUse1m?: number;
+  dbConnsInUse5m?: number;
+  dbConnsInUse15m?: number;
 }
 ```
 

@@ -1292,7 +1292,12 @@ Response data: `GCWorkerEventGoalsResponse`
   "dbLatency15mUs"?: float,
   "dbQueriesPerSec"?: float,
   "dbConnsInUse"?: int,
-  "dbConnsMax"?: int
+  "dbConnsMax"?: int,
+  "dbConnsIdle"?: int,
+  "dbConnsFree"?: int,
+  "dbConnsInUse1m"?: float,
+  "dbConnsInUse5m"?: float,
+  "dbConnsInUse15m"?: float
 }
 ```
 

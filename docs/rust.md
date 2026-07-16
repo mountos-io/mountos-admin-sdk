@@ -532,6 +532,11 @@ pub struct NodeStatsSample {
     pub db_queries_per_sec: Option<f64>,
     pub db_conns_in_use: Option<i64>,
     pub db_conns_max: Option<i64>,
+    pub db_conns_idle: Option<i64>,
+    pub db_conns_free: Option<i64>,
+    pub db_conns_in_use1m: Option<f64>,
+    pub db_conns_in_use5m: Option<f64>,
+    pub db_conns_in_use15m: Option<f64>,
 }
 ```
 

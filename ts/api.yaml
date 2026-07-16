@@ -433,6 +433,15 @@ types:
     - "dbQueriesPerSec: float?"
     - "dbConnsInUse: int?"
     - "dbConnsMax: int?"
+    # dbConnsIdle/dbConnsFree are current point-in-time counts (not decayed):
+    # Idle = opened but currently unused; Free = pool headroom below
+    # dbConnsMax not yet opened. dbConnsInUse*m are the same 1m/5m/15m
+    # decayed-average model as dbLatency*, applied to in-use connection count.
+    - "dbConnsIdle: int?"
+    - "dbConnsFree: int?"
+    - "dbConnsInUse1m: float?"
+    - "dbConnsInUse5m: float?"
+    - "dbConnsInUse15m: float?"
 
   ClientSession:
     - "id: int64"

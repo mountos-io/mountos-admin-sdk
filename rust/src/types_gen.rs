@@ -793,6 +793,16 @@ pub struct NodeStatsSample {
     pub db_conns_in_use: Option<i64>,
     #[serde(rename = "dbConnsMax", skip_serializing_if = "Option::is_none")]
     pub db_conns_max: Option<i64>,
+    #[serde(rename = "dbConnsIdle", skip_serializing_if = "Option::is_none")]
+    pub db_conns_idle: Option<i64>,
+    #[serde(rename = "dbConnsFree", skip_serializing_if = "Option::is_none")]
+    pub db_conns_free: Option<i64>,
+    #[serde(rename = "dbConnsInUse1m", skip_serializing_if = "Option::is_none")]
+    pub db_conns_in_use1m: Option<f64>,
+    #[serde(rename = "dbConnsInUse5m", skip_serializing_if = "Option::is_none")]
+    pub db_conns_in_use5m: Option<f64>,
+    #[serde(rename = "dbConnsInUse15m", skip_serializing_if = "Option::is_none")]
+    pub db_conns_in_use15m: Option<f64>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
