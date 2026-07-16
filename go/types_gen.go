@@ -72,21 +72,19 @@ const (
 
 
 type Account struct {
-	ID                           int64          `json:"id"`
-	Name                         string         `json:"name"`
-	Description                  string         `json:"description"`
-	IconURL                      string         `json:"iconUrl,omitempty"`
-	ProviderInfo                 map[string]any `json:"providerInfo,omitempty"`
-	LiveVolume                   int64          `json:"liveVolume"`
-	TotalVolume                  int64          `json:"totalVolume"`
-	QuotaLimit                   int64          `json:"quotaLimit"`
-	QuotaExcessPct               int32          `json:"quotaExcessPct"`
-	MetadataRateLimitPerMinute   int32          `json:"metadataRateLimitPerMinute"`
-	MetadataMaxRequestsPerSecond int32          `json:"metadataMaxRequestsPerSecond"`
-	IsActive                     bool           `json:"isActive"`
-	Locked                       bool           `json:"locked"`
-	CreatedAt                    string         `json:"createdAt"`
-	UpdatedAt                    string         `json:"updatedAt"`
+	ID             int64          `json:"id"`
+	Name           string         `json:"name"`
+	Description    string         `json:"description"`
+	IconURL        string         `json:"iconUrl,omitempty"`
+	ProviderInfo   map[string]any `json:"providerInfo,omitempty"`
+	LiveVolume     int64          `json:"liveVolume"`
+	TotalVolume    int64          `json:"totalVolume"`
+	QuotaLimit     int64          `json:"quotaLimit"`
+	QuotaExcessPct int32          `json:"quotaExcessPct"`
+	IsActive       bool           `json:"isActive"`
+	Locked         bool           `json:"locked"`
+	CreatedAt      string         `json:"createdAt"`
+	UpdatedAt      string         `json:"updatedAt"`
 }
 
 type User struct {
@@ -590,11 +588,6 @@ type EditAccountRequest struct {
 type UpdateAccountQuotaRequest struct {
 	QuotaLimit     int64  `json:"quotaLimit"`
 	QuotaExcessPct *int32 `json:"quotaExcessPct,omitempty"`
-}
-
-type UpdateAccountMetadataRateLimitRequest struct {
-	RateLimitPerMinute   int32 `json:"rateLimitPerMinute"`
-	MaxRequestsPerSecond int32 `json:"maxRequestsPerSecond"`
 }
 
 type AccountListOptions struct {

@@ -105,17 +105,6 @@ Request:
 ```
 Response data: `{ "id": int64 }`
 
-### PUT /api/v1/accounts/:accountId/metadata-rate-limit
-Param: `accountId`
-Request:
-```
-{
-  "rateLimitPerMinute": int32(required),
-  "maxRequestsPerSecond": int32(required)
-}
-```
-Response data: `{ "id": int64 }`
-
 ### Account Type
 ```
 {
@@ -128,8 +117,6 @@ Response data: `{ "id": int64 }`
   "totalVolume": int64,
   "quotaLimit": int64,
   "quotaExcessPct": int32,
-  "metadataRateLimitPerMinute": int32,
-  "metadataMaxRequestsPerSecond": int32,
   "isActive": bool,
   "locked": bool,
   "createdAt": RFC3339,

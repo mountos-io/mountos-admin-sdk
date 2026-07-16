@@ -120,8 +120,6 @@ pub struct Account {
     pub total_volume: i64,
     pub quota_limit: i64,
     pub quota_excess_pct: i32,
-    pub metadata_rate_limit_per_minute: i32,
-    pub metadata_max_requests_per_second: i32,
     pub is_active: bool,
     pub locked: bool,
     pub created_at: String,
@@ -887,21 +885,6 @@ Request body:
 pub struct UpdateAccountQuotaRequest {
     pub quota_limit: i64,
     pub quota_excess_pct: Option<i32>,
-}
-```
-
-#### `update_metadata_rate_limit` - PUT /api/v1/accounts/:accountId/metadata-rate-limit
-
-```rust
-pub async fn update_metadata_rate_limit(&self, account_id: i64, req: &UpdateAccountMetadataRateLimitRequest) -> Result<IdResponse, Error>
-```
-
-Request body:
-
-```rust
-pub struct UpdateAccountMetadataRateLimitRequest {
-    pub rate_limit_per_minute: i32,
-    pub max_requests_per_second: i32,
 }
 ```
 

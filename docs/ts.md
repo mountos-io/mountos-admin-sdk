@@ -88,8 +88,6 @@ interface Account {
   totalVolume: number;
   quotaLimit: number;
   quotaExcessPct: number;
-  metadataRateLimitPerMinute: number;
-  metadataMaxRequestsPerSecond: number;
   isActive: boolean;
   locked: boolean;
   createdAt: string;
@@ -855,21 +853,6 @@ Request body:
 {
   quotaLimit: number;
   quotaExcessPct?: number;
-}
-```
-
-#### `updateMetadataRateLimit` - PUT /api/v1/accounts/:accountId/metadata-rate-limit
-
-```typescript
-client.accounts.updateMetadataRateLimit(accountId: number, req: UpdateAccountMetadataRateLimitRequest, signal?: AbortSignal): Promise<{ id: number }>;
-```
-
-Request body:
-
-```typescript
-{
-  rateLimitPerMinute: number;
-  maxRequestsPerSecond: number;
 }
 ```
 
