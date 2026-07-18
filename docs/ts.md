@@ -630,6 +630,7 @@ interface ServiceNode {
   advertiseAddr: string;
   rpcAddr?: string;
   metadata?: Record<string, unknown>;
+  metricsEndpoint?: string;
   instanceId?: string;
   instanceInfo?: Record<string, unknown>;
   status: string;

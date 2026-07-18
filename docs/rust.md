@@ -662,6 +662,7 @@ pub struct ServiceNode {
     pub advertise_addr: String,
     pub rpc_addr: Option<String>,
     pub metadata: Option<serde_json::Value>,
+    pub metrics_endpoint: Option<String>,
     pub instance_id: Option<String>,
     pub instance_info: Option<serde_json::Value>,
     pub status: String,
