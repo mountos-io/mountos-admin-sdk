@@ -881,6 +881,30 @@ Response data: `SessionSummary`
 Query: `access_key_id=string(required)`
 Response data: `DiscoverMetaResponse`
 
+### GET /api/v1/discover/metrics-targets
+Response data: `MetricsTarget[]`
+
+### MetricsTarget Type
+```
+{
+  "targets": string[],
+  "labels": object
+}
+```
+
+---
+
+## Metrics
+
+### POST /api/v1/metrics/token
+Request:
+```
+{
+  "expirySeconds": int64(required)
+}
+```
+Response data: `MetricsTokenResponse`
+
 ---
 
 ## Dashboard
@@ -1260,6 +1284,13 @@ Response data: `GCWorkerEventGoalsResponse`
 ```
 {
   "terms": string
+}
+```
+
+### MetricsTokenResponse Type
+```
+{
+  "token": string
 }
 ```
 

@@ -500,6 +500,23 @@ pub struct LicenseTerms {
 }
 ```
 
+### `MetricsTarget`
+
+```rust
+pub struct MetricsTarget {
+    pub targets: Vec<String>,
+    pub labels: serde_json::Value,
+}
+```
+
+### `MetricsTokenResponse`
+
+```rust
+pub struct MetricsTokenResponse {
+    pub token: String,
+}
+```
+
 ### `MoveVolumeFailure`
 
 ```rust
@@ -1930,6 +1947,30 @@ Accessor: `client.discover`
 
 ```rust
 pub async fn meta(&self, access_key_id: &str) -> Result<DiscoverMetaResponse, Error>
+```
+
+#### `metrics_targets` - GET /api/v1/discover/metrics-targets
+
+```rust
+pub async fn metrics_targets(&self) -> Result<Vec<MetricsTarget>, Error>
+```
+
+### Metrics
+
+Accessor: `client.metrics`
+
+#### `generate_token` - POST /api/v1/metrics/token
+
+```rust
+pub async fn generate_token(&self, req: &GenerateMetricTokenRequest) -> Result<MetricsTokenResponse, Error>
+```
+
+Request body:
+
+```rust
+pub struct GenerateMetricTokenRequest {
+    pub expiry_seconds: i64,
+}
 ```
 
 ### Dashboard

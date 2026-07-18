@@ -18,11 +18,11 @@ import type {
   VolumeForkTreeListOptions, ForkEntryDetail, ForkEntryVersion, VolumeForkEntryListOptions, 
   ForkTreeMatch, VolumeForkSearchListOptions, AuditLog, AuditLogListOptions, 
   RegionAuditLogListOptions, ServiceNode, NodeStatsSample, ClientSession, 
-  ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, DashboardStats, 
-  LicenseDetails, LicenseTerms, LoadLicenseRequest, LicenseLoadResult, LicenseList, 
-  ServiceAlert, AlertListOptions, AlertCountResponse, RegionAlert, RegionAlertListOptions, 
-  GCWorkerEvent, GCWorkerEventListOptions, GCWorkerEventHistogramResponse, 
-  GCWorkerEventGoalsResponse,
+  ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, MetricsTarget, 
+  GenerateMetricTokenRequest, MetricsTokenResponse, DashboardStats, LicenseDetails, 
+  LicenseTerms, LoadLicenseRequest, LicenseLoadResult, LicenseList, ServiceAlert, 
+  AlertListOptions, AlertCountResponse, RegionAlert, RegionAlertListOptions, GCWorkerEvent, 
+  GCWorkerEventListOptions, GCWorkerEventHistogramResponse, GCWorkerEventGoalsResponse,
 } from './types_gen.js'
 
 export type RequestFn = <T>(method: string, path: string, body?: unknown, signal?: AbortSignal) => Promise<T>
@@ -52,6 +52,7 @@ export interface AdminClient {
   readonly nodes: NodesResource
   readonly clientSessions: ClientSessionsResource
   readonly discover: DiscoverResource
+  readonly metrics: MetricsResource
   readonly dashboard: DashboardResource
   readonly license: LicenseResource
   readonly alerts: AlertsResource
@@ -78,6 +79,7 @@ export function createClient(request: RequestFn): AdminClient {
   let _nodes: NodesResource | undefined
   let _clientSessions: ClientSessionsResource | undefined
   let _discover: DiscoverResource | undefined
+  let _metrics: MetricsResource | undefined
   let _dashboard: DashboardResource | undefined
   let _license: LicenseResource | undefined
   let _alerts: AlertsResource | undefined
@@ -101,6 +103,7 @@ export function createClient(request: RequestFn): AdminClient {
     get nodes() { return _nodes ??= new NodesResource(client) },
     get clientSessions() { return _clientSessions ??= new ClientSessionsResource(client) },
     get discover() { return _discover ??= new DiscoverResource(client) },
+    get metrics() { return _metrics ??= new MetricsResource(client) },
     get dashboard() { return _dashboard ??= new DashboardResource(client) },
     get license() { return _license ??= new LicenseResource(client) },
     get alerts() { return _alerts ??= new AlertsResource(client) },
@@ -499,6 +502,18 @@ export class DiscoverResource {
 
   meta(accessKeyId: string, signal?: AbortSignal): Promise<DiscoverMetaResponse> {
     return this.client.request('GET', `/api/v1/discover/meta${queryString({ access_key_id: accessKeyId })}`, undefined, signal)
+  }
+
+  metricsTargets(signal?: AbortSignal): Promise<MetricsTarget[]> {
+    return this.client.request('GET', '/api/v1/discover/metrics-targets', undefined, signal)
+  }
+}
+
+export class MetricsResource {
+  constructor(private client: Client) {}
+
+  generateToken(req: GenerateMetricTokenRequest, signal?: AbortSignal): Promise<MetricsTokenResponse> {
+    return this.client.request('POST', '/api/v1/metrics/token', req, signal)
   }
 }
 

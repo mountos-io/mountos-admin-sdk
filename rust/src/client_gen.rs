@@ -26,6 +26,7 @@ pub struct Client {
     pub nodes: NodesService,
     pub client_sessions: ClientSessionsService,
     pub discover: DiscoverService,
+    pub metrics: MetricsService,
     pub dashboard: DashboardService,
     pub license: LicenseService,
     pub alerts: AlertsService,
@@ -55,6 +56,7 @@ impl Client {
             nodes: NodesService { inner: Arc::clone(&inner) },
             client_sessions: ClientSessionsService { inner: Arc::clone(&inner) },
             discover: DiscoverService { inner: Arc::clone(&inner) },
+            metrics: MetricsService { inner: Arc::clone(&inner) },
             dashboard: DashboardService { inner: Arc::clone(&inner) },
             license: LicenseService { inner: Arc::clone(&inner) },
             alerts: AlertsService { inner: Arc::clone(&inner) },
@@ -780,6 +782,21 @@ impl DiscoverService {
         let mut query: Vec<(&str, String)> = Vec::new();
         query.push(("access_key_id", access_key_id.to_string()));
         self.inner.get("/api/v1/discover/meta", &query).await
+    }
+
+    pub async fn metrics_targets(&self) -> Result<Vec<MetricsTarget>, Error> {
+        self.inner.get("/api/v1/discover/metrics-targets", &[]).await
+    }
+}
+
+/// Operations on the `Metrics` resource.
+pub struct MetricsService {
+    inner: Arc<ClientInner>,
+}
+
+impl MetricsService {
+    pub async fn generate_token(&self, req: &GenerateMetricTokenRequest) -> Result<MetricsTokenResponse, Error> {
+        self.inner.post("/api/v1/metrics/token", req).await
     }
 }
 

@@ -320,6 +320,15 @@ type DiscoverMetaResponse struct {
 	Endpoints []DiscoverEndpoint `json:"endpoints"`
 }
 
+type MetricsTarget struct {
+	Targets []string       `json:"targets"`
+	Labels  map[string]any `json:"labels"`
+}
+
+type MetricsTokenResponse struct {
+	Token string `json:"token"`
+}
+
 type DashboardStats struct {
 	UserCount          int64                 `json:"userCount"`
 	VolumeCount        int64                 `json:"volumeCount"`
@@ -1001,6 +1010,12 @@ type ClientSessionListOptions struct {
 }
 
 // Discover
+
+// Metrics
+
+type GenerateMetricTokenRequest struct {
+	ExpirySeconds int64 `json:"expirySeconds"`
+}
 
 // Dashboard
 

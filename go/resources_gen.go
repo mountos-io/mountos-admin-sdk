@@ -976,6 +976,28 @@ func (s *DiscoverService) Meta(ctx context.Context, accessKeyID string) (*Discov
 	return decodeJSON[DiscoverMetaResponse](data)
 }
 
+func (s *DiscoverService) MetricsTargets(ctx context.Context) ([]MetricsTarget, error) {
+	data, err := s.c.get(ctx, "/api/v1/discover/metrics-targets")
+	if err != nil {
+		return nil, err
+	}
+	result, err := decodeJSON[[]MetricsTarget](data)
+	if err != nil {
+		return nil, err
+	}
+	return *result, nil
+}
+
+type MetricsService struct{ c *Client }
+
+func (s *MetricsService) GenerateToken(ctx context.Context, req *GenerateMetricTokenRequest) (*MetricsTokenResponse, error) {
+	data, err := s.c.post(ctx, "/api/v1/metrics/token", req)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[MetricsTokenResponse](data)
+}
+
 type DashboardService struct{ c *Client }
 
 func (s *DashboardService) Stats(ctx context.Context, accountID int64) (*DashboardStats, error) {

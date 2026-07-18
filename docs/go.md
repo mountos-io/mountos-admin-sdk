@@ -505,6 +505,23 @@ type LicenseTerms struct {
 }
 ```
 
+### `MetricsTarget`
+
+```go
+type MetricsTarget struct {
+    Targets                  []string                 `json:"targets"`
+    Labels                   map[string]any           `json:"labels"`
+}
+```
+
+### `MetricsTokenResponse`
+
+```go
+type MetricsTokenResponse struct {
+    Token                    string                   `json:"token"`
+}
+```
+
 ### `MoveVolumeFailure`
 
 ```go
@@ -1935,6 +1952,30 @@ Accessor: `client.Discover`
 
 ```go
 func (s *DiscoverService) Meta(ctx context.Context, accessKeyID string) (*DiscoverMetaResponse, error)
+```
+
+#### `MetricsTargets` - GET /api/v1/discover/metrics-targets
+
+```go
+func (s *DiscoverService) MetricsTargets(ctx context.Context) ([]MetricsTarget, error)
+```
+
+### Metrics
+
+Accessor: `client.Metrics`
+
+#### `GenerateToken` - POST /api/v1/metrics/token
+
+```go
+func (s *MetricsService) GenerateToken(ctx context.Context, req *GenerateMetricTokenRequest) (*MetricsTokenResponse, error)
+```
+
+Request body:
+
+```go
+type GenerateMetricTokenRequest struct {
+    ExpirySeconds            int64                    `json:"expirySeconds"`
+}
 ```
 
 ### Dashboard

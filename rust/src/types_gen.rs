@@ -477,6 +477,17 @@ pub struct DiscoverMetaResponse {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MetricsTarget {
+    pub targets: Vec<String>,
+    pub labels: serde_json::Value,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MetricsTokenResponse {
+    pub token: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DashboardStats {
     #[serde(rename = "userCount")]
     pub user_count: i64,
@@ -1453,6 +1464,14 @@ pub struct ClientSessionListOptions {
 }
 
 // Discover
+
+// Metrics
+
+#[derive(Debug, Clone, Serialize)]
+pub struct GenerateMetricTokenRequest {
+    #[serde(rename = "expirySeconds")]
+    pub expiry_seconds: i64,
+}
 
 // Dashboard
 

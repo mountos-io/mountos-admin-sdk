@@ -292,6 +292,15 @@ export interface DiscoverMetaResponse {
   endpoints: DiscoverEndpoint[]
 }
 
+export interface MetricsTarget {
+  targets: string[]
+  labels: Record<string, unknown>
+}
+
+export interface MetricsTokenResponse {
+  token: string
+}
+
 export interface DashboardStats {
   userCount: number
   volumeCount: number
@@ -860,6 +869,12 @@ export interface ClientSessionListOptions extends ListOptions {
 }
 
 // Discover
+
+// Metrics
+
+export interface GenerateMetricTokenRequest {
+  expirySeconds: number
+}
 
 // Dashboard
 

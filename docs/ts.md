@@ -468,6 +468,23 @@ interface LicenseTerms {
 }
 ```
 
+### `MetricsTarget`
+
+```typescript
+interface MetricsTarget {
+  targets: string[];
+  labels: Record<string, unknown>;
+}
+```
+
+### `MetricsTokenResponse`
+
+```typescript
+interface MetricsTokenResponse {
+  token: string;
+}
+```
+
 ### `MoveVolumeFailure`
 
 ```typescript
@@ -1809,6 +1826,30 @@ Query params:
 ```typescript
 {
   access_key_id: string;
+}
+```
+
+#### `metricsTargets` - GET /api/v1/discover/metrics-targets
+
+```typescript
+client.discover.metricsTargets(signal?: AbortSignal): Promise<MetricsTarget[]>;
+```
+
+### Metrics
+
+Accessor: `client.metrics`
+
+#### `generateToken` - POST /api/v1/metrics/token
+
+```typescript
+client.metrics.generateToken(req: GenerateMetricTokenRequest, signal?: AbortSignal): Promise<MetricsTokenResponse>;
+```
+
+Request body:
+
+```typescript
+{
+  expirySeconds: number;
 }
 ```
 

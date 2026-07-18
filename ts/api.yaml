@@ -496,6 +496,14 @@ types:
     - "addr: string"
     - "status: string"
 
+  # Prometheus/VictoriaMetrics http_sd_configs target shape.
+  MetricsTarget:
+    - "targets: string[]"
+    - "labels: object"
+
+  MetricsTokenResponse:
+    - "token: string"
+
   RegionVolumeMetrics:
     - "regionId: int64"
     - "regionName: string"
@@ -1401,6 +1409,28 @@ resources:
         query:
           - "access_key_id: string!"
         responseType: DiscoverMetaResponse
+
+      # Prometheus/VictoriaMetrics http_sd_configs source: deployment-wide
+      # {ip, metrics_port} targets. Requires a metrics token (see Metrics.generateToken),
+      # not the normal provider auth.
+      - action: metricsTargets
+        method: GET
+        path: /metrics-targets
+        responseType: MetricsTarget
+        responseArray: true
+
+  - name: Metrics
+    path: /metrics
+    endpoints:
+      # Mints a bearer JWT scoped only for scraping /metrics and the
+      # Discover.metricsTargets endpoint -- can't be reused as any other kind
+      # of token. expirySeconds=0 mints a token that never expires.
+      - action: generateToken
+        method: POST
+        path: /token
+        request:
+          - "expirySeconds: int64!"
+        responseType: MetricsTokenResponse
 
   - name: Dashboard
     path: /dashboard
