@@ -666,9 +666,19 @@ func goHTTPMethod(method string) string {
 		return "put"
 	case "DELETE":
 		return "delete"
+	case "QUERY":
+		return "query"
 	default:
 		return "do"
 	}
+}
+
+// goBodyCarryingMethod reports whether httpMethod (as returned by
+// goHTTPMethod) sends req as a JSON request body. QUERY is a safe/read
+// method like GET but, unlike GET, is defined to carry a body -- see
+// docs/design/query-verb.md.
+func goBodyCarryingMethod(httpMethod string) bool {
+	return httpMethod == "put" || httpMethod == "post" || httpMethod == "query"
 }
 
 func goPathExpr(fullPath string, allPathParams []string, paramTypes map[string]string) string {
@@ -699,7 +709,7 @@ func writeGoBodyResponseMethod(w *strings.Builder, svcType, methodName string, e
 	httpMethod := goHTTPMethod(ep.Method)
 
 	fmt.Fprintf(w, "func (s *%s) %s(%s) (*%s, error) {\n", svcType, methodName, sig, respType)
-	if httpMethod == "put" || httpMethod == "post" {
+	if goBodyCarryingMethod(httpMethod) {
 		fmt.Fprintf(w, "\tdata, err := s.c.%s(ctx, %s, req)\n", httpMethod, pathExpr)
 	} else {
 		fmt.Fprintf(w, "\tdata, err := s.c.%s(ctx, %s)\n", httpMethod, pathExpr)
@@ -722,7 +732,7 @@ func writeGoBodyResponseTypeMethod(w *strings.Builder, svcType, methodName strin
 	httpMethod := goHTTPMethod(ep.Method)
 
 	fmt.Fprintf(w, "func (s *%s) %s(%s) (*%s, error) {\n", svcType, methodName, sig, ep.ResponseType)
-	if httpMethod == "put" || httpMethod == "post" {
+	if goBodyCarryingMethod(httpMethod) {
 		fmt.Fprintf(w, "\tdata, err := s.c.%s(ctx, %s, req)\n", httpMethod, pathExpr)
 	} else {
 		fmt.Fprintf(w, "\tdata, err := s.c.%s(ctx, %s)\n", httpMethod, pathExpr)

@@ -835,7 +835,7 @@ Query params:
 client.accounts.get(accountId: number, signal?: AbortSignal): Promise<Account>;
 ```
 
-#### `edit` - PUT /api/v1/accounts/:accountId/edit
+#### `edit` - PUT /api/v1/accounts/:accountId
 
 ```typescript
 client.accounts.edit(accountId: number, req: EditAccountRequest, signal?: AbortSignal): Promise<{ id: number }>;
@@ -931,7 +931,7 @@ Query params:
 client.users.get(userId: number, signal?: AbortSignal): Promise<User>;
 ```
 
-#### `bulk` - POST /api/v1/users/bulk
+#### `bulk` - QUERY /api/v1/users/bulk
 
 ```typescript
 client.users.bulk(req: BulkUserRequest, signal?: AbortSignal): Promise<{ users: UserLite[] }>;
@@ -945,7 +945,7 @@ Request body:
 }
 ```
 
-#### `edit` - PUT /api/v1/users/:userId/edit
+#### `edit` - PUT /api/v1/users/:userId
 
 ```typescript
 client.users.edit(userId: number, req: EditUserRequest, signal?: AbortSignal): Promise<{ id: number }>;
@@ -1011,7 +1011,7 @@ Query params:
 client.regions.get(regionId: number, signal?: AbortSignal): Promise<Region>;
 ```
 
-#### `edit` - PUT /api/v1/regions/:regionId/edit
+#### `edit` - PUT /api/v1/regions/:regionId
 
 ```typescript
 client.regions.edit(regionId: number, req: EditRegionRequest, signal?: AbortSignal): Promise<{ id: number }>;
@@ -1095,7 +1095,7 @@ Query params:
 client.regionClusters.get(regionId: number, clusterId: number, signal?: AbortSignal): Promise<RegionCluster>;
 ```
 
-#### `edit` - PUT /api/v1/regions/:regionId/clusters/:clusterId/edit
+#### `edit` - PUT /api/v1/regions/:regionId/clusters/:clusterId
 
 ```typescript
 client.regionClusters.edit(regionId: number, clusterId: number, req: EditRegionClusterRequest, signal?: AbortSignal): Promise<{ id: number }>;
@@ -1201,7 +1201,7 @@ client.storages.get(storageId: number, signal?: AbortSignal): Promise<Storage>;
 client.storages.listBlockVolumes(storageId: number, signal?: AbortSignal): Promise<BlockVolume[]>;
 ```
 
-#### `edit` - PUT /api/v1/storages/:storageId/edit
+#### `edit` - PUT /api/v1/storages/:storageId
 
 ```typescript
 client.storages.edit(storageId: number, req: EditStorageRequest, signal?: AbortSignal): Promise<{ id: number }>;
@@ -1226,10 +1226,10 @@ Request body:
 client.storages.deactivate(storageId: number, signal?: AbortSignal): Promise<{ id: number }>;
 ```
 
-#### `testBucket` - POST /api/v1/storages/test-bucket
+#### `testNewBucket` - POST /api/v1/storages/test-bucket
 
 ```typescript
-client.storages.testBucket(req: TestStorageBucketRequest, signal?: AbortSignal): Promise<{ bucketExists: boolean; list: boolean; write: boolean; read: boolean; delete: boolean; multipart: boolean }>;
+client.storages.testNewBucket(req: TestStorageNewBucketRequest, signal?: AbortSignal): Promise<{ bucketExists: boolean; list: boolean; write: boolean; read: boolean; delete: boolean; multipart: boolean }>;
 ```
 
 Request body:
@@ -1336,7 +1336,7 @@ Query params:
 client.volumes.get(volumeId: number, signal?: AbortSignal): Promise<Volume>;
 ```
 
-#### `edit` - PUT /api/v1/volumes/:volumeId/edit
+#### `edit` - PUT /api/v1/volumes/:volumeId
 
 ```typescript
 client.volumes.edit(volumeId: number, req: EditVolumeRequest, signal?: AbortSignal): Promise<{ id: number }>;
@@ -1522,7 +1522,7 @@ Request body:
 #### `listForks` - GET /api/v1/volumes/:volumeId/forks
 
 ```typescript
-client.volumes.listForks(volumeId: number, volumeType?: string, signal?: AbortSignal): Promise<Fork[]>;
+client.volumes.listForks(volumeId: number, volumeType?: string, includeInactive?: boolean, signal?: AbortSignal): Promise<Fork[]>;
 ```
 
 Query params:
@@ -1530,20 +1530,7 @@ Query params:
 ```typescript
 {
   volumeType?: string;
-}
-```
-
-#### `listAllForks` - GET /api/v1/volumes/:volumeId/forks?include_inactive=true
-
-```typescript
-client.volumes.listAllForks(volumeId: number, volumeType?: string, signal?: AbortSignal): Promise<Fork[]>;
-```
-
-Query params:
-
-```typescript
-{
-  volumeType?: string;
+  includeInactive?: boolean;  // default: false
 }
 ```
 
@@ -1741,10 +1728,10 @@ client.serviceNodes.statsHistory(regionId: number, nodeId: string, signal?: Abor
 
 Accessor: `client.nodes`
 
-#### `listAll` - GET /api/v1/nodes
+#### `list` - GET /api/v1/nodes
 
 ```typescript
-client.nodes.listAll(accountId: number, serviceType?: string, status?: string, inactiveHours?: number, signal?: AbortSignal): Promise<ServiceNode[]>;
+client.nodes.list(accountId: number, serviceType?: string, status?: string, inactiveHours?: number, signal?: AbortSignal): Promise<ServiceNode[]>;
 ```
 
 Query params:
@@ -1779,7 +1766,7 @@ Query params:
   userId?: number;
   clientType?: string;
   status?: ClientSessionStatus;
-  isActive?: string;
+  isActive?: boolean;
   osName?: string;
   platform?: string;
   search?: string;
@@ -1826,7 +1813,7 @@ Query params:
 
 ```typescript
 {
-  access_key_id: string;
+  accessKeyId: string;
 }
 ```
 
@@ -1942,7 +1929,7 @@ client.alerts.count(signal?: AbortSignal): Promise<AlertCountResponse>;
 #### `resolve` - POST /api/v1/alerts/:alertId/resolve
 
 ```typescript
-client.alerts.resolve(alertId: string, signal?: AbortSignal): Promise<void>;
+client.alerts.resolve(alertId: string, signal?: AbortSignal): Promise<{ alertId: string }>;
 ```
 
 ### RegionAlerts
@@ -1987,7 +1974,7 @@ Query params:
 #### `resolve` - POST /api/v1/regions/:regionId/alerts/:alertId/resolve
 
 ```typescript
-client.regionAlerts.resolve(regionId: number, alertId: string, signal?: AbortSignal): Promise<void>;
+client.regionAlerts.resolve(regionId: number, alertId: string, signal?: AbortSignal): Promise<{ alertId: string }>;
 ```
 
 ### GCWorkerEvents

@@ -127,10 +127,10 @@ Errors are `mountos_admin_sdk::Error`; match `Error::Api { message, status, erro
 
 All three SDKs expose the same resource groups (TS `client.<group>.<action>`, Go
 `client.<Group>.<Action>`, Rust `client.<group>.<action>` snake_case): accounts, users,
-regions, regionClusters, storages, volumes (+ quota, API keys, stats),
+regions, regionClusters, clusters, storages, volumes (+ quota, API keys, stats),
 volumeForkTrees/Entries/Searches, auditLogs, regionAuditLogs, serviceNodes, nodes,
-clientSessions, discover, dashboard, license, alerts, regionAlerts, vault. See
-[api.md](api.md) for the authoritative list and shapes.
+clientSessions, discover, dashboard, metrics, license, alerts, regionAlerts,
+gcWorkerEvents, vault. See [api.md](api.md) for the authoritative list and shapes.
 
 ## Auth contract (quick reference)
 

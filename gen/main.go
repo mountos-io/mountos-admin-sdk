@@ -19,6 +19,7 @@ func main() {
 	flag.Parse()
 
 	spec := loadSpec(*specPath)
+	validateSpec(spec)
 	generateGo(spec, *goOut)
 	generateTS(spec, *tsOut)
 	generateRust(spec, *rustOut)
@@ -39,6 +40,26 @@ func loadSpec(path string) *Spec {
 		fatalf("parse spec: %v", err)
 	}
 	return &spec
+}
+
+// validateSpec catches endpoint shapes the generators don't fully cover.
+// method: QUERY carries its parameters in a JSON request body instead of the
+// URL (see docs/design/query-verb.md) -- that only makes sense when the
+// endpoint actually declares fields to put there. A QUERY endpoint with
+// neither request nor query fields is a plain GET; the Rust and Go toggle/
+// void writers don't plumb a body for that shape (Rust would silently mis-map
+// to POST, Go would fail to compile), so reject it here instead.
+func validateSpec(spec *Spec) {
+	for _, res := range spec.Resources {
+		for _, ep := range res.Endpoints {
+			if ep.Method != "QUERY" {
+				continue
+			}
+			if len(ep.Request) == 0 && len(ep.Query) == 0 {
+				fatalf("%s.%s: method QUERY requires request or query fields (use GET for a parameterless read)", res.Name, ep.Action)
+			}
+		}
+	}
 }
 
 func writeFile(path, content string) {

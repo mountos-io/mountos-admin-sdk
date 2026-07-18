@@ -631,7 +631,7 @@ resources:
 
       - action: edit
         method: PUT
-        path: /:accountId/edit
+        path: /:accountId
         request:
           - "name: string!"
           - "description: string"
@@ -709,8 +709,11 @@ resources:
       # firing N detail requests. Missing ids return UserLite{id: 0, ...}
       # entries omitted from the response; clients display "user#<id>" for
       # unresolved ids.
+      # Read-only resolve, not a mutation: QUERY carries the id array in the
+      # body since GET can't (a page's worth of updater/creator ids won't
+      # fit a query string reliably). See docs/design/query-verb.md.
       - action: bulk
-        method: POST
+        method: QUERY
         path: /bulk
         request:
           - "ids: int64[]!"
@@ -719,7 +722,7 @@ resources:
 
       - action: edit
         method: PUT
-        path: /:userId/edit
+        path: /:userId
         request:
           - "username: string!"
           - "email: string!"
@@ -765,7 +768,7 @@ resources:
 
       - action: edit
         method: PUT
-        path: /:regionId/edit
+        path: /:regionId
         request:
           - "accountId: int64!"
           - "name: string!"
@@ -822,7 +825,7 @@ resources:
 
       - action: edit
         method: PUT
-        path: /:clusterId/edit
+        path: /:clusterId
         request:
           - "name: string!"
         response:
@@ -905,7 +908,7 @@ resources:
 
       - action: edit
         method: PUT
-        path: /:storageId/edit
+        path: /:storageId
         request:
           - "name: string!"
           - "description: string"
@@ -923,7 +926,9 @@ resources:
         response:
           - "id: int64"
 
-      - action: testBucket
+      # Pre-create dry run: tests raw connection params for a storage that
+      # doesn't exist yet. See testStorageBucket for testing an existing one.
+      - action: testNewBucket
         method: POST
         path: /test-bucket
         request:
@@ -1038,7 +1043,7 @@ resources:
 
       - action: edit
         method: PUT
-        path: /:volumeId/edit
+        path: /:volumeId
         # `volumeType` is intentionally absent: the storage personality is
         # immutable after create. appserv MUST reject any payload that
         # carries a `volumeType` field (even if it matches the current
@@ -1192,14 +1197,7 @@ resources:
         # ?volumeType=iceberg → list lake forks; default = general.
         query:
           - "volumeType: string?"
-        responseType: Fork
-        responseArray: true
-
-      - action: listAllForks
-        method: GET
-        path: /:volumeId/forks?include_inactive=true
-        query:
-          - "volumeType: string?"
+          - "includeInactive: bool=false"
         responseType: Fork
         responseArray: true
 
@@ -1351,7 +1349,7 @@ resources:
   - name: Nodes
     path: /nodes
     endpoints:
-      - action: listAll
+      - action: list
         method: GET
         path: /
         query:
@@ -1377,7 +1375,7 @@ resources:
           - "userId: int64"
           - "clientType: string"
           - "status: ClientSessionStatus"
-          - "isActive: string"
+          - "isActive: bool"
           - "osName: string"
           - "platform: string"
           - "search: string"
@@ -1408,7 +1406,7 @@ resources:
         method: GET
         path: /meta
         query:
-          - "access_key_id: string!"
+          - "accessKeyId: string!"
         responseType: DiscoverMetaResponse
 
       # Prometheus/VictoriaMetrics http_sd_configs source: deployment-wide
@@ -1496,6 +1494,8 @@ resources:
       - action: resolve
         method: POST
         path: /:alertId/resolve
+        response:
+          - "alertId: string"
 
   - name: RegionAlerts
     path: /regions/:regionId/alerts
@@ -1528,6 +1528,8 @@ resources:
       - action: resolve
         method: POST
         path: /:alertId/resolve
+        response:
+          - "alertId: string"
 
   - name: GCWorkerEvents
     path: /regions/:regionId/gc-worker-events

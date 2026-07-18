@@ -11,6 +11,11 @@ import (
 	"strconv"
 )
 
+// MethodQuery is the HTTP QUERY method (RFC 10008): a safe, idempotent
+// method like GET, but its parameters travel in the request body instead of
+// the URL. Not in net/http's method constants. See docs/design/query-verb.md.
+const MethodQuery = "QUERY"
+
 type envelope struct {
 	Status    string          `json:"status"`
 	Message   string          `json:"message"`
@@ -80,6 +85,10 @@ func (c *Client) put(ctx context.Context, path string, body any) (json.RawMessag
 
 func (c *Client) delete(ctx context.Context, path string) (json.RawMessage, error) {
 	return c.do(ctx, http.MethodDelete, path, nil)
+}
+
+func (c *Client) query(ctx context.Context, path string, body any) (json.RawMessage, error) {
+	return c.do(ctx, MethodQuery, path, body)
 }
 
 func decodeJSON[T any](data json.RawMessage) (*T, error) {

@@ -872,7 +872,7 @@ type AccountListOptions struct {
 func (s *AccountsService) Get(ctx context.Context, accountID int64) (*Account, error)
 ```
 
-#### `Edit` - PUT /api/v1/accounts/:accountId/edit
+#### `Edit` - PUT /api/v1/accounts/:accountId
 
 ```go
 func (s *AccountsService) Edit(ctx context.Context, accountID int64, req *EditAccountRequest) (*IDResponse, error)
@@ -968,7 +968,7 @@ type UserListOptions struct {
 func (s *UsersService) Get(ctx context.Context, userID int64) (*User, error)
 ```
 
-#### `Bulk` - POST /api/v1/users/bulk
+#### `Bulk` - QUERY /api/v1/users/bulk
 
 ```go
 func (s *UsersService) Bulk(ctx context.Context, req *BulkUserRequest) (*BulkUserResponse, error)
@@ -990,7 +990,7 @@ type BulkUserResponse struct {
 }
 ```
 
-#### `Edit` - PUT /api/v1/users/:userId/edit
+#### `Edit` - PUT /api/v1/users/:userId
 
 ```go
 func (s *UsersService) Edit(ctx context.Context, userID int64, req *EditUserRequest) (*IDResponse, error)
@@ -1056,7 +1056,7 @@ type RegionListOptions struct {
 func (s *RegionsService) Get(ctx context.Context, regionID int64) (*Region, error)
 ```
 
-#### `Edit` - PUT /api/v1/regions/:regionId/edit
+#### `Edit` - PUT /api/v1/regions/:regionId
 
 ```go
 func (s *RegionsService) Edit(ctx context.Context, regionID int64, req *EditRegionRequest) (*IDResponse, error)
@@ -1140,7 +1140,7 @@ type RegionClusterListOptions struct {
 func (s *RegionClustersService) Get(ctx context.Context, regionID int64, clusterID int64) (*RegionCluster, error)
 ```
 
-#### `Edit` - PUT /api/v1/regions/:regionId/clusters/:clusterId/edit
+#### `Edit` - PUT /api/v1/regions/:regionId/clusters/:clusterId
 
 ```go
 func (s *RegionClustersService) Edit(ctx context.Context, regionID int64, clusterID int64, req *EditRegionClusterRequest) (*IDResponse, error)
@@ -1264,7 +1264,7 @@ func (s *StoragesService) Get(ctx context.Context, storageID int64) (*Storage, e
 func (s *StoragesService) ListBlockVolumes(ctx context.Context, storageID int64) ([]BlockVolume, error)
 ```
 
-#### `Edit` - PUT /api/v1/storages/:storageId/edit
+#### `Edit` - PUT /api/v1/storages/:storageId
 
 ```go
 func (s *StoragesService) Edit(ctx context.Context, storageID int64, req *EditStorageRequest) (*IDResponse, error)
@@ -1289,16 +1289,16 @@ type EditStorageRequest struct {
 func (s *StoragesService) Deactivate(ctx context.Context, storageID int64) (*IDResponse, error)
 ```
 
-#### `TestBucket` - POST /api/v1/storages/test-bucket
+#### `TestNewBucket` - POST /api/v1/storages/test-bucket
 
 ```go
-func (s *StoragesService) TestBucket(ctx context.Context, req *TestStorageBucketRequest) (*TestBucketStorageResponse, error)
+func (s *StoragesService) TestNewBucket(ctx context.Context, req *TestStorageNewBucketRequest) (*TestNewBucketStorageResponse, error)
 ```
 
 Request body:
 
 ```go
-type TestStorageBucketRequest struct {
+type TestStorageNewBucketRequest struct {
     Endpoint                 string                   `json:"endpoint"`
     Region                   string                   `json:"region,omitempty"`
     Bucket                   string                   `json:"bucket"`
@@ -1311,7 +1311,7 @@ type TestStorageBucketRequest struct {
 Response body:
 
 ```go
-type TestBucketStorageResponse struct {
+type TestNewBucketStorageResponse struct {
     BucketExists             bool                     `json:"bucketExists"`
     List                     bool                     `json:"list"`
     Write                    bool                     `json:"write"`
@@ -1462,7 +1462,7 @@ type VolumeListOptions struct {
 func (s *VolumesService) Get(ctx context.Context, volumeID int64) (*Volume, error)
 ```
 
-#### `Edit` - PUT /api/v1/volumes/:volumeId/edit
+#### `Edit` - PUT /api/v1/volumes/:volumeId
 
 ```go
 func (s *VolumesService) Edit(ctx context.Context, volumeID int64, req *EditVolumeRequest) (*IDResponse, error)
@@ -1698,13 +1698,7 @@ type CreateVolumeForkRequest struct {
 #### `ListForks` - GET /api/v1/volumes/:volumeId/forks
 
 ```go
-func (s *VolumesService) ListForks(ctx context.Context, volumeID int64, volumeType string) ([]Fork, error)
-```
-
-#### `ListAllForks` - GET /api/v1/volumes/:volumeId/forks?include_inactive=true
-
-```go
-func (s *VolumesService) ListAllForks(ctx context.Context, volumeID int64, volumeType string) ([]Fork, error)
+func (s *VolumesService) ListForks(ctx context.Context, volumeID int64, volumeType string, includeInactive bool) ([]Fork, error)
 ```
 
 #### `DeleteFork` - POST /api/v1/volumes/:volumeId/forks/:forkName/delete
@@ -1897,10 +1891,10 @@ type StatsHistoryServiceNodeResponse struct {
 
 Accessor: `client.Nodes`
 
-#### `ListAll` - GET /api/v1/nodes
+#### `List` - GET /api/v1/nodes
 
 ```go
-func (s *NodesService) ListAll(ctx context.Context, accountID int64, serviceType string, status string, inactiveHours int) ([]ServiceNode, error)
+func (s *NodesService) List(ctx context.Context, accountID int64, serviceType string, status string, inactiveHours int) ([]ServiceNode, error)
 ```
 
 ### ClientSessions
@@ -1924,7 +1918,7 @@ type ClientSessionListOptions struct {
     UserID               *int64       `url:"userId"`
     ClientType           string       `url:"clientType"`
     Status               ClientSessionStatus `url:"status"`
-    IsActive             string       `url:"isActive"`
+    IsActive             *bool        `url:"isActive"`
     OsName               string       `url:"osName"`
     Platform             string       `url:"platform"`
     Search               string       `url:"search"`
@@ -2059,7 +2053,15 @@ func (s *AlertsService) Count(ctx context.Context) (*AlertCountResponse, error)
 #### `Resolve` - POST /api/v1/alerts/:alertId/resolve
 
 ```go
-func (s *AlertsService) Resolve(ctx context.Context, alertID string) error
+func (s *AlertsService) Resolve(ctx context.Context, alertID string) (*ResolveAlertResponse, error)
+```
+
+Response body:
+
+```go
+type ResolveAlertResponse struct {
+    AlertID                  string                   `json:"alertId"`
+}
 ```
 
 ### RegionAlerts
@@ -2096,7 +2098,15 @@ func (s *RegionAlertsService) Count(ctx context.Context, regionID int64, regionC
 #### `Resolve` - POST /api/v1/regions/:regionId/alerts/:alertId/resolve
 
 ```go
-func (s *RegionAlertsService) Resolve(ctx context.Context, regionID int64, alertID string) error
+func (s *RegionAlertsService) Resolve(ctx context.Context, regionID int64, alertID string) (*ResolveRegionAlertResponse, error)
+```
+
+Response body:
+
+```go
+type ResolveRegionAlertResponse struct {
+    AlertID                  string                   `json:"alertId"`
+}
 ```
 
 ### GCWorkerEvents

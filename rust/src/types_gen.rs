@@ -1099,7 +1099,7 @@ pub struct EditStorageRequest {
 }
 
 #[derive(Debug, Clone, Serialize)]
-pub struct TestStorageBucketRequest {
+pub struct TestStorageNewBucketRequest {
     pub endpoint: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub region: Option<String>,
@@ -1113,7 +1113,7 @@ pub struct TestStorageBucketRequest {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TestBucketStorageResponse {
+pub struct TestNewBucketStorageResponse {
     #[serde(rename = "bucketExists")]
     pub bucket_exists: bool,
     pub list: bool,
@@ -1457,7 +1457,7 @@ pub struct ClientSessionListOptions {
     pub user_id: Option<i64>,
     pub client_type: Option<String>,
     pub status: Option<ClientSessionStatus>,
-    pub is_active: Option<String>,
+    pub is_active: Option<bool>,
     pub os_name: Option<String>,
     pub platform: Option<String>,
     pub search: Option<String>,
@@ -1486,6 +1486,12 @@ pub struct LoadLicenseRequest {
 
 // Alerts
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ResolveAlertResponse {
+    #[serde(rename = "alertId")]
+    pub alert_id: String,
+}
+
 #[derive(Debug, Clone, Default)]
 pub struct AlertListOptions {
     pub active: Option<bool>,
@@ -1499,6 +1505,12 @@ pub struct AlertListOptions {
 }
 
 // RegionAlerts
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ResolveRegionAlertResponse {
+    #[serde(rename = "alertId")]
+    pub alert_id: String,
+}
 
 #[derive(Debug, Clone, Default)]
 pub struct RegionAlertListOptions {

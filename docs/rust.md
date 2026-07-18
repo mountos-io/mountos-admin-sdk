@@ -867,7 +867,7 @@ pub struct AccountListOptions {
 pub async fn get(&self, account_id: i64) -> Result<Account, Error>
 ```
 
-#### `edit` - PUT /api/v1/accounts/:accountId/edit
+#### `edit` - PUT /api/v1/accounts/:accountId
 
 ```rust
 pub async fn edit(&self, account_id: i64, req: &EditAccountRequest) -> Result<IdResponse, Error>
@@ -963,7 +963,7 @@ pub struct UserListOptions {
 pub async fn get(&self, user_id: i64) -> Result<User, Error>
 ```
 
-#### `bulk` - POST /api/v1/users/bulk
+#### `bulk` - QUERY /api/v1/users/bulk
 
 ```rust
 pub async fn bulk(&self, req: &BulkUserRequest) -> Result<BulkUserResponse, Error>
@@ -985,7 +985,7 @@ pub struct BulkUserResponse {
 }
 ```
 
-#### `edit` - PUT /api/v1/users/:userId/edit
+#### `edit` - PUT /api/v1/users/:userId
 
 ```rust
 pub async fn edit(&self, user_id: i64, req: &EditUserRequest) -> Result<IdResponse, Error>
@@ -1051,7 +1051,7 @@ pub struct RegionListOptions {
 pub async fn get(&self, region_id: i64) -> Result<Region, Error>
 ```
 
-#### `edit` - PUT /api/v1/regions/:regionId/edit
+#### `edit` - PUT /api/v1/regions/:regionId
 
 ```rust
 pub async fn edit(&self, region_id: i64, req: &EditRegionRequest) -> Result<IdResponse, Error>
@@ -1135,7 +1135,7 @@ pub struct RegionClusterListOptions {
 pub async fn get(&self, region_id: i64, cluster_id: i64) -> Result<RegionCluster, Error>
 ```
 
-#### `edit` - PUT /api/v1/regions/:regionId/clusters/:clusterId/edit
+#### `edit` - PUT /api/v1/regions/:regionId/clusters/:clusterId
 
 ```rust
 pub async fn edit(&self, region_id: i64, cluster_id: i64, req: &EditRegionClusterRequest) -> Result<IdResponse, Error>
@@ -1259,7 +1259,7 @@ pub async fn get(&self, storage_id: i64) -> Result<Storage, Error>
 pub async fn list_block_volumes(&self, storage_id: i64) -> Result<Vec<BlockVolume>, Error>
 ```
 
-#### `edit` - PUT /api/v1/storages/:storageId/edit
+#### `edit` - PUT /api/v1/storages/:storageId
 
 ```rust
 pub async fn edit(&self, storage_id: i64, req: &EditStorageRequest) -> Result<IdResponse, Error>
@@ -1284,16 +1284,16 @@ pub struct EditStorageRequest {
 pub async fn deactivate(&self, storage_id: i64) -> Result<IdResponse, Error>
 ```
 
-#### `test_bucket` - POST /api/v1/storages/test-bucket
+#### `test_new_bucket` - POST /api/v1/storages/test-bucket
 
 ```rust
-pub async fn test_bucket(&self, req: &TestStorageBucketRequest) -> Result<TestBucketStorageResponse, Error>
+pub async fn test_new_bucket(&self, req: &TestStorageNewBucketRequest) -> Result<TestNewBucketStorageResponse, Error>
 ```
 
 Request body:
 
 ```rust
-pub struct TestStorageBucketRequest {
+pub struct TestStorageNewBucketRequest {
     pub endpoint: String,
     pub region: Option<String>,
     pub bucket: String,
@@ -1306,7 +1306,7 @@ pub struct TestStorageBucketRequest {
 Response body:
 
 ```rust
-pub struct TestBucketStorageResponse {
+pub struct TestNewBucketStorageResponse {
     pub bucket_exists: bool,
     pub list: bool,
     pub write: bool,
@@ -1457,7 +1457,7 @@ pub struct VolumeListOptions {
 pub async fn get(&self, volume_id: i64) -> Result<Volume, Error>
 ```
 
-#### `edit` - PUT /api/v1/volumes/:volumeId/edit
+#### `edit` - PUT /api/v1/volumes/:volumeId
 
 ```rust
 pub async fn edit(&self, volume_id: i64, req: &EditVolumeRequest) -> Result<IdResponse, Error>
@@ -1693,13 +1693,7 @@ pub struct CreateVolumeForkRequest {
 #### `list_forks` - GET /api/v1/volumes/:volumeId/forks
 
 ```rust
-pub async fn list_forks(&self, volume_id: i64, volume_type: Option<&str>) -> Result<Vec<Fork>, Error>
-```
-
-#### `list_all_forks` - GET /api/v1/volumes/:volumeId/forks?include_inactive=true
-
-```rust
-pub async fn list_all_forks(&self, volume_id: i64, volume_type: Option<&str>) -> Result<Vec<Fork>, Error>
+pub async fn list_forks(&self, volume_id: i64, volume_type: Option<&str>, include_inactive: Option<bool>) -> Result<Vec<Fork>, Error>
 ```
 
 #### `delete_fork` - POST /api/v1/volumes/:volumeId/forks/:forkName/delete
@@ -1892,10 +1886,10 @@ pub struct StatsHistoryServiceNodeResponse {
 
 Accessor: `client.nodes`
 
-#### `list_all` - GET /api/v1/nodes
+#### `list` - GET /api/v1/nodes
 
 ```rust
-pub async fn list_all(&self, account_id: i64, service_type: Option<&str>, status: Option<&str>, inactive_hours: Option<i64>) -> Result<Vec<ServiceNode>, Error>
+pub async fn list(&self, account_id: i64, service_type: Option<&str>, status: Option<&str>, inactive_hours: Option<i64>) -> Result<Vec<ServiceNode>, Error>
 ```
 
 ### ClientSessions
@@ -1919,7 +1913,7 @@ pub struct ClientSessionListOptions {
     pub user_id: Option<i64>,
     pub client_type: Option<String>,
     pub status: Option<ClientSessionStatus>,
-    pub is_active: Option<String>,
+    pub is_active: Option<bool>,
     pub os_name: Option<String>,
     pub platform: Option<String>,
     pub search: Option<String>,
@@ -2054,7 +2048,15 @@ pub async fn count(&self) -> Result<AlertCountResponse, Error>
 #### `resolve` - POST /api/v1/alerts/:alertId/resolve
 
 ```rust
-pub async fn resolve(&self, alert_id: &str) -> Result<(), Error>
+pub async fn resolve(&self, alert_id: &str) -> Result<ResolveAlertResponse, Error>
+```
+
+Response body:
+
+```rust
+pub struct ResolveAlertResponse {
+    pub alert_id: String,
+}
 ```
 
 ### RegionAlerts
@@ -2091,7 +2093,15 @@ pub async fn count(&self, region_id: i64, region_cluster_id: Option<i64>) -> Res
 #### `resolve` - POST /api/v1/regions/:regionId/alerts/:alertId/resolve
 
 ```rust
-pub async fn resolve(&self, region_id: i64, alert_id: &str) -> Result<(), Error>
+pub async fn resolve(&self, region_id: i64, alert_id: &str) -> Result<ResolveRegionAlertResponse, Error>
+```
+
+Response body:
+
+```rust
+pub struct ResolveRegionAlertResponse {
+    pub alert_id: String,
+}
 ```
 
 ### GCWorkerEvents

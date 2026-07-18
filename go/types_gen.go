@@ -740,7 +740,7 @@ type EditStorageRequest struct {
 	DirectAccess *bool  `json:"directAccess,omitempty"`
 }
 
-type TestStorageBucketRequest struct {
+type TestStorageNewBucketRequest struct {
 	Endpoint     string `json:"endpoint"`
 	Region       string `json:"region,omitempty"`
 	Bucket       string `json:"bucket"`
@@ -749,7 +749,7 @@ type TestStorageBucketRequest struct {
 	ProviderType string `json:"providerType,omitempty"`
 }
 
-type TestBucketStorageResponse struct {
+type TestNewBucketStorageResponse struct {
 	BucketExists bool `json:"bucketExists"`
 	List         bool `json:"list"`
 	Write        bool `json:"write"`
@@ -1002,7 +1002,7 @@ type ClientSessionListOptions struct {
 	UserID          *int64
 	ClientType      string
 	Status          ClientSessionStatus
-	IsActive        string
+	IsActive        *bool
 	OsName          string
 	Platform        string
 	Search          string
@@ -1028,6 +1028,10 @@ type LoadLicenseRequest struct {
 
 // Alerts
 
+type ResolveAlertResponse struct {
+	AlertID string `json:"alertId"`
+}
+
 type AlertListOptions struct {
 	Active    *bool
 	AccountID *int64
@@ -1040,6 +1044,10 @@ type AlertListOptions struct {
 }
 
 // RegionAlerts
+
+type ResolveRegionAlertResponse struct {
+	AlertID string `json:"alertId"`
+}
 
 type RegionAlertListOptions struct {
 	Active          *bool

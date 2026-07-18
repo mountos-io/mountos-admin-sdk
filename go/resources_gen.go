@@ -47,7 +47,7 @@ func (s *AccountsService) Get(ctx context.Context, accountID int64) (*Account, e
 }
 
 func (s *AccountsService) Edit(ctx context.Context, accountID int64, req *EditAccountRequest) (*IDResponse, error) {
-	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/accounts/%s/edit", strconv.FormatInt(accountID, 10)), req)
+	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/accounts/%s", strconv.FormatInt(accountID, 10)), req)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +124,7 @@ func (s *UsersService) Get(ctx context.Context, userID int64) (*User, error) {
 }
 
 func (s *UsersService) Bulk(ctx context.Context, req *BulkUserRequest) (*BulkUserResponse, error) {
-	data, err := s.c.post(ctx, "/api/v1/users/bulk", req)
+	data, err := s.c.query(ctx, "/api/v1/users/bulk", req)
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +132,7 @@ func (s *UsersService) Bulk(ctx context.Context, req *BulkUserRequest) (*BulkUse
 }
 
 func (s *UsersService) Edit(ctx context.Context, userID int64, req *EditUserRequest) (*IDResponse, error) {
-	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/users/%s/edit", strconv.FormatInt(userID, 10)), req)
+	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/users/%s", strconv.FormatInt(userID, 10)), req)
 	if err != nil {
 		return nil, err
 	}
@@ -182,7 +182,7 @@ func (s *RegionsService) Get(ctx context.Context, regionID int64) (*Region, erro
 }
 
 func (s *RegionsService) Edit(ctx context.Context, regionID int64, req *EditRegionRequest) (*IDResponse, error) {
-	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/regions/%s/edit", strconv.FormatInt(regionID, 10)), req)
+	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/regions/%s", strconv.FormatInt(regionID, 10)), req)
 	if err != nil {
 		return nil, err
 	}
@@ -256,7 +256,7 @@ func (s *RegionClustersService) Get(ctx context.Context, regionID int64, cluster
 }
 
 func (s *RegionClustersService) Edit(ctx context.Context, regionID int64, clusterID int64, req *EditRegionClusterRequest) (*IDResponse, error) {
-	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/regions/%s/clusters/%s/edit", strconv.FormatInt(regionID, 10), strconv.FormatInt(clusterID, 10)), req)
+	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/regions/%s/clusters/%s", strconv.FormatInt(regionID, 10), strconv.FormatInt(clusterID, 10)), req)
 	if err != nil {
 		return nil, err
 	}
@@ -349,7 +349,7 @@ func (s *StoragesService) ListBlockVolumes(ctx context.Context, storageID int64)
 }
 
 func (s *StoragesService) Edit(ctx context.Context, storageID int64, req *EditStorageRequest) (*IDResponse, error) {
-	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/storages/%s/edit", strconv.FormatInt(storageID, 10)), req)
+	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/storages/%s", strconv.FormatInt(storageID, 10)), req)
 	if err != nil {
 		return nil, err
 	}
@@ -364,12 +364,12 @@ func (s *StoragesService) Deactivate(ctx context.Context, storageID int64) (*IDR
 	return decodeJSON[IDResponse](data)
 }
 
-func (s *StoragesService) TestBucket(ctx context.Context, req *TestStorageBucketRequest) (*TestBucketStorageResponse, error) {
+func (s *StoragesService) TestNewBucket(ctx context.Context, req *TestStorageNewBucketRequest) (*TestNewBucketStorageResponse, error) {
 	data, err := s.c.post(ctx, "/api/v1/storages/test-bucket", req)
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[TestBucketStorageResponse](data)
+	return decodeJSON[TestNewBucketStorageResponse](data)
 }
 
 func (s *StoragesService) TestStorageBucket(ctx context.Context, storageID int64) (*TestStorageBucketStorageResponse, error) {
@@ -454,7 +454,7 @@ func (s *VolumesService) Get(ctx context.Context, volumeID int64) (*Volume, erro
 }
 
 func (s *VolumesService) Edit(ctx context.Context, volumeID int64, req *EditVolumeRequest) (*IDResponse, error) {
-	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/volumes/%s/edit", strconv.FormatInt(volumeID, 10)), req)
+	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/volumes/%s", strconv.FormatInt(volumeID, 10)), req)
 	if err != nil {
 		return nil, err
 	}
@@ -574,31 +574,13 @@ func (s *VolumesService) CreateFork(ctx context.Context, volumeID int64, req *Cr
 	return decodeJSON[Fork](data)
 }
 
-func (s *VolumesService) ListForks(ctx context.Context, volumeID int64, volumeType string) ([]Fork, error) {
+func (s *VolumesService) ListForks(ctx context.Context, volumeID int64, volumeType string, includeInactive bool) ([]Fork, error) {
 	q := url.Values{}
 	if volumeType != "" {
 		q.Set("volumeType", volumeType)
 	}
-	path := fmt.Sprintf("/api/v1/volumes/%s/forks", strconv.FormatInt(volumeID, 10))
-	if qs := q.Encode(); qs != "" {
-		path += "?" + qs
-	}
-	data, err := s.c.get(ctx, path)
-	if err != nil {
-		return nil, err
-	}
-	result, err := decodeJSON[[]Fork](data)
-	if err != nil {
-		return nil, err
-	}
-	return *result, nil
-}
-
-func (s *VolumesService) ListAllForks(ctx context.Context, volumeID int64, volumeType string) ([]Fork, error) {
-	q := url.Values{}
-	q.Set("include_inactive", "true")
-	if volumeType != "" {
-		q.Set("volumeType", volumeType)
+	if includeInactive {
+		q.Set("includeInactive", strconv.FormatBool(includeInactive))
 	}
 	path := fmt.Sprintf("/api/v1/volumes/%s/forks", strconv.FormatInt(volumeID, 10))
 	if qs := q.Encode(); qs != "" {
@@ -862,7 +844,7 @@ func (s *ServiceNodesService) StatsHistory(ctx context.Context, regionID int64, 
 
 type NodesService struct{ c *Client }
 
-func (s *NodesService) ListAll(ctx context.Context, accountID int64, serviceType string, status string, inactiveHours int) ([]ServiceNode, error) {
+func (s *NodesService) List(ctx context.Context, accountID int64, serviceType string, status string, inactiveHours int) ([]ServiceNode, error) {
 	q := url.Values{}
 	q.Set("accountId", strconv.FormatInt(accountID, 10))
 	if serviceType != "" {
@@ -913,8 +895,8 @@ func (s *ClientSessionsService) List(ctx context.Context, opts ClientSessionList
 		if opts.Status != "" {
 			q.Set("status", opts.Status)
 		}
-		if opts.IsActive != "" {
-			q.Set("isActive", opts.IsActive)
+		if opts.IsActive != nil {
+			q.Set("isActive", strconv.FormatBool(*opts.IsActive))
 		}
 		if opts.OsName != "" {
 			q.Set("osName", opts.OsName)
@@ -968,7 +950,7 @@ type DiscoverService struct{ c *Client }
 
 func (s *DiscoverService) Meta(ctx context.Context, accessKeyID string) (*DiscoverMetaResponse, error) {
 	q := url.Values{}
-	q.Set("access_key_id", accessKeyID)
+	q.Set("accessKeyId", accessKeyID)
 	data, err := s.c.get(ctx, "/api/v1/discover/meta"+"?"+q.Encode())
 	if err != nil {
 		return nil, err
@@ -1088,9 +1070,12 @@ func (s *AlertsService) Count(ctx context.Context) (*AlertCountResponse, error) 
 	return decodeJSON[AlertCountResponse](data)
 }
 
-func (s *AlertsService) Resolve(ctx context.Context, alertID string) error {
-	_, err := s.c.post(ctx, fmt.Sprintf("/api/v1/alerts/%s/resolve", alertID), nil)
-	return err
+func (s *AlertsService) Resolve(ctx context.Context, alertID string) (*ResolveAlertResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/alerts/%s/resolve", alertID), nil)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[ResolveAlertResponse](data)
 }
 
 type RegionAlertsService struct{ c *Client }
@@ -1141,9 +1126,12 @@ func (s *RegionAlertsService) Count(ctx context.Context, regionID int64, regionC
 	return decodeJSON[AlertCountResponse](data)
 }
 
-func (s *RegionAlertsService) Resolve(ctx context.Context, regionID int64, alertID string) error {
-	_, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%s/alerts/%s/resolve", strconv.FormatInt(regionID, 10), alertID), nil)
-	return err
+func (s *RegionAlertsService) Resolve(ctx context.Context, regionID int64, alertID string) (*ResolveRegionAlertResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%s/alerts/%s/resolve", strconv.FormatInt(regionID, 10), alertID), nil)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[ResolveRegionAlertResponse](data)
 }
 
 type GCWorkerEventsService struct{ c *Client }

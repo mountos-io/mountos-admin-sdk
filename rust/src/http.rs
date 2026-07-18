@@ -78,6 +78,20 @@ impl ClientInner {
         self.send(self.http.put(self.url(path)).json(body)).await
     }
 
+    /// HTTP QUERY (RFC 10008): a safe, idempotent method like GET, but its
+    /// parameters travel in the request body instead of the URL. reqwest has
+    /// no built-in `Method::QUERY`; "QUERY" is a valid token byte string, so
+    /// `from_bytes` cannot fail here. See docs/design/query-verb.md.
+    pub(crate) async fn query<T: DeserializeOwned, B: Serialize>(
+        &self,
+        path: &str,
+        body: &B,
+    ) -> Result<T, Error> {
+        let method = reqwest::Method::from_bytes(b"QUERY").expect("QUERY is a valid HTTP token");
+        self.send(self.http.request(method, self.url(path)).json(body))
+            .await
+    }
+
     // Emitted by the generator only for DELETE endpoints; the current spec has
     // none, so it is unused until one is added (kept for transport symmetry).
     #[allow(dead_code)]

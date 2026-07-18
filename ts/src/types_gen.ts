@@ -688,7 +688,7 @@ export interface EditStorageRequest {
   directAccess?: boolean
 }
 
-export interface TestStorageBucketRequest {
+export interface TestStorageNewBucketRequest {
   endpoint: string
   region?: string
   bucket: string
@@ -863,7 +863,7 @@ export interface ClientSessionListOptions extends ListOptions {
   userId?: number
   clientType?: string
   status?: ClientSessionStatus
-  isActive?: string
+  isActive?: boolean
   osName?: string
   platform?: string
   search?: string

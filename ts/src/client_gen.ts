@@ -8,7 +8,7 @@ import type {
   EditRegionRequest, RegionCluster, ClusterListOptions, CreateRegionClusterRequest, 
   RegionClusterListOptions, EditRegionClusterRequest, SetRegionClusterReadyRequest, 
   CreateStorageRequest, BlockMember, Storage, StorageListOptions, BlockVolume, 
-  EditStorageRequest, TestStorageBucketRequest, CompatibleStorage, 
+  EditStorageRequest, TestStorageNewBucketRequest, CompatibleStorage, 
   MoveStorageVolumesRequest, MoveVolumeFailure, BackfillFailure, CreateVolumeRequest, 
   Volume, VolumeListOptions, EditVolumeRequest, MoveVolumeClusterRequest, 
   DeactivateVolumeRequest, GenerateVolumeAPIKeysRequest, VolumeApiKey, 
@@ -129,7 +129,7 @@ export class AccountsResource {
   }
 
   edit(accountId: number, req: EditAccountRequest, signal?: AbortSignal): Promise<{ id: number }> {
-    return this.client.request('PUT', `/api/v1/accounts/${accountId}/edit`, req, signal)
+    return this.client.request('PUT', `/api/v1/accounts/${accountId}`, req, signal)
   }
 
   lock(accountId: number, signal?: AbortSignal): Promise<{ id: number }> {
@@ -165,11 +165,11 @@ export class UsersResource {
   }
 
   bulk(req: BulkUserRequest, signal?: AbortSignal): Promise<{ users: UserLite[] }> {
-    return this.client.request('POST', '/api/v1/users/bulk', req, signal)
+    return this.client.request('QUERY', '/api/v1/users/bulk', req, signal)
   }
 
   edit(userId: number, req: EditUserRequest, signal?: AbortSignal): Promise<{ id: number }> {
-    return this.client.request('PUT', `/api/v1/users/${userId}/edit`, req, signal)
+    return this.client.request('PUT', `/api/v1/users/${userId}`, req, signal)
   }
 
   deactivate(userId: number, signal?: AbortSignal): Promise<{ id: number }> {
@@ -193,7 +193,7 @@ export class RegionsResource {
   }
 
   edit(regionId: number, req: EditRegionRequest, signal?: AbortSignal): Promise<{ id: number }> {
-    return this.client.request('PUT', `/api/v1/regions/${regionId}/edit`, req, signal)
+    return this.client.request('PUT', `/api/v1/regions/${regionId}`, req, signal)
   }
 
   deactivate(regionId: number, signal?: AbortSignal): Promise<{ id: number }> {
@@ -225,7 +225,7 @@ export class RegionClustersResource {
   }
 
   edit(regionId: number, clusterId: number, req: EditRegionClusterRequest, signal?: AbortSignal): Promise<{ id: number }> {
-    return this.client.request('PUT', `/api/v1/regions/${regionId}/clusters/${clusterId}/edit`, req, signal)
+    return this.client.request('PUT', `/api/v1/regions/${regionId}/clusters/${clusterId}`, req, signal)
   }
 
   setDefault(regionId: number, clusterId: number, signal?: AbortSignal): Promise<{ id: number }> {
@@ -261,14 +261,14 @@ export class StoragesResource {
   }
 
   edit(storageId: number, req: EditStorageRequest, signal?: AbortSignal): Promise<{ id: number }> {
-    return this.client.request('PUT', `/api/v1/storages/${storageId}/edit`, req, signal)
+    return this.client.request('PUT', `/api/v1/storages/${storageId}`, req, signal)
   }
 
   deactivate(storageId: number, signal?: AbortSignal): Promise<{ id: number }> {
     return this.client.request('POST', `/api/v1/storages/${storageId}/deactivate`, undefined, signal)
   }
 
-  testBucket(req: TestStorageBucketRequest, signal?: AbortSignal): Promise<{ bucketExists: boolean; list: boolean; write: boolean; read: boolean; delete: boolean; multipart: boolean }> {
+  testNewBucket(req: TestStorageNewBucketRequest, signal?: AbortSignal): Promise<{ bucketExists: boolean; list: boolean; write: boolean; read: boolean; delete: boolean; multipart: boolean }> {
     return this.client.request('POST', '/api/v1/storages/test-bucket', req, signal)
   }
 
@@ -305,7 +305,7 @@ export class VolumesResource {
   }
 
   edit(volumeId: number, req: EditVolumeRequest, signal?: AbortSignal): Promise<{ id: number }> {
-    return this.client.request('PUT', `/api/v1/volumes/${volumeId}/edit`, req, signal)
+    return this.client.request('PUT', `/api/v1/volumes/${volumeId}`, req, signal)
   }
 
   lock(volumeId: number, signal?: AbortSignal): Promise<{ id: number }> {
@@ -364,12 +364,8 @@ export class VolumesResource {
     return this.client.request('POST', `/api/v1/volumes/${volumeId}/forks/create`, req, signal)
   }
 
-  listForks(volumeId: number, volumeType?: string, signal?: AbortSignal): Promise<Fork[]> {
-    return this.client.request('GET', `/api/v1/volumes/${volumeId}/forks${queryString({ volumeType: volumeType })}`, undefined, signal)
-  }
-
-  listAllForks(volumeId: number, volumeType?: string, signal?: AbortSignal): Promise<Fork[]> {
-    return this.client.request('GET', `/api/v1/volumes/${volumeId}/forks${queryString({ include_inactive: "true", volumeType: volumeType })}`, undefined, signal)
+  listForks(volumeId: number, volumeType?: string, includeInactive?: boolean, signal?: AbortSignal): Promise<Fork[]> {
+    return this.client.request('GET', `/api/v1/volumes/${volumeId}/forks${queryString({ volumeType: volumeType, includeInactive: includeInactive })}`, undefined, signal)
   }
 
   deleteFork(volumeId: number, forkName: string, req: DeleteVolumeForkRequest, signal?: AbortSignal): Promise<{ inactivatedFids: number[] }> {
@@ -476,7 +472,7 @@ export class ServiceNodesResource {
 export class NodesResource {
   constructor(private client: Client) {}
 
-  listAll(accountId: number, serviceType?: string, status?: string, inactiveHours?: number, signal?: AbortSignal): Promise<ServiceNode[]> {
+  list(accountId: number, serviceType?: string, status?: string, inactiveHours?: number, signal?: AbortSignal): Promise<ServiceNode[]> {
     return this.client.request('GET', `/api/v1/nodes${queryString({ accountId: accountId, serviceType: serviceType, status: status, inactiveHours: inactiveHours })}`, undefined, signal)
   }
 }
@@ -501,7 +497,7 @@ export class DiscoverResource {
   constructor(private client: Client) {}
 
   meta(accessKeyId: string, signal?: AbortSignal): Promise<DiscoverMetaResponse> {
-    return this.client.request('GET', `/api/v1/discover/meta${queryString({ access_key_id: accessKeyId })}`, undefined, signal)
+    return this.client.request('GET', `/api/v1/discover/meta${queryString({ accessKeyId: accessKeyId })}`, undefined, signal)
   }
 
   metricsTargets(signal?: AbortSignal): Promise<MetricsTarget[]> {
@@ -556,7 +552,7 @@ export class AlertsResource {
     return this.client.request('GET', '/api/v1/alerts/count', undefined, signal)
   }
 
-  resolve(alertId: string, signal?: AbortSignal): Promise<void> {
+  resolve(alertId: string, signal?: AbortSignal): Promise<{ alertId: string }> {
     return this.client.request('POST', `/api/v1/alerts/${alertId}/resolve`, undefined, signal)
   }
 }
@@ -572,7 +568,7 @@ export class RegionAlertsResource {
     return this.client.request('GET', `/api/v1/regions/${regionId}/alerts/count${queryString({ regionClusterId: regionClusterId })}`, undefined, signal)
   }
 
-  resolve(regionId: number, alertId: string, signal?: AbortSignal): Promise<void> {
+  resolve(regionId: number, alertId: string, signal?: AbortSignal): Promise<{ alertId: string }> {
     return this.client.request('POST', `/api/v1/regions/${regionId}/alerts/${alertId}/resolve`, undefined, signal)
   }
 }

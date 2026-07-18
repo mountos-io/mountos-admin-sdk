@@ -98,7 +98,7 @@ impl AccountsService {
     }
 
     pub async fn edit(&self, account_id: i64, req: &EditAccountRequest) -> Result<IdResponse, Error> {
-        self.inner.put(&format!("/api/v1/accounts/{}/edit", account_id), req).await
+        self.inner.put(&format!("/api/v1/accounts/{}", account_id), req).await
     }
 
     pub async fn lock(&self, account_id: i64) -> Result<IdResponse, Error> {
@@ -151,11 +151,11 @@ impl UsersService {
     }
 
     pub async fn bulk(&self, req: &BulkUserRequest) -> Result<BulkUserResponse, Error> {
-        self.inner.post("/api/v1/users/bulk", req).await
+        self.inner.query("/api/v1/users/bulk", req).await
     }
 
     pub async fn edit(&self, user_id: i64, req: &EditUserRequest) -> Result<IdResponse, Error> {
-        self.inner.put(&format!("/api/v1/users/{}/edit", user_id), req).await
+        self.inner.put(&format!("/api/v1/users/{}", user_id), req).await
     }
 
     pub async fn deactivate(&self, user_id: i64) -> Result<IdResponse, Error> {
@@ -193,7 +193,7 @@ impl RegionsService {
     }
 
     pub async fn edit(&self, region_id: i64, req: &EditRegionRequest) -> Result<IdResponse, Error> {
-        self.inner.put(&format!("/api/v1/regions/{}/edit", region_id), req).await
+        self.inner.put(&format!("/api/v1/regions/{}", region_id), req).await
     }
 
     pub async fn deactivate(&self, region_id: i64) -> Result<IdResponse, Error> {
@@ -257,7 +257,7 @@ impl RegionClustersService {
     }
 
     pub async fn edit(&self, region_id: i64, cluster_id: i64, req: &EditRegionClusterRequest) -> Result<IdResponse, Error> {
-        self.inner.put(&format!("/api/v1/regions/{}/clusters/{}/edit", region_id, cluster_id), req).await
+        self.inner.put(&format!("/api/v1/regions/{}/clusters/{}", region_id, cluster_id), req).await
     }
 
     pub async fn set_default(&self, region_id: i64, cluster_id: i64) -> Result<IdResponse, Error> {
@@ -322,14 +322,14 @@ impl StoragesService {
     }
 
     pub async fn edit(&self, storage_id: i64, req: &EditStorageRequest) -> Result<IdResponse, Error> {
-        self.inner.put(&format!("/api/v1/storages/{}/edit", storage_id), req).await
+        self.inner.put(&format!("/api/v1/storages/{}", storage_id), req).await
     }
 
     pub async fn deactivate(&self, storage_id: i64) -> Result<IdResponse, Error> {
         self.inner.post_empty(&format!("/api/v1/storages/{}/deactivate", storage_id)).await
     }
 
-    pub async fn test_bucket(&self, req: &TestStorageBucketRequest) -> Result<TestBucketStorageResponse, Error> {
+    pub async fn test_new_bucket(&self, req: &TestStorageNewBucketRequest) -> Result<TestNewBucketStorageResponse, Error> {
         self.inner.post("/api/v1/storages/test-bucket", req).await
     }
 
@@ -395,7 +395,7 @@ impl VolumesService {
     }
 
     pub async fn edit(&self, volume_id: i64, req: &EditVolumeRequest) -> Result<IdResponse, Error> {
-        self.inner.put(&format!("/api/v1/volumes/{}/edit", volume_id), req).await
+        self.inner.put(&format!("/api/v1/volumes/{}", volume_id), req).await
     }
 
     pub async fn lock(&self, volume_id: i64) -> Result<IdResponse, Error> {
@@ -461,20 +461,15 @@ impl VolumesService {
         self.inner.post(&format!("/api/v1/volumes/{}/forks/create", volume_id), req).await
     }
 
-    pub async fn list_forks(&self, volume_id: i64, volume_type: Option<&str>) -> Result<Vec<Fork>, Error> {
+    pub async fn list_forks(&self, volume_id: i64, volume_type: Option<&str>, include_inactive: Option<bool>) -> Result<Vec<Fork>, Error> {
         let mut query: Vec<(&str, String)> = Vec::new();
         if let Some(v) = volume_type {
             query.push(("volumeType", v.to_string()));
+        }
+        if let Some(v) = include_inactive {
+            query.push(("includeInactive", v.to_string()));
         }
         self.inner.get(&format!("/api/v1/volumes/{}/forks", volume_id), &query).await
-    }
-
-    pub async fn list_all_forks(&self, volume_id: i64, volume_type: Option<&str>) -> Result<Vec<Fork>, Error> {
-        let mut query: Vec<(&str, String)> = Vec::new();
-        if let Some(v) = volume_type {
-            query.push(("volumeType", v.to_string()));
-        }
-        self.inner.get(&format!("/api/v1/volumes/{}/forks?include_inactive=true", volume_id), &query).await
     }
 
     pub async fn delete_fork(&self, volume_id: i64, fork_name: &str, req: &DeleteVolumeForkRequest) -> Result<DeleteForkVolumeResponse, Error> {
@@ -685,7 +680,7 @@ pub struct NodesService {
 }
 
 impl NodesService {
-    pub async fn list_all(&self, account_id: i64, service_type: Option<&str>, status: Option<&str>, inactive_hours: Option<i64>) -> Result<Vec<ServiceNode>, Error> {
+    pub async fn list(&self, account_id: i64, service_type: Option<&str>, status: Option<&str>, inactive_hours: Option<i64>) -> Result<Vec<ServiceNode>, Error> {
         let mut query: Vec<(&str, String)> = Vec::new();
         query.push(("accountId", account_id.to_string()));
         if let Some(v) = service_type {
@@ -780,7 +775,7 @@ pub struct DiscoverService {
 impl DiscoverService {
     pub async fn meta(&self, access_key_id: &str) -> Result<DiscoverMetaResponse, Error> {
         let mut query: Vec<(&str, String)> = Vec::new();
-        query.push(("access_key_id", access_key_id.to_string()));
+        query.push(("accessKeyId", access_key_id.to_string()));
         self.inner.get("/api/v1/discover/meta", &query).await
     }
 
@@ -877,8 +872,8 @@ impl AlertsService {
         self.inner.get("/api/v1/alerts/count", &[]).await
     }
 
-    pub async fn resolve(&self, alert_id: &str) -> Result<(), Error> {
-        self.inner.post_empty::<serde_json::Value>(&format!("/api/v1/alerts/{}/resolve", alert_id)).await.map(|_| ())
+    pub async fn resolve(&self, alert_id: &str) -> Result<ResolveAlertResponse, Error> {
+        self.inner.post_empty(&format!("/api/v1/alerts/{}/resolve", alert_id)).await
     }
 }
 
@@ -927,8 +922,8 @@ impl RegionAlertsService {
         self.inner.get(&format!("/api/v1/regions/{}/alerts/count", region_id), &query).await
     }
 
-    pub async fn resolve(&self, region_id: i64, alert_id: &str) -> Result<(), Error> {
-        self.inner.post_empty::<serde_json::Value>(&format!("/api/v1/regions/{}/alerts/{}/resolve", region_id, alert_id)).await.map(|_| ())
+    pub async fn resolve(&self, region_id: i64, alert_id: &str) -> Result<ResolveRegionAlertResponse, Error> {
+        self.inner.post_empty(&format!("/api/v1/regions/{}/alerts/{}/resolve", region_id, alert_id)).await
     }
 }
 

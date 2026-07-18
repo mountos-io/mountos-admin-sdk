@@ -69,7 +69,7 @@ Response data: `{ "items": Account[], "pagination": PaginationMeta }`
 Param: `accountId`
 Response data: `Account`
 
-### PUT /api/v1/accounts/:accountId/edit
+### PUT /api/v1/accounts/:accountId
 Param: `accountId`
 Request:
 ```
@@ -149,7 +149,7 @@ Response data: `{ "items": User[], "pagination": PaginationMeta }`
 Param: `userId`
 Response data: `User`
 
-### POST /api/v1/users/bulk
+### QUERY /api/v1/users/bulk
 Request:
 ```
 {
@@ -158,7 +158,7 @@ Request:
 ```
 Response data: `{ "users": UserLite[] }`
 
-### PUT /api/v1/users/:userId/edit
+### PUT /api/v1/users/:userId
 Param: `userId`
 Request:
 ```
@@ -210,7 +210,7 @@ Response data: `{ "items": Region[], "pagination": PaginationMeta }`
 Param: `regionId`
 Response data: `Region`
 
-### PUT /api/v1/regions/:regionId/edit
+### PUT /api/v1/regions/:regionId
 Param: `regionId`
 Request:
 ```
@@ -289,7 +289,7 @@ Param: `regionId`
 Param: `clusterId`
 Response data: `RegionCluster`
 
-### PUT /api/v1/regions/:regionId/clusters/:clusterId/edit
+### PUT /api/v1/regions/:regionId/clusters/:clusterId
 Param: `regionId`
 Param: `clusterId`
 Request:
@@ -360,7 +360,7 @@ Response data: `Storage`
 Param: `storageId`
 Response data: `BlockVolume[]`
 
-### PUT /api/v1/storages/:storageId/edit
+### PUT /api/v1/storages/:storageId
 Param: `storageId`
 Request:
 ```
@@ -473,7 +473,7 @@ Response data: `{ "items": Volume[], "pagination": PaginationMeta }`
 Param: `volumeId`
 Response data: `Volume`
 
-### PUT /api/v1/volumes/:volumeId/edit
+### PUT /api/v1/volumes/:volumeId
 Param: `volumeId`
 Request:
 ```
@@ -600,12 +600,7 @@ Response data: `Fork`
 
 ### GET /api/v1/volumes/:volumeId/forks
 Param: `volumeId`
-Query: `volumeType=string`
-Response data: `Fork[]`
-
-### GET /api/v1/volumes/:volumeId/forks?include_inactive=true
-Param: `volumeId`
-Query: `volumeType=string`
+Query: `volumeType=string`, `includeInactive=bool(default false)`
 Response data: `Fork[]`
 
 ### POST /api/v1/volumes/:volumeId/forks/:forkName/delete
@@ -834,7 +829,7 @@ Response data: `ServiceNode[]`
 ## ClientSessions
 
 ### GET /api/v1/client-sessions/list
-Query: `accountId=int64(required)`, `regionId=int64`, `regionClusterId=int64`, `volumeId=int64`, `userId=int64`, `clientType=string`, `status=ClientSessionStatus`, `isActive=string`, `osName=string`, `platform=string`, `search=string`, `page=int(default 1)`, `limit=int(default 20)`
+Query: `accountId=int64(required)`, `regionId=int64`, `regionClusterId=int64`, `volumeId=int64`, `userId=int64`, `clientType=string`, `status=ClientSessionStatus`, `isActive=bool`, `osName=string`, `platform=string`, `search=string`, `page=int(default 1)`, `limit=int(default 20)`
 Response data: `{ "items": ClientSession[], "pagination": PaginationMeta }`
 
 ### GET /api/v1/client-sessions/:sessionId
@@ -879,7 +874,7 @@ Response data: `SessionSummary`
 ## Discover
 
 ### GET /api/v1/discover/meta
-Query: `access_key_id=string(required)`
+Query: `accessKeyId=string(required)`
 Response data: `DiscoverMetaResponse`
 
 ### GET /api/v1/discover/metrics-targets
@@ -979,6 +974,7 @@ Response data: `AlertCountResponse`
 
 ### POST /api/v1/alerts/:alertId/resolve
 Param: `alertId`
+Response data: `{ "alertId": string }`
 
 ### ServiceAlert Type
 ```
@@ -1016,6 +1012,7 @@ Response data: `AlertCountResponse`
 ### POST /api/v1/regions/:regionId/alerts/:alertId/resolve
 Param: `regionId`
 Param: `alertId`
+Response data: `{ "alertId": string }`
 
 ### RegionAlert Type
 ```
