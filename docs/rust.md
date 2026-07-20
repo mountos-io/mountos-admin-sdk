@@ -574,7 +574,6 @@ pub struct Region {
     pub export_id: String,
     pub account_id: i64,
     pub name: String,
-    pub dns: String,
     pub live_volume: i64,
     pub total_volume: i64,
     pub is_active: bool,
@@ -1024,7 +1023,6 @@ Request body:
 pub struct CreateRegionRequest {
     pub account_id: i64,
     pub name: String,
-    pub dns: String,
 }
 ```
 
@@ -1063,7 +1061,6 @@ Request body:
 pub struct EditRegionRequest {
     pub account_id: i64,
     pub name: String,
-    pub dns: String,
 }
 ```
 

@@ -106,7 +106,6 @@ types:
     - "exportId: string"
     - "accountId: int64"
     - "name: string"
-    - "dns: string"
     - "liveVolume: int64"
     - "totalVolume: int64"
     - "isActive: bool"
@@ -746,7 +745,6 @@ resources:
         request:
           - "accountId: int64!"
           - "name: string!"
-          - "dns: string!"
         response:
           - "id: int64"
 
@@ -772,7 +770,6 @@ resources:
         request:
           - "accountId: int64!"
           - "name: string!"
-          - "dns: string!"
         response:
           - "id: int64"
 

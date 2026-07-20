@@ -579,7 +579,6 @@ type Region struct {
     ExportID                 string                   `json:"exportId"`
     AccountID                int64                    `json:"accountId"`
     Name                     string                   `json:"name"`
-    DNS                      string                   `json:"dns"`
     LiveVolume               int64                    `json:"liveVolume"`
     TotalVolume              int64                    `json:"totalVolume"`
     IsActive                 bool                     `json:"isActive"`
@@ -1029,7 +1028,6 @@ Request body:
 type CreateRegionRequest struct {
     AccountID                int64                    `json:"accountId"`
     Name                     string                   `json:"name"`
-    DNS                      string                   `json:"dns"`
 }
 ```
 
@@ -1068,7 +1066,6 @@ Request body:
 type EditRegionRequest struct {
     AccountID                int64                    `json:"accountId"`
     Name                     string                   `json:"name"`
-    DNS                      string                   `json:"dns"`
 }
 ```
 

@@ -542,7 +542,6 @@ interface Region {
   exportId: string;
   accountId: number;
   name: string;
-  dns: string;
   liveVolume: number;
   totalVolume: number;
   isActive: boolean;
@@ -984,7 +983,6 @@ Request body:
 {
   accountId: number;
   name: string;
-  dns: string;
 }
 ```
 
@@ -1023,7 +1021,6 @@ Request body:
 {
   accountId: number;
   name: string;
-  dns: string;
 }
 ```
 

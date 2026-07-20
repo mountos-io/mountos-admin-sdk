@@ -196,8 +196,7 @@ Request:
 ```
 {
   "accountId": int64(required),
-  "name": string(required),
-  "dns": string(required)
+  "name": string(required)
 }
 ```
 Response data: `{ "id": int64 }`
@@ -216,8 +215,7 @@ Request:
 ```
 {
   "accountId": int64(required),
-  "name": string(required),
-  "dns": string(required)
+  "name": string(required)
 }
 ```
 Response data: `{ "id": int64 }`
@@ -233,7 +231,6 @@ Response data: `{ "id": int64 }`
   "exportId": string,
   "accountId": int64,
   "name": string,
-  "dns": string,
   "liveVolume": int64,
   "totalVolume": int64,
   "isActive": bool,

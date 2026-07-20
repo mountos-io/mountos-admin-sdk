@@ -113,7 +113,6 @@ async fn main() -> Result<(), Error> {
         .create(&CreateRegionRequest {
             account_id: created.id,
             name: format!("us-east-{}", created.id),
-            dns: format!("us-east-{}.example.com", created.id),
         })
         .await?;
     println!("Created region ID: {}", region.id);

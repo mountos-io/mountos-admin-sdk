@@ -73,7 +73,6 @@ export interface Region {
   exportId: string
   accountId: number
   name: string
-  dns: string
   liveVolume: number
   totalVolume: number
   isActive: boolean
@@ -619,13 +618,11 @@ export interface UserListOptions extends ListOptions {
 export interface CreateRegionRequest {
   accountId: number
   name: string
-  dns: string
 }
 
 export interface EditRegionRequest {
   accountId: number
   name: string
-  dns: string
 }
 
 export interface RegionListOptions extends ListOptions {

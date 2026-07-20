@@ -122,7 +122,6 @@ pub struct Region {
     #[serde(rename = "accountId")]
     pub account_id: i64,
     pub name: String,
-    pub dns: String,
     #[serde(rename = "liveVolume")]
     pub live_volume: i64,
     #[serde(rename = "totalVolume")]
@@ -982,7 +981,6 @@ pub struct CreateRegionRequest {
     #[serde(rename = "accountId")]
     pub account_id: i64,
     pub name: String,
-    pub dns: String,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -990,7 +988,6 @@ pub struct EditRegionRequest {
     #[serde(rename = "accountId")]
     pub account_id: i64,
     pub name: String,
-    pub dns: String,
 }
 
 #[derive(Debug, Clone, Default)]
