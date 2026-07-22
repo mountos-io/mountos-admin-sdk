@@ -47,7 +47,7 @@ type ClientSessionStatus = string
 const (
 	ClientSessionStatusConnected ClientSessionStatus = "connected"
 	ClientSessionStatusActive ClientSessionStatus = "active"
-	ClientSessionStatusUnhealthy ClientSessionStatus = "unhealthy"
+	ClientSessionStatusDegraded ClientSessionStatus = "degraded"
 	ClientSessionStatusDisconnected ClientSessionStatus = "disconnected"
 	ClientSessionStatusExpired ClientSessionStatus = "expired"
 	ClientSessionStatusUnknown ClientSessionStatus = "unknown"
@@ -305,13 +305,13 @@ type ClientSession struct {
 }
 
 type SessionSummary struct {
-	ByStatus       []SessionSummaryStatusEntry `json:"byStatus"`
-	ByPlatform     []SessionSummaryFacet       `json:"byPlatform"`
-	ByOsName       []SessionSummaryFacet       `json:"byOsName"`
-	RegionCount    int64                       `json:"regionCount"`
-	VolumeCount    int64                       `json:"volumeCount"`
-	HostCount      int64                       `json:"hostCount"`
-	UnhealthyCount int64                       `json:"unhealthyCount"`
+	ByStatus      []SessionSummaryStatusEntry `json:"byStatus"`
+	ByPlatform    []SessionSummaryFacet       `json:"byPlatform"`
+	ByOsName      []SessionSummaryFacet       `json:"byOsName"`
+	RegionCount   int64                       `json:"regionCount"`
+	VolumeCount   int64                       `json:"volumeCount"`
+	HostCount     int64                       `json:"hostCount"`
+	DegradedCount int64                       `json:"degradedCount"`
 }
 
 type DiscoverMetaResponse struct {

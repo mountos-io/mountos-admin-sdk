@@ -78,7 +78,7 @@ type ClientSessionStatus = string
 const (
     ClientSessionStatusConnected ClientSessionStatus = "connected"
     ClientSessionStatusActive ClientSessionStatus = "active"
-    ClientSessionStatusUnhealthy ClientSessionStatus = "unhealthy"
+    ClientSessionStatusDegraded ClientSessionStatus = "degraded"
     ClientSessionStatusDisconnected ClientSessionStatus = "disconnected"
     ClientSessionStatusExpired ClientSessionStatus = "expired"
     ClientSessionStatusUnknown ClientSessionStatus = "unknown"
@@ -688,7 +688,7 @@ type SessionSummary struct {
     RegionCount              int64                    `json:"regionCount"`
     VolumeCount              int64                    `json:"volumeCount"`
     HostCount                int64                    `json:"hostCount"`
-    UnhealthyCount           int64                    `json:"unhealthyCount"`
+    DegradedCount            int64                    `json:"degradedCount"`
 }
 ```
 

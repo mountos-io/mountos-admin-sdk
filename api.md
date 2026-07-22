@@ -39,7 +39,7 @@ Cursor-paginated responses nest in `data`:
 
 ## Enums
 
-`ClientSessionStatus`: "connected" | "active" | "unhealthy" | "disconnected" | "expired" | "unknown"
+`ClientSessionStatus`: "connected" | "active" | "degraded" | "disconnected" | "expired" | "unknown"
 
 `LicenseQuotaState`: "ok" | "exceeded"
 
@@ -1355,7 +1355,7 @@ Response data: `GCWorkerEventGoalsResponse`
   "regionCount": int64,
   "volumeCount": int64,
   "hostCount": int64,
-  "unhealthyCount": int64
+  "degradedCount": int64
 }
 ```
 

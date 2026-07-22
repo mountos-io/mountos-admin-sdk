@@ -46,14 +46,14 @@ enums:
   #   connected    - row written by register; replaced by 'active' on first
   #                  heartbeat. Rarely seen on the wire in practice.
   #   active       - heartbeating; healthy connection
-  #   unhealthy    - 6 to 15 min of silence, may still recover on next heartbeat
+  #   degraded     - 6 to 15 min of silence, may still recover on next heartbeat
   #   disconnected - clean unmount; client sent an explicit disconnect
   #   expired      - dead-sweep gave up after 15 min of silence with no explicit
   #                  disconnect; row is also is_active=false. Terminal state.
   ClientSessionStatus:
     - connected
     - active
-    - unhealthy
+    - degraded
     - disconnected
     - expired
     - unknown
@@ -484,7 +484,7 @@ types:
     - "regionCount: int64"
     - "volumeCount: int64"
     - "hostCount: int64"
-    - "unhealthyCount: int64"
+    - "degradedCount: int64"
 
   DiscoverMetaResponse:
     - "regionId: int64"

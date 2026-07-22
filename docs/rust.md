@@ -80,7 +80,7 @@ String aliases; the listed constants are the accepted values.
 pub type ClientSessionStatus = String;
 pub const CLIENT_SESSION_STATUS_CONNECTED: &str = "connected";
 pub const CLIENT_SESSION_STATUS_ACTIVE: &str = "active";
-pub const CLIENT_SESSION_STATUS_UNHEALTHY: &str = "unhealthy";
+pub const CLIENT_SESSION_STATUS_DEGRADED: &str = "degraded";
 pub const CLIENT_SESSION_STATUS_DISCONNECTED: &str = "disconnected";
 pub const CLIENT_SESSION_STATUS_EXPIRED: &str = "expired";
 pub const CLIENT_SESSION_STATUS_UNKNOWN: &str = "unknown";
@@ -683,7 +683,7 @@ pub struct SessionSummary {
     pub region_count: i64,
     pub volume_count: i64,
     pub host_count: i64,
-    pub unhealthy_count: i64,
+    pub degraded_count: i64,
 }
 ```
 

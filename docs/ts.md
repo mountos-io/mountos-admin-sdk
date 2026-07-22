@@ -58,7 +58,7 @@ type PaginationMeta             = { page: number; limit: number; total: number; 
 ### `ClientSessionStatus`
 
 ```typescript
-type ClientSessionStatus = "connected" | "active" | "unhealthy" | "disconnected" | "expired" | "unknown";
+type ClientSessionStatus = "connected" | "active" | "degraded" | "disconnected" | "expired" | "unknown";
 ```
 
 ### `LicenseQuotaState`
@@ -651,7 +651,7 @@ interface SessionSummary {
   regionCount: number;
   volumeCount: number;
   hostCount: number;
-  unhealthyCount: number;
+  degradedCount: number;
 }
 ```
 

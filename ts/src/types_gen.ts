@@ -37,7 +37,7 @@ export interface ListOptions {
   limit?: number
 }
 
-export type ClientSessionStatus = 'connected' | 'active' | 'unhealthy' | 'disconnected' | 'expired' | 'unknown'
+export type ClientSessionStatus = 'connected' | 'active' | 'degraded' | 'disconnected' | 'expired' | 'unknown'
 
 export type LicenseQuotaState = 'ok' | 'exceeded'
 
@@ -283,7 +283,7 @@ export interface SessionSummary {
   regionCount: number
   volumeCount: number
   hostCount: number
-  unhealthyCount: number
+  degradedCount: number
 }
 
 export interface DiscoverMetaResponse {
