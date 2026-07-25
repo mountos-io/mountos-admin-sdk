@@ -508,6 +508,10 @@ export interface NodeStatsSample {
   dbConnsInUse1m?: number
   dbConnsInUse5m?: number
   dbConnsInUse15m?: number
+  dbPingAvgUs?: number
+  dbPingMinUs?: number
+  dbPingMaxUs?: number
+  dbPingStdDevUs?: number
 }
 
 export interface Ref {

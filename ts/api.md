@@ -1323,7 +1323,11 @@ Response data: `GCWorkerEventGoalsResponse`
   "dbConnsFree"?: int,
   "dbConnsInUse1m"?: float,
   "dbConnsInUse5m"?: float,
-  "dbConnsInUse15m"?: float
+  "dbConnsInUse15m"?: float,
+  "dbPingAvgUs"?: float,
+  "dbPingMinUs"?: float,
+  "dbPingMaxUs"?: float,
+  "dbPingStdDevUs"?: float
 }
 ```
 

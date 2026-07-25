@@ -536,6 +536,10 @@ type NodeStatsSample struct {
 	DbConnsInUse1m   float64 `json:"dbConnsInUse1m,omitempty"`
 	DbConnsInUse5m   float64 `json:"dbConnsInUse5m,omitempty"`
 	DbConnsInUse15m  float64 `json:"dbConnsInUse15m,omitempty"`
+	DbPingAvgUs      float64 `json:"dbPingAvgUs,omitempty"`
+	DbPingMinUs      float64 `json:"dbPingMinUs,omitempty"`
+	DbPingMaxUs      float64 `json:"dbPingMaxUs,omitempty"`
+	DbPingStdDevUs   float64 `json:"dbPingStdDevUs,omitempty"`
 }
 
 type Ref struct {

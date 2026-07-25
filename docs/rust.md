@@ -554,6 +554,10 @@ pub struct NodeStatsSample {
     pub db_conns_in_use1m: Option<f64>,
     pub db_conns_in_use5m: Option<f64>,
     pub db_conns_in_use15m: Option<f64>,
+    pub db_ping_avg_us: Option<f64>,
+    pub db_ping_min_us: Option<f64>,
+    pub db_ping_max_us: Option<f64>,
+    pub db_ping_std_dev_us: Option<f64>,
 }
 ```
 

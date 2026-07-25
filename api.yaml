@@ -442,6 +442,15 @@ types:
     - "dbConnsInUse1m: float?"
     - "dbConnsInUse5m: float?"
     - "dbConnsInUse15m: float?"
+    # Node<->DB network round-trip (microseconds): kernel TCP_INFO on the
+    # live connection where reachable, else a TCP dial-handshake burst. No
+    # SQL involved either way, distinct from dbLatency*Us above which times
+    # actual query execution. Point-in-time (the latest sample's own
+    # stats), not decayed.
+    - "dbPingAvgUs: float?"
+    - "dbPingMinUs: float?"
+    - "dbPingMaxUs: float?"
+    - "dbPingStdDevUs: float?"
 
   ClientSession:
     - "id: int64"

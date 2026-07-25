@@ -815,6 +815,14 @@ pub struct NodeStatsSample {
     pub db_conns_in_use5m: Option<f64>,
     #[serde(rename = "dbConnsInUse15m", skip_serializing_if = "Option::is_none")]
     pub db_conns_in_use15m: Option<f64>,
+    #[serde(rename = "dbPingAvgUs", skip_serializing_if = "Option::is_none")]
+    pub db_ping_avg_us: Option<f64>,
+    #[serde(rename = "dbPingMinUs", skip_serializing_if = "Option::is_none")]
+    pub db_ping_min_us: Option<f64>,
+    #[serde(rename = "dbPingMaxUs", skip_serializing_if = "Option::is_none")]
+    pub db_ping_max_us: Option<f64>,
+    #[serde(rename = "dbPingStdDevUs", skip_serializing_if = "Option::is_none")]
+    pub db_ping_std_dev_us: Option<f64>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
