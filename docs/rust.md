@@ -788,10 +788,7 @@ pub struct Volume {
     pub pending_volume: i64,
     pub live_inactive_volume: i64,
     pub locked: bool,
-    pub retention_period: i32,
-    pub grace_period: i32,
-    pub fork_grace_period: i32,
-    pub event_log_retention_period: i32,
+    pub retention: VolumeRetentionPolicy,
     pub is_active: bool,
     pub is_cleanup_meta_enabled: bool,
     pub is_cleanup_storage_enabled: bool,
@@ -819,6 +816,17 @@ pub struct VolumeRef {
     pub id: i64,
     pub name: String,
     pub r#type: Option<String>,
+}
+```
+
+### `VolumeRetentionPolicy`
+
+```rust
+pub struct VolumeRetentionPolicy {
+    pub data_days: Option<i32>,
+    pub grace_days: Option<i32>,
+    pub fork_grace_days: Option<i32>,
+    pub event_log_days: Option<i32>,
 }
 ```
 
@@ -1421,10 +1429,7 @@ pub struct CreateVolumeRequest {
     pub volume_type: String,
     pub encryption: Option<bool>,
     pub encryption_key: Option<String>,
-    pub retention_period: Option<i32>,
-    pub grace_period: Option<i32>,
-    pub fork_grace_period: Option<i32>,
-    pub event_log_retention_period: Option<i32>,
+    pub retention: Option<VolumeRetentionPolicy>,
     pub quota_limit: Option<i64>,
     pub region_cluster_id: Option<i64>,
     pub region_cluster_uuid: Option<String>,
@@ -1479,10 +1484,7 @@ Request body:
 ```rust
 pub struct EditVolumeRequest {
     pub description: Option<String>,
-    pub retention_period: Option<i32>,
-    pub grace_period: Option<i32>,
-    pub fork_grace_period: Option<i32>,
-    pub event_log_retention_period: Option<i32>,
+    pub retention: Option<VolumeRetentionPolicy>,
 }
 ```
 

@@ -793,10 +793,7 @@ type Volume struct {
     PendingVolume            int64                    `json:"pendingVolume"`
     LiveInactiveVolume       int64                    `json:"liveInactiveVolume"`
     Locked                   bool                     `json:"locked"`
-    RetentionPeriod          int32                    `json:"retentionPeriod"`
-    GracePeriod              int32                    `json:"gracePeriod"`
-    ForkGracePeriod          int32                    `json:"forkGracePeriod"`
-    EventLogRetentionPeriod  int32                    `json:"eventLogRetentionPeriod"`
+    Retention                VolumeRetentionPolicy    `json:"retention"`
     IsActive                 bool                     `json:"isActive"`
     IsCleanupMetaEnabled     bool                     `json:"isCleanupMetaEnabled"`
     IsCleanupStorageEnabled  bool                     `json:"isCleanupStorageEnabled"`
@@ -824,6 +821,17 @@ type VolumeRef struct {
     ID                       int64                    `json:"id"`
     Name                     string                   `json:"name"`
     Type                     string                   `json:"type,omitempty"`
+}
+```
+
+### `VolumeRetentionPolicy`
+
+```go
+type VolumeRetentionPolicy struct {
+    DataDays                 int32                    `json:"dataDays,omitempty"`
+    GraceDays                int32                    `json:"graceDays,omitempty"`
+    ForkGraceDays            int32                    `json:"forkGraceDays,omitempty"`
+    EventLogDays             int32                    `json:"eventLogDays,omitempty"`
 }
 ```
 
@@ -1426,10 +1434,7 @@ type CreateVolumeRequest struct {
     VolumeType               string                   `json:"volumeType"`
     Encryption               *bool                    `json:"encryption,omitempty"`
     EncryptionKey            string                   `json:"encryptionKey,omitempty"`
-    RetentionPeriod          *int32                   `json:"retentionPeriod,omitempty"`
-    GracePeriod              *int32                   `json:"gracePeriod,omitempty"`
-    ForkGracePeriod          *int32                   `json:"forkGracePeriod,omitempty"`
-    EventLogRetentionPeriod  *int32                   `json:"eventLogRetentionPeriod,omitempty"`
+    Retention                VolumeRetentionPolicy    `json:"retention,omitempty"`
     QuotaLimit               *int64                   `json:"quotaLimit,omitempty"`
     RegionClusterID          *int64                   `json:"regionClusterId,omitempty"`
     RegionClusterUUID        string                   `json:"regionClusterUuid,omitempty"`
@@ -1484,10 +1489,7 @@ Request body:
 ```go
 type EditVolumeRequest struct {
     Description              string                   `json:"description,omitempty"`
-    RetentionPeriod          *int32                   `json:"retentionPeriod,omitempty"`
-    GracePeriod              *int32                   `json:"gracePeriod,omitempty"`
-    ForkGracePeriod          *int32                   `json:"forkGracePeriod,omitempty"`
-    EventLogRetentionPeriod  *int32                   `json:"eventLogRetentionPeriod,omitempty"`
+    Retention                VolumeRetentionPolicy    `json:"retention,omitempty"`
 }
 ```
 

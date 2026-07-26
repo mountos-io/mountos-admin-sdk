@@ -243,14 +243,7 @@ pub struct Volume {
     #[serde(rename = "liveInactiveVolume")]
     pub live_inactive_volume: i64,
     pub locked: bool,
-    #[serde(rename = "retentionPeriod")]
-    pub retention_period: i32,
-    #[serde(rename = "gracePeriod")]
-    pub grace_period: i32,
-    #[serde(rename = "forkGracePeriod")]
-    pub fork_grace_period: i32,
-    #[serde(rename = "eventLogRetentionPeriod")]
-    pub event_log_retention_period: i32,
+    pub retention: VolumeRetentionPolicy,
     #[serde(rename = "isActive")]
     pub is_active: bool,
     #[serde(rename = "isCleanupMetaEnabled")]
@@ -895,6 +888,18 @@ pub struct VolumeRef {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct VolumeRetentionPolicy {
+    #[serde(rename = "dataDays", skip_serializing_if = "Option::is_none")]
+    pub data_days: Option<i32>,
+    #[serde(rename = "graceDays", skip_serializing_if = "Option::is_none")]
+    pub grace_days: Option<i32>,
+    #[serde(rename = "forkGraceDays", skip_serializing_if = "Option::is_none")]
+    pub fork_grace_days: Option<i32>,
+    #[serde(rename = "eventLogDays", skip_serializing_if = "Option::is_none")]
+    pub event_log_days: Option<i32>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VolumeSizePoint {
     #[serde(rename = "bucketEnd")]
     pub bucket_end: String,
@@ -1205,14 +1210,8 @@ pub struct CreateVolumeRequest {
     pub encryption: Option<bool>,
     #[serde(rename = "encryptionKey", skip_serializing_if = "Option::is_none")]
     pub encryption_key: Option<String>,
-    #[serde(rename = "retentionPeriod", skip_serializing_if = "Option::is_none")]
-    pub retention_period: Option<i32>,
-    #[serde(rename = "gracePeriod", skip_serializing_if = "Option::is_none")]
-    pub grace_period: Option<i32>,
-    #[serde(rename = "forkGracePeriod", skip_serializing_if = "Option::is_none")]
-    pub fork_grace_period: Option<i32>,
-    #[serde(rename = "eventLogRetentionPeriod", skip_serializing_if = "Option::is_none")]
-    pub event_log_retention_period: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub retention: Option<VolumeRetentionPolicy>,
     #[serde(rename = "quotaLimit", skip_serializing_if = "Option::is_none")]
     pub quota_limit: Option<i64>,
     #[serde(rename = "regionClusterId", skip_serializing_if = "Option::is_none")]
@@ -1232,14 +1231,8 @@ pub struct CreateVolumeResponse {
 pub struct EditVolumeRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
-    #[serde(rename = "retentionPeriod", skip_serializing_if = "Option::is_none")]
-    pub retention_period: Option<i32>,
-    #[serde(rename = "gracePeriod", skip_serializing_if = "Option::is_none")]
-    pub grace_period: Option<i32>,
-    #[serde(rename = "forkGracePeriod", skip_serializing_if = "Option::is_none")]
-    pub fork_grace_period: Option<i32>,
-    #[serde(rename = "eventLogRetentionPeriod", skip_serializing_if = "Option::is_none")]
-    pub event_log_retention_period: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub retention: Option<VolumeRetentionPolicy>,
 }
 
 #[derive(Debug, Clone, Serialize)]

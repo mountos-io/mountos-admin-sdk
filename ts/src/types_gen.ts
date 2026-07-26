@@ -145,10 +145,7 @@ export interface Volume {
   pendingVolume: number
   liveInactiveVolume: number
   locked: boolean
-  retentionPeriod: number
-  gracePeriod: number
-  forkGracePeriod: number
-  eventLogRetentionPeriod: number
+  retention: VolumeRetentionPolicy
   isActive: boolean
   isCleanupMetaEnabled: boolean
   isCleanupStorageEnabled: boolean
@@ -562,6 +559,13 @@ export interface VolumeRef {
   type?: string
 }
 
+export interface VolumeRetentionPolicy {
+  dataDays?: number
+  graceDays?: number
+  forkGraceDays?: number
+  eventLogDays?: number
+}
+
 export interface VolumeSizePoint {
   bucketEnd: string
   liveVolume: number
@@ -728,10 +732,7 @@ export interface CreateVolumeRequest {
   volumeType: string
   encryption?: boolean
   encryptionKey?: string
-  retentionPeriod?: number
-  gracePeriod?: number
-  forkGracePeriod?: number
-  eventLogRetentionPeriod?: number
+  retention?: VolumeRetentionPolicy
   quotaLimit?: number
   regionClusterId?: number
   regionClusterUuid?: string
@@ -739,10 +740,7 @@ export interface CreateVolumeRequest {
 
 export interface EditVolumeRequest {
   description?: string
-  retentionPeriod?: number
-  gracePeriod?: number
-  forkGracePeriod?: number
-  eventLogRetentionPeriod?: number
+  retention?: VolumeRetentionPolicy
 }
 
 export interface MoveVolumeClusterRequest {

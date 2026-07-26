@@ -453,10 +453,7 @@ Request:
   "volumeType": string(required),
   "encryption"?: bool,
   "encryptionKey"?: string,
-  "retentionPeriod"?: int32,
-  "gracePeriod"?: int32,
-  "forkGracePeriod"?: int32,
-  "eventLogRetentionPeriod"?: int32,
+  "retention"?: VolumeRetentionPolicy,
   "quotaLimit"?: int64,
   "regionClusterId"?: int64,
   "regionClusterUuid"?: string
@@ -478,10 +475,7 @@ Request:
 ```
 {
   "description"?: string,
-  "retentionPeriod"?: int32,
-  "gracePeriod"?: int32,
-  "forkGracePeriod"?: int32,
-  "eventLogRetentionPeriod"?: int32
+  "retention"?: VolumeRetentionPolicy
 }
 ```
 Response data: `{ "id": int64 }`
@@ -644,10 +638,7 @@ Response data: `Fork`
   "pendingVolume": int64,
   "liveInactiveVolume": int64,
   "locked": bool,
-  "retentionPeriod": int32,
-  "gracePeriod": int32,
-  "forkGracePeriod": int32,
-  "eventLogRetentionPeriod": int32,
+  "retention": VolumeRetentionPolicy,
   "isActive": bool,
   "isCleanupMetaEnabled": bool,
   "isCleanupStorageEnabled": bool,
@@ -1414,6 +1405,16 @@ Response data: `GCWorkerEventGoalsResponse`
   "id": int64,
   "name": string,
   "type"?: string
+}
+```
+
+### VolumeRetentionPolicy Type
+```
+{
+  "dataDays"?: int32,
+  "graceDays"?: int32,
+  "forkGraceDays"?: int32,
+  "eventLogDays"?: int32
 }
 ```
 

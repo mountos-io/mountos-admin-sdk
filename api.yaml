@@ -76,6 +76,15 @@ types:
   RetentionPolicy:
     - "clientSessionDays: int32?"
 
+  # Per-volume retention/lifecycle policy. Every field has a server-side
+  # default applied when absent, so an older client that omits one is
+  # unaffected and new fields can be added without a migration.
+  VolumeRetentionPolicy:
+    - "dataDays: int32?"
+    - "graceDays: int32?"
+    - "forkGraceDays: int32?"
+    - "eventLogDays: int32?"
+
   Account:
     - "id: int64"
     - "name: string"
@@ -226,10 +235,7 @@ types:
     - "pendingVolume: int64"
     - "liveInactiveVolume: int64"
     - "locked: bool"
-    - "retentionPeriod: int32"
-    - "gracePeriod: int32"
-    - "forkGracePeriod: int32"
-    - "eventLogRetentionPeriod: int32"
+    - "retention: VolumeRetentionPolicy"
     - "isActive: bool"
     - "isCleanupMetaEnabled: bool"
     - "isCleanupStorageEnabled: bool"
@@ -1024,10 +1030,7 @@ resources:
           - "volumeType: string!"
           - "encryption: bool"
           - "encryptionKey: string"
-          - "retentionPeriod: int32"
-          - "gracePeriod: int32"
-          - "forkGracePeriod: int32?"
-          - "eventLogRetentionPeriod: int32?"
+          - "retention: VolumeRetentionPolicy?"
           - "quotaLimit: int64"
           # Optional cluster pin. Omit to land on the region's default cluster.
           # If set, the cluster must belong to the storage's region, be
@@ -1068,10 +1071,7 @@ resources:
         # value) so callers can't accidentally retype a populated volume.
         request:
           - "description: string"
-          - "retentionPeriod: int32"
-          - "gracePeriod: int32"
-          - "forkGracePeriod: int32?"
-          - "eventLogRetentionPeriod: int32?"
+          - "retention: VolumeRetentionPolicy?"
         response:
           - "id: int64"
 
