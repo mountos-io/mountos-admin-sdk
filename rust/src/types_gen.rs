@@ -96,6 +96,8 @@ pub struct Account {
     #[serde(rename = "isActive")]
     pub is_active: bool,
     pub locked: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub retention: Option<RetentionPolicy>,
     #[serde(rename = "createdAt")]
     pub created_at: String,
     #[serde(rename = "updatedAt")]
@@ -846,6 +848,12 @@ pub struct RegionVolumeMetrics {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RetentionPolicy {
+    #[serde(rename = "clientSessionDays", skip_serializing_if = "Option::is_none")]
+    pub client_session_days: Option<i32>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SessionSummaryFacet {
     pub label: String,
     pub count: i64,
@@ -922,6 +930,8 @@ pub struct EditAccountRequest {
     pub icon_url: Option<String>,
     #[serde(rename = "providerInfo", skip_serializing_if = "Option::is_none")]
     pub provider_info: Option<serde_json::Value>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub retention: Option<RetentionPolicy>,
 }
 
 #[derive(Debug, Clone, Serialize)]

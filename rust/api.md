@@ -77,7 +77,8 @@ Request:
   "name": string(required),
   "description"?: string,
   "iconUrl"?: string,
-  "providerInfo"?: object
+  "providerInfo"?: object,
+  "retention"?: RetentionPolicy
 }
 ```
 Response data: `{ "id": int64 }`
@@ -119,6 +120,7 @@ Response data: `{ "id": int64 }`
   "quotaExcessPct": int32,
   "isActive": bool,
   "locked": bool,
+  "retention"?: RetentionPolicy,
   "createdAt": RFC3339,
   "updatedAt": RFC3339
 }
@@ -1347,6 +1349,13 @@ Response data: `GCWorkerEventGoalsResponse`
   "volumeCount": int64,
   "totalVolumeUsed": int64,
   "totalQuotaLimit": int64
+}
+```
+
+### RetentionPolicy Type
+```
+{
+  "clientSessionDays"?: int32
 }
 ```
 

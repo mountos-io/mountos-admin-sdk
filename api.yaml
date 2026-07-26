@@ -70,6 +70,12 @@ types:
     - "name: string"
     - "type: string?"
 
+  # Per-account retention policy. Every field has a server-side default applied
+  # when absent, so an older client that omits one is unaffected and new fields
+  # can be added without a migration.
+  RetentionPolicy:
+    - "clientSessionDays: int32?"
+
   Account:
     - "id: int64"
     - "name: string"
@@ -82,6 +88,7 @@ types:
     - "quotaExcessPct: int32"
     - "isActive: bool"
     - "locked: bool"
+    - "retention: RetentionPolicy?"
     - "createdAt: datetime"
     - "updatedAt: datetime"
 
@@ -637,6 +644,10 @@ resources:
         path: /:accountId
         responseType: Account
 
+      # retention holds the account's retention policy. clientSessionDays is how
+      # long a disconnected client session row is kept before pruning (default 90
+      # when absent). Where these are stored is a server concern; callers never
+      # see the underlying representation. Omitted fields keep their stored value.
       - action: edit
         method: PUT
         path: /:accountId
@@ -645,6 +656,7 @@ resources:
           - "description: string"
           - "iconUrl: string"
           - "providerInfo: object"
+          - "retention: RetentionPolicy"
         response:
           - "id: int64"
 

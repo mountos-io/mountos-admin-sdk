@@ -127,6 +127,7 @@ type Account struct {
     QuotaExcessPct           int32                    `json:"quotaExcessPct"`
     IsActive                 bool                     `json:"isActive"`
     Locked                   bool                     `json:"locked"`
+    Retention                RetentionPolicy          `json:"retention,omitempty"`
     CreatedAt                string                   `json:"createdAt"`
     UpdatedAt                string                   `json:"updatedAt"`
 }
@@ -638,6 +639,14 @@ type RegionVolumeMetrics struct {
 }
 ```
 
+### `RetentionPolicy`
+
+```go
+type RetentionPolicy struct {
+    ClientSessionDays        int32                    `json:"clientSessionDays,omitempty"`
+}
+```
+
 ### `ServiceAlert`
 
 ```go
@@ -889,6 +898,7 @@ type EditAccountRequest struct {
     Description              string                   `json:"description,omitempty"`
     IconURL                  string                   `json:"iconUrl,omitempty"`
     ProviderInfo             map[string]any           `json:"providerInfo,omitempty"`
+    Retention                RetentionPolicy          `json:"retention,omitempty"`
 }
 ```
 

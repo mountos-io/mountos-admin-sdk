@@ -55,6 +55,7 @@ export interface Account {
   quotaExcessPct: number
   isActive: boolean
   locked: boolean
+  retention?: RetentionPolicy
   createdAt: string
   updatedAt: string
 }
@@ -527,6 +528,10 @@ export interface RegionVolumeMetrics {
   totalQuotaLimit: number
 }
 
+export interface RetentionPolicy {
+  clientSessionDays?: number
+}
+
 export interface SessionSummaryFacet {
   label: string
   count: number
@@ -579,6 +584,7 @@ export interface EditAccountRequest {
   description?: string
   iconUrl?: string
   providerInfo?: Record<string, unknown>
+  retention?: RetentionPolicy
 }
 
 export interface UpdateAccountQuotaRequest {

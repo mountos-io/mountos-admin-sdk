@@ -2,7 +2,7 @@
 
 import type {
   ListOptions, PaginatedResponse, CursorPaginatedResponse,
-  CreateAccountRequest, Account, AccountListOptions, EditAccountRequest, 
+  CreateAccountRequest, Account, AccountListOptions, EditAccountRequest, RetentionPolicy, 
   UpdateAccountQuotaRequest, AddUserRequest, User, UserListOptions, BulkUserRequest, 
   UserLite, EditUserRequest, CreateRegionRequest, Region, RegionListOptions, 
   EditRegionRequest, RegionCluster, ClusterListOptions, CreateRegionClusterRequest, 

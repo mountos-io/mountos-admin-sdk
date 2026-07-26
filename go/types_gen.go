@@ -72,19 +72,20 @@ const (
 
 
 type Account struct {
-	ID             int64          `json:"id"`
-	Name           string         `json:"name"`
-	Description    string         `json:"description"`
-	IconURL        string         `json:"iconUrl,omitempty"`
-	ProviderInfo   map[string]any `json:"providerInfo,omitempty"`
-	LiveVolume     int64          `json:"liveVolume"`
-	TotalVolume    int64          `json:"totalVolume"`
-	QuotaLimit     int64          `json:"quotaLimit"`
-	QuotaExcessPct int32          `json:"quotaExcessPct"`
-	IsActive       bool           `json:"isActive"`
-	Locked         bool           `json:"locked"`
-	CreatedAt      string         `json:"createdAt"`
-	UpdatedAt      string         `json:"updatedAt"`
+	ID             int64           `json:"id"`
+	Name           string          `json:"name"`
+	Description    string          `json:"description"`
+	IconURL        string          `json:"iconUrl,omitempty"`
+	ProviderInfo   map[string]any  `json:"providerInfo,omitempty"`
+	LiveVolume     int64           `json:"liveVolume"`
+	TotalVolume    int64           `json:"totalVolume"`
+	QuotaLimit     int64           `json:"quotaLimit"`
+	QuotaExcessPct int32           `json:"quotaExcessPct"`
+	IsActive       bool            `json:"isActive"`
+	Locked         bool            `json:"locked"`
+	Retention      RetentionPolicy `json:"retention,omitempty"`
+	CreatedAt      string          `json:"createdAt"`
+	UpdatedAt      string          `json:"updatedAt"`
 }
 
 type User struct {
@@ -555,6 +556,10 @@ type RegionVolumeMetrics struct {
 	TotalQuotaLimit int64  `json:"totalQuotaLimit"`
 }
 
+type RetentionPolicy struct {
+	ClientSessionDays int32 `json:"clientSessionDays,omitempty"`
+}
+
 type SessionSummaryFacet struct {
 	Label string `json:"label"`
 	Count int64  `json:"count"`
@@ -603,10 +608,11 @@ type CreateAccountRequest struct {
 }
 
 type EditAccountRequest struct {
-	Name         string         `json:"name"`
-	Description  string         `json:"description,omitempty"`
-	IconURL      string         `json:"iconUrl,omitempty"`
-	ProviderInfo map[string]any `json:"providerInfo,omitempty"`
+	Name         string          `json:"name"`
+	Description  string          `json:"description,omitempty"`
+	IconURL      string          `json:"iconUrl,omitempty"`
+	ProviderInfo map[string]any  `json:"providerInfo,omitempty"`
+	Retention    RetentionPolicy `json:"retention,omitempty"`
 }
 
 type UpdateAccountQuotaRequest struct {

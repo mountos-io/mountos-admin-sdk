@@ -90,6 +90,7 @@ interface Account {
   quotaExcessPct: number;
   isActive: boolean;
   locked: boolean;
+  retention?: RetentionPolicy;
   createdAt: string;
   updatedAt: string;
 }
@@ -601,6 +602,14 @@ interface RegionVolumeMetrics {
 }
 ```
 
+### `RetentionPolicy`
+
+```typescript
+interface RetentionPolicy {
+  clientSessionDays?: number;
+}
+```
+
 ### `ServiceAlert`
 
 ```typescript
@@ -852,6 +861,7 @@ Request body:
   description?: string;
   iconUrl?: string;
   providerInfo?: Record<string, unknown>;
+  retention?: RetentionPolicy;
 }
 ```
 

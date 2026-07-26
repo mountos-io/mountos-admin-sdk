@@ -122,6 +122,7 @@ pub struct Account {
     pub quota_excess_pct: i32,
     pub is_active: bool,
     pub locked: bool,
+    pub retention: Option<RetentionPolicy>,
     pub created_at: String,
     pub updated_at: String,
 }
@@ -633,6 +634,14 @@ pub struct RegionVolumeMetrics {
 }
 ```
 
+### `RetentionPolicy`
+
+```rust
+pub struct RetentionPolicy {
+    pub client_session_days: Option<i32>,
+}
+```
+
 ### `ServiceAlert`
 
 ```rust
@@ -884,6 +893,7 @@ pub struct EditAccountRequest {
     pub description: Option<String>,
     pub icon_url: Option<String>,
     pub provider_info: Option<serde_json::Value>,
+    pub retention: Option<RetentionPolicy>,
 }
 ```
 
