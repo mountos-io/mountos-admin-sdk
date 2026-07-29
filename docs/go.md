@@ -795,6 +795,7 @@ type Volume struct {
     Locked                   bool                     `json:"locked"`
     Retention                VolumeRetentionPolicy    `json:"retention"`
     Versioning               VolumeVersioningPolicy   `json:"versioning"`
+    Compaction               string                   `json:"compaction"`
     IsActive                 bool                     `json:"isActive"`
     IsCleanupMetaEnabled     bool                     `json:"isCleanupMetaEnabled"`
     IsCleanupStorageEnabled  bool                     `json:"isCleanupStorageEnabled"`
@@ -1445,6 +1446,7 @@ type CreateVolumeRequest struct {
     EncryptionKey            string                   `json:"encryptionKey,omitempty"`
     Retention                VolumeRetentionPolicy    `json:"retention,omitempty"`
     Versioning               VolumeVersioningPolicy   `json:"versioning,omitempty"`
+    Compaction               string                   `json:"compaction,omitempty"`
     QuotaLimit               *int64                   `json:"quotaLimit,omitempty"`
     RegionClusterID          *int64                   `json:"regionClusterId,omitempty"`
     RegionClusterUUID        string                   `json:"regionClusterUuid,omitempty"`
@@ -1501,6 +1503,7 @@ type EditVolumeRequest struct {
     Description              string                   `json:"description,omitempty"`
     Retention                VolumeRetentionPolicy    `json:"retention,omitempty"`
     Versioning               VolumeVersioningPolicy   `json:"versioning,omitempty"`
+    Compaction               string                   `json:"compaction,omitempty"`
 }
 ```
 

@@ -245,6 +245,7 @@ pub struct Volume {
     pub locked: bool,
     pub retention: VolumeRetentionPolicy,
     pub versioning: VolumeVersioningPolicy,
+    pub compaction: String,
     #[serde(rename = "isActive")]
     pub is_active: bool,
     #[serde(rename = "isCleanupMetaEnabled")]
@@ -1221,6 +1222,8 @@ pub struct CreateVolumeRequest {
     pub retention: Option<VolumeRetentionPolicy>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub versioning: Option<VolumeVersioningPolicy>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub compaction: Option<String>,
     #[serde(rename = "quotaLimit", skip_serializing_if = "Option::is_none")]
     pub quota_limit: Option<i64>,
     #[serde(rename = "regionClusterId", skip_serializing_if = "Option::is_none")]
@@ -1244,6 +1247,8 @@ pub struct EditVolumeRequest {
     pub retention: Option<VolumeRetentionPolicy>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub versioning: Option<VolumeVersioningPolicy>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub compaction: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize)]

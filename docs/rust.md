@@ -790,6 +790,7 @@ pub struct Volume {
     pub locked: bool,
     pub retention: VolumeRetentionPolicy,
     pub versioning: VolumeVersioningPolicy,
+    pub compaction: String,
     pub is_active: bool,
     pub is_cleanup_meta_enabled: bool,
     pub is_cleanup_storage_enabled: bool,
@@ -1440,6 +1441,7 @@ pub struct CreateVolumeRequest {
     pub encryption_key: Option<String>,
     pub retention: Option<VolumeRetentionPolicy>,
     pub versioning: Option<VolumeVersioningPolicy>,
+    pub compaction: Option<String>,
     pub quota_limit: Option<i64>,
     pub region_cluster_id: Option<i64>,
     pub region_cluster_uuid: Option<String>,
@@ -1496,6 +1498,7 @@ pub struct EditVolumeRequest {
     pub description: Option<String>,
     pub retention: Option<VolumeRetentionPolicy>,
     pub versioning: Option<VolumeVersioningPolicy>,
+    pub compaction: Option<String>,
 }
 ```
 

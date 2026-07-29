@@ -455,6 +455,7 @@ Request:
   "encryptionKey"?: string,
   "retention"?: VolumeRetentionPolicy,
   "versioning"?: VolumeVersioningPolicy,
+  "compaction"?: string,
   "quotaLimit"?: int64,
   "regionClusterId"?: int64,
   "regionClusterUuid"?: string
@@ -477,7 +478,8 @@ Request:
 {
   "description"?: string,
   "retention"?: VolumeRetentionPolicy,
-  "versioning"?: VolumeVersioningPolicy
+  "versioning"?: VolumeVersioningPolicy,
+  "compaction"?: string
 }
 ```
 Response data: `{ "id": int64 }`
@@ -642,6 +644,7 @@ Response data: `Fork`
   "locked": bool,
   "retention": VolumeRetentionPolicy,
   "versioning": VolumeVersioningPolicy,
+  "compaction": string,
   "isActive": bool,
   "isCleanupMetaEnabled": bool,
   "isCleanupStorageEnabled": bool,

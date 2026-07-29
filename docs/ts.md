@@ -758,6 +758,7 @@ interface Volume {
   locked: boolean;
   retention: VolumeRetentionPolicy;
   versioning: VolumeVersioningPolicy;
+  compaction: string;
   isActive: boolean;
   isCleanupMetaEnabled: boolean;
   isCleanupStorageEnabled: boolean;
@@ -1328,6 +1329,7 @@ Request body:
   encryptionKey?: string;
   retention?: VolumeRetentionPolicy;
   versioning?: VolumeVersioningPolicy;
+  compaction?: string;
   quotaLimit?: number;
   regionClusterId?: number;
   regionClusterUuid?: string;
@@ -1375,6 +1377,7 @@ Request body:
   description?: string;
   retention?: VolumeRetentionPolicy;
   versioning?: VolumeVersioningPolicy;
+  compaction?: string;
 }
 ```
 

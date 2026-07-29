@@ -244,6 +244,13 @@ types:
     - "locked: bool"
     - "retention: VolumeRetentionPolicy"
     - "versioning: VolumeVersioningPolicy"
+    # Who defragments this volume's storage: "off" | "server" | "client".
+    # "server" is admin-only to set (the admin-client backend's policy, not
+    # an appserv-enforced role model -- appserv has no end-user concept of
+    # its own). "client" is a no-op on an iceberg volume (no client-side
+    # iceberg-compaction path); external engines already work unmodified
+    # against the existing REST catalog for that case.
+    - "compaction: string"
     - "isActive: bool"
     - "isCleanupMetaEnabled: bool"
     - "isCleanupStorageEnabled: bool"
@@ -1040,6 +1047,9 @@ resources:
           - "encryptionKey: string"
           - "retention: VolumeRetentionPolicy?"
           - "versioning: VolumeVersioningPolicy?"
+          # "off" | "server" | "client". Omit for the schema default ("off").
+          # Setting "server" is admin-only -- see the Volume type comment.
+          - "compaction: string?"
           - "quotaLimit: int64"
           # Optional cluster pin. Omit to land on the region's default cluster.
           # If set, the cluster must belong to the storage's region, be
@@ -1082,6 +1092,11 @@ resources:
           - "description: string"
           - "retention: VolumeRetentionPolicy?"
           - "versioning: VolumeVersioningPolicy?"
+          # "off" | "server" | "client". Omit to leave untouched. Setting
+          # "server" is admin-only -- see the Volume type comment; a
+          # non-admin caller's "server" value is cleared server-side rather
+          # than rejected, falling back to whatever is currently persisted.
+          - "compaction: string?"
         response:
           - "id: int64"
 

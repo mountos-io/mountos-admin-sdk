@@ -147,6 +147,7 @@ export interface Volume {
   locked: boolean
   retention: VolumeRetentionPolicy
   versioning: VolumeVersioningPolicy
+  compaction: string
   isActive: boolean
   isCleanupMetaEnabled: boolean
   isCleanupStorageEnabled: boolean
@@ -739,6 +740,7 @@ export interface CreateVolumeRequest {
   encryptionKey?: string
   retention?: VolumeRetentionPolicy
   versioning?: VolumeVersioningPolicy
+  compaction?: string
   quotaLimit?: number
   regionClusterId?: number
   regionClusterUuid?: string
@@ -748,6 +750,7 @@ export interface EditVolumeRequest {
   description?: string
   retention?: VolumeRetentionPolicy
   versioning?: VolumeVersioningPolicy
+  compaction?: string
 }
 
 export interface MoveVolumeClusterRequest {
