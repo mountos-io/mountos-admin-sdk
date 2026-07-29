@@ -794,6 +794,7 @@ type Volume struct {
     LiveInactiveVolume       int64                    `json:"liveInactiveVolume"`
     Locked                   bool                     `json:"locked"`
     Retention                VolumeRetentionPolicy    `json:"retention"`
+    Versioning               VolumeVersioningPolicy   `json:"versioning"`
     IsActive                 bool                     `json:"isActive"`
     IsCleanupMetaEnabled     bool                     `json:"isCleanupMetaEnabled"`
     IsCleanupStorageEnabled  bool                     `json:"isCleanupStorageEnabled"`
@@ -844,6 +845,14 @@ type VolumeSizePoint struct {
     TotalVolume              int64                    `json:"totalVolume"`
     PendingVolume            int64                    `json:"pendingVolume"`
     LiveInactiveVolume       int64                    `json:"liveInactiveVolume"`
+}
+```
+
+### `VolumeVersioningPolicy`
+
+```go
+type VolumeVersioningPolicy struct {
+    ContentWindowSeconds     int32                    `json:"contentWindowSeconds,omitempty"`
 }
 ```
 
@@ -1435,6 +1444,7 @@ type CreateVolumeRequest struct {
     Encryption               *bool                    `json:"encryption,omitempty"`
     EncryptionKey            string                   `json:"encryptionKey,omitempty"`
     Retention                VolumeRetentionPolicy    `json:"retention,omitempty"`
+    Versioning               VolumeVersioningPolicy   `json:"versioning,omitempty"`
     QuotaLimit               *int64                   `json:"quotaLimit,omitempty"`
     RegionClusterID          *int64                   `json:"regionClusterId,omitempty"`
     RegionClusterUUID        string                   `json:"regionClusterUuid,omitempty"`
@@ -1490,6 +1500,7 @@ Request body:
 type EditVolumeRequest struct {
     Description              string                   `json:"description,omitempty"`
     Retention                VolumeRetentionPolicy    `json:"retention,omitempty"`
+    Versioning               VolumeVersioningPolicy   `json:"versioning,omitempty"`
 }
 ```
 

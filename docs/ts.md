@@ -757,6 +757,7 @@ interface Volume {
   liveInactiveVolume: number;
   locked: boolean;
   retention: VolumeRetentionPolicy;
+  versioning: VolumeVersioningPolicy;
   isActive: boolean;
   isCleanupMetaEnabled: boolean;
   isCleanupStorageEnabled: boolean;
@@ -807,6 +808,14 @@ interface VolumeSizePoint {
   totalVolume: number;
   pendingVolume: number;
   liveInactiveVolume: number;
+}
+```
+
+### `VolumeVersioningPolicy`
+
+```typescript
+interface VolumeVersioningPolicy {
+  contentWindowSeconds?: number;
 }
 ```
 
@@ -1318,6 +1327,7 @@ Request body:
   encryption?: boolean;
   encryptionKey?: string;
   retention?: VolumeRetentionPolicy;
+  versioning?: VolumeVersioningPolicy;
   quotaLimit?: number;
   regionClusterId?: number;
   regionClusterUuid?: string;
@@ -1364,6 +1374,7 @@ Request body:
 {
   description?: string;
   retention?: VolumeRetentionPolicy;
+  versioning?: VolumeVersioningPolicy;
 }
 ```
 

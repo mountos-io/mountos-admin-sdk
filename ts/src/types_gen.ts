@@ -146,6 +146,7 @@ export interface Volume {
   liveInactiveVolume: number
   locked: boolean
   retention: VolumeRetentionPolicy
+  versioning: VolumeVersioningPolicy
   isActive: boolean
   isCleanupMetaEnabled: boolean
   isCleanupStorageEnabled: boolean
@@ -574,6 +575,10 @@ export interface VolumeSizePoint {
   liveInactiveVolume: number
 }
 
+export interface VolumeVersioningPolicy {
+  contentWindowSeconds?: number
+}
+
 // Accounts
 
 export interface CreateAccountRequest {
@@ -733,6 +738,7 @@ export interface CreateVolumeRequest {
   encryption?: boolean
   encryptionKey?: string
   retention?: VolumeRetentionPolicy
+  versioning?: VolumeVersioningPolicy
   quotaLimit?: number
   regionClusterId?: number
   regionClusterUuid?: string
@@ -741,6 +747,7 @@ export interface CreateVolumeRequest {
 export interface EditVolumeRequest {
   description?: string
   retention?: VolumeRetentionPolicy
+  versioning?: VolumeVersioningPolicy
 }
 
 export interface MoveVolumeClusterRequest {

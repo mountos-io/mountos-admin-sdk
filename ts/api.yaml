@@ -85,6 +85,13 @@ types:
     - "forkGraceDays: int32?"
     - "eventLogDays: int32?"
 
+  # Per-volume content-version-collapse window. contentWindowSeconds is
+  # restricted server-side to exact divisors of 60 (1,2,3,4,5,6,10,12,15,
+  # 20,30,60); absent takes the server default (60, today's minute-collapse
+  # behavior).
+  VolumeVersioningPolicy:
+    - "contentWindowSeconds: int32?"
+
   Account:
     - "id: int64"
     - "name: string"
@@ -236,6 +243,7 @@ types:
     - "liveInactiveVolume: int64"
     - "locked: bool"
     - "retention: VolumeRetentionPolicy"
+    - "versioning: VolumeVersioningPolicy"
     - "isActive: bool"
     - "isCleanupMetaEnabled: bool"
     - "isCleanupStorageEnabled: bool"
@@ -1031,6 +1039,7 @@ resources:
           - "encryption: bool"
           - "encryptionKey: string"
           - "retention: VolumeRetentionPolicy?"
+          - "versioning: VolumeVersioningPolicy?"
           - "quotaLimit: int64"
           # Optional cluster pin. Omit to land on the region's default cluster.
           # If set, the cluster must belong to the storage's region, be
@@ -1072,6 +1081,7 @@ resources:
         request:
           - "description: string"
           - "retention: VolumeRetentionPolicy?"
+          - "versioning: VolumeVersioningPolicy?"
         response:
           - "id: int64"
 

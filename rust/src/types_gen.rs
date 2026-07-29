@@ -244,6 +244,7 @@ pub struct Volume {
     pub live_inactive_volume: i64,
     pub locked: bool,
     pub retention: VolumeRetentionPolicy,
+    pub versioning: VolumeVersioningPolicy,
     #[serde(rename = "isActive")]
     pub is_active: bool,
     #[serde(rename = "isCleanupMetaEnabled")]
@@ -913,6 +914,12 @@ pub struct VolumeSizePoint {
     pub live_inactive_volume: i64,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct VolumeVersioningPolicy {
+    #[serde(rename = "contentWindowSeconds", skip_serializing_if = "Option::is_none")]
+    pub content_window_seconds: Option<i32>,
+}
+
 // Accounts
 
 #[derive(Debug, Clone, Serialize)]
@@ -1212,6 +1219,8 @@ pub struct CreateVolumeRequest {
     pub encryption_key: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub retention: Option<VolumeRetentionPolicy>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub versioning: Option<VolumeVersioningPolicy>,
     #[serde(rename = "quotaLimit", skip_serializing_if = "Option::is_none")]
     pub quota_limit: Option<i64>,
     #[serde(rename = "regionClusterId", skip_serializing_if = "Option::is_none")]
@@ -1233,6 +1242,8 @@ pub struct EditVolumeRequest {
     pub description: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub retention: Option<VolumeRetentionPolicy>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub versioning: Option<VolumeVersioningPolicy>,
 }
 
 #[derive(Debug, Clone, Serialize)]

@@ -157,29 +157,30 @@ type BlockVolume struct {
 }
 
 type Volume struct {
-	ID                      int64                 `json:"id"`
-	Account                 Ref                   `json:"account"`
-	Storage                 Ref                   `json:"storage"`
-	Region                  Ref                   `json:"region"`
-	RegionCluster           Ref                   `json:"regionCluster,omitempty"`
-	Name                    string                `json:"name"`
-	Description             string                `json:"description,omitempty"`
-	VolumeType              string                `json:"volumeType"`
-	StorageType             string                `json:"storageType,omitempty"`
-	Encryption              bool                  `json:"encryption"`
-	QuotaLimit              int64                 `json:"quotaLimit"`
-	LiveVolume              int64                 `json:"liveVolume"`
-	TotalVolume             int64                 `json:"totalVolume"`
-	PendingVolume           int64                 `json:"pendingVolume"`
-	LiveInactiveVolume      int64                 `json:"liveInactiveVolume"`
-	Locked                  bool                  `json:"locked"`
-	Retention               VolumeRetentionPolicy `json:"retention"`
-	IsActive                bool                  `json:"isActive"`
-	IsCleanupMetaEnabled    bool                  `json:"isCleanupMetaEnabled"`
-	IsCleanupStorageEnabled bool                  `json:"isCleanupStorageEnabled"`
-	IsCleanupVaultEnabled   bool                  `json:"isCleanupVaultEnabled"`
-	CreatedAt               string                `json:"createdAt"`
-	UpdatedAt               string                `json:"updatedAt"`
+	ID                      int64                  `json:"id"`
+	Account                 Ref                    `json:"account"`
+	Storage                 Ref                    `json:"storage"`
+	Region                  Ref                    `json:"region"`
+	RegionCluster           Ref                    `json:"regionCluster,omitempty"`
+	Name                    string                 `json:"name"`
+	Description             string                 `json:"description,omitempty"`
+	VolumeType              string                 `json:"volumeType"`
+	StorageType             string                 `json:"storageType,omitempty"`
+	Encryption              bool                   `json:"encryption"`
+	QuotaLimit              int64                  `json:"quotaLimit"`
+	LiveVolume              int64                  `json:"liveVolume"`
+	TotalVolume             int64                  `json:"totalVolume"`
+	PendingVolume           int64                  `json:"pendingVolume"`
+	LiveInactiveVolume      int64                  `json:"liveInactiveVolume"`
+	Locked                  bool                   `json:"locked"`
+	Retention               VolumeRetentionPolicy  `json:"retention"`
+	Versioning              VolumeVersioningPolicy `json:"versioning"`
+	IsActive                bool                   `json:"isActive"`
+	IsCleanupMetaEnabled    bool                   `json:"isCleanupMetaEnabled"`
+	IsCleanupStorageEnabled bool                   `json:"isCleanupStorageEnabled"`
+	IsCleanupVaultEnabled   bool                   `json:"isCleanupVaultEnabled"`
+	CreatedAt               string                 `json:"createdAt"`
+	UpdatedAt               string                 `json:"updatedAt"`
 }
 
 type Fork struct {
@@ -602,6 +603,10 @@ type VolumeSizePoint struct {
 	LiveInactiveVolume int64  `json:"liveInactiveVolume"`
 }
 
+type VolumeVersioningPolicy struct {
+	ContentWindowSeconds int32 `json:"contentWindowSeconds,omitempty"`
+}
+
 // Accounts
 
 type CreateAccountRequest struct {
@@ -813,17 +818,18 @@ type StorageListOptions struct {
 // Volumes
 
 type CreateVolumeRequest struct {
-	AccountID         int64                 `json:"accountId"`
-	StorageID         int64                 `json:"storageId"`
-	Name              string                `json:"name"`
-	Description       string                `json:"description,omitempty"`
-	VolumeType        string                `json:"volumeType"`
-	Encryption        *bool                 `json:"encryption,omitempty"`
-	EncryptionKey     string                `json:"encryptionKey,omitempty"`
-	Retention         VolumeRetentionPolicy `json:"retention,omitempty"`
-	QuotaLimit        *int64                `json:"quotaLimit,omitempty"`
-	RegionClusterID   *int64                `json:"regionClusterId,omitempty"`
-	RegionClusterUUID string                `json:"regionClusterUuid,omitempty"`
+	AccountID         int64                  `json:"accountId"`
+	StorageID         int64                  `json:"storageId"`
+	Name              string                 `json:"name"`
+	Description       string                 `json:"description,omitempty"`
+	VolumeType        string                 `json:"volumeType"`
+	Encryption        *bool                  `json:"encryption,omitempty"`
+	EncryptionKey     string                 `json:"encryptionKey,omitempty"`
+	Retention         VolumeRetentionPolicy  `json:"retention,omitempty"`
+	Versioning        VolumeVersioningPolicy `json:"versioning,omitempty"`
+	QuotaLimit        *int64                 `json:"quotaLimit,omitempty"`
+	RegionClusterID   *int64                 `json:"regionClusterId,omitempty"`
+	RegionClusterUUID string                 `json:"regionClusterUuid,omitempty"`
 }
 
 type CreateVolumeResponse struct {
@@ -832,8 +838,9 @@ type CreateVolumeResponse struct {
 }
 
 type EditVolumeRequest struct {
-	Description string                `json:"description,omitempty"`
-	Retention   VolumeRetentionPolicy `json:"retention,omitempty"`
+	Description string                 `json:"description,omitempty"`
+	Retention   VolumeRetentionPolicy  `json:"retention,omitempty"`
+	Versioning  VolumeVersioningPolicy `json:"versioning,omitempty"`
 }
 
 type MoveVolumeClusterRequest struct {

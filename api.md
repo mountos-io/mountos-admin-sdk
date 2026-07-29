@@ -454,6 +454,7 @@ Request:
   "encryption"?: bool,
   "encryptionKey"?: string,
   "retention"?: VolumeRetentionPolicy,
+  "versioning"?: VolumeVersioningPolicy,
   "quotaLimit"?: int64,
   "regionClusterId"?: int64,
   "regionClusterUuid"?: string
@@ -475,7 +476,8 @@ Request:
 ```
 {
   "description"?: string,
-  "retention"?: VolumeRetentionPolicy
+  "retention"?: VolumeRetentionPolicy,
+  "versioning"?: VolumeVersioningPolicy
 }
 ```
 Response data: `{ "id": int64 }`
@@ -639,6 +641,7 @@ Response data: `Fork`
   "liveInactiveVolume": int64,
   "locked": bool,
   "retention": VolumeRetentionPolicy,
+  "versioning": VolumeVersioningPolicy,
   "isActive": bool,
   "isCleanupMetaEnabled": bool,
   "isCleanupStorageEnabled": bool,
@@ -1426,6 +1429,13 @@ Response data: `GCWorkerEventGoalsResponse`
   "totalVolume": int64,
   "pendingVolume": int64,
   "liveInactiveVolume": int64
+}
+```
+
+### VolumeVersioningPolicy Type
+```
+{
+  "contentWindowSeconds"?: int32
 }
 ```
 

@@ -789,6 +789,7 @@ pub struct Volume {
     pub live_inactive_volume: i64,
     pub locked: bool,
     pub retention: VolumeRetentionPolicy,
+    pub versioning: VolumeVersioningPolicy,
     pub is_active: bool,
     pub is_cleanup_meta_enabled: bool,
     pub is_cleanup_storage_enabled: bool,
@@ -839,6 +840,14 @@ pub struct VolumeSizePoint {
     pub total_volume: i64,
     pub pending_volume: i64,
     pub live_inactive_volume: i64,
+}
+```
+
+### `VolumeVersioningPolicy`
+
+```rust
+pub struct VolumeVersioningPolicy {
+    pub content_window_seconds: Option<i32>,
 }
 ```
 
@@ -1430,6 +1439,7 @@ pub struct CreateVolumeRequest {
     pub encryption: Option<bool>,
     pub encryption_key: Option<String>,
     pub retention: Option<VolumeRetentionPolicy>,
+    pub versioning: Option<VolumeVersioningPolicy>,
     pub quota_limit: Option<i64>,
     pub region_cluster_id: Option<i64>,
     pub region_cluster_uuid: Option<String>,
@@ -1485,6 +1495,7 @@ Request body:
 pub struct EditVolumeRequest {
     pub description: Option<String>,
     pub retention: Option<VolumeRetentionPolicy>,
+    pub versioning: Option<VolumeVersioningPolicy>,
 }
 ```
 
