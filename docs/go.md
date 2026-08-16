@@ -1858,6 +1858,7 @@ type AuditLogListOptions struct {
     Cursor               int64        `url:"cursor"`
     Limit                int          `url:"limit"` // default: 20
     Subject              string       `url:"subject"`
+    CreatedBy            string       `url:"createdBy"`
 }
 ```
 

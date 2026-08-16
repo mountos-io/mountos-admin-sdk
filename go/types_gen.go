@@ -986,6 +986,7 @@ type AuditLogListOptions struct {
 	Cursor          int64
 	Limit           int
 	Subject         string
+	CreatedBy       string
 }
 
 // RegionAuditLogs

@@ -751,6 +751,9 @@ func (s *AuditLogsService) List(ctx context.Context, opts AuditLogListOptions) (
 		if opts.Subject != "" {
 			q.Set("subject", opts.Subject)
 		}
+		if opts.CreatedBy != "" {
+			q.Set("createdBy", opts.CreatedBy)
+		}
 	}
 	path := "/api/v1/audit-logs/list"
 	if qs := q.Encode(); qs != "" {

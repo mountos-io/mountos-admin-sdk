@@ -1693,6 +1693,7 @@ Query params:
   cursor?: number;
   limit?: number;  // default: 20
   subject?: string;
+  createdBy?: string;
 }
 ```
 

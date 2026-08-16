@@ -609,6 +609,9 @@ impl AuditLogsService {
         if let Some(v) = &opts.subject {
             query.push(("subject", v.to_string()));
         }
+        if let Some(v) = &opts.created_by {
+            query.push(("createdBy", v.to_string()));
+        }
         self.inner.get("/api/v1/audit-logs/list", &query).await
     }
 }

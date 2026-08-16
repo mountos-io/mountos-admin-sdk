@@ -739,7 +739,7 @@ Response data: `{ "items": ForkTreeMatch[], "nextCursor": int64|null }`
 ## AuditLogs
 
 ### GET /api/v1/audit-logs/list
-Query: `accountId=int64(required)`, `regionId=int64`, `regionClusterId=int64`, `cursor=int64`, `limit=int(default 20)`, `subject=string`
+Query: `accountId=int64(required)`, `regionId=int64`, `regionClusterId=int64`, `cursor=int64`, `limit=int(default 20)`, `subject=string`, `createdBy=string`
 Response data: `{ "items": AuditLog[], "nextCursor": int64|null }`
 
 ### AuditLog Type

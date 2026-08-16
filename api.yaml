@@ -1333,6 +1333,12 @@ resources:
   - name: AuditLogs
     path: /audit-logs
     endpoints:
+      # createdBy matches the actor recorded on the row: the dashboard user id
+      # for operator-driven events, the provider token subject for everything
+      # signed with no dashboard identity (direct SDK use, background workers).
+      # It is a plain filter and carries no access control of its own. A caller
+      # that must see only its own rows is confined by whoever builds the
+      # request, not by the hub.
       - action: list
         method: GET
         path: /list
@@ -1344,6 +1350,7 @@ resources:
           - "cursor: int64"
           - "limit: int=20"
           - "subject: string"
+          - "createdBy: string"
         responseType: AuditLog
 
   - name: RegionAuditLogs

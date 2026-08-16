@@ -852,6 +852,7 @@ export interface AuditLogListOptions {
   cursor?: number
   limit?: number
   subject?: string
+  createdBy?: string
 }
 
 // RegionAuditLogs

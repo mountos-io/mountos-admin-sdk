@@ -436,6 +436,7 @@ export class AuditLogsResource {
       cursor: opts.cursor,
       limit: opts.limit,
       subject: opts.subject,
+      createdBy: opts.createdBy,
     })}`, undefined, signal)
   }
 }
