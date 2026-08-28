@@ -86,9 +86,10 @@ types:
     - "eventLogDays: int32?"
 
   # Per-volume content-version-collapse window. contentWindowSeconds is
-  # restricted server-side to exact divisors of 60 (1,2,3,4,5,6,10,12,15,
-  # 20,30,60); absent takes the server default (60, today's minute-collapse
-  # behavior).
+  # restricted server-side to a fixed set: sub-minute divisors of 60
+  # (1,2,3,4,5,6,10,12,15,20,30,60) or whole-minute multiples of 60 up to
+  # 1h (120,300,600,900,1800,3600); absent takes the server default (60,
+  # today's minute-collapse behavior).
   VolumeVersioningPolicy:
     - "contentWindowSeconds: int32?"
 
