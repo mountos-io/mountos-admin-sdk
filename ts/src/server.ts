@@ -2,6 +2,7 @@ import { TokenSigner } from './auth.js'
 import { MountOSError } from './errors.js'
 import { signDashboardUser } from './dashboard_user.js'
 import { createClient, type RequestFn, type AdminClient } from './client_gen.js'
+import { assertSafeIntegers } from './safe_int.js'
 import type { Config, StandardResponse } from './types_gen.js'
 
 export function createServerClient(config: Config): AdminClient {
@@ -19,6 +20,7 @@ export function createServerClient(config: Config): AdminClient {
 
     const init: RequestInit = { method, headers, signal }
     if (body !== undefined) {
+      assertSafeIntegers(body, 'request body')
       headers['Content-Type'] = 'application/json'
       init.body = JSON.stringify(body)
     }
@@ -35,6 +37,7 @@ export function createServerClient(config: Config): AdminClient {
     if (json.status !== 'success') {
       throw new MountOSError(json.message, res.status, json.errorCode)
     }
+    assertSafeIntegers(json.data, 'response data')
     return json.data as T
   }
 
