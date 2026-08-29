@@ -9,10 +9,10 @@ import type {
   RegionClusterListOptions, EditRegionClusterRequest, SetRegionClusterReadyRequest, 
   CreateStorageRequest, BlockMember, Storage, StorageListOptions, BlockVolume, 
   EditStorageRequest, TestStorageNewBucketRequest, CompatibleStorage, 
-  MoveStorageVolumesRequest, MoveVolumeFailure, UpdateStorageConfigRequest, Pair, 
-  RegisterStorageMemberRequest, PoolMember, BackfillFailure, CreateVolumeRequest, 
-  VolumeRetentionPolicy, VolumeVersioningPolicy, Volume, VolumeListOptions, 
-  EditVolumeRequest, MoveVolumeClusterRequest, DeactivateVolumeRequest, 
+  MoveStorageVolumesRequest, MoveVolumeFailure, UpdateStorageConfigRequest, 
+  UpdateConfigResult, Pair, RegisterStorageMemberRequest, PoolMember, BackfillFailure, 
+  CreateVolumeRequest, VolumeRetentionPolicy, VolumeVersioningPolicy, Volume, 
+  VolumeListOptions, EditVolumeRequest, MoveVolumeClusterRequest, DeactivateVolumeRequest, 
   GenerateVolumeAPIKeysRequest, VolumeApiKey, RevokeVolumeAPIKeyRequest, 
   RevokeVolumeAPIKeysByUserRequest, GenerateVolumeSttKeyRequest, UpdateVolumeQuotaRequest, 
   VolumeSizePoint, CreateVolumeForkRequest, Fork, DeleteVolumeForkRequest, 
@@ -286,7 +286,7 @@ export class StoragesResource {
     return this.client.request('POST', `/api/v1/storages/${storageId}/move-volumes`, req, signal)
   }
 
-  updateConfig(storageId: number, req: UpdateStorageConfigRequest, signal?: AbortSignal): Promise<{ id: string; pairsFormed: number; pairsRequested: number; partial: boolean; reason?: string }> {
+  updateConfig(storageId: number, req: UpdateStorageConfigRequest, signal?: AbortSignal): Promise<UpdateConfigResult> {
     return this.client.request('PUT', `/api/v1/storages/${storageId}/config`, req, signal)
   }
 

@@ -76,6 +76,13 @@ pub const LICENSE_STATUS_GRACE: &str = "grace";
 pub const LICENSE_STATUS_EXPIRED_ACCESS: &str = "expired_access";
 pub const LICENSE_STATUS_EXPIRED: &str = "expired";
 
+/// `PairState` values accepted/returned on the wire.
+pub type PairState = String;
+pub const PAIR_STATE_ACTIVE: &str = "active";
+pub const PAIR_STATE_DRAINING: &str = "draining";
+pub const PAIR_STATE_SYNCED_DRAINED: &str = "synced_drained";
+pub const PAIR_STATE_RETIRED: &str = "retired";
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Account {
     pub id: i64,
@@ -221,11 +228,23 @@ pub struct BlockVolume {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UpdateConfigResult {
+    pub id: String,
+    #[serde(rename = "pairsFormed")]
+    pub pairs_formed: i32,
+    #[serde(rename = "pairsRequested")]
+    pub pairs_requested: i32,
+    pub partial: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reason: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Pair {
     pub id: String,
     #[serde(rename = "storageId")]
     pub storage_id: String,
-    pub state: String,
+    pub state: PairState,
     #[serde(rename = "memberA", skip_serializing_if = "Option::is_none")]
     pub member_a: Option<String>,
     #[serde(rename = "memberB", skip_serializing_if = "Option::is_none")]
@@ -1224,18 +1243,6 @@ pub struct MoveVolumesStorageResponse {
 #[derive(Debug, Clone, Serialize)]
 pub struct UpdateStorageConfigRequest {
     pub k: i32,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct UpdateConfigStorageResponse {
-    pub id: String,
-    #[serde(rename = "pairsFormed")]
-    pub pairs_formed: i32,
-    #[serde(rename = "pairsRequested")]
-    pub pairs_requested: i32,
-    pub partial: bool,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub reason: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

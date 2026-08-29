@@ -70,6 +70,15 @@ const (
 	LicenseStatusExpired LicenseStatus = "expired"
 )
 
+type PairState = string
+
+const (
+	PairStateActive PairState = "active"
+	PairStateDraining PairState = "draining"
+	PairStateSyncedDrained PairState = "synced_drained"
+	PairStateRetired PairState = "retired"
+)
+
 
 type Account struct {
 	ID             int64           `json:"id"`
@@ -158,19 +167,27 @@ type BlockVolume struct {
 	PairID          string `json:"pairId,omitempty"`
 }
 
+type UpdateConfigResult struct {
+	ID             string `json:"id"`
+	PairsFormed    int32  `json:"pairsFormed"`
+	PairsRequested int32  `json:"pairsRequested"`
+	Partial        bool   `json:"partial"`
+	Reason         string `json:"reason,omitempty"`
+}
+
 type Pair struct {
-	ID               string `json:"id"`
-	StorageID        string `json:"storageId"`
-	State            string `json:"state"`
-	MemberA          string `json:"memberA,omitempty"`
-	MemberB          string `json:"memberB,omitempty"`
-	PlacementGroupA  int64  `json:"placementGroupA,omitempty"`
-	PlacementGroupB  int64  `json:"placementGroupB,omitempty"`
-	DrainStartedAt   string `json:"drainStartedAt,omitempty"`
-	SyncedAt         string `json:"syncedAt,omitempty"`
-	RetiredAt        string `json:"retiredAt,omitempty"`
-	PendingSyncJobsA int32  `json:"pendingSyncJobsA,omitempty"`
-	PendingSyncJobsB int32  `json:"pendingSyncJobsB,omitempty"`
+	ID               string    `json:"id"`
+	StorageID        string    `json:"storageId"`
+	State            PairState `json:"state"`
+	MemberA          string    `json:"memberA,omitempty"`
+	MemberB          string    `json:"memberB,omitempty"`
+	PlacementGroupA  int64     `json:"placementGroupA,omitempty"`
+	PlacementGroupB  int64     `json:"placementGroupB,omitempty"`
+	DrainStartedAt   string    `json:"drainStartedAt,omitempty"`
+	SyncedAt         string    `json:"syncedAt,omitempty"`
+	RetiredAt        string    `json:"retiredAt,omitempty"`
+	PendingSyncJobsA int32     `json:"pendingSyncJobsA,omitempty"`
+	PendingSyncJobsB int32     `json:"pendingSyncJobsB,omitempty"`
 }
 
 type PoolMember struct {
@@ -824,14 +841,6 @@ type MoveVolumesStorageResponse struct {
 
 type UpdateStorageConfigRequest struct {
 	K int32 `json:"k"`
-}
-
-type UpdateConfigStorageResponse struct {
-	ID             string `json:"id"`
-	PairsFormed    int32  `json:"pairsFormed"`
-	PairsRequested int32  `json:"pairsRequested"`
-	Partial        bool   `json:"partial"`
-	Reason         string `json:"reason,omitempty"`
 }
 
 type GetConfigStorageResponse struct {

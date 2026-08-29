@@ -110,6 +110,19 @@ const (
 )
 ```
 
+### `PairState`
+
+```go
+type PairState = string
+
+const (
+    PairStateActive PairState = "active"
+    PairStateDraining PairState = "draining"
+    PairStateSyncedDrained PairState = "synced_drained"
+    PairStateRetired PairState = "retired"
+)
+```
+
 ## Types
 
 ### `Account`
@@ -575,7 +588,7 @@ type NodeStatsSample struct {
 type Pair struct {
     ID                       string                   `json:"id"`
     StorageID                string                   `json:"storageId"`
-    State                    string                   `json:"state"`
+    State                    PairState                `json:"state"`
     MemberA                  string                   `json:"memberA,omitempty"`
     MemberB                  string                   `json:"memberB,omitempty"`
     PlacementGroupA          int64                    `json:"placementGroupA,omitempty"`
@@ -780,6 +793,18 @@ type Storage struct {
     IsActive                 bool                     `json:"isActive"`
     CreatedAt                string                   `json:"createdAt"`
     UpdatedAt                string                   `json:"updatedAt"`
+}
+```
+
+### `UpdateConfigResult`
+
+```go
+type UpdateConfigResult struct {
+    ID                       string                   `json:"id"`
+    PairsFormed              int32                    `json:"pairsFormed"`
+    PairsRequested           int32                    `json:"pairsRequested"`
+    Partial                  bool                     `json:"partial"`
+    Reason                   string                   `json:"reason,omitempty"`
 }
 ```
 
@@ -1442,7 +1467,7 @@ type MoveVolumesStorageResponse struct {
 #### `UpdateConfig` - PUT /api/v1/storages/:storageId/config
 
 ```go
-func (s *StoragesService) UpdateConfig(ctx context.Context, storageID int64, req *UpdateStorageConfigRequest) (*UpdateConfigStorageResponse, error)
+func (s *StoragesService) UpdateConfig(ctx context.Context, storageID int64, req *UpdateStorageConfigRequest) (*UpdateConfigResult, error)
 ```
 
 Request body:
@@ -1450,18 +1475,6 @@ Request body:
 ```go
 type UpdateStorageConfigRequest struct {
     K                        int32                    `json:"k"`
-}
-```
-
-Response body:
-
-```go
-type UpdateConfigStorageResponse struct {
-    ID                       string                   `json:"id"`
-    PairsFormed              int32                    `json:"pairsFormed"`
-    PairsRequested           int32                    `json:"pairsRequested"`
-    Partial                  bool                     `json:"partial"`
-    Reason                   string                   `json:"reason,omitempty"`
 }
 ```
 

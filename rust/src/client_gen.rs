@@ -345,7 +345,7 @@ impl StoragesService {
         self.inner.post(&format!("/api/v1/storages/{}/move-volumes", storage_id), req).await
     }
 
-    pub async fn update_config(&self, storage_id: i64, req: &UpdateStorageConfigRequest) -> Result<UpdateConfigStorageResponse, Error> {
+    pub async fn update_config(&self, storage_id: i64, req: &UpdateStorageConfigRequest) -> Result<UpdateConfigResult, Error> {
         self.inner.put(&format!("/api/v1/storages/{}/config", storage_id), req).await
     }
 

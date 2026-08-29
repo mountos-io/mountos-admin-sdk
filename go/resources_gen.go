@@ -396,12 +396,12 @@ func (s *StoragesService) MoveVolumes(ctx context.Context, storageID int64, req 
 	return decodeJSON[MoveVolumesStorageResponse](data)
 }
 
-func (s *StoragesService) UpdateConfig(ctx context.Context, storageID int64, req *UpdateStorageConfigRequest) (*UpdateConfigStorageResponse, error) {
+func (s *StoragesService) UpdateConfig(ctx context.Context, storageID int64, req *UpdateStorageConfigRequest) (*UpdateConfigResult, error) {
 	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/storages/%s/config", strconv.FormatInt(storageID, 10)), req)
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[UpdateConfigStorageResponse](data)
+	return decodeJSON[UpdateConfigResult](data)
 }
 
 func (s *StoragesService) GetConfig(ctx context.Context, storageID int64) (*GetConfigStorageResponse, error) {

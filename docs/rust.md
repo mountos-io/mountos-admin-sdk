@@ -105,6 +105,16 @@ pub const LICENSE_STATUS_EXPIRED_ACCESS: &str = "expired_access";
 pub const LICENSE_STATUS_EXPIRED: &str = "expired";
 ```
 
+### `PairState`
+
+```rust
+pub type PairState = String;
+pub const PAIR_STATE_ACTIVE: &str = "active";
+pub const PAIR_STATE_DRAINING: &str = "draining";
+pub const PAIR_STATE_SYNCED_DRAINED: &str = "synced_drained";
+pub const PAIR_STATE_RETIRED: &str = "retired";
+```
+
 ## Types
 
 ### `Account`
@@ -570,7 +580,7 @@ pub struct NodeStatsSample {
 pub struct Pair {
     pub id: String,
     pub storage_id: String,
-    pub state: String,
+    pub state: PairState,
     pub member_a: Option<String>,
     pub member_b: Option<String>,
     pub placement_group_a: Option<i64>,
@@ -775,6 +785,18 @@ pub struct Storage {
     pub is_active: bool,
     pub created_at: String,
     pub updated_at: String,
+}
+```
+
+### `UpdateConfigResult`
+
+```rust
+pub struct UpdateConfigResult {
+    pub id: String,
+    pub pairs_formed: i32,
+    pub pairs_requested: i32,
+    pub partial: bool,
+    pub reason: Option<String>,
 }
 ```
 
@@ -1437,7 +1459,7 @@ pub struct MoveVolumesStorageResponse {
 #### `update_config` - PUT /api/v1/storages/:storageId/config
 
 ```rust
-pub async fn update_config(&self, storage_id: i64, req: &UpdateStorageConfigRequest) -> Result<UpdateConfigStorageResponse, Error>
+pub async fn update_config(&self, storage_id: i64, req: &UpdateStorageConfigRequest) -> Result<UpdateConfigResult, Error>
 ```
 
 Request body:
@@ -1445,18 +1467,6 @@ Request body:
 ```rust
 pub struct UpdateStorageConfigRequest {
     pub k: i32,
-}
-```
-
-Response body:
-
-```rust
-pub struct UpdateConfigStorageResponse {
-    pub id: String,
-    pub pairs_formed: i32,
-    pub pairs_requested: i32,
-    pub partial: bool,
-    pub reason: Option<String>,
 }
 ```
 

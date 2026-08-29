@@ -73,6 +73,12 @@ type LicenseQuotaState = "ok" | "exceeded";
 type LicenseStatus = "valid" | "expiring" | "grace" | "expired_access" | "expired";
 ```
 
+### `PairState`
+
+```typescript
+type PairState = "active" | "draining" | "synced_drained" | "retired";
+```
+
 ## Types
 
 ### `Account`
@@ -538,7 +544,7 @@ interface NodeStatsSample {
 interface Pair {
   id: string;
   storageId: string;
-  state: string;
+  state: PairState;
   memberA?: string;
   memberB?: string;
   placementGroupA?: number;
@@ -743,6 +749,18 @@ interface Storage {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+}
+```
+
+### `UpdateConfigResult`
+
+```typescript
+interface UpdateConfigResult {
+  id: string;
+  pairsFormed: number;
+  pairsRequested: number;
+  partial: boolean;
+  reason?: string;
 }
 ```
 
@@ -1336,7 +1354,7 @@ Request body:
 #### `updateConfig` - PUT /api/v1/storages/:storageId/config
 
 ```typescript
-client.storages.updateConfig(storageId: number, req: UpdateStorageConfigRequest, signal?: AbortSignal): Promise<{ id: string; pairsFormed: number; pairsRequested: number; partial: boolean; reason?: string }>;
+client.storages.updateConfig(storageId: number, req: UpdateStorageConfigRequest, signal?: AbortSignal): Promise<UpdateConfigResult>;
 ```
 
 Request body:

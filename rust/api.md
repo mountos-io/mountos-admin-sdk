@@ -45,6 +45,8 @@ Cursor-paginated responses nest in `data`:
 
 `LicenseStatus`: "valid" | "expiring" | "grace" | "expired_access" | "expired"
 
+`PairState`: "active" | "draining" | "synced_drained" | "retired"
+
 ---
 
 ## Accounts
@@ -418,7 +420,7 @@ Request:
   "k": int32(required)
 }
 ```
-Response data: `{ "id": string, "pairsFormed": int32, "pairsRequested": int32, "partial": bool, "reason?": string }`
+Response data: `UpdateConfigResult`
 
 ### GET /api/v1/storages/:storageId/config
 Param: `storageId`
@@ -1386,7 +1388,7 @@ Response data: `GCWorkerEventGoalsResponse`
 {
   "id": string,
   "storageId": string,
-  "state": string,
+  "state": PairState,
   "memberA"?: string,
   "memberB"?: string,
   "placementGroupA"?: int64,
@@ -1463,6 +1465,17 @@ Response data: `GCWorkerEventGoalsResponse`
   "clientType": string,
   "status": string,
   "count": int64
+}
+```
+
+### UpdateConfigResult Type
+```
+{
+  "id": string,
+  "pairsFormed": int32,
+  "pairsRequested": int32,
+  "partial": bool,
+  "reason"?: string
 }
 ```
 

@@ -58,6 +58,13 @@ enums:
     - expired
     - unknown
 
+  # Block HA-pair lifecycle (spec/appserv.md §5b).
+  PairState:
+    - active
+    - draining
+    - synced_drained
+    - retired
+
 types:
   Ref:
     - "id: int64"
@@ -211,7 +218,7 @@ types:
   Pair:
     - "id: string"
     - "storageId: string"
-    - "state: string" # active | draining | synced_drained | retired
+    - "state: PairState"
     - "memberA: string?" # BlockVolume.id
     - "memberB: string?" # BlockVolume.id
     - "placementGroupA: int64?" # region_cluster_id
@@ -235,6 +242,14 @@ types:
     - "regionId: int64"
     - "regionClusterId: int64"
     - "memberState: string" # always "active" from these two actions
+
+  # Response shape for updateConfig.
+  UpdateConfigResult:
+    - "id: string"
+    - "pairsFormed: int32"
+    - "pairsRequested: int32"
+    - "partial: bool"
+    - "reason: string?"
 
   # A volume currently sitting on a compatible (same physicalFingerprint) storage,
   # eligible to move onto the storage being viewed.
@@ -1085,12 +1100,7 @@ resources:
         path: /:storageId/config
         request:
           - "k: int32!"
-        response:
-          - "id: string"
-          - "pairsFormed: int32"
-          - "pairsRequested: int32"
-          - "partial: bool"
-          - "reason: string?"
+        responseType: UpdateConfigResult
 
       # The read-back half of updateConfig{k} (D40): a storage's current
       # target K plus the placement-config values needed to interpret it.

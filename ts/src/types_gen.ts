@@ -43,6 +43,8 @@ export type LicenseQuotaState = 'ok' | 'exceeded'
 
 export type LicenseStatus = 'valid' | 'expiring' | 'grace' | 'expired_access' | 'expired'
 
+export type PairState = 'active' | 'draining' | 'synced_drained' | 'retired'
+
 export interface Account {
   id: number
   name: string
@@ -130,10 +132,18 @@ export interface BlockVolume {
   pairId?: string
 }
 
+export interface UpdateConfigResult {
+  id: string
+  pairsFormed: number
+  pairsRequested: number
+  partial: boolean
+  reason?: string
+}
+
 export interface Pair {
   id: string
   storageId: string
-  state: string
+  state: PairState
   memberA?: string
   memberB?: string
   placementGroupA?: number
