@@ -230,10 +230,16 @@ pub struct BlockVolume {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UpdateConfigResult {
     pub id: String,
+    #[serde(rename = "targetK")]
+    pub target_k: i32,
+    #[serde(rename = "activePairCountBefore")]
+    pub active_pair_count_before: i32,
+    #[serde(rename = "pairsNeeded")]
+    pub pairs_needed: i32,
     #[serde(rename = "pairsFormed")]
     pub pairs_formed: i32,
-    #[serde(rename = "pairsRequested")]
-    pub pairs_requested: i32,
+    #[serde(rename = "activePairCountAfter")]
+    pub active_pair_count_after: i32,
     pub partial: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reason: Option<String>,

@@ -82,13 +82,19 @@ test('cancelDrain (D27): active-again ack', async () => {
 test('updateConfig: partial-success surfaces reason, not swallowed', async () => {
   const { client, calls } = fakeClient({
     'PUT /api/v1/storages/7/config': {
-      id: 's1', pairsFormed: 2, pairsRequested: 3, partial: true,
+      id: 's1', targetK: 3, activePairCountBefore: 1, pairsNeeded: 2,
+      pairsFormed: 1, activePairCountAfter: 2, partial: true,
       reason: 'placement cluster B has no unused members',
     },
   })
   const res = await client.storages.updateConfig(7, { k: 3 })
   assert.equal(res.partial, true)
   assert.equal(res.reason, 'placement cluster B has no unused members')
+  assert.equal(res.targetK, 3)
+  assert.equal(res.activePairCountBefore, 1)
+  assert.equal(res.pairsNeeded, 2)
+  assert.equal(res.pairsFormed, 1)
+  assert.equal(res.activePairCountAfter, 2)
   assert.deepEqual(calls[0].body, { k: 3 })
 })
 

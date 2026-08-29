@@ -122,7 +122,7 @@ async fn list_pairs_full_state_per_pair() {
     ]));
     let client = test_client(base_url);
 
-    let pairs = client.storages.list_pairs(7).await.expect("list_pairs");
+    let pairs = client.storages.list_pairs(7, None, None).await.expect("list_pairs");
     assert_eq!(pairs.len(), 2);
     assert_eq!(pairs[1].state, "draining");
     assert_eq!(pairs[1].pending_sync_jobs_a, Some(3));
@@ -157,7 +157,8 @@ async fn cancel_drain_active_again() {
 #[tokio::test]
 async fn update_config_partial_surfaces_reason() {
     let (base_url, handle) = fixture_server(serde_json::json!({
-        "id": "s1", "pairsFormed": 2, "pairsRequested": 3, "partial": true,
+        "id": "s1", "targetK": 3, "activePairCountBefore": 1, "pairsNeeded": 2,
+        "pairsFormed": 1, "activePairCountAfter": 2, "partial": true,
         "reason": "placement cluster B has no unused members",
     }));
     let client = test_client(base_url);
@@ -169,6 +170,11 @@ async fn update_config_partial_surfaces_reason() {
         .expect("update_config");
     assert!(res.partial);
     assert_eq!(res.reason.as_deref(), Some("placement cluster B has no unused members"));
+    assert_eq!(res.target_k, 3);
+    assert_eq!(res.active_pair_count_before, 1);
+    assert_eq!(res.pairs_needed, 2);
+    assert_eq!(res.pairs_formed, 1);
+    assert_eq!(res.active_pair_count_after, 2);
     assert_eq!(handle.join().unwrap().body.unwrap()["k"], 3);
 }
 

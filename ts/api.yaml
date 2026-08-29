@@ -243,11 +243,20 @@ types:
     - "regionClusterId: int64"
     - "memberState: string" # always "active" from these two actions
 
-  # Response shape for updateConfig.
+  # Response shape for updateConfig. Every count a caller could want is
+  # explicit so none has to be inferred from a delta: targetK is the
+  # absolute K requested; activePairCountBefore/After are the storage's
+  # active-or-draining pair count immediately before/after this call
+  # (After = Before + pairsFormed); pairsNeeded is how many additional
+  # pairs this call actually needed (targetK - activePairCountBefore,
+  # floored at 0); pairsFormed is the delta this call actually created.
   UpdateConfigResult:
     - "id: string"
+    - "targetK: int32"
+    - "activePairCountBefore: int32"
+    - "pairsNeeded: int32"
     - "pairsFormed: int32"
-    - "pairsRequested: int32"
+    - "activePairCountAfter: int32"
     - "partial: bool"
     - "reason: string?"
 
@@ -1118,9 +1127,16 @@ resources:
           - "algorithmVersion: int32"
           - "epochPolicyVersion: int32"
 
+      # Defaults to non-retired pairs only - state, given, filters to
+      # exactly that PairState; includeRetired=true drops the default
+      # filter entirely (full audit history). At most one of the two
+      # is meaningful at a time; state wins if both are given.
       - action: listPairs
         method: GET
         path: /:storageId/pairs
+        query:
+          - "state: string"
+          - "includeRetired: bool"
         responseType: Pair
         responseArray: true
 

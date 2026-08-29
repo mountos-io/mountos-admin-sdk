@@ -793,8 +793,11 @@ pub struct Storage {
 ```rust
 pub struct UpdateConfigResult {
     pub id: String,
+    pub target_k: i32,
+    pub active_pair_count_before: i32,
+    pub pairs_needed: i32,
     pub pairs_formed: i32,
-    pub pairs_requested: i32,
+    pub active_pair_count_after: i32,
     pub partial: bool,
     pub reason: Option<String>,
 }
@@ -1490,7 +1493,7 @@ pub struct GetConfigStorageResponse {
 #### `list_pairs` - GET /api/v1/storages/:storageId/pairs
 
 ```rust
-pub async fn list_pairs(&self, storage_id: i64) -> Result<Vec<Pair>, Error>
+pub async fn list_pairs(&self, storage_id: i64, state: Option<&str>, include_retired: Option<bool>) -> Result<Vec<Pair>, Error>
 ```
 
 #### `get_pair_status` - GET /api/v1/storages/:storageId/pairs/:pairId

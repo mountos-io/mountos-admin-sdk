@@ -757,8 +757,11 @@ interface Storage {
 ```typescript
 interface UpdateConfigResult {
   id: string;
+  targetK: number;
+  activePairCountBefore: number;
+  pairsNeeded: number;
   pairsFormed: number;
-  pairsRequested: number;
+  activePairCountAfter: number;
   partial: boolean;
   reason?: string;
 }
@@ -1374,7 +1377,16 @@ client.storages.getConfig(storageId: number, signal?: AbortSignal): Promise<{ id
 #### `listPairs` - GET /api/v1/storages/:storageId/pairs
 
 ```typescript
-client.storages.listPairs(storageId: number, signal?: AbortSignal): Promise<Pair[]>;
+client.storages.listPairs(storageId: number, state?: string, includeRetired?: boolean, signal?: AbortSignal): Promise<Pair[]>;
+```
+
+Query params:
+
+```typescript
+{
+  state?: string;
+  includeRetired?: boolean;
+}
 ```
 
 #### `getPairStatus` - GET /api/v1/storages/:storageId/pairs/:pairId

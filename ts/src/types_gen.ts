@@ -134,8 +134,11 @@ export interface BlockVolume {
 
 export interface UpdateConfigResult {
   id: string
+  targetK: number
+  activePairCountBefore: number
+  pairsNeeded: number
   pairsFormed: number
-  pairsRequested: number
+  activePairCountAfter: number
   partial: boolean
   reason?: string
 }

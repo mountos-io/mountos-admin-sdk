@@ -93,7 +93,7 @@ func TestListPairs(t *testing.T) {
 	defer srv.Close()
 	c := newTestClient(t, srv.URL)
 
-	pairs, err := c.Storages.ListPairs(context.Background(), 7)
+	pairs, err := c.Storages.ListPairs(context.Background(), 7, "", false)
 	if err != nil {
 		t.Fatalf("ListPairs: %v", err)
 	}
@@ -139,7 +139,8 @@ func TestCancelDrain(t *testing.T) {
 func TestUpdateConfigPartialSurfacesReason(t *testing.T) {
 	_, srv := newFixtureServer(t, map[string]any{
 		"PUT /api/v1/storages/7/config": map[string]any{
-			"id": "s1", "pairsFormed": 2, "pairsRequested": 3, "partial": true,
+			"id": "s1", "targetK": 3, "activePairCountBefore": 1, "pairsNeeded": 2,
+			"pairsFormed": 1, "activePairCountAfter": 2, "partial": true,
 			"reason": "placement cluster B has no unused members",
 		},
 	})
@@ -152,6 +153,9 @@ func TestUpdateConfigPartialSurfacesReason(t *testing.T) {
 	}
 	if !res.Partial || res.Reason == "" {
 		t.Fatalf("expected partial=true with a reason, got %+v", res)
+	}
+	if res.TargetK != 3 || res.ActivePairCountBefore != 1 || res.PairsNeeded != 2 || res.PairsFormed != 1 || res.ActivePairCountAfter != 2 {
+		t.Fatalf("unexpected explicit before/needed/formed/after fields: %+v", res)
 	}
 }
 

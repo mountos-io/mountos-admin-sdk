@@ -412,8 +412,19 @@ func (s *StoragesService) GetConfig(ctx context.Context, storageID int64) (*GetC
 	return decodeJSON[GetConfigStorageResponse](data)
 }
 
-func (s *StoragesService) ListPairs(ctx context.Context, storageID int64) ([]Pair, error) {
-	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/storages/%s/pairs", strconv.FormatInt(storageID, 10)))
+func (s *StoragesService) ListPairs(ctx context.Context, storageID int64, state string, includeRetired bool) ([]Pair, error) {
+	q := url.Values{}
+	if state != "" {
+		q.Set("state", state)
+	}
+	if includeRetired {
+		q.Set("includeRetired", strconv.FormatBool(includeRetired))
+	}
+	path := fmt.Sprintf("/api/v1/storages/%s/pairs", strconv.FormatInt(storageID, 10))
+	if qs := q.Encode(); qs != "" {
+		path += "?" + qs
+	}
+	data, err := s.c.get(ctx, path)
 	if err != nil {
 		return nil, err
 	}

@@ -294,8 +294,8 @@ export class StoragesResource {
     return this.client.request('GET', `/api/v1/storages/${storageId}/config`, undefined, signal)
   }
 
-  listPairs(storageId: number, signal?: AbortSignal): Promise<Pair[]> {
-    return this.client.request('GET', `/api/v1/storages/${storageId}/pairs`, undefined, signal)
+  listPairs(storageId: number, state?: string, includeRetired?: boolean, signal?: AbortSignal): Promise<Pair[]> {
+    return this.client.request('GET', `/api/v1/storages/${storageId}/pairs${queryString({ state: state, includeRetired: includeRetired })}`, undefined, signal)
   }
 
   getPairStatus(storageId: number, pairId: string, signal?: AbortSignal): Promise<Pair> {

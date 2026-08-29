@@ -353,8 +353,15 @@ impl StoragesService {
         self.inner.get(&format!("/api/v1/storages/{}/config", storage_id), &[]).await
     }
 
-    pub async fn list_pairs(&self, storage_id: i64) -> Result<Vec<Pair>, Error> {
-        self.inner.get(&format!("/api/v1/storages/{}/pairs", storage_id), &[]).await
+    pub async fn list_pairs(&self, storage_id: i64, state: Option<&str>, include_retired: Option<bool>) -> Result<Vec<Pair>, Error> {
+        let mut query: Vec<(&str, String)> = Vec::new();
+        if let Some(v) = state {
+            query.push(("state", v.to_string()));
+        }
+        if let Some(v) = include_retired {
+            query.push(("includeRetired", v.to_string()));
+        }
+        self.inner.get(&format!("/api/v1/storages/{}/pairs", storage_id), &query).await
     }
 
     pub async fn get_pair_status(&self, storage_id: i64, pair_id: &str) -> Result<Pair, Error> {

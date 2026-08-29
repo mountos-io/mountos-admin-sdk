@@ -168,11 +168,14 @@ type BlockVolume struct {
 }
 
 type UpdateConfigResult struct {
-	ID             string `json:"id"`
-	PairsFormed    int32  `json:"pairsFormed"`
-	PairsRequested int32  `json:"pairsRequested"`
-	Partial        bool   `json:"partial"`
-	Reason         string `json:"reason,omitempty"`
+	ID                    string `json:"id"`
+	TargetK               int32  `json:"targetK"`
+	ActivePairCountBefore int32  `json:"activePairCountBefore"`
+	PairsNeeded           int32  `json:"pairsNeeded"`
+	PairsFormed           int32  `json:"pairsFormed"`
+	ActivePairCountAfter  int32  `json:"activePairCountAfter"`
+	Partial               bool   `json:"partial"`
+	Reason                string `json:"reason,omitempty"`
 }
 
 type Pair struct {

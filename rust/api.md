@@ -428,6 +428,7 @@ Response data: `{ "id": string, "k": int32, "algorithmVersion": int32, "epochPol
 
 ### GET /api/v1/storages/:storageId/pairs
 Param: `storageId`
+Query: `state=string`, `includeRetired=bool`
 Response data: `Pair[]`
 
 ### GET /api/v1/storages/:storageId/pairs/:pairId
@@ -1472,8 +1473,11 @@ Response data: `GCWorkerEventGoalsResponse`
 ```
 {
   "id": string,
+  "targetK": int32,
+  "activePairCountBefore": int32,
+  "pairsNeeded": int32,
   "pairsFormed": int32,
-  "pairsRequested": int32,
+  "activePairCountAfter": int32,
   "partial": bool,
   "reason"?: string
 }

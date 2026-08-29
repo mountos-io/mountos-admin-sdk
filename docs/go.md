@@ -801,8 +801,11 @@ type Storage struct {
 ```go
 type UpdateConfigResult struct {
     ID                       string                   `json:"id"`
+    TargetK                  int32                    `json:"targetK"`
+    ActivePairCountBefore    int32                    `json:"activePairCountBefore"`
+    PairsNeeded              int32                    `json:"pairsNeeded"`
     PairsFormed              int32                    `json:"pairsFormed"`
-    PairsRequested           int32                    `json:"pairsRequested"`
+    ActivePairCountAfter     int32                    `json:"activePairCountAfter"`
     Partial                  bool                     `json:"partial"`
     Reason                   string                   `json:"reason,omitempty"`
 }
@@ -1498,7 +1501,7 @@ type GetConfigStorageResponse struct {
 #### `ListPairs` - GET /api/v1/storages/:storageId/pairs
 
 ```go
-func (s *StoragesService) ListPairs(ctx context.Context, storageID int64) ([]Pair, error)
+func (s *StoragesService) ListPairs(ctx context.Context, storageID int64, state string, includeRetired bool) ([]Pair, error)
 ```
 
 #### `GetPairStatus` - GET /api/v1/storages/:storageId/pairs/:pairId
