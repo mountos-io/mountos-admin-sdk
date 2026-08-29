@@ -358,15 +358,15 @@ impl StoragesService {
     }
 
     pub async fn get_pair_status(&self, storage_id: i64, pair_id: &str) -> Result<Pair, Error> {
-        self.inner.get(&format!("/api/v1/storages/{}/pairs/{}", storage_id, pair_id), &[]).await
+        self.inner.get(&format!("/api/v1/storages/{}/pairs/{}", storage_id, crate::http::encode_segment(pair_id)), &[]).await
     }
 
     pub async fn drain_pair(&self, storage_id: i64, pair_id: &str) -> Result<DrainPairStorageResponse, Error> {
-        self.inner.post_empty(&format!("/api/v1/storages/{}/pairs/{}/drain", storage_id, pair_id)).await
+        self.inner.post_empty(&format!("/api/v1/storages/{}/pairs/{}/drain", storage_id, crate::http::encode_segment(pair_id))).await
     }
 
     pub async fn cancel_drain(&self, storage_id: i64, pair_id: &str) -> Result<CancelDrainStorageResponse, Error> {
-        self.inner.post_empty(&format!("/api/v1/storages/{}/pairs/{}/cancel-drain", storage_id, pair_id)).await
+        self.inner.post_empty(&format!("/api/v1/storages/{}/pairs/{}/cancel-drain", storage_id, crate::http::encode_segment(pair_id))).await
     }
 
     pub async fn register_member(&self, storage_id: i64, req: &RegisterStorageMemberRequest) -> Result<PoolMember, Error> {
@@ -374,7 +374,7 @@ impl StoragesService {
     }
 
     pub async fn reactivate_member(&self, storage_id: i64, block_volume_id: &str) -> Result<PoolMember, Error> {
-        self.inner.post_empty(&format!("/api/v1/storages/{}/members/{}/reactivate", storage_id, block_volume_id)).await
+        self.inner.post_empty(&format!("/api/v1/storages/{}/members/{}/reactivate", storage_id, crate::http::encode_segment(block_volume_id))).await
     }
 
     pub async fn backfill_fingerprints(&self) -> Result<BackfillFingerprintsStorageResponse, Error> {
@@ -505,11 +505,11 @@ impl VolumesService {
     }
 
     pub async fn delete_fork(&self, volume_id: i64, fork_name: &str, req: &DeleteVolumeForkRequest) -> Result<DeleteForkVolumeResponse, Error> {
-        self.inner.post(&format!("/api/v1/volumes/{}/forks/{}/delete", volume_id, fork_name), req).await
+        self.inner.post(&format!("/api/v1/volumes/{}/forks/{}/delete", volume_id, crate::http::encode_segment(fork_name)), req).await
     }
 
     pub async fn restore_fork(&self, volume_id: i64, fork_name: &str, req: &RestoreVolumeForkRequest) -> Result<Fork, Error> {
-        self.inner.post(&format!("/api/v1/volumes/{}/forks/{}/restore", volume_id, fork_name), req).await
+        self.inner.post(&format!("/api/v1/volumes/{}/forks/{}/restore", volume_id, crate::http::encode_segment(fork_name)), req).await
     }
 }
 
@@ -541,7 +541,7 @@ impl VolumeForkTreesService {
                 query.push(("kind", v.to_string()));
             }
         }
-        self.inner.get(&format!("/api/v1/volumes/{}/forks/{}/tree", volume_id, fork_name), &query).await
+        self.inner.get(&format!("/api/v1/volumes/{}/forks/{}/tree", volume_id, crate::http::encode_segment(fork_name)), &query).await
     }
 }
 
@@ -562,7 +562,7 @@ impl VolumeForkEntriesService {
         if let Some(v) = as_of {
             query.push(("asOf", v.to_string()));
         }
-        self.inner.get(&format!("/api/v1/volumes/{}/forks/{}/entry", volume_id, fork_name), &query).await
+        self.inner.get(&format!("/api/v1/volumes/{}/forks/{}/entry", volume_id, crate::http::encode_segment(fork_name)), &query).await
     }
 
     pub async fn versions(&self, volume_id: i64, fork_name: &str, opts: Option<&VolumeForkEntryListOptions>) -> Result<CursorPaginatedResponse<ForkEntryVersion>, Error> {
@@ -578,7 +578,7 @@ impl VolumeForkEntriesService {
                 query.push(("limit", v.to_string()));
             }
         }
-        self.inner.get(&format!("/api/v1/volumes/{}/forks/{}/entry/versions", volume_id, fork_name), &query).await
+        self.inner.get(&format!("/api/v1/volumes/{}/forks/{}/entry/versions", volume_id, crate::http::encode_segment(fork_name)), &query).await
     }
 }
 
@@ -613,7 +613,7 @@ impl VolumeForkSearchesService {
                 query.push(("kind", v.to_string()));
             }
         }
-        self.inner.get(&format!("/api/v1/volumes/{}/forks/{}/search", volume_id, fork_name), &query).await
+        self.inner.get(&format!("/api/v1/volumes/{}/forks/{}/search", volume_id, crate::http::encode_segment(fork_name)), &query).await
     }
 }
 
@@ -908,7 +908,7 @@ impl AlertsService {
     }
 
     pub async fn resolve(&self, alert_id: &str) -> Result<ResolveAlertResponse, Error> {
-        self.inner.post_empty(&format!("/api/v1/alerts/{}/resolve", alert_id)).await
+        self.inner.post_empty(&format!("/api/v1/alerts/{}/resolve", crate::http::encode_segment(alert_id))).await
     }
 }
 
@@ -958,7 +958,7 @@ impl RegionAlertsService {
     }
 
     pub async fn resolve(&self, region_id: i64, alert_id: &str) -> Result<ResolveRegionAlertResponse, Error> {
-        self.inner.post_empty(&format!("/api/v1/regions/{}/alerts/{}/resolve", region_id, alert_id)).await
+        self.inner.post_empty(&format!("/api/v1/regions/{}/alerts/{}/resolve", region_id, crate::http::encode_segment(alert_id))).await
     }
 }
 

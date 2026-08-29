@@ -9,7 +9,7 @@ TS_RUN_deno := deno task
 TS_RUN_node := npm run
 TS_RUN      := $(or $(TS_RUN_$(TS_RUNTIME)),$(TS_RUNTIME) run)
 
-.PHONY: all gen docs check test build install clean ts-install ts-check ts-build ts-test ts-publish go-check go-build go-test rust-check rust-build rust-test rust-publish rust-clean tag tag-minor tag-major bump-version help
+.PHONY: all gen gen-test docs check test build install clean ts-install ts-check ts-build ts-test ts-publish go-check go-build go-test rust-check rust-build rust-test rust-publish rust-clean tag tag-minor tag-major bump-version help
 
 all: gen check build
 
@@ -24,6 +24,9 @@ gen: ## Generate Go + TS + Rust SDK and docs from api.yaml
 	cp api.md ts/api.md
 	cp SKILL.md ts/SKILL.md
 	cp api.md LICENSE NOTICE rust/
+
+gen-test: ## Run the generator's own unit tests (dispatch matrix, etc.)
+	cd gen && go test ./...
 
 docs: ## Regenerate docs/ts.md, docs/go.md and docs/rust.md from api.yaml
 	cd gen && go run . --spec ../api.yaml --go-out ../go --ts-out ../ts/src --rust-out ../rust/src --doc-out .. --docs-out ../docs
@@ -86,7 +89,7 @@ check: ts-check go-check rust-check ## Run all checks
 # Not folded into `check`/`all` - deliberately separate so existing
 # check/build behavior doesn't change under anyone currently relying on it.
 # Run explicitly (`make test`) or per-language (`make go-test`, etc.).
-test: ts-test go-test rust-test ## Run all fixture/contract tests
+test: gen-test ts-test go-test rust-test ## Run all fixture/contract tests
 
 build: ts-build go-build rust-build ## Build all
 

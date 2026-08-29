@@ -500,9 +500,7 @@ func generateGoResources(spec *Spec, outDir string) {
 					t := paramGoType(raw, res.PathParamTypes)
 					switch t {
 					case "string":
-						if raw == "nodeId" {
-							imports.add("net/url")
-						}
+						imports.add("net/url")
 					case "int64":
 						imports.add("strconv")
 					}
@@ -655,11 +653,7 @@ func goFmtArgs(allPathParams []string, paramTypes map[string]string) string {
 		t := paramGoType(raw, paramTypes)
 		switch t {
 		case "string":
-			if raw == "nodeId" {
-				args = append(args, "url.PathEscape("+name+")")
-			} else {
-				args = append(args, name)
-			}
+			args = append(args, "url.PathEscape("+name+")")
 		case "int64":
 			args = append(args, "strconv.FormatInt("+name+", 10)")
 		default:
@@ -803,8 +797,8 @@ func writeGoToggleMethod(w *strings.Builder, svcType, methodName string, ep Endp
 
 	fmt.Fprintf(w, "func (s *%s) %s(%s) (*%s, error) {\n", svcType, methodName, sig, respType)
 	switch httpMethod {
-	case "post":
-		fmt.Fprintf(w, "\tdata, err := s.c.post(ctx, %s, nil)\n", pathExpr)
+	case "post", "put":
+		fmt.Fprintf(w, "\tdata, err := s.c.%s(ctx, %s, nil)\n", httpMethod, pathExpr)
 	case "delete":
 		fmt.Fprintf(w, "\tdata, err := s.c.delete(ctx, %s)\n", pathExpr)
 	default:
@@ -826,9 +820,12 @@ func writeGoVoidMethod(w *strings.Builder, svcType, methodName string, ep Endpoi
 	httpMethod := goHTTPMethod(ep.Method)
 
 	fmt.Fprintf(w, "func (s *%s) %s(%s) error {\n", svcType, methodName, sig)
-	if httpMethod == "delete" {
+	switch httpMethod {
+	case "delete":
 		fmt.Fprintf(w, "\t_, err := s.c.delete(ctx, %s)\n", pathExpr)
-	} else {
+	case "get":
+		fmt.Fprintf(w, "\t_, err := s.c.get(ctx, %s)\n", pathExpr)
+	default:
 		fmt.Fprintf(w, "\t_, err := s.c.%s(ctx, %s, nil)\n", httpMethod, pathExpr)
 	}
 	w.WriteString("\treturn err\n")

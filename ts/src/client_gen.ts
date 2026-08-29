@@ -299,15 +299,15 @@ export class StoragesResource {
   }
 
   getPairStatus(storageId: number, pairId: string, signal?: AbortSignal): Promise<Pair> {
-    return this.client.request('GET', `/api/v1/storages/${storageId}/pairs/${pairId}`, undefined, signal)
+    return this.client.request('GET', `/api/v1/storages/${storageId}/pairs/${encodeURIComponent(pairId)}`, undefined, signal)
   }
 
   drainPair(storageId: number, pairId: string, signal?: AbortSignal): Promise<{ id: string; state: string }> {
-    return this.client.request('POST', `/api/v1/storages/${storageId}/pairs/${pairId}/drain`, undefined, signal)
+    return this.client.request('POST', `/api/v1/storages/${storageId}/pairs/${encodeURIComponent(pairId)}/drain`, undefined, signal)
   }
 
   cancelDrain(storageId: number, pairId: string, signal?: AbortSignal): Promise<{ id: string; state: string }> {
-    return this.client.request('POST', `/api/v1/storages/${storageId}/pairs/${pairId}/cancel-drain`, undefined, signal)
+    return this.client.request('POST', `/api/v1/storages/${storageId}/pairs/${encodeURIComponent(pairId)}/cancel-drain`, undefined, signal)
   }
 
   registerMember(storageId: number, req: RegisterStorageMemberRequest, signal?: AbortSignal): Promise<PoolMember> {
@@ -315,7 +315,7 @@ export class StoragesResource {
   }
 
   reactivateMember(storageId: number, blockVolumeId: string, signal?: AbortSignal): Promise<PoolMember> {
-    return this.client.request('POST', `/api/v1/storages/${storageId}/members/${blockVolumeId}/reactivate`, undefined, signal)
+    return this.client.request('POST', `/api/v1/storages/${storageId}/members/${encodeURIComponent(blockVolumeId)}/reactivate`, undefined, signal)
   }
 
   backfillFingerprints(signal?: AbortSignal): Promise<{ scanned: number; updated: number; failures: BackfillFailure[]; hasMore: boolean }> {
@@ -403,11 +403,11 @@ export class VolumesResource {
   }
 
   deleteFork(volumeId: number, forkName: string, req: DeleteVolumeForkRequest, signal?: AbortSignal): Promise<{ inactivatedFids: number[] }> {
-    return this.client.request('POST', `/api/v1/volumes/${volumeId}/forks/${forkName}/delete`, req, signal)
+    return this.client.request('POST', `/api/v1/volumes/${volumeId}/forks/${encodeURIComponent(forkName)}/delete`, req, signal)
   }
 
   restoreFork(volumeId: number, forkName: string, req: RestoreVolumeForkRequest, signal?: AbortSignal): Promise<Fork> {
-    return this.client.request('POST', `/api/v1/volumes/${volumeId}/forks/${forkName}/restore`, req, signal)
+    return this.client.request('POST', `/api/v1/volumes/${volumeId}/forks/${encodeURIComponent(forkName)}/restore`, req, signal)
   }
 }
 
@@ -415,7 +415,7 @@ export class VolumeForkTreesResource {
   constructor(private client: Client) {}
 
   list(volumeId: number, forkName: string, opts?: VolumeForkTreeListOptions, signal?: AbortSignal): Promise<CursorPaginatedResponse<ForkTreeEntry>> {
-    return this.client.request('GET', `/api/v1/volumes/${volumeId}/forks/${forkName}/tree${queryString({
+    return this.client.request('GET', `/api/v1/volumes/${volumeId}/forks/${encodeURIComponent(forkName)}/tree${queryString({
       path: opts?.path,
       asOf: opts?.asOf,
       cursor: opts?.cursor,
@@ -430,11 +430,11 @@ export class VolumeForkEntriesResource {
   constructor(private client: Client) {}
 
   get(volumeId: number, forkName: string, path?: string, inode?: number, asOf?: number, signal?: AbortSignal): Promise<ForkEntryDetail> {
-    return this.client.request('GET', `/api/v1/volumes/${volumeId}/forks/${forkName}/entry${queryString({ path: path, inode: inode, asOf: asOf })}`, undefined, signal)
+    return this.client.request('GET', `/api/v1/volumes/${volumeId}/forks/${encodeURIComponent(forkName)}/entry${queryString({ path: path, inode: inode, asOf: asOf })}`, undefined, signal)
   }
 
   versions(volumeId: number, forkName: string, opts?: VolumeForkEntryListOptions, signal?: AbortSignal): Promise<CursorPaginatedResponse<ForkEntryVersion>> {
-    return this.client.request('GET', `/api/v1/volumes/${volumeId}/forks/${forkName}/entry/versions${queryString({
+    return this.client.request('GET', `/api/v1/volumes/${volumeId}/forks/${encodeURIComponent(forkName)}/entry/versions${queryString({
       path: opts?.path,
       cursor: opts?.cursor,
       limit: opts?.limit,
@@ -446,7 +446,7 @@ export class VolumeForkSearchesResource {
   constructor(private client: Client) {}
 
   find(volumeId: number, forkName: string, opts?: VolumeForkSearchListOptions, signal?: AbortSignal): Promise<CursorPaginatedResponse<ForkTreeMatch>> {
-    return this.client.request('GET', `/api/v1/volumes/${volumeId}/forks/${forkName}/search${queryString({
+    return this.client.request('GET', `/api/v1/volumes/${volumeId}/forks/${encodeURIComponent(forkName)}/search${queryString({
       q: opts?.q,
       path: opts?.path,
       asOf: opts?.asOf,
@@ -588,7 +588,7 @@ export class AlertsResource {
   }
 
   resolve(alertId: string, signal?: AbortSignal): Promise<{ alertId: string }> {
-    return this.client.request('POST', `/api/v1/alerts/${alertId}/resolve`, undefined, signal)
+    return this.client.request('POST', `/api/v1/alerts/${encodeURIComponent(alertId)}/resolve`, undefined, signal)
   }
 }
 
@@ -604,7 +604,7 @@ export class RegionAlertsResource {
   }
 
   resolve(regionId: number, alertId: string, signal?: AbortSignal): Promise<{ alertId: string }> {
-    return this.client.request('POST', `/api/v1/regions/${regionId}/alerts/${alertId}/resolve`, undefined, signal)
+    return this.client.request('POST', `/api/v1/regions/${regionId}/alerts/${encodeURIComponent(alertId)}/resolve`, undefined, signal)
   }
 }
 

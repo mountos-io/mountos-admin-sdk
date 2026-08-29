@@ -396,7 +396,7 @@ func tsInlineResponseType(resp []string) string {
 	return "{ " + strings.Join(parts, "; ") + " }"
 }
 
-func tsPathExpr(fullPath string, allPathParams []string) string {
+func tsPathExpr(fullPath string, allPathParams []string, paramTypes map[string]string) string {
 	if len(allPathParams) == 0 {
 		return "'" + fullPath + "'"
 	}
@@ -404,13 +404,21 @@ func tsPathExpr(fullPath string, allPathParams []string) string {
 	for _, p := range allPathParams {
 		paramName := tsParamName(p)
 		raw := strings.TrimPrefix(p, ":")
-		if raw == "nodeId" {
+		if tsPathParamIsString(raw, paramTypes) {
 			result = strings.Replace(result, p, "${encodeURIComponent("+paramName+")}", 1)
 		} else {
 			result = strings.Replace(result, p, "${"+paramName+"}", 1)
 		}
 	}
 	return "`" + result + "`"
+}
+
+// tsPathParamIsString reports whether a :path param serializes to a string
+// (and so needs URL-encoding); numeric params never contain characters that
+// need escaping.
+func tsPathParamIsString(raw string, paramTypes map[string]string) bool {
+	t, ok := paramTypes[raw]
+	return ok && (t == "string" || t == "datetime")
 }
 
 func tsParamName(pathParam string) string {
@@ -448,7 +456,7 @@ func writeTSBodyMethod(w *strings.Builder, methodName string, ep Endpoint, fullP
 	}
 	sig += "req: " + reqType + ", signal?: AbortSignal"
 
-	pathExpr := tsPathExpr(fullPath, allPathParams)
+	pathExpr := tsPathExpr(fullPath, allPathParams, pt)
 
 	fmt.Fprintf(w, "  %s(%s): Promise<%s> {\n", methodName, sig, retType)
 	fmt.Fprintf(w, "    return this.client.request('%s', %s, req, signal)\n", ep.Method, pathExpr)
@@ -465,7 +473,7 @@ func writeTSGetMethod(w *strings.Builder, methodName string, ep Endpoint, fullPa
 	}
 	sig += "signal?: AbortSignal"
 
-	pathExpr := tsPathExpr(fullPath, allPathParams)
+	pathExpr := tsPathExpr(fullPath, allPathParams, pt)
 
 	fmt.Fprintf(w, "  %s(%s): Promise<%s> {\n", methodName, sig, retType)
 	fmt.Fprintf(w, "    return this.client.request('GET', %s, undefined, signal)\n", pathExpr)
@@ -482,7 +490,7 @@ func writeTSToggleMethod(w *strings.Builder, methodName string, ep Endpoint, ful
 		sig += ", "
 	}
 	sig += "signal?: AbortSignal"
-	pathExpr := tsPathExpr(fullPath, allPathParams)
+	pathExpr := tsPathExpr(fullPath, allPathParams, pt)
 
 	fmt.Fprintf(w, "  %s(%s): Promise<%s> {\n", methodName, sig, retType)
 	fmt.Fprintf(w, "    return this.client.request('%s', %s, undefined, signal)\n", ep.Method, pathExpr)
@@ -497,7 +505,7 @@ func writeTSVoidMethod(w *strings.Builder, methodName string, ep Endpoint, fullP
 		sig += ", "
 	}
 	sig += "signal?: AbortSignal"
-	pathExpr := tsPathExpr(fullPath, allPathParams)
+	pathExpr := tsPathExpr(fullPath, allPathParams, pt)
 
 	fmt.Fprintf(w, "  %s(%s): Promise<void> {\n", methodName, sig)
 	fmt.Fprintf(w, "    return this.client.request('%s', %s, undefined, signal)\n", ep.Method, pathExpr)
@@ -535,7 +543,7 @@ func writeTSArrayMethod(w *strings.Builder, methodName string, ep Endpoint, full
 			qsArgs = append(qsArgs, f.Name+": "+paramName)
 		}
 		qsCall := "queryString({ " + strings.Join(qsArgs, ", ") + " })"
-		pathExpr := tsPathExpr(basePath, allPathParams)
+		pathExpr := tsPathExpr(basePath, allPathParams, pt)
 		pathInner := pathExpr[1 : len(pathExpr)-1]
 		fmt.Fprintf(w, "  %s(%s): Promise<%s> {\n", methodName, params, retType)
 		fmt.Fprintf(w, "    return this.client.request('GET', `%s${%s}`, undefined, signal)\n", pathInner, qsCall)
@@ -544,7 +552,7 @@ func writeTSArrayMethod(w *strings.Builder, methodName string, ep Endpoint, full
 			params += ", "
 		}
 		params += "signal?: AbortSignal"
-		pathExpr := tsPathExpr(fullPath, allPathParams)
+		pathExpr := tsPathExpr(fullPath, allPathParams, pt)
 		fmt.Fprintf(w, "  %s(%s): Promise<%s> {\n", methodName, params, retType)
 		fmt.Fprintf(w, "    return this.client.request('GET', %s, undefined, signal)\n", pathExpr)
 	}
@@ -590,7 +598,7 @@ func writeTSPageListMethod(w *strings.Builder, methodName string, ep Endpoint, f
 	}
 	qsCall := "queryString({ " + strings.Join(qsArgs, ", ") + " })"
 
-	pathExpr := tsPathExpr(fullPath, allPathParams)
+	pathExpr := tsPathExpr(fullPath, allPathParams, pt)
 	// For template literal paths with path params, we need to concat
 	if len(allPathParams) > 0 {
 		fmt.Fprintf(w, "  %s(%s): Promise<%s> {\n", methodName, sig, retType)
@@ -632,7 +640,7 @@ func writeTSCursorListMethod(w *strings.Builder, methodName string, ep Endpoint,
 	}
 	qsCall := "queryString({\n      " + strings.Join(qsArgs, ",\n      ") + ",\n    })"
 
-	pathExpr := tsPathExpr(fullPath, allPathParams)
+	pathExpr := tsPathExpr(fullPath, allPathParams, pt)
 	// Strip surrounding quotes/backticks to embed in template literal
 	inner := pathExpr[1 : len(pathExpr)-1]
 
@@ -673,7 +681,7 @@ func writeTSQueryMethod(w *strings.Builder, methodName string, ep Endpoint, full
 	}
 	qsCall := "queryString({ " + strings.Join(qsArgs, ", ") + " })"
 
-	pathExpr := tsPathExpr(fullPath, allPathParams)
+	pathExpr := tsPathExpr(fullPath, allPathParams, pt)
 	// Strip outer quotes/backticks - we need raw content for template literal with query string
 	pathInner := pathExpr[1 : len(pathExpr)-1]
 

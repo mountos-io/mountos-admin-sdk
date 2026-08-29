@@ -346,7 +346,7 @@ func rustPathExpr(fullPath string, allPathParams []string, pt map[string]string)
 		tmpl = strings.Replace(tmpl, p, "{}", 1)
 		raw := strings.TrimPrefix(p, ":")
 		name := rustParamName(p)
-		if rustParamType(raw, pt) == "&str" && raw == "nodeId" {
+		if rustParamType(raw, pt) == "&str" {
 			args = append(args, "crate::http::encode_segment("+name+")")
 		} else {
 			args = append(args, name)
@@ -410,6 +410,8 @@ func writeRustToggleMethod(w *strings.Builder, methodName string, ep Endpoint, f
 		fmt.Fprintf(w, "        self.inner.get(%s, &[]).await\n", pathExpr)
 	case "DELETE":
 		fmt.Fprintf(w, "        self.inner.delete(%s).await\n", pathExpr)
+	case "PUT":
+		fmt.Fprintf(w, "        self.inner.put_empty(%s).await\n", pathExpr)
 	default:
 		fmt.Fprintf(w, "        self.inner.post_empty(%s).await\n", pathExpr)
 	}
@@ -427,6 +429,8 @@ func writeRustVoidMethod(w *strings.Builder, methodName string, ep Endpoint, ful
 		fmt.Fprintf(w, "        self.inner.get::<serde_json::Value>(%s, &[]).await.map(|_| ())\n", pathExpr)
 	case "DELETE":
 		fmt.Fprintf(w, "        self.inner.delete::<serde_json::Value>(%s).await.map(|_| ())\n", pathExpr)
+	case "PUT":
+		fmt.Fprintf(w, "        self.inner.put_empty::<serde_json::Value>(%s).await.map(|_| ())\n", pathExpr)
 	default:
 		fmt.Fprintf(w, "        self.inner.post_empty::<serde_json::Value>(%s).await.map(|_| ())\n", pathExpr)
 	}

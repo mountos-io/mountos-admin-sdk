@@ -425,7 +425,7 @@ func (s *StoragesService) ListPairs(ctx context.Context, storageID int64) ([]Pai
 }
 
 func (s *StoragesService) GetPairStatus(ctx context.Context, storageID int64, pairID string) (*Pair, error) {
-	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/storages/%s/pairs/%s", strconv.FormatInt(storageID, 10), pairID))
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/storages/%s/pairs/%s", strconv.FormatInt(storageID, 10), url.PathEscape(pairID)))
 	if err != nil {
 		return nil, err
 	}
@@ -433,7 +433,7 @@ func (s *StoragesService) GetPairStatus(ctx context.Context, storageID int64, pa
 }
 
 func (s *StoragesService) DrainPair(ctx context.Context, storageID int64, pairID string) (*DrainPairStorageResponse, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/pairs/%s/drain", strconv.FormatInt(storageID, 10), pairID), nil)
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/pairs/%s/drain", strconv.FormatInt(storageID, 10), url.PathEscape(pairID)), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -441,7 +441,7 @@ func (s *StoragesService) DrainPair(ctx context.Context, storageID int64, pairID
 }
 
 func (s *StoragesService) CancelDrain(ctx context.Context, storageID int64, pairID string) (*CancelDrainStorageResponse, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/pairs/%s/cancel-drain", strconv.FormatInt(storageID, 10), pairID), nil)
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/pairs/%s/cancel-drain", strconv.FormatInt(storageID, 10), url.PathEscape(pairID)), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -457,7 +457,7 @@ func (s *StoragesService) RegisterMember(ctx context.Context, storageID int64, r
 }
 
 func (s *StoragesService) ReactivateMember(ctx context.Context, storageID int64, blockVolumeID string) (*PoolMember, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/members/%s/reactivate", strconv.FormatInt(storageID, 10), blockVolumeID), nil)
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/members/%s/reactivate", strconv.FormatInt(storageID, 10), url.PathEscape(blockVolumeID)), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -666,7 +666,7 @@ func (s *VolumesService) ListForks(ctx context.Context, volumeID int64, volumeTy
 }
 
 func (s *VolumesService) DeleteFork(ctx context.Context, volumeID int64, forkName string, req *DeleteVolumeForkRequest) (*DeleteForkVolumeResponse, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/volumes/%s/forks/%s/delete", strconv.FormatInt(volumeID, 10), forkName), req)
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/volumes/%s/forks/%s/delete", strconv.FormatInt(volumeID, 10), url.PathEscape(forkName)), req)
 	if err != nil {
 		return nil, err
 	}
@@ -674,7 +674,7 @@ func (s *VolumesService) DeleteFork(ctx context.Context, volumeID int64, forkNam
 }
 
 func (s *VolumesService) RestoreFork(ctx context.Context, volumeID int64, forkName string, req *RestoreVolumeForkRequest) (*Fork, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/volumes/%s/forks/%s/restore", strconv.FormatInt(volumeID, 10), forkName), req)
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/volumes/%s/forks/%s/restore", strconv.FormatInt(volumeID, 10), url.PathEscape(forkName)), req)
 	if err != nil {
 		return nil, err
 	}
@@ -705,7 +705,7 @@ func (s *VolumeForkTreesService) List(ctx context.Context, volumeID int64, forkN
 			q.Set("kind", opts.Kind)
 		}
 	}
-	path := fmt.Sprintf("/api/v1/volumes/%s/forks/%s/tree", strconv.FormatInt(volumeID, 10), forkName)
+	path := fmt.Sprintf("/api/v1/volumes/%s/forks/%s/tree", strconv.FormatInt(volumeID, 10), url.PathEscape(forkName))
 	if qs := q.Encode(); qs != "" {
 		path += "?" + qs
 	}
@@ -729,7 +729,7 @@ func (s *VolumeForkEntriesService) Get(ctx context.Context, volumeID int64, fork
 	if asOf != nil {
 		q.Set("asOf", strconv.FormatInt(*asOf, 10))
 	}
-	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/volumes/%s/forks/%s/entry", strconv.FormatInt(volumeID, 10), forkName)+"?"+q.Encode())
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/volumes/%s/forks/%s/entry", strconv.FormatInt(volumeID, 10), url.PathEscape(forkName))+"?"+q.Encode())
 	if err != nil {
 		return nil, err
 	}
@@ -749,7 +749,7 @@ func (s *VolumeForkEntriesService) Versions(ctx context.Context, volumeID int64,
 			q.Set("limit", strconv.Itoa(opts.Limit))
 		}
 	}
-	path := fmt.Sprintf("/api/v1/volumes/%s/forks/%s/entry/versions", strconv.FormatInt(volumeID, 10), forkName)
+	path := fmt.Sprintf("/api/v1/volumes/%s/forks/%s/entry/versions", strconv.FormatInt(volumeID, 10), url.PathEscape(forkName))
 	if qs := q.Encode(); qs != "" {
 		path += "?" + qs
 	}
@@ -787,7 +787,7 @@ func (s *VolumeForkSearchesService) Find(ctx context.Context, volumeID int64, fo
 			q.Set("kind", opts.Kind)
 		}
 	}
-	path := fmt.Sprintf("/api/v1/volumes/%s/forks/%s/search", strconv.FormatInt(volumeID, 10), forkName)
+	path := fmt.Sprintf("/api/v1/volumes/%s/forks/%s/search", strconv.FormatInt(volumeID, 10), url.PathEscape(forkName))
 	if qs := q.Encode(); qs != "" {
 		path += "?" + qs
 	}
@@ -1142,7 +1142,7 @@ func (s *AlertsService) Count(ctx context.Context) (*AlertCountResponse, error) 
 }
 
 func (s *AlertsService) Resolve(ctx context.Context, alertID string) (*ResolveAlertResponse, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/alerts/%s/resolve", alertID), nil)
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/alerts/%s/resolve", url.PathEscape(alertID)), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -1198,7 +1198,7 @@ func (s *RegionAlertsService) Count(ctx context.Context, regionID int64, regionC
 }
 
 func (s *RegionAlertsService) Resolve(ctx context.Context, regionID int64, alertID string) (*ResolveRegionAlertResponse, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%s/alerts/%s/resolve", strconv.FormatInt(regionID, 10), alertID), nil)
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%s/alerts/%s/resolve", strconv.FormatInt(regionID, 10), url.PathEscape(alertID)), nil)
 	if err != nil {
 		return nil, err
 	}

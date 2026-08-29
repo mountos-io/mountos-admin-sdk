@@ -204,3 +204,29 @@ async fn register_member_required_name() {
     assert_eq!(res.member_state, "active");
     assert_eq!(handle.join().unwrap().body.unwrap()["name"], "new-member");
 }
+
+// Regression coverage for the generator emitting crate::http::encode_segment
+// on every &str :path param (not just the one endpoint that originally
+// needed it): a raw slash, space, or non-ASCII character in a string id
+// must reach the wire as one escaped segment, not split into extra
+// segments. `recorded.path` here is the literal request-line bytes read
+// off the socket, not a re-parsed/decoded view, so it can actually tell an
+// escaped "%2F" apart from a real segment boundary.
+#[tokio::test]
+async fn string_path_params_are_url_encoded() {
+    let raw_pair_id = "pair/id with spaces/café";
+    let (base_url, handle) = fixture_server(serde_json::json!({
+        "id": raw_pair_id, "storageId": "s1", "state": "active",
+    }));
+    let client = test_client(base_url);
+
+    let pair = client.storages.get_pair_status(7, raw_pair_id).await.expect("get_pair_status");
+    assert_eq!(pair.id, raw_pair_id);
+
+    let path = handle.join().unwrap().path;
+    assert!(
+        path.contains("pair%2Fid%20with%20spaces%2Fcaf%C3%A9"),
+        "request path {path:?} did not contain the escaped segment"
+    );
+    assert!(!path.contains("/pairs/pair/"), "request path {path:?} sent the '/' unescaped, splitting the path");
+}

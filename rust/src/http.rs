@@ -78,6 +78,14 @@ impl ClientInner {
         self.send(self.http.put(self.url(path)).json(body)).await
     }
 
+    // Emitted by the generator only for a bodyless PUT endpoint; the current
+    // spec has none, so it is unused until one is added (kept for transport
+    // symmetry with post_empty/delete).
+    #[allow(dead_code)]
+    pub(crate) async fn put_empty<T: DeserializeOwned>(&self, path: &str) -> Result<T, Error> {
+        self.send(self.http.put(self.url(path))).await
+    }
+
     /// HTTP QUERY (RFC 10008): a safe, idempotent method like GET, but its
     /// parameters travel in the request body instead of the URL. reqwest has
     /// no built-in `Method::QUERY`; "QUERY" is a valid token byte string, so
