@@ -9,7 +9,8 @@ import type {
   RegionClusterListOptions, EditRegionClusterRequest, SetRegionClusterReadyRequest, 
   CreateStorageRequest, BlockMember, Storage, StorageListOptions, BlockVolume, 
   EditStorageRequest, TestStorageNewBucketRequest, CompatibleStorage, 
-  MoveStorageVolumesRequest, MoveVolumeFailure, BackfillFailure, CreateVolumeRequest, 
+  MoveStorageVolumesRequest, MoveVolumeFailure, UpdateStorageConfigRequest, Pair, 
+  RegisterStorageMemberRequest, PoolMember, BackfillFailure, CreateVolumeRequest, 
   VolumeRetentionPolicy, VolumeVersioningPolicy, Volume, VolumeListOptions, 
   EditVolumeRequest, MoveVolumeClusterRequest, DeactivateVolumeRequest, 
   GenerateVolumeAPIKeysRequest, VolumeApiKey, RevokeVolumeAPIKeyRequest, 
@@ -283,6 +284,38 @@ export class StoragesResource {
 
   moveVolumes(storageId: number, req: MoveStorageVolumesRequest, signal?: AbortSignal): Promise<{ moved: string[]; failures: MoveVolumeFailure[] }> {
     return this.client.request('POST', `/api/v1/storages/${storageId}/move-volumes`, req, signal)
+  }
+
+  updateConfig(storageId: number, req: UpdateStorageConfigRequest, signal?: AbortSignal): Promise<{ id: string; pairsFormed: number; pairsRequested: number; partial: boolean; reason?: string }> {
+    return this.client.request('PUT', `/api/v1/storages/${storageId}/config`, req, signal)
+  }
+
+  getConfig(storageId: number, signal?: AbortSignal): Promise<{ id: string; k: number; algorithmVersion: number; epochPolicyVersion: number }> {
+    return this.client.request('GET', `/api/v1/storages/${storageId}/config`, undefined, signal)
+  }
+
+  listPairs(storageId: number, signal?: AbortSignal): Promise<Pair[]> {
+    return this.client.request('GET', `/api/v1/storages/${storageId}/pairs`, undefined, signal)
+  }
+
+  getPairStatus(storageId: number, pairId: string, signal?: AbortSignal): Promise<Pair> {
+    return this.client.request('GET', `/api/v1/storages/${storageId}/pairs/${pairId}`, undefined, signal)
+  }
+
+  drainPair(storageId: number, pairId: string, signal?: AbortSignal): Promise<{ id: string; state: string }> {
+    return this.client.request('POST', `/api/v1/storages/${storageId}/pairs/${pairId}/drain`, undefined, signal)
+  }
+
+  cancelDrain(storageId: number, pairId: string, signal?: AbortSignal): Promise<{ id: string; state: string }> {
+    return this.client.request('POST', `/api/v1/storages/${storageId}/pairs/${pairId}/cancel-drain`, undefined, signal)
+  }
+
+  registerMember(storageId: number, req: RegisterStorageMemberRequest, signal?: AbortSignal): Promise<PoolMember> {
+    return this.client.request('POST', `/api/v1/storages/${storageId}/members`, req, signal)
+  }
+
+  reactivateMember(storageId: number, blockVolumeId: string, signal?: AbortSignal): Promise<PoolMember> {
+    return this.client.request('POST', `/api/v1/storages/${storageId}/members/${blockVolumeId}/reactivate`, undefined, signal)
   }
 
   backfillFingerprints(signal?: AbortSignal): Promise<{ scanned: number; updated: number; failures: BackfillFailure[]; hasMore: boolean }> {

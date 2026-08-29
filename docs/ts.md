@@ -160,6 +160,8 @@ interface BlockVolume {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  memberState?: string;
+  pairId?: string;
 }
 ```
 
@@ -527,6 +529,37 @@ interface NodeStatsSample {
   dbPingMinUs?: number;
   dbPingMaxUs?: number;
   dbPingStdDevUs?: number;
+}
+```
+
+### `Pair`
+
+```typescript
+interface Pair {
+  id: string;
+  storageId: string;
+  state: string;
+  memberA?: string;
+  memberB?: string;
+  placementGroupA?: number;
+  placementGroupB?: number;
+  drainStartedAt?: string;
+  syncedAt?: string;
+  retiredAt?: string;
+  pendingSyncJobsA?: number;
+  pendingSyncJobsB?: number;
+}
+```
+
+### `PoolMember`
+
+```typescript
+interface PoolMember {
+  id: string;
+  name: string;
+  regionId: number;
+  regionClusterId: number;
+  memberState: string;
 }
 ```
 
@@ -1298,6 +1331,71 @@ Request body:
 {
   volumeIds: string[];
 }
+```
+
+#### `updateConfig` - PUT /api/v1/storages/:storageId/config
+
+```typescript
+client.storages.updateConfig(storageId: number, req: UpdateStorageConfigRequest, signal?: AbortSignal): Promise<{ id: string; pairsFormed: number; pairsRequested: number; partial: boolean; reason?: string }>;
+```
+
+Request body:
+
+```typescript
+{
+  k: number;
+}
+```
+
+#### `getConfig` - GET /api/v1/storages/:storageId/config
+
+```typescript
+client.storages.getConfig(storageId: number, signal?: AbortSignal): Promise<{ id: string; k: number; algorithmVersion: number; epochPolicyVersion: number }>;
+```
+
+#### `listPairs` - GET /api/v1/storages/:storageId/pairs
+
+```typescript
+client.storages.listPairs(storageId: number, signal?: AbortSignal): Promise<Pair[]>;
+```
+
+#### `getPairStatus` - GET /api/v1/storages/:storageId/pairs/:pairId
+
+```typescript
+client.storages.getPairStatus(storageId: number, pairId: string, signal?: AbortSignal): Promise<Pair>;
+```
+
+#### `drainPair` - POST /api/v1/storages/:storageId/pairs/:pairId/drain
+
+```typescript
+client.storages.drainPair(storageId: number, pairId: string, signal?: AbortSignal): Promise<{ id: string; state: string }>;
+```
+
+#### `cancelDrain` - POST /api/v1/storages/:storageId/pairs/:pairId/cancel-drain
+
+```typescript
+client.storages.cancelDrain(storageId: number, pairId: string, signal?: AbortSignal): Promise<{ id: string; state: string }>;
+```
+
+#### `registerMember` - POST /api/v1/storages/:storageId/members
+
+```typescript
+client.storages.registerMember(storageId: number, req: RegisterStorageMemberRequest, signal?: AbortSignal): Promise<PoolMember>;
+```
+
+Request body:
+
+```typescript
+{
+  regionClusterId: number;
+  name: string;
+}
+```
+
+#### `reactivateMember` - POST /api/v1/storages/:storageId/members/:blockVolumeId/reactivate
+
+```typescript
+client.storages.reactivateMember(storageId: number, blockVolumeId: string, signal?: AbortSignal): Promise<PoolMember>;
 ```
 
 #### `backfillFingerprints` - POST /api/v1/storages/backfill-fingerprints

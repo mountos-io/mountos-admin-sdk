@@ -9,7 +9,7 @@ TS_RUN_deno := deno task
 TS_RUN_node := npm run
 TS_RUN      := $(or $(TS_RUN_$(TS_RUNTIME)),$(TS_RUNTIME) run)
 
-.PHONY: all gen docs check build install clean ts-install ts-check ts-build ts-publish go-check go-build rust-check rust-build rust-test rust-publish rust-clean tag tag-minor tag-major bump-version help
+.PHONY: all gen docs check test build install clean ts-install ts-check ts-build ts-test ts-publish go-check go-build go-test rust-check rust-build rust-test rust-publish rust-clean tag tag-minor tag-major bump-version help
 
 all: gen check build
 
@@ -39,6 +39,9 @@ ts-check: ts-install ## Type-check TS
 ts-build: ts-install ## Build TS
 	cd ts && $(TS_RUN) build
 
+ts-test: ts-install ## Run TS fixture/contract tests (node:test against dist/)
+	cd ts && $(TS_RUN) test
+
 ts-publish: ts-build ## Publish TS package to npm
 	@npm whoami >/dev/null 2>&1 || npm login
 	cd ts && npm publish --access public
@@ -53,6 +56,9 @@ go-check: ## Vet Go code
 
 go-build: ## Build Go code
 	cd go && go build ./...
+
+go-test: ## Run Go fixture/contract tests
+	cd go && go test ./...
 
 # ── Rust ────────────────────────────────────────────────────
 
@@ -76,6 +82,11 @@ rust-clean: ## Remove Rust build artifacts
 install: ts-install ## Install all dependencies
 
 check: ts-check go-check rust-check ## Run all checks
+
+# Not folded into `check`/`all` - deliberately separate so existing
+# check/build behavior doesn't change under anyone currently relying on it.
+# Run explicitly (`make test`) or per-language (`make go-test`, etc.).
+test: ts-test go-test rust-test ## Run all fixture/contract tests
 
 build: ts-build go-build rust-build ## Build all
 

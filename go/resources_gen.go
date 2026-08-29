@@ -396,6 +396,74 @@ func (s *StoragesService) MoveVolumes(ctx context.Context, storageID int64, req 
 	return decodeJSON[MoveVolumesStorageResponse](data)
 }
 
+func (s *StoragesService) UpdateConfig(ctx context.Context, storageID int64, req *UpdateStorageConfigRequest) (*UpdateConfigStorageResponse, error) {
+	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/storages/%s/config", strconv.FormatInt(storageID, 10)), req)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[UpdateConfigStorageResponse](data)
+}
+
+func (s *StoragesService) GetConfig(ctx context.Context, storageID int64) (*GetConfigStorageResponse, error) {
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/storages/%s/config", strconv.FormatInt(storageID, 10)))
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[GetConfigStorageResponse](data)
+}
+
+func (s *StoragesService) ListPairs(ctx context.Context, storageID int64) ([]Pair, error) {
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/storages/%s/pairs", strconv.FormatInt(storageID, 10)))
+	if err != nil {
+		return nil, err
+	}
+	result, err := decodeJSON[[]Pair](data)
+	if err != nil {
+		return nil, err
+	}
+	return *result, nil
+}
+
+func (s *StoragesService) GetPairStatus(ctx context.Context, storageID int64, pairID string) (*Pair, error) {
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/storages/%s/pairs/%s", strconv.FormatInt(storageID, 10), pairID))
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[Pair](data)
+}
+
+func (s *StoragesService) DrainPair(ctx context.Context, storageID int64, pairID string) (*DrainPairStorageResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/pairs/%s/drain", strconv.FormatInt(storageID, 10), pairID), nil)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[DrainPairStorageResponse](data)
+}
+
+func (s *StoragesService) CancelDrain(ctx context.Context, storageID int64, pairID string) (*CancelDrainStorageResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/pairs/%s/cancel-drain", strconv.FormatInt(storageID, 10), pairID), nil)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[CancelDrainStorageResponse](data)
+}
+
+func (s *StoragesService) RegisterMember(ctx context.Context, storageID int64, req *RegisterStorageMemberRequest) (*PoolMember, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/members", strconv.FormatInt(storageID, 10)), req)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[PoolMember](data)
+}
+
+func (s *StoragesService) ReactivateMember(ctx context.Context, storageID int64, blockVolumeID string) (*PoolMember, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/members/%s/reactivate", strconv.FormatInt(storageID, 10), blockVolumeID), nil)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[PoolMember](data)
+}
+
 func (s *StoragesService) BackfillFingerprints(ctx context.Context) (*BackfillFingerprintsStorageResponse, error) {
 	data, err := s.c.post(ctx, "/api/v1/storages/backfill-fingerprints", nil)
 	if err != nil {

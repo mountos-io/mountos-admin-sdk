@@ -343,10 +343,18 @@ func writeTSMethod(w *strings.Builder, res Resource, ep Endpoint, fullBasePath s
 		writeTSQueryMethod(w, methodName, ep, fullPath, allPathParams, pt)
 	case len(ep.Request) > 0:
 		writeTSBodyMethod(w, methodName, ep, fullPath, allPathParams, res.Name, pt)
-	case ep.ResponseType != "":
+	// A no-request endpoint with a named responseType is a GET (list/get)
+	// in every case that predates this comment, so writeTSGetMethod (which
+	// always issues a GET, ignoring ep.Method) was never wrong until an
+	// endpoint like reactivateMember combined a mutating method with a
+	// named responseType and no request body - route those through the
+	// method-aware toggle writer instead (mirrors gogen.go's fix).
+	case ep.ResponseType != "" && ep.Method == "GET":
 		writeTSGetMethod(w, methodName, ep, fullPath, allPathParams, pt)
+	case ep.ResponseType != "":
+		writeTSToggleMethod(w, methodName, ep, fullPath, allPathParams, ep.ResponseType, pt)
 	case len(ep.Response) > 0:
-		writeTSToggleMethod(w, methodName, ep, fullPath, allPathParams, pt)
+		writeTSToggleMethod(w, methodName, ep, fullPath, allPathParams, tsInlineResponseType(ep.Response), pt)
 	default:
 		writeTSVoidMethod(w, methodName, ep, fullPath, allPathParams, pt)
 	}
@@ -464,9 +472,10 @@ func writeTSGetMethod(w *strings.Builder, methodName string, ep Endpoint, fullPa
 	w.WriteString("  }\n")
 }
 
-// POST/DELETE with response but no body (toggle actions)
-func writeTSToggleMethod(w *strings.Builder, methodName string, ep Endpoint, fullPath string, allPathParams []string, pt map[string]string) {
-	retType := tsInlineResponseType(ep.Response)
+// POST/PUT/DELETE with response but no body (toggle actions) - retType is
+// the caller's already-resolved return type (inline shape or a named
+// responseType).
+func writeTSToggleMethod(w *strings.Builder, methodName string, ep Endpoint, fullPath string, allPathParams []string, retType string, pt map[string]string) {
 	params := tsParams(allPathParams, pt)
 	sig := params
 	if sig != "" {

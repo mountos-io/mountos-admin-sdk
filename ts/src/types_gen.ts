@@ -126,6 +126,31 @@ export interface BlockVolume {
   isActive: boolean
   createdAt: string
   updatedAt: string
+  memberState?: string
+  pairId?: string
+}
+
+export interface Pair {
+  id: string
+  storageId: string
+  state: string
+  memberA?: string
+  memberB?: string
+  placementGroupA?: number
+  placementGroupB?: number
+  drainStartedAt?: string
+  syncedAt?: string
+  retiredAt?: string
+  pendingSyncJobsA?: number
+  pendingSyncJobsB?: number
+}
+
+export interface PoolMember {
+  id: string
+  name: string
+  regionId: number
+  regionClusterId: number
+  memberState: string
 }
 
 export interface Volume {
@@ -716,6 +741,15 @@ export interface TestStorageNewBucketRequest {
 
 export interface MoveStorageVolumesRequest {
   volumeIds: string[]
+}
+
+export interface UpdateStorageConfigRequest {
+  k: number
+}
+
+export interface RegisterStorageMemberRequest {
+  regionClusterId: number
+  name: string
 }
 
 export interface StorageListOptions extends ListOptions {

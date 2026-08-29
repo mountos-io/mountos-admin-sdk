@@ -299,10 +299,18 @@ func writeRustMethod(w *strings.Builder, res Resource, ep Endpoint, fullBasePath
 		writeRustQueryMethod(w, methodName, ep, fullPath, allPathParams, res.Name, pt)
 	case len(ep.Request) > 0:
 		writeRustBodyMethod(w, methodName, ep, fullPath, allPathParams, res.Name, pt)
-	case ep.ResponseType != "":
+	// A no-request endpoint with a named responseType is a GET (list/get)
+	// in every case that predates this comment, so writeRustGetMethod
+	// (which always issues a GET, ignoring ep.Method) was never wrong
+	// until an endpoint like reactivateMember combined a mutating method
+	// with a named responseType and no request body - route those through
+	// the method-aware toggle writer instead (mirrors gogen.go's fix).
+	case ep.ResponseType != "" && ep.Method == "GET":
 		writeRustGetMethod(w, methodName, ep, fullPath, allPathParams, pt)
+	case ep.ResponseType != "":
+		writeRustToggleMethod(w, methodName, ep, fullPath, allPathParams, rustType(ep.ResponseType), pt)
 	case len(ep.Response) > 0:
-		writeRustToggleMethod(w, methodName, ep, fullPath, allPathParams, res.Name, pt)
+		writeRustToggleMethod(w, methodName, ep, fullPath, allPathParams, rustReturnResponseType(ep, res.Name), pt)
 	default:
 		writeRustVoidMethod(w, methodName, ep, fullPath, allPathParams, pt)
 	}
@@ -389,12 +397,14 @@ func writeRustGetMethod(w *strings.Builder, methodName string, ep Endpoint, full
 	w.WriteString("    }\n")
 }
 
-// writeRustToggleMethod handles no-request endpoints with an inline response
-// body (e.g. lock/unlock returning {id}, or a GET stats with inline fields).
-func writeRustToggleMethod(w *strings.Builder, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string, pt map[string]string) {
+// writeRustToggleMethod handles no-request endpoints with a response (either
+// an inline response body, e.g. lock/unlock returning {id}, or a named
+// responseType on a mutating method, e.g. reactivateMember) - retType is
+// the caller's already-resolved return type.
+func writeRustToggleMethod(w *strings.Builder, methodName string, ep Endpoint, fullPath string, allPathParams []string, retType string, pt map[string]string) {
 	pathExpr := rustPathExpr(fullPath, allPathParams, pt)
 	parts := rustPathParamParts(allPathParams, pt)
-	fmt.Fprintf(w, "    pub async fn %s(&self%s) -> Result<%s, Error> {\n", methodName, rustSig(parts), rustReturnResponseType(ep, resName))
+	fmt.Fprintf(w, "    pub async fn %s(&self%s) -> Result<%s, Error> {\n", methodName, rustSig(parts), retType)
 	switch strings.ToUpper(ep.Method) {
 	case "GET":
 		fmt.Fprintf(w, "        self.inner.get(%s, &[]).await\n", pathExpr)

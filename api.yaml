@@ -193,6 +193,48 @@ types:
     - "isActive: bool"
     - "createdAt: datetime"
     - "updatedAt: datetime"
+    # Pool-membership state for the block HA-pair placement redesign, mirroring
+    # block_volumes.member_state/pair_sid (appserv.md §4). pairId is absent/null
+    # while unpaired (member_state == "detached"). NOTE: listBlockVolumes'
+    # handler does not populate these yet as of this writing (only the new
+    # pairs endpoints below do) - flagged to mos-appserv, needed for
+    # admin-client to find/reactivate a detached member outside a pair view.
+    - "memberState: string?" # active | retiring | detached
+    - "pairId: string?"
+
+  # One pair of block-volume members under the deterministic HA-pair placement
+  # redesign (spec/appserv.md §5b). id/storageId/memberA/memberB are opaque
+  # external ids (string), matching BlockVolume.id - NOT the int64 shard id
+  # used in the :storageId URL path param. memberA/memberB and the placement
+  # groups are absent only in the defensive 0/1-member edge case; a normally
+  # formed pair always has both.
+  Pair:
+    - "id: string"
+    - "storageId: string"
+    - "state: string" # active | draining | synced_drained | retired
+    - "memberA: string?" # BlockVolume.id
+    - "memberB: string?" # BlockVolume.id
+    - "placementGroupA: int64?" # region_cluster_id
+    - "placementGroupB: int64?" # region_cluster_id
+    - "drainStartedAt: datetime?"
+    - "syncedAt: datetime?"
+    - "retiredAt: datetime?"
+    # nullable, drain-only (D5): appserv's reconciler only polls draining
+    # pairs, so these are its last-observed values, null otherwise.
+    - "pendingSyncJobsA: int32?"
+    - "pendingSyncJobsB: int32?"
+
+  # Response shape for registerMember/reactivateMember - deliberately
+  # narrower than the full BlockVolume view (no clusterName/clusterUuid/
+  # shardId/clusterReady/createdAt/updatedAt): both call sites always return
+  # a freshly poolable member with pairId implicitly 0/unpaired, so there's
+  # no pair to reference and the extra fields would just be zero-value noise.
+  PoolMember:
+    - "id: string"
+    - "name: string"
+    - "regionId: int64"
+    - "regionClusterId: int64"
+    - "memberState: string" # always "active" from these two actions
 
   # A volume currently sitting on a compatible (same physicalFingerprint) storage,
   # eligible to move onto the storage being viewed.
@@ -894,6 +936,9 @@ resources:
 
   - name: Storages
     path: /storages
+    pathParamTypes:
+      pairId: string
+      blockVolumeId: string
     endpoints:
       - action: create
         method: POST
@@ -1018,6 +1063,99 @@ resources:
         response:
           - "moved: string[]"
           - "failures: MoveVolumeFailure[]"
+
+      # ── Block HA-pair placement admin surface (spec/appserv.md §7) ──
+      # Nested under /storages/:storageId/..., matching listBlockVolumes'
+      # existing style rather than a first-class top-level "pairs" resource
+      # (decided and documented in spec/admin-sdk.md §4: every action here is
+      # storage-scoped, same as block-volumes already is, and there is no
+      # cross-storage pair query anywhere in scope).
+      #
+      # AuthZ (D25): every mutating action below (updateConfig, drainPair,
+      # cancelDrain, registerMember, reactivateMember) is gated by the same
+      # adminOnly route middleware + EnforceUserRoleAccountID account-scope
+      # check as deactivate/edit above (routes_appserv.go). listPairs/
+      # getPairStatus/getConfig are unguarded reads, matching listBlockVolumes.
+
+      # Idempotently re-runs auto-pairing toward k every call (a no-op at the
+      # current k). recomputePairs as a separate endpoint was REMOVED (D7) -
+      # redundant with calling this at the current k.
+      - action: updateConfig
+        method: PUT
+        path: /:storageId/config
+        request:
+          - "k: int32!"
+        response:
+          - "id: string"
+          - "pairsFormed: int32"
+          - "pairsRequested: int32"
+          - "partial: bool"
+          - "reason: string?"
+
+      # The read-back half of updateConfig{k} (D40): a storage's current
+      # target K plus the placement-config values needed to interpret it.
+      # mos-adminclient had no way to reach this without re-deriving K from
+      # listPairs' pair count, which is wrong once a drain or auto-pairing
+      # partial has run. 404s if the storage has never been paired (no
+      # config row minted yet) - never a zero-value k.
+      - action: getConfig
+        method: GET
+        path: /:storageId/config
+        response:
+          - "id: string"
+          - "k: int32"
+          - "algorithmVersion: int32"
+          - "epochPolicyVersion: int32"
+
+      - action: listPairs
+        method: GET
+        path: /:storageId/pairs
+        responseType: Pair
+        responseArray: true
+
+      - action: getPairStatus
+        method: GET
+        path: /:storageId/pairs/:pairId
+        responseType: Pair
+
+      # Accepted-transition ack, NOT completion - poll getPairStatus.
+      # IDEMPOTENT (D9): a second call on an already-draining/beyond pair
+      # returns the CURRENT state as success, not a 409 - draining is an
+      # observed state, not a contended resource.
+      - action: drainPair
+        method: POST
+        path: /:storageId/pairs/:pairId/drain
+        response:
+          - "id: string"
+          - "state: string"
+
+      # Only valid while draining (D27) - fails (409) once synced_drained;
+      # reads have already stopped and the pair is committed to retiring by
+      # then, un-retiring is a different, riskier operation not offered here.
+      - action: cancelDrain
+        method: POST
+        path: /:storageId/pairs/:pairId/cancel-drain
+        response:
+          - "id: string"
+          - "state: string"
+
+      # Moves member provisioning into its own pooling step, out of create's
+      # create-time-only flow (D24). Immediately poolable: the handler
+      # reactivates the freshly created member in the same call.
+      - action: registerMember
+        method: POST
+        path: /:storageId/members
+        request:
+          - "regionClusterId: int64!"
+          - "name: string!"
+        responseType: PoolMember
+
+      # The ONLY way a 'detached' member becomes poolable again (D24) -
+      # without this, a drained pair's nodes are permanently stranded.
+      - action: reactivateMember
+        method: POST
+        path: /:storageId/members/:blockVolumeId/reactivate
+        responseType: PoolMember
 
       # One-time migration helper: computes physicalFingerprint for storages
       # created before the column existed. Platform-admin only, not per-account.

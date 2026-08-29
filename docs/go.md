@@ -197,6 +197,8 @@ type BlockVolume struct {
     IsActive                 bool                     `json:"isActive"`
     CreatedAt                string                   `json:"createdAt"`
     UpdatedAt                string                   `json:"updatedAt"`
+    MemberState              string                   `json:"memberState,omitempty"`
+    PairID                   string                   `json:"pairId,omitempty"`
 }
 ```
 
@@ -564,6 +566,37 @@ type NodeStatsSample struct {
     DbPingMinUs              float64                  `json:"dbPingMinUs,omitempty"`
     DbPingMaxUs              float64                  `json:"dbPingMaxUs,omitempty"`
     DbPingStdDevUs           float64                  `json:"dbPingStdDevUs,omitempty"`
+}
+```
+
+### `Pair`
+
+```go
+type Pair struct {
+    ID                       string                   `json:"id"`
+    StorageID                string                   `json:"storageId"`
+    State                    string                   `json:"state"`
+    MemberA                  string                   `json:"memberA,omitempty"`
+    MemberB                  string                   `json:"memberB,omitempty"`
+    PlacementGroupA          int64                    `json:"placementGroupA,omitempty"`
+    PlacementGroupB          int64                    `json:"placementGroupB,omitempty"`
+    DrainStartedAt           string                   `json:"drainStartedAt,omitempty"`
+    SyncedAt                 string                   `json:"syncedAt,omitempty"`
+    RetiredAt                string                   `json:"retiredAt,omitempty"`
+    PendingSyncJobsA         int32                    `json:"pendingSyncJobsA,omitempty"`
+    PendingSyncJobsB         int32                    `json:"pendingSyncJobsB,omitempty"`
+}
+```
+
+### `PoolMember`
+
+```go
+type PoolMember struct {
+    ID                       string                   `json:"id"`
+    Name                     string                   `json:"name"`
+    RegionID                 int64                    `json:"regionId"`
+    RegionClusterID          int64                    `json:"regionClusterId"`
+    MemberState              string                   `json:"memberState"`
 }
 ```
 
@@ -1404,6 +1437,112 @@ type MoveVolumesStorageResponse struct {
     Moved                    []string                 `json:"moved"`
     Failures                 []MoveVolumeFailure      `json:"failures"`
 }
+```
+
+#### `UpdateConfig` - PUT /api/v1/storages/:storageId/config
+
+```go
+func (s *StoragesService) UpdateConfig(ctx context.Context, storageID int64, req *UpdateStorageConfigRequest) (*UpdateConfigStorageResponse, error)
+```
+
+Request body:
+
+```go
+type UpdateStorageConfigRequest struct {
+    K                        int32                    `json:"k"`
+}
+```
+
+Response body:
+
+```go
+type UpdateConfigStorageResponse struct {
+    ID                       string                   `json:"id"`
+    PairsFormed              int32                    `json:"pairsFormed"`
+    PairsRequested           int32                    `json:"pairsRequested"`
+    Partial                  bool                     `json:"partial"`
+    Reason                   string                   `json:"reason,omitempty"`
+}
+```
+
+#### `GetConfig` - GET /api/v1/storages/:storageId/config
+
+```go
+func (s *StoragesService) GetConfig(ctx context.Context, storageID int64) (*GetConfigStorageResponse, error)
+```
+
+Response body:
+
+```go
+type GetConfigStorageResponse struct {
+    ID                       string                   `json:"id"`
+    K                        int32                    `json:"k"`
+    AlgorithmVersion         int32                    `json:"algorithmVersion"`
+    EpochPolicyVersion       int32                    `json:"epochPolicyVersion"`
+}
+```
+
+#### `ListPairs` - GET /api/v1/storages/:storageId/pairs
+
+```go
+func (s *StoragesService) ListPairs(ctx context.Context, storageID int64) ([]Pair, error)
+```
+
+#### `GetPairStatus` - GET /api/v1/storages/:storageId/pairs/:pairId
+
+```go
+func (s *StoragesService) GetPairStatus(ctx context.Context, storageID int64, pairID string) (*Pair, error)
+```
+
+#### `DrainPair` - POST /api/v1/storages/:storageId/pairs/:pairId/drain
+
+```go
+func (s *StoragesService) DrainPair(ctx context.Context, storageID int64, pairID string) (*DrainPairStorageResponse, error)
+```
+
+Response body:
+
+```go
+type DrainPairStorageResponse struct {
+    ID                       string                   `json:"id"`
+    State                    string                   `json:"state"`
+}
+```
+
+#### `CancelDrain` - POST /api/v1/storages/:storageId/pairs/:pairId/cancel-drain
+
+```go
+func (s *StoragesService) CancelDrain(ctx context.Context, storageID int64, pairID string) (*CancelDrainStorageResponse, error)
+```
+
+Response body:
+
+```go
+type CancelDrainStorageResponse struct {
+    ID                       string                   `json:"id"`
+    State                    string                   `json:"state"`
+}
+```
+
+#### `RegisterMember` - POST /api/v1/storages/:storageId/members
+
+```go
+func (s *StoragesService) RegisterMember(ctx context.Context, storageID int64, req *RegisterStorageMemberRequest) (*PoolMember, error)
+```
+
+Request body:
+
+```go
+type RegisterStorageMemberRequest struct {
+    RegionClusterID          int64                    `json:"regionClusterId"`
+    Name                     string                   `json:"name"`
+}
+```
+
+#### `ReactivateMember` - POST /api/v1/storages/:storageId/members/:blockVolumeId/reactivate
+
+```go
+func (s *StoragesService) ReactivateMember(ctx context.Context, storageID int64, blockVolumeID string) (*PoolMember, error)
 ```
 
 #### `BackfillFingerprints` - POST /api/v1/storages/backfill-fingerprints

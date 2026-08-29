@@ -345,6 +345,38 @@ impl StoragesService {
         self.inner.post(&format!("/api/v1/storages/{}/move-volumes", storage_id), req).await
     }
 
+    pub async fn update_config(&self, storage_id: i64, req: &UpdateStorageConfigRequest) -> Result<UpdateConfigStorageResponse, Error> {
+        self.inner.put(&format!("/api/v1/storages/{}/config", storage_id), req).await
+    }
+
+    pub async fn get_config(&self, storage_id: i64) -> Result<GetConfigStorageResponse, Error> {
+        self.inner.get(&format!("/api/v1/storages/{}/config", storage_id), &[]).await
+    }
+
+    pub async fn list_pairs(&self, storage_id: i64) -> Result<Vec<Pair>, Error> {
+        self.inner.get(&format!("/api/v1/storages/{}/pairs", storage_id), &[]).await
+    }
+
+    pub async fn get_pair_status(&self, storage_id: i64, pair_id: &str) -> Result<Pair, Error> {
+        self.inner.get(&format!("/api/v1/storages/{}/pairs/{}", storage_id, pair_id), &[]).await
+    }
+
+    pub async fn drain_pair(&self, storage_id: i64, pair_id: &str) -> Result<DrainPairStorageResponse, Error> {
+        self.inner.post_empty(&format!("/api/v1/storages/{}/pairs/{}/drain", storage_id, pair_id)).await
+    }
+
+    pub async fn cancel_drain(&self, storage_id: i64, pair_id: &str) -> Result<CancelDrainStorageResponse, Error> {
+        self.inner.post_empty(&format!("/api/v1/storages/{}/pairs/{}/cancel-drain", storage_id, pair_id)).await
+    }
+
+    pub async fn register_member(&self, storage_id: i64, req: &RegisterStorageMemberRequest) -> Result<PoolMember, Error> {
+        self.inner.post(&format!("/api/v1/storages/{}/members", storage_id), req).await
+    }
+
+    pub async fn reactivate_member(&self, storage_id: i64, block_volume_id: &str) -> Result<PoolMember, Error> {
+        self.inner.post_empty(&format!("/api/v1/storages/{}/members/{}/reactivate", storage_id, block_volume_id)).await
+    }
+
     pub async fn backfill_fingerprints(&self) -> Result<BackfillFingerprintsStorageResponse, Error> {
         self.inner.post_empty("/api/v1/storages/backfill-fingerprints").await
     }

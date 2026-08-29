@@ -192,6 +192,8 @@ pub struct BlockVolume {
     pub is_active: bool,
     pub created_at: String,
     pub updated_at: String,
+    pub member_state: Option<String>,
+    pub pair_id: Option<String>,
 }
 ```
 
@@ -559,6 +561,37 @@ pub struct NodeStatsSample {
     pub db_ping_min_us: Option<f64>,
     pub db_ping_max_us: Option<f64>,
     pub db_ping_std_dev_us: Option<f64>,
+}
+```
+
+### `Pair`
+
+```rust
+pub struct Pair {
+    pub id: String,
+    pub storage_id: String,
+    pub state: String,
+    pub member_a: Option<String>,
+    pub member_b: Option<String>,
+    pub placement_group_a: Option<i64>,
+    pub placement_group_b: Option<i64>,
+    pub drain_started_at: Option<String>,
+    pub synced_at: Option<String>,
+    pub retired_at: Option<String>,
+    pub pending_sync_jobs_a: Option<i32>,
+    pub pending_sync_jobs_b: Option<i32>,
+}
+```
+
+### `PoolMember`
+
+```rust
+pub struct PoolMember {
+    pub id: String,
+    pub name: String,
+    pub region_id: i64,
+    pub region_cluster_id: i64,
+    pub member_state: String,
 }
 ```
 
@@ -1399,6 +1432,112 @@ pub struct MoveVolumesStorageResponse {
     pub moved: Vec<String>,
     pub failures: Vec<MoveVolumeFailure>,
 }
+```
+
+#### `update_config` - PUT /api/v1/storages/:storageId/config
+
+```rust
+pub async fn update_config(&self, storage_id: i64, req: &UpdateStorageConfigRequest) -> Result<UpdateConfigStorageResponse, Error>
+```
+
+Request body:
+
+```rust
+pub struct UpdateStorageConfigRequest {
+    pub k: i32,
+}
+```
+
+Response body:
+
+```rust
+pub struct UpdateConfigStorageResponse {
+    pub id: String,
+    pub pairs_formed: i32,
+    pub pairs_requested: i32,
+    pub partial: bool,
+    pub reason: Option<String>,
+}
+```
+
+#### `get_config` - GET /api/v1/storages/:storageId/config
+
+```rust
+pub async fn get_config(&self, storage_id: i64) -> Result<GetConfigStorageResponse, Error>
+```
+
+Response body:
+
+```rust
+pub struct GetConfigStorageResponse {
+    pub id: String,
+    pub k: i32,
+    pub algorithm_version: i32,
+    pub epoch_policy_version: i32,
+}
+```
+
+#### `list_pairs` - GET /api/v1/storages/:storageId/pairs
+
+```rust
+pub async fn list_pairs(&self, storage_id: i64) -> Result<Vec<Pair>, Error>
+```
+
+#### `get_pair_status` - GET /api/v1/storages/:storageId/pairs/:pairId
+
+```rust
+pub async fn get_pair_status(&self, storage_id: i64, pair_id: &str) -> Result<Pair, Error>
+```
+
+#### `drain_pair` - POST /api/v1/storages/:storageId/pairs/:pairId/drain
+
+```rust
+pub async fn drain_pair(&self, storage_id: i64, pair_id: &str) -> Result<DrainPairStorageResponse, Error>
+```
+
+Response body:
+
+```rust
+pub struct DrainPairStorageResponse {
+    pub id: String,
+    pub state: String,
+}
+```
+
+#### `cancel_drain` - POST /api/v1/storages/:storageId/pairs/:pairId/cancel-drain
+
+```rust
+pub async fn cancel_drain(&self, storage_id: i64, pair_id: &str) -> Result<CancelDrainStorageResponse, Error>
+```
+
+Response body:
+
+```rust
+pub struct CancelDrainStorageResponse {
+    pub id: String,
+    pub state: String,
+}
+```
+
+#### `register_member` - POST /api/v1/storages/:storageId/members
+
+```rust
+pub async fn register_member(&self, storage_id: i64, req: &RegisterStorageMemberRequest) -> Result<PoolMember, Error>
+```
+
+Request body:
+
+```rust
+pub struct RegisterStorageMemberRequest {
+    pub region_cluster_id: i64,
+    pub name: String,
+}
+```
+
+#### `reactivate_member` - POST /api/v1/storages/:storageId/members/:blockVolumeId/reactivate
+
+```rust
+pub async fn reactivate_member(&self, storage_id: i64, block_volume_id: &str) -> Result<PoolMember, Error>
 ```
 
 #### `backfill_fingerprints` - POST /api/v1/storages/backfill-fingerprints

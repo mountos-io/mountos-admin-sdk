@@ -214,6 +214,48 @@ pub struct BlockVolume {
     pub created_at: String,
     #[serde(rename = "updatedAt")]
     pub updated_at: String,
+    #[serde(rename = "memberState", skip_serializing_if = "Option::is_none")]
+    pub member_state: Option<String>,
+    #[serde(rename = "pairId", skip_serializing_if = "Option::is_none")]
+    pub pair_id: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Pair {
+    pub id: String,
+    #[serde(rename = "storageId")]
+    pub storage_id: String,
+    pub state: String,
+    #[serde(rename = "memberA", skip_serializing_if = "Option::is_none")]
+    pub member_a: Option<String>,
+    #[serde(rename = "memberB", skip_serializing_if = "Option::is_none")]
+    pub member_b: Option<String>,
+    #[serde(rename = "placementGroupA", skip_serializing_if = "Option::is_none")]
+    pub placement_group_a: Option<i64>,
+    #[serde(rename = "placementGroupB", skip_serializing_if = "Option::is_none")]
+    pub placement_group_b: Option<i64>,
+    #[serde(rename = "drainStartedAt", skip_serializing_if = "Option::is_none")]
+    pub drain_started_at: Option<String>,
+    #[serde(rename = "syncedAt", skip_serializing_if = "Option::is_none")]
+    pub synced_at: Option<String>,
+    #[serde(rename = "retiredAt", skip_serializing_if = "Option::is_none")]
+    pub retired_at: Option<String>,
+    #[serde(rename = "pendingSyncJobsA", skip_serializing_if = "Option::is_none")]
+    pub pending_sync_jobs_a: Option<i32>,
+    #[serde(rename = "pendingSyncJobsB", skip_serializing_if = "Option::is_none")]
+    pub pending_sync_jobs_b: Option<i32>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PoolMember {
+    pub id: String,
+    pub name: String,
+    #[serde(rename = "regionId")]
+    pub region_id: i64,
+    #[serde(rename = "regionClusterId")]
+    pub region_cluster_id: i64,
+    #[serde(rename = "memberState")]
+    pub member_state: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -1177,6 +1219,52 @@ pub struct MoveStorageVolumesRequest {
 pub struct MoveVolumesStorageResponse {
     pub moved: Vec<String>,
     pub failures: Vec<MoveVolumeFailure>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct UpdateStorageConfigRequest {
+    pub k: i32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UpdateConfigStorageResponse {
+    pub id: String,
+    #[serde(rename = "pairsFormed")]
+    pub pairs_formed: i32,
+    #[serde(rename = "pairsRequested")]
+    pub pairs_requested: i32,
+    pub partial: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reason: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GetConfigStorageResponse {
+    pub id: String,
+    pub k: i32,
+    #[serde(rename = "algorithmVersion")]
+    pub algorithm_version: i32,
+    #[serde(rename = "epochPolicyVersion")]
+    pub epoch_policy_version: i32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DrainPairStorageResponse {
+    pub id: String,
+    pub state: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CancelDrainStorageResponse {
+    pub id: String,
+    pub state: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct RegisterStorageMemberRequest {
+    #[serde(rename = "regionClusterId")]
+    pub region_cluster_id: i64,
+    pub name: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -154,6 +154,31 @@ type BlockVolume struct {
 	IsActive        bool   `json:"isActive"`
 	CreatedAt       string `json:"createdAt"`
 	UpdatedAt       string `json:"updatedAt"`
+	MemberState     string `json:"memberState,omitempty"`
+	PairID          string `json:"pairId,omitempty"`
+}
+
+type Pair struct {
+	ID               string `json:"id"`
+	StorageID        string `json:"storageId"`
+	State            string `json:"state"`
+	MemberA          string `json:"memberA,omitempty"`
+	MemberB          string `json:"memberB,omitempty"`
+	PlacementGroupA  int64  `json:"placementGroupA,omitempty"`
+	PlacementGroupB  int64  `json:"placementGroupB,omitempty"`
+	DrainStartedAt   string `json:"drainStartedAt,omitempty"`
+	SyncedAt         string `json:"syncedAt,omitempty"`
+	RetiredAt        string `json:"retiredAt,omitempty"`
+	PendingSyncJobsA int32  `json:"pendingSyncJobsA,omitempty"`
+	PendingSyncJobsB int32  `json:"pendingSyncJobsB,omitempty"`
+}
+
+type PoolMember struct {
+	ID              string `json:"id"`
+	Name            string `json:"name"`
+	RegionID        int64  `json:"regionId"`
+	RegionClusterID int64  `json:"regionClusterId"`
+	MemberState     string `json:"memberState"`
 }
 
 type Volume struct {
@@ -795,6 +820,40 @@ type MoveStorageVolumesRequest struct {
 type MoveVolumesStorageResponse struct {
 	Moved    []string            `json:"moved"`
 	Failures []MoveVolumeFailure `json:"failures"`
+}
+
+type UpdateStorageConfigRequest struct {
+	K int32 `json:"k"`
+}
+
+type UpdateConfigStorageResponse struct {
+	ID             string `json:"id"`
+	PairsFormed    int32  `json:"pairsFormed"`
+	PairsRequested int32  `json:"pairsRequested"`
+	Partial        bool   `json:"partial"`
+	Reason         string `json:"reason,omitempty"`
+}
+
+type GetConfigStorageResponse struct {
+	ID                 string `json:"id"`
+	K                  int32  `json:"k"`
+	AlgorithmVersion   int32  `json:"algorithmVersion"`
+	EpochPolicyVersion int32  `json:"epochPolicyVersion"`
+}
+
+type DrainPairStorageResponse struct {
+	ID    string `json:"id"`
+	State string `json:"state"`
+}
+
+type CancelDrainStorageResponse struct {
+	ID    string `json:"id"`
+	State string `json:"state"`
+}
+
+type RegisterStorageMemberRequest struct {
+	RegionClusterID int64  `json:"regionClusterId"`
+	Name            string `json:"name"`
 }
 
 type BackfillFingerprintsStorageResponse struct {

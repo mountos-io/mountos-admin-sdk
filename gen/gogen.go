@@ -599,10 +599,23 @@ func writeGoMethod(w *strings.Builder, res Resource, ep Endpoint, svcType, fullB
 		writeGoBodyResponseMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name, pt)
 	case len(ep.Request) > 0:
 		writeGoBodyVoidMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name, pt)
-	case ep.ResponseType != "":
+	// A no-request endpoint with a named responseType is a GET (list/get)
+	// in every case that predates this comment, so writeGoGetMethod (which
+	// always issues a GET, ignoring ep.Method) was never wrong until an
+	// endpoint like reactivateMember combined a mutating method with a
+	// named responseType and no request body - route those through the
+	// method-aware toggle writer instead, matching the response-fields
+	// branch below.
+	case ep.ResponseType != "" && ep.Method == "GET":
 		writeGoGetMethod(w, svcType, methodName, ep, fullPath, allPathParams, pt)
+	case ep.ResponseType != "":
+		writeGoToggleMethod(w, svcType, methodName, ep, fullPath, allPathParams, ep.ResponseType, pt)
 	case len(ep.Response) > 0:
-		writeGoToggleMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name, pt)
+		respType := "IDResponse"
+		if !responseIsIDOnly(ep.Response) {
+			respType = customResponseTypeName(res.Name, ep.Action)
+		}
+		writeGoToggleMethod(w, svcType, methodName, ep, fullPath, allPathParams, respType, pt)
 	default:
 		writeGoVoidMethod(w, svcType, methodName, ep, fullPath, allPathParams, pt)
 	}
@@ -776,8 +789,10 @@ func writeGoGetMethod(w *strings.Builder, svcType, methodName string, ep Endpoin
 	w.WriteString("}\n")
 }
 
-// POST/DELETE with path param, no request body, has response fields
-func writeGoToggleMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string, pt map[string]string) {
+// POST/PUT/DELETE with path param, no request body, has a response
+// (either inline response fields or a named responseType) - respType is
+// the caller's already-resolved return type name.
+func writeGoToggleMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, respType string, pt map[string]string) {
 	pathParams := goMethodParams(allPathParams, pt)
 	sig := "ctx context.Context"
 	if pathParams != "" {
@@ -785,13 +800,6 @@ func writeGoToggleMethod(w *strings.Builder, svcType, methodName string, ep Endp
 	}
 	pathExpr := goPathExpr(fullPath, allPathParams, pt)
 	httpMethod := goHTTPMethod(ep.Method)
-
-	var respType string
-	if responseIsIDOnly(ep.Response) {
-		respType = "IDResponse"
-	} else {
-		respType = customResponseTypeName(resName, ep.Action)
-	}
 
 	fmt.Fprintf(w, "func (s *%s) %s(%s) (*%s, error) {\n", svcType, methodName, sig, respType)
 	switch httpMethod {

@@ -410,6 +410,55 @@ Request:
 ```
 Response data: `{ "moved": string[], "failures": MoveVolumeFailure[] }`
 
+### PUT /api/v1/storages/:storageId/config
+Param: `storageId`
+Request:
+```
+{
+  "k": int32(required)
+}
+```
+Response data: `{ "id": string, "pairsFormed": int32, "pairsRequested": int32, "partial": bool, "reason?": string }`
+
+### GET /api/v1/storages/:storageId/config
+Param: `storageId`
+Response data: `{ "id": string, "k": int32, "algorithmVersion": int32, "epochPolicyVersion": int32 }`
+
+### GET /api/v1/storages/:storageId/pairs
+Param: `storageId`
+Response data: `Pair[]`
+
+### GET /api/v1/storages/:storageId/pairs/:pairId
+Param: `storageId`
+Param: `pairId`
+Response data: `Pair`
+
+### POST /api/v1/storages/:storageId/pairs/:pairId/drain
+Param: `storageId`
+Param: `pairId`
+Response data: `{ "id": string, "state": string }`
+
+### POST /api/v1/storages/:storageId/pairs/:pairId/cancel-drain
+Param: `storageId`
+Param: `pairId`
+Response data: `{ "id": string, "state": string }`
+
+### POST /api/v1/storages/:storageId/members
+Param: `storageId`
+Request:
+```
+{
+  "regionClusterId": int64(required),
+  "name": string(required)
+}
+```
+Response data: `PoolMember`
+
+### POST /api/v1/storages/:storageId/members/:blockVolumeId/reactivate
+Param: `storageId`
+Param: `blockVolumeId`
+Response data: `PoolMember`
+
 ### POST /api/v1/storages/backfill-fingerprints
 Response data: `{ "scanned": int32, "updated": int32, "failures": BackfillFailure[], "hasMore": bool }`
 
@@ -1112,7 +1161,9 @@ Response data: `GCWorkerEventGoalsResponse`
   "clusterReady": bool,
   "isActive": bool,
   "createdAt": RFC3339,
-  "updatedAt": RFC3339
+  "updatedAt": RFC3339,
+  "memberState"?: string,
+  "pairId"?: string
 }
 ```
 
@@ -1327,6 +1378,35 @@ Response data: `GCWorkerEventGoalsResponse`
   "dbPingMinUs"?: float,
   "dbPingMaxUs"?: float,
   "dbPingStdDevUs"?: float
+}
+```
+
+### Pair Type
+```
+{
+  "id": string,
+  "storageId": string,
+  "state": string,
+  "memberA"?: string,
+  "memberB"?: string,
+  "placementGroupA"?: int64,
+  "placementGroupB"?: int64,
+  "drainStartedAt"?: RFC3339,
+  "syncedAt"?: RFC3339,
+  "retiredAt"?: RFC3339,
+  "pendingSyncJobsA"?: int32,
+  "pendingSyncJobsB"?: int32
+}
+```
+
+### PoolMember Type
+```
+{
+  "id": string,
+  "name": string,
+  "regionId": int64,
+  "regionClusterId": int64,
+  "memberState": string
 }
 ```
 
