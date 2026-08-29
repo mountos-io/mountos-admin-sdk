@@ -1086,11 +1086,12 @@ resources:
       # storage-scoped, same as block-volumes already is, and there is no
       # cross-storage pair query anywhere in scope).
       #
-      # AuthZ (D25): every mutating action below (updateConfig, drainPair,
-      # cancelDrain, registerMember, reactivateMember) is gated by the same
-      # adminOnly route middleware + EnforceUserRoleAccountID account-scope
-      # check as deactivate/edit above (routes_appserv.go). listPairs/
-      # getPairStatus/getConfig are unguarded reads, matching listBlockVolumes.
+      # AuthZ: every action below - mutating (updateConfig, drainPair,
+      # cancelDrain, registerMember, reactivateMember) and read (listPairs,
+      # getPairStatus, getConfig) - is gated by the EnforceUserRoleAccountID
+      # account-scope check (routes_appserv.go); mutating actions also
+      # require adminOnly. Matches listBlockVolumes, which enforces the same
+      # account-scope check on its own read.
 
       # Idempotently re-runs auto-pairing toward k every call (a no-op at the
       # current k). recomputePairs as a separate endpoint was REMOVED (D7) -
