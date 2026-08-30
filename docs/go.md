@@ -70,10 +70,12 @@ type IDResponse struct {
 
 ## Enums
 
+Each is a defined string type (not a plain alias), with a `Parse<Name>` constructor and an `IsValid`/`String` method - use `Parse<Name>` for a value read from outside the package (a request, a config file, etc.) rather than a bare conversion.
+
 ### `ClientSessionStatus`
 
 ```go
-type ClientSessionStatus = string
+type ClientSessionStatus string
 
 const (
     ClientSessionStatusConnected ClientSessionStatus = "connected"
@@ -83,23 +85,31 @@ const (
     ClientSessionStatusExpired ClientSessionStatus = "expired"
     ClientSessionStatusUnknown ClientSessionStatus = "unknown"
 )
+
+func (v ClientSessionStatus) String() string
+func (v ClientSessionStatus) IsValid() bool
+func ParseClientSessionStatus(s string) (ClientSessionStatus, error)
 ```
 
 ### `LicenseQuotaState`
 
 ```go
-type LicenseQuotaState = string
+type LicenseQuotaState string
 
 const (
     LicenseQuotaStateOk LicenseQuotaState = "ok"
     LicenseQuotaStateExceeded LicenseQuotaState = "exceeded"
 )
+
+func (v LicenseQuotaState) String() string
+func (v LicenseQuotaState) IsValid() bool
+func ParseLicenseQuotaState(s string) (LicenseQuotaState, error)
 ```
 
 ### `LicenseStatus`
 
 ```go
-type LicenseStatus = string
+type LicenseStatus string
 
 const (
     LicenseStatusValid LicenseStatus = "valid"
@@ -108,12 +118,16 @@ const (
     LicenseStatusExpiredAccess LicenseStatus = "expired_access"
     LicenseStatusExpired LicenseStatus = "expired"
 )
+
+func (v LicenseStatus) String() string
+func (v LicenseStatus) IsValid() bool
+func ParseLicenseStatus(s string) (LicenseStatus, error)
 ```
 
 ### `PairState`
 
 ```go
-type PairState = string
+type PairState string
 
 const (
     PairStateActive PairState = "active"
@@ -121,6 +135,10 @@ const (
     PairStateSyncedDrained PairState = "synced_drained"
     PairStateRetired PairState = "retired"
 )
+
+func (v PairState) String() string
+func (v PairState) IsValid() bool
+func ParsePairState(s string) (PairState, error)
 ```
 
 ## Types

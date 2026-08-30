@@ -72,47 +72,55 @@ pub struct IdResponse {
 
 ## Enums
 
-String aliases; the listed constants are the accepted values.
+Each is a real Rust enum with a trailing fallback variant (normally `Unknown`, renamed only if a wire value is itself named "unknown"), so a wire value newer than this SDK deserializes instead of failing. `as_str()` returns the wire string (including for the fallback); `is_known()` reports whether it is the fallback.
 
 ### `ClientSessionStatus`
 
 ```rust
-pub type ClientSessionStatus = String;
-pub const CLIENT_SESSION_STATUS_CONNECTED: &str = "connected";
-pub const CLIENT_SESSION_STATUS_ACTIVE: &str = "active";
-pub const CLIENT_SESSION_STATUS_DEGRADED: &str = "degraded";
-pub const CLIENT_SESSION_STATUS_DISCONNECTED: &str = "disconnected";
-pub const CLIENT_SESSION_STATUS_EXPIRED: &str = "expired";
-pub const CLIENT_SESSION_STATUS_UNKNOWN: &str = "unknown";
+pub enum ClientSessionStatus {
+    Connected,
+    Active,
+    Degraded,
+    Disconnected,
+    Expired,
+    Unknown,
+    UnknownValue(String),
+}
 ```
 
 ### `LicenseQuotaState`
 
 ```rust
-pub type LicenseQuotaState = String;
-pub const LICENSE_QUOTA_STATE_OK: &str = "ok";
-pub const LICENSE_QUOTA_STATE_EXCEEDED: &str = "exceeded";
+pub enum LicenseQuotaState {
+    Ok,
+    Exceeded,
+    Unknown(String),
+}
 ```
 
 ### `LicenseStatus`
 
 ```rust
-pub type LicenseStatus = String;
-pub const LICENSE_STATUS_VALID: &str = "valid";
-pub const LICENSE_STATUS_EXPIRING: &str = "expiring";
-pub const LICENSE_STATUS_GRACE: &str = "grace";
-pub const LICENSE_STATUS_EXPIRED_ACCESS: &str = "expired_access";
-pub const LICENSE_STATUS_EXPIRED: &str = "expired";
+pub enum LicenseStatus {
+    Valid,
+    Expiring,
+    Grace,
+    ExpiredAccess,
+    Expired,
+    Unknown(String),
+}
 ```
 
 ### `PairState`
 
 ```rust
-pub type PairState = String;
-pub const PAIR_STATE_ACTIVE: &str = "active";
-pub const PAIR_STATE_DRAINING: &str = "draining";
-pub const PAIR_STATE_SYNCED_DRAINED: &str = "synced_drained";
-pub const PAIR_STATE_RETIRED: &str = "retired";
+pub enum PairState {
+    Active,
+    Draining,
+    SyncedDrained,
+    Retired,
+    Unknown(String),
+}
 ```
 
 ## Types

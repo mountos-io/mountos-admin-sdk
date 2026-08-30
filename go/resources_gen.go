@@ -975,7 +975,7 @@ func (s *ClientSessionsService) List(ctx context.Context, opts ClientSessionList
 			q.Set("clientType", opts.ClientType)
 		}
 		if opts.Status != "" {
-			q.Set("status", opts.Status)
+			q.Set("status", string(opts.Status))
 		}
 		if opts.IsActive != nil {
 			q.Set("isActive", strconv.FormatBool(*opts.IsActive))

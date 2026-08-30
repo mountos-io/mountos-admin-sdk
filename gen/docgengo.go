@@ -64,19 +64,23 @@ func generateDocGo(spec *Spec, outDir string) {
 	// Enums
 	if len(spec.Enums) > 0 {
 		w.WriteString("## Enums\n\n")
+		w.WriteString("Each is a defined string type (not a plain alias), with a `Parse<Name>` ")
+		w.WriteString("constructor and an `IsValid`/`String` method - use `Parse<Name>` for a value read ")
+		w.WriteString("from outside the package (a request, a config file, etc.) rather than a bare conversion.\n\n")
 		for _, name := range sortedKeys(spec.Enums) {
 			values := spec.Enums[name]
 			fmt.Fprintf(&w, "### `%s`\n\n", name)
 			w.WriteString("```go\n")
-			// Alias ("= string"), not a defined type, matching gogen.go's
-			// actual "type %s = string" -- a defined type would require
-			// explicit conversion to/from string, which the real SDK doesn't.
-			fmt.Fprintf(&w, "type %s = string\n\n", name)
+			fmt.Fprintf(&w, "type %s string\n\n", name)
 			w.WriteString("const (\n")
 			for _, v := range values {
 				fmt.Fprintf(&w, "    %s%s %s = %q\n", name, pascalCase(v), name, v)
 			}
-			w.WriteString(")\n```\n\n")
+			w.WriteString(")\n\n")
+			fmt.Fprintf(&w, "func (v %s) String() string\n", name)
+			fmt.Fprintf(&w, "func (v %s) IsValid() bool\n", name)
+			fmt.Fprintf(&w, "func Parse%s(s string) (%s, error)\n", name, name)
+			w.WriteString("```\n\n")
 		}
 	}
 

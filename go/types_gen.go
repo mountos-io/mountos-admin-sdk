@@ -2,7 +2,10 @@
 
 package sdk
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 // Config holds client configuration.
 type Config struct {
@@ -42,43 +45,143 @@ type CursorPaginatedResponse[T any] struct {
 type IDResponse struct {
 	ID int64 `json:"id"`
 }
-type ClientSessionStatus = string
+
+// ClientSessionStatus is a closed set of wire values (see ParseClientSessionStatus/IsValid).
+type ClientSessionStatus string
 
 const (
-	ClientSessionStatusConnected ClientSessionStatus = "connected"
-	ClientSessionStatusActive ClientSessionStatus = "active"
-	ClientSessionStatusDegraded ClientSessionStatus = "degraded"
+	ClientSessionStatusConnected    ClientSessionStatus = "connected"
+	ClientSessionStatusActive       ClientSessionStatus = "active"
+	ClientSessionStatusDegraded     ClientSessionStatus = "degraded"
 	ClientSessionStatusDisconnected ClientSessionStatus = "disconnected"
-	ClientSessionStatusExpired ClientSessionStatus = "expired"
-	ClientSessionStatusUnknown ClientSessionStatus = "unknown"
+	ClientSessionStatusExpired      ClientSessionStatus = "expired"
+	ClientSessionStatusUnknown      ClientSessionStatus = "unknown"
 )
 
-type LicenseQuotaState = string
+// String returns v's wire value.
+func (v ClientSessionStatus) String() string { return string(v) }
+
+// IsValid reports whether v is one of ClientSessionStatus's defined wire values.
+func (v ClientSessionStatus) IsValid() bool {
+	switch v {
+	case ClientSessionStatusConnected, ClientSessionStatusActive, ClientSessionStatusDegraded, ClientSessionStatusDisconnected, ClientSessionStatusExpired, ClientSessionStatusUnknown:
+		return true
+	default:
+		return false
+	}
+}
+
+// ParseClientSessionStatus validates s as one of ClientSessionStatus's defined wire values, returning an
+// error if s is not recognized - use this instead of a bare conversion
+// when s came from outside this package (a request, a config file, etc.).
+func ParseClientSessionStatus(s string) (ClientSessionStatus, error) {
+	v := ClientSessionStatus(s)
+	if !v.IsValid() {
+		return "", fmt.Errorf("invalid ClientSessionStatus %q", s)
+	}
+	return v, nil
+}
+
+// LicenseQuotaState is a closed set of wire values (see ParseLicenseQuotaState/IsValid).
+type LicenseQuotaState string
 
 const (
-	LicenseQuotaStateOk LicenseQuotaState = "ok"
+	LicenseQuotaStateOk       LicenseQuotaState = "ok"
 	LicenseQuotaStateExceeded LicenseQuotaState = "exceeded"
 )
 
-type LicenseStatus = string
+// String returns v's wire value.
+func (v LicenseQuotaState) String() string { return string(v) }
+
+// IsValid reports whether v is one of LicenseQuotaState's defined wire values.
+func (v LicenseQuotaState) IsValid() bool {
+	switch v {
+	case LicenseQuotaStateOk, LicenseQuotaStateExceeded:
+		return true
+	default:
+		return false
+	}
+}
+
+// ParseLicenseQuotaState validates s as one of LicenseQuotaState's defined wire values, returning an
+// error if s is not recognized - use this instead of a bare conversion
+// when s came from outside this package (a request, a config file, etc.).
+func ParseLicenseQuotaState(s string) (LicenseQuotaState, error) {
+	v := LicenseQuotaState(s)
+	if !v.IsValid() {
+		return "", fmt.Errorf("invalid LicenseQuotaState %q", s)
+	}
+	return v, nil
+}
+
+// LicenseStatus is a closed set of wire values (see ParseLicenseStatus/IsValid).
+type LicenseStatus string
 
 const (
-	LicenseStatusValid LicenseStatus = "valid"
-	LicenseStatusExpiring LicenseStatus = "expiring"
-	LicenseStatusGrace LicenseStatus = "grace"
+	LicenseStatusValid         LicenseStatus = "valid"
+	LicenseStatusExpiring      LicenseStatus = "expiring"
+	LicenseStatusGrace         LicenseStatus = "grace"
 	LicenseStatusExpiredAccess LicenseStatus = "expired_access"
-	LicenseStatusExpired LicenseStatus = "expired"
+	LicenseStatusExpired       LicenseStatus = "expired"
 )
 
-type PairState = string
+// String returns v's wire value.
+func (v LicenseStatus) String() string { return string(v) }
+
+// IsValid reports whether v is one of LicenseStatus's defined wire values.
+func (v LicenseStatus) IsValid() bool {
+	switch v {
+	case LicenseStatusValid, LicenseStatusExpiring, LicenseStatusGrace, LicenseStatusExpiredAccess, LicenseStatusExpired:
+		return true
+	default:
+		return false
+	}
+}
+
+// ParseLicenseStatus validates s as one of LicenseStatus's defined wire values, returning an
+// error if s is not recognized - use this instead of a bare conversion
+// when s came from outside this package (a request, a config file, etc.).
+func ParseLicenseStatus(s string) (LicenseStatus, error) {
+	v := LicenseStatus(s)
+	if !v.IsValid() {
+		return "", fmt.Errorf("invalid LicenseStatus %q", s)
+	}
+	return v, nil
+}
+
+// PairState is a closed set of wire values (see ParsePairState/IsValid).
+type PairState string
 
 const (
-	PairStateActive PairState = "active"
-	PairStateDraining PairState = "draining"
+	PairStateActive        PairState = "active"
+	PairStateDraining      PairState = "draining"
 	PairStateSyncedDrained PairState = "synced_drained"
-	PairStateRetired PairState = "retired"
+	PairStateRetired       PairState = "retired"
 )
 
+// String returns v's wire value.
+func (v PairState) String() string { return string(v) }
+
+// IsValid reports whether v is one of PairState's defined wire values.
+func (v PairState) IsValid() bool {
+	switch v {
+	case PairStateActive, PairStateDraining, PairStateSyncedDrained, PairStateRetired:
+		return true
+	default:
+		return false
+	}
+}
+
+// ParsePairState validates s as one of PairState's defined wire values, returning an
+// error if s is not recognized - use this instead of a bare conversion
+// when s came from outside this package (a request, a config file, etc.).
+func ParsePairState(s string) (PairState, error) {
+	v := PairState(s)
+	if !v.IsValid() {
+		return "", fmt.Errorf("invalid PairState %q", s)
+	}
+	return v, nil
+}
 
 type Account struct {
 	ID             int64           `json:"id"`

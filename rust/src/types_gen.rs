@@ -54,34 +54,284 @@ pub struct IdResponse {
     pub id: i64,
 }
 
-/// `ClientSessionStatus` values accepted/returned on the wire.
-pub type ClientSessionStatus = String;
-pub const CLIENT_SESSION_STATUS_CONNECTED: &str = "connected";
-pub const CLIENT_SESSION_STATUS_ACTIVE: &str = "active";
-pub const CLIENT_SESSION_STATUS_DEGRADED: &str = "degraded";
-pub const CLIENT_SESSION_STATUS_DISCONNECTED: &str = "disconnected";
-pub const CLIENT_SESSION_STATUS_EXPIRED: &str = "expired";
-pub const CLIENT_SESSION_STATUS_UNKNOWN: &str = "unknown";
+/// `ClientSessionStatus` values accepted/returned on the wire. `UnknownValue` preserves a
+/// value this SDK does not recognize yet, for forward compatibility with
+/// a server that has introduced a new ClientSessionStatus value.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ClientSessionStatus {
+    Connected,
+    Active,
+    Degraded,
+    Disconnected,
+    Expired,
+    Unknown,
+    /// A value not defined when this SDK was generated.
+    UnknownValue(String),
+}
 
-/// `LicenseQuotaState` values accepted/returned on the wire.
-pub type LicenseQuotaState = String;
-pub const LICENSE_QUOTA_STATE_OK: &str = "ok";
-pub const LICENSE_QUOTA_STATE_EXCEEDED: &str = "exceeded";
+impl ClientSessionStatus {
+    /// Returns the wire string for this value.
+    pub fn as_str(&self) -> &str {
+        match self {
+            ClientSessionStatus::Connected => "connected",
+            ClientSessionStatus::Active => "active",
+            ClientSessionStatus::Degraded => "degraded",
+            ClientSessionStatus::Disconnected => "disconnected",
+            ClientSessionStatus::Expired => "expired",
+            ClientSessionStatus::Unknown => "unknown",
+            ClientSessionStatus::UnknownValue(s) => s.as_str(),
+        }
+    }
 
-/// `LicenseStatus` values accepted/returned on the wire.
-pub type LicenseStatus = String;
-pub const LICENSE_STATUS_VALID: &str = "valid";
-pub const LICENSE_STATUS_EXPIRING: &str = "expiring";
-pub const LICENSE_STATUS_GRACE: &str = "grace";
-pub const LICENSE_STATUS_EXPIRED_ACCESS: &str = "expired_access";
-pub const LICENSE_STATUS_EXPIRED: &str = "expired";
+    /// Reports whether this is one of the values defined when this SDK was
+    /// generated (false for `UnknownValue`).
+    pub fn is_known(&self) -> bool {
+        !matches!(self, ClientSessionStatus::UnknownValue(_))
+    }
+}
 
-/// `PairState` values accepted/returned on the wire.
-pub type PairState = String;
-pub const PAIR_STATE_ACTIVE: &str = "active";
-pub const PAIR_STATE_DRAINING: &str = "draining";
-pub const PAIR_STATE_SYNCED_DRAINED: &str = "synced_drained";
-pub const PAIR_STATE_RETIRED: &str = "retired";
+impl std::fmt::Display for ClientSessionStatus {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl From<&str> for ClientSessionStatus {
+    fn from(s: &str) -> Self {
+        match s {
+            "connected" => ClientSessionStatus::Connected,
+            "active" => ClientSessionStatus::Active,
+            "degraded" => ClientSessionStatus::Degraded,
+            "disconnected" => ClientSessionStatus::Disconnected,
+            "expired" => ClientSessionStatus::Expired,
+            "unknown" => ClientSessionStatus::Unknown,
+            other => ClientSessionStatus::UnknownValue(other.to_string()),
+        }
+    }
+}
+
+impl Serialize for ClientSessionStatus {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de> Deserialize<'de> for ClientSessionStatus {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        Ok(ClientSessionStatus::from(s.as_str()))
+    }
+}
+
+/// `LicenseQuotaState` values accepted/returned on the wire. `Unknown` preserves a
+/// value this SDK does not recognize yet, for forward compatibility with
+/// a server that has introduced a new LicenseQuotaState value.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum LicenseQuotaState {
+    Ok,
+    Exceeded,
+    /// A value not defined when this SDK was generated.
+    Unknown(String),
+}
+
+impl LicenseQuotaState {
+    /// Returns the wire string for this value.
+    pub fn as_str(&self) -> &str {
+        match self {
+            LicenseQuotaState::Ok => "ok",
+            LicenseQuotaState::Exceeded => "exceeded",
+            LicenseQuotaState::Unknown(s) => s.as_str(),
+        }
+    }
+
+    /// Reports whether this is one of the values defined when this SDK was
+    /// generated (false for `Unknown`).
+    pub fn is_known(&self) -> bool {
+        !matches!(self, LicenseQuotaState::Unknown(_))
+    }
+}
+
+impl std::fmt::Display for LicenseQuotaState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl From<&str> for LicenseQuotaState {
+    fn from(s: &str) -> Self {
+        match s {
+            "ok" => LicenseQuotaState::Ok,
+            "exceeded" => LicenseQuotaState::Exceeded,
+            other => LicenseQuotaState::Unknown(other.to_string()),
+        }
+    }
+}
+
+impl Serialize for LicenseQuotaState {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de> Deserialize<'de> for LicenseQuotaState {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        Ok(LicenseQuotaState::from(s.as_str()))
+    }
+}
+
+/// `LicenseStatus` values accepted/returned on the wire. `Unknown` preserves a
+/// value this SDK does not recognize yet, for forward compatibility with
+/// a server that has introduced a new LicenseStatus value.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum LicenseStatus {
+    Valid,
+    Expiring,
+    Grace,
+    ExpiredAccess,
+    Expired,
+    /// A value not defined when this SDK was generated.
+    Unknown(String),
+}
+
+impl LicenseStatus {
+    /// Returns the wire string for this value.
+    pub fn as_str(&self) -> &str {
+        match self {
+            LicenseStatus::Valid => "valid",
+            LicenseStatus::Expiring => "expiring",
+            LicenseStatus::Grace => "grace",
+            LicenseStatus::ExpiredAccess => "expired_access",
+            LicenseStatus::Expired => "expired",
+            LicenseStatus::Unknown(s) => s.as_str(),
+        }
+    }
+
+    /// Reports whether this is one of the values defined when this SDK was
+    /// generated (false for `Unknown`).
+    pub fn is_known(&self) -> bool {
+        !matches!(self, LicenseStatus::Unknown(_))
+    }
+}
+
+impl std::fmt::Display for LicenseStatus {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl From<&str> for LicenseStatus {
+    fn from(s: &str) -> Self {
+        match s {
+            "valid" => LicenseStatus::Valid,
+            "expiring" => LicenseStatus::Expiring,
+            "grace" => LicenseStatus::Grace,
+            "expired_access" => LicenseStatus::ExpiredAccess,
+            "expired" => LicenseStatus::Expired,
+            other => LicenseStatus::Unknown(other.to_string()),
+        }
+    }
+}
+
+impl Serialize for LicenseStatus {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de> Deserialize<'de> for LicenseStatus {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        Ok(LicenseStatus::from(s.as_str()))
+    }
+}
+
+/// `PairState` values accepted/returned on the wire. `Unknown` preserves a
+/// value this SDK does not recognize yet, for forward compatibility with
+/// a server that has introduced a new PairState value.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PairState {
+    Active,
+    Draining,
+    SyncedDrained,
+    Retired,
+    /// A value not defined when this SDK was generated.
+    Unknown(String),
+}
+
+impl PairState {
+    /// Returns the wire string for this value.
+    pub fn as_str(&self) -> &str {
+        match self {
+            PairState::Active => "active",
+            PairState::Draining => "draining",
+            PairState::SyncedDrained => "synced_drained",
+            PairState::Retired => "retired",
+            PairState::Unknown(s) => s.as_str(),
+        }
+    }
+
+    /// Reports whether this is one of the values defined when this SDK was
+    /// generated (false for `Unknown`).
+    pub fn is_known(&self) -> bool {
+        !matches!(self, PairState::Unknown(_))
+    }
+}
+
+impl std::fmt::Display for PairState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl From<&str> for PairState {
+    fn from(s: &str) -> Self {
+        match s {
+            "active" => PairState::Active,
+            "draining" => PairState::Draining,
+            "synced_drained" => PairState::SyncedDrained,
+            "retired" => PairState::Retired,
+            other => PairState::Unknown(other.to_string()),
+        }
+    }
+}
+
+impl Serialize for PairState {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de> Deserialize<'de> for PairState {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        Ok(PairState::from(s.as_str()))
+    }
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Account {

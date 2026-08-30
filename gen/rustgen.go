@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"path/filepath"
+	"slices"
 	"strings"
 )
 
@@ -47,6 +48,70 @@ func rustParamType(paramRaw string, paramTypes map[string]string) string {
 		return rustType(t)
 	}
 	return "i64"
+}
+
+// writeRustEnum emits a real Rust enum for a closed wire string-enum, with a
+// trailing Unknown(String) variant so a server value newer than this SDK
+// deserializes instead of hard-failing (the idiomatic Rust pattern for a
+// forward-compatible wire enum - see docs/design). #[serde(other)] cannot
+// capture the unrecognized string into a variant, so Serialize/Deserialize
+// are hand-written against as_str()/From<&str> rather than derived.
+func writeRustEnum(w *strings.Builder, name string, values []string) {
+	variants := make([]string, len(values))
+	for i, v := range values {
+		variants[i] = pascalCase(v)
+	}
+	unknown := rustUnknownVariantName(variants)
+
+	fmt.Fprintf(w, "\n/// `%s` values accepted/returned on the wire. `%s` preserves a\n", name, unknown)
+	fmt.Fprintf(w, "/// value this SDK does not recognize yet, for forward compatibility with\n")
+	fmt.Fprintf(w, "/// a server that has introduced a new %s value.\n", name)
+	fmt.Fprintf(w, "#[derive(Debug, Clone, PartialEq, Eq)]\npub enum %s {\n", name)
+	for _, variant := range variants {
+		fmt.Fprintf(w, "    %s,\n", variant)
+	}
+	fmt.Fprintf(w, "    /// A value not defined when this SDK was generated.\n    %s(String),\n}\n\n", unknown)
+
+	fmt.Fprintf(w, "impl %s {\n", name)
+	w.WriteString("    /// Returns the wire string for this value.\n    pub fn as_str(&self) -> &str {\n        match self {\n")
+	for i, v := range values {
+		fmt.Fprintf(w, "            %s::%s => %q,\n", name, variants[i], v)
+	}
+	fmt.Fprintf(w, "            %s::%s(s) => s.as_str(),\n        }\n    }\n\n", name, unknown)
+	fmt.Fprintf(w, "    /// Reports whether this is one of the values defined when this SDK was\n    /// generated (false for `%s`).\n    pub fn is_known(&self) -> bool {\n", unknown)
+	fmt.Fprintf(w, "        !matches!(self, %s::%s(_))\n    }\n}\n\n", name, unknown)
+
+	fmt.Fprintf(w, "impl std::fmt::Display for %s {\n    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {\n        f.write_str(self.as_str())\n    }\n}\n\n", name)
+
+	fmt.Fprintf(w, "impl From<&str> for %s {\n    fn from(s: &str) -> Self {\n        match s {\n", name)
+	for i, v := range values {
+		fmt.Fprintf(w, "            %q => %s::%s,\n", v, name, variants[i])
+	}
+	fmt.Fprintf(w, "            other => %s::%s(other.to_string()),\n        }\n    }\n}\n\n", name, unknown)
+
+	fmt.Fprintf(w, "impl Serialize for %s {\n", name)
+	w.WriteString("    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>\n    where\n        S: serde::Serializer,\n    {\n        serializer.serialize_str(self.as_str())\n    }\n}\n\n")
+
+	fmt.Fprintf(w, "impl<'de> Deserialize<'de> for %s {\n", name)
+	w.WriteString("    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>\n    where\n        D: serde::Deserializer<'de>,\n    {\n        let s = String::deserialize(deserializer)?;\n")
+	fmt.Fprintf(w, "        Ok(%s::from(s.as_str()))\n    }\n}\n", name)
+}
+
+// rustUnknownVariantName picks a name for the fallback catch-all variant
+// that cannot collide with any of the enum's own declared variant names -
+// api.yaml has at least one enum with a value literally named "unknown"
+// (ClientSessionStatus), whose PascalCase variant is already "Unknown".
+func rustUnknownVariantName(variants []string) string {
+	for _, candidate := range []string{"Unknown", "UnknownValue", "UnrecognizedValue"} {
+		if !slices.Contains(variants, candidate) {
+			return candidate
+		}
+	}
+	name := "UnrecognizedValue"
+	for slices.Contains(variants, name) {
+		name += "_"
+	}
+	return name
 }
 
 func generateRustTypes(spec *Spec, outDir string) {
@@ -112,15 +177,9 @@ func generateRustTypes(spec *Spec, outDir string) {
 	w.WriteString("    pub id: i64,\n")
 	w.WriteString("}\n")
 
-	// Enum string aliases + value constants.
+	// Enum types.
 	for _, name := range orderEnums(spec) {
-		values := spec.Enums[name]
-		fmt.Fprintf(&w, "\n/// `%s` values accepted/returned on the wire.\n", name)
-		fmt.Fprintf(&w, "pub type %s = String;\n", name)
-		for _, v := range values {
-			constName := screamingSnake(name) + "_" + screamingSnake(v)
-			fmt.Fprintf(&w, "pub const %s: &str = %q;\n", constName, v)
-		}
+		writeRustEnum(&w, name, spec.Enums[name])
 	}
 
 	// Model types.

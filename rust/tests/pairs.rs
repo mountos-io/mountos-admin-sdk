@@ -10,7 +10,9 @@
 
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
-use mountos_admin_sdk::{Client, Config, RegisterStorageMemberRequest, UpdateStorageConfigRequest};
+use mountos_admin_sdk::{
+    Client, Config, PairState, RegisterStorageMemberRequest, UpdateStorageConfigRequest,
+};
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
 use std::thread;
@@ -124,7 +126,7 @@ async fn list_pairs_full_state_per_pair() {
 
     let pairs = client.storages.list_pairs(7, None, None).await.expect("list_pairs");
     assert_eq!(pairs.len(), 2);
-    assert_eq!(pairs[1].state, "draining");
+    assert_eq!(pairs[1].state, PairState::Draining);
     assert_eq!(pairs[1].pending_sync_jobs_a, Some(3));
 
     let recorded = handle.join().expect("server thread");

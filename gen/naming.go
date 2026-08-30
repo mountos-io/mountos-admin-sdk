@@ -136,11 +136,6 @@ func snakeCase(s string) string {
 	return strings.Join(words, "_")
 }
 
-// screamingSnake converts a name to SCREAMING_SNAKE_CASE for Rust consts.
-func screamingSnake(s string) string {
-	return strings.ToUpper(snakeCase(s))
-}
-
 // rustFieldName returns the snake_case Rust field/binding name, escaping
 // reserved keywords as raw identifiers.
 func rustFieldName(jsonName string) string {

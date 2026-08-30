@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"go/format"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -11,6 +12,20 @@ func generateGo(spec *Spec, outDir string) {
 	generateGoTypes(spec, outDir)
 	generateGoClient(spec, outDir)
 	generateGoResources(spec, outDir)
+}
+
+// writeGoFile gofmt-formats content (column-aligning const/struct blocks the
+// individual write* functions above don't hand-align themselves, e.g. the
+// enum const blocks) before writing it, so generated .go output never needs
+// a manual `gofmt -w` pass after `make gen`. A formatting failure means the
+// generator itself produced invalid Go syntax - fail loudly rather than
+// write broken output.
+func writeGoFile(path, content string) {
+	formatted, err := format.Source([]byte(content))
+	if err != nil {
+		fatalf("gofmt %s: %v", path, err)
+	}
+	writeFile(path, string(formatted))
 }
 
 // goType maps a spec type to Go type.
@@ -39,6 +54,28 @@ func goType(specType string) string {
 	default:
 		return specType
 	}
+}
+
+// isEnumField reports whether t names one of spec's closed enum types.
+// Generated enum types are a defined string type (type X string), not a
+// plain-string alias, so a value of that type is not assignable where a
+// bare string is required (e.g. url.Values.Set) without an explicit
+// string(...) conversion - goQueryValueExpr below applies it only where
+// actually needed.
+func isEnumField(spec *Spec, t string) bool {
+	_, ok := spec.Enums[t]
+	return ok
+}
+
+// goQueryValueExpr returns expr, wrapped in string(...) when f's type is a
+// generated enum type. Only the "string-like" default branch of the query-
+// building switches needs this: the numeric/bool branches already convert
+// explicitly via strconv, and enum values are never numeric/bool.
+func goQueryValueExpr(spec *Spec, f Field, expr string) string {
+	if isEnumField(spec, f.Type) {
+		return "string(" + expr + ")"
+	}
+	return expr
 }
 
 func goTag(f Field, isRequest bool) string {
@@ -171,9 +208,14 @@ func generateGoTypes(spec *Spec, outDir string) {
 			break
 		}
 	}
+	imports := newGoImports()
 	if needsJSON {
-		w.WriteString("import \"encoding/json\"\n\n")
+		imports.add("encoding/json")
 	}
+	if len(spec.Enums) > 0 {
+		imports.add("fmt") // ParseXxx enum constructors below report an unrecognized value via fmt.Errorf
+	}
+	w.WriteString(imports.render())
 
 	// Config
 	w.WriteString("// Config holds client configuration.\n")
@@ -223,13 +265,7 @@ func generateGoTypes(spec *Spec, outDir string) {
 	// Enum types
 	enumOrder := orderEnums(spec)
 	for _, name := range enumOrder {
-		values := spec.Enums[name]
-		fmt.Fprintf(&w, "type %s = string\n\nconst (\n", name)
-		for _, v := range values {
-			constName := name + pascalCase(v)
-			fmt.Fprintf(&w, "\t%s %s = %q\n", constName, name, v)
-		}
-		w.WriteString(")\n\n")
+		writeGoEnum(&w, name, spec.Enums[name])
 	}
 
 	// Collect type order from resources (types referenced first come first)
@@ -277,7 +313,7 @@ func generateGoTypes(spec *Spec, outDir string) {
 		}
 	}
 
-	writeFile(filepath.Join(outDir, "types_gen.go"), w.String())
+	writeGoFile(filepath.Join(outDir, "types_gen.go"), w.String())
 }
 
 func orderEnums(spec *Spec) []string {
@@ -287,6 +323,35 @@ func orderEnums(spec *Spec) []string {
 	}
 	sort.Strings(names)
 	return names
+}
+
+// writeGoEnum emits a closed string-enum type: a defined type (not a plain
+// alias, so a stray unvalidated string cannot silently stand in for it),
+// its value constants, and String()/IsValid()/Parse<Name> - the established
+// idiom for a closed string enum elsewhere in this codebase's Go (e.g.
+// internal/db/admin.CacheType, internal/db/dialect.SQLDialect in
+// mountos-servers). Go has no sum type, so IsValid()/Parse<Name> are the
+// closest a caller gets to being forced to handle an unrecognized value
+// instead of it propagating silently.
+func writeGoEnum(w *strings.Builder, name string, values []string) {
+	constNames := make([]string, len(values))
+	for i, v := range values {
+		constNames[i] = name + pascalCase(v)
+	}
+
+	fmt.Fprintf(w, "// %s is a closed set of wire values (see Parse%s/IsValid).\ntype %s string\n\nconst (\n", name, name, name)
+	for i, v := range values {
+		fmt.Fprintf(w, "\t%s %s = %q\n", constNames[i], name, v)
+	}
+	w.WriteString(")\n\n")
+
+	fmt.Fprintf(w, "// String returns v's wire value.\nfunc (v %s) String() string { return string(v) }\n\n", name)
+
+	fmt.Fprintf(w, "// IsValid reports whether v is one of %s's defined wire values.\nfunc (v %s) IsValid() bool {\n\tswitch v {\n\tcase %s:\n\t\treturn true\n\tdefault:\n\t\treturn false\n\t}\n}\n\n",
+		name, name, strings.Join(constNames, ", "))
+
+	fmt.Fprintf(w, "// Parse%s validates s as one of %s's defined wire values, returning an\n// error if s is not recognized - use this instead of a bare conversion\n// when s came from outside this package (a request, a config file, etc.).\nfunc Parse%s(s string) (%s, error) {\n\tv := %s(s)\n\tif !v.IsValid() {\n\t\treturn \"\", fmt.Errorf(\"invalid %s %%q\", s)\n\t}\n\treturn v, nil\n}\n\n",
+		name, name, name, name, name, name)
 }
 
 func orderTypes(spec *Spec) []string {
@@ -377,7 +442,7 @@ func goOptionalQueryType(f Field) string {
 
 // writeGoOptionalQuerySet emits the q.Set call for an optional (non-required, non-pagination) field.
 // Bool and int types use pointer checks (nil), strings use empty-string checks.
-func writeGoOptionalQuerySet(w *strings.Builder, f Field, goName string) {
+func writeGoOptionalQuerySet(w *strings.Builder, spec *Spec, f Field, goName string) {
 	switch f.Type {
 	case "int64":
 		fmt.Fprintf(w, "\t\tif opts.%s != nil {\n", goName)
@@ -397,7 +462,7 @@ func writeGoOptionalQuerySet(w *strings.Builder, f Field, goName string) {
 		w.WriteString("\t\t}\n")
 	default:
 		fmt.Fprintf(w, "\t\tif opts.%s != \"\" {\n", goName)
-		fmt.Fprintf(w, "\t\t\tq.Set(%q, opts.%s)\n", f.Name, goName)
+		fmt.Fprintf(w, "\t\t\tq.Set(%q, %s)\n", f.Name, goQueryValueExpr(spec, f, "opts."+goName))
 		w.WriteString("\t\t}\n")
 	}
 }
@@ -477,7 +542,7 @@ func generateGoClient(spec *Spec, outDir string) {
 	w.WriteString("\treturn c, nil\n")
 	w.WriteString("}\n")
 
-	writeFile(filepath.Join(outDir, "client_gen.go"), w.String())
+	writeGoFile(filepath.Join(outDir, "client_gen.go"), w.String())
 }
 
 func generateGoResources(spec *Spec, outDir string) {
@@ -552,14 +617,14 @@ func generateGoResources(spec *Spec, outDir string) {
 
 		for _, ep := range res.Endpoints {
 			w.WriteString("\n")
-			writeGoMethod(&w, res, ep, svcType, fullBasePath, resPathParams)
+			writeGoMethod(&w, spec, res, ep, svcType, fullBasePath, resPathParams)
 		}
 	}
 
-	writeFile(filepath.Join(outDir, "resources_gen.go"), w.String())
+	writeGoFile(filepath.Join(outDir, "resources_gen.go"), w.String())
 }
 
-func writeGoMethod(w *strings.Builder, res Resource, ep Endpoint, svcType, fullBasePath string, resPathParams []string) {
+func writeGoMethod(w *strings.Builder, spec *Spec, res Resource, ep Endpoint, svcType, fullBasePath string, resPathParams []string) {
 	epPathParams := extractPathParams(ep.Path)
 	allPathParams := make([]string, 0, len(resPathParams)+len(epPathParams))
 	allPathParams = append(allPathParams, resPathParams...)
@@ -578,13 +643,13 @@ func writeGoMethod(w *strings.Builder, res Resource, ep Endpoint, svcType, fullB
 	// Determine return type and method signature
 	switch {
 	case ep.ResponseArray:
-		writeGoArrayMethod(w, svcType, methodName, ep, fullPath, allPathParams, pt)
+		writeGoArrayMethod(w, spec, svcType, methodName, ep, fullPath, allPathParams, pt)
 	case ep.Pagination == "page":
-		writeGoPageListMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name, pt)
+		writeGoPageListMethod(w, spec, svcType, methodName, ep, fullPath, allPathParams, res.Name, pt)
 	case ep.Pagination == "cursor":
-		writeGoCursorListMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name, pt)
+		writeGoCursorListMethod(w, spec, svcType, methodName, ep, fullPath, allPathParams, res.Name, pt)
 	case len(ep.Query) > 0 && ep.Pagination == "":
-		writeGoQueryMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name, pt)
+		writeGoQueryMethod(w, spec, svcType, methodName, ep, fullPath, allPathParams, res.Name, pt)
 	// ResponseType is checked before the ad-hoc Response field list (matches
 	// TS's tsReturnType and Rust's writeRustBodyMethod, and this switch's own
 	// no-request branches below) so all three languages agree on which shape
@@ -833,7 +898,7 @@ func writeGoVoidMethod(w *strings.Builder, svcType, methodName string, ep Endpoi
 }
 
 // GET returning array (with optional query params)
-func writeGoArrayMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, pt map[string]string) {
+func writeGoArrayMethod(w *strings.Builder, spec *Spec, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, pt map[string]string) {
 	pathParams := goMethodParams(allPathParams, pt)
 	sig := "ctx context.Context"
 	if pathParams != "" {
@@ -870,7 +935,7 @@ func writeGoArrayMethod(w *strings.Builder, svcType, methodName string, ep Endpo
 				case "bool":
 					fmt.Fprintf(w, "\tq.Set(%q, strconv.FormatBool(%s))\n", f.Name, paramName)
 				default:
-					fmt.Fprintf(w, "\tq.Set(%q, %s)\n", f.Name, paramName)
+					fmt.Fprintf(w, "\tq.Set(%q, %s)\n", f.Name, goQueryValueExpr(spec, f, paramName))
 				}
 				continue
 			}
@@ -884,7 +949,7 @@ func writeGoArrayMethod(w *strings.Builder, svcType, methodName string, ep Endpo
 			case "bool":
 				fmt.Fprintf(w, "\tif %s {\n\t\tq.Set(%q, strconv.FormatBool(%s))\n\t}\n", paramName, f.Name, paramName)
 			default:
-				fmt.Fprintf(w, "\tif %s != \"\" {\n\t\tq.Set(%q, %s)\n\t}\n", paramName, f.Name, paramName)
+				fmt.Fprintf(w, "\tif %s != \"\" {\n\t\tq.Set(%q, %s)\n\t}\n", paramName, f.Name, goQueryValueExpr(spec, f, paramName))
 			}
 		}
 		pathExpr := goPathExpr(basePath, allPathParams, pt)
@@ -906,7 +971,7 @@ func writeGoArrayMethod(w *strings.Builder, svcType, methodName string, ep Endpo
 }
 
 // GET with page pagination
-func writeGoPageListMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string, pt map[string]string) {
+func writeGoPageListMethod(w *strings.Builder, spec *Spec, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string, pt map[string]string) {
 	hasCustomOpts := hasExtraQueryParam(ep.Query)
 	pathParams := goMethodParams(allPathParams, pt)
 	sig := "ctx context.Context"
@@ -957,10 +1022,10 @@ func writeGoPageListMethod(w *strings.Builder, svcType, methodName string, ep En
 				case "bool":
 					fmt.Fprintf(w, "\t\tq.Set(%q, strconv.FormatBool(opts.%s))\n", f.Name, goName)
 				default:
-					fmt.Fprintf(w, "\t\tq.Set(%q, opts.%s)\n", f.Name, goName)
+					fmt.Fprintf(w, "\t\tq.Set(%q, %s)\n", f.Name, goQueryValueExpr(spec, f, "opts."+goName))
 				}
 			} else {
-				writeGoOptionalQuerySet(w, f, goName)
+				writeGoOptionalQuerySet(w, spec, f, goName)
 			}
 		}
 	}
@@ -984,7 +1049,7 @@ func writeGoPageListMethod(w *strings.Builder, svcType, methodName string, ep En
 }
 
 // GET with cursor pagination
-func writeGoCursorListMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string, pt map[string]string) {
+func writeGoCursorListMethod(w *strings.Builder, spec *Spec, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string, pt map[string]string) {
 	optsType := listOptionsTypeName(resName)
 	pathParams := goMethodParams(allPathParams, pt)
 	sig := "ctx context.Context"
@@ -1037,10 +1102,10 @@ func writeGoCursorListMethod(w *strings.Builder, svcType, methodName string, ep 
 			case "bool":
 				fmt.Fprintf(w, "\t\tq.Set(%q, strconv.FormatBool(opts.%s))\n", f.Name, goName)
 			default:
-				fmt.Fprintf(w, "\t\tq.Set(%q, opts.%s)\n", f.Name, goName)
+				fmt.Fprintf(w, "\t\tq.Set(%q, %s)\n", f.Name, goQueryValueExpr(spec, f, "opts."+goName))
 			}
 		default:
-			writeGoOptionalQuerySet(w, f, goName)
+			writeGoOptionalQuerySet(w, spec, f, goName)
 		}
 	}
 
@@ -1057,7 +1122,7 @@ func writeGoCursorListMethod(w *strings.Builder, svcType, methodName string, ep 
 }
 
 // GET with query params (non-paginated, like Discover.Meta)
-func writeGoQueryMethod(w *strings.Builder, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string, pt map[string]string) {
+func writeGoQueryMethod(w *strings.Builder, spec *Spec, svcType, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string, pt map[string]string) {
 	pathParams := goMethodParams(allPathParams, pt)
 	sig := "ctx context.Context"
 	if pathParams != "" {
@@ -1102,7 +1167,7 @@ func writeGoQueryMethod(w *strings.Builder, svcType, methodName string, ep Endpo
 			case "bool":
 				fmt.Fprintf(w, "\tq.Set(%q, strconv.FormatBool(%s))\n", f.Name, paramName)
 			default:
-				fmt.Fprintf(w, "\tq.Set(%q, %s)\n", f.Name, paramName)
+				fmt.Fprintf(w, "\tq.Set(%q, %s)\n", f.Name, goQueryValueExpr(spec, f, paramName))
 			}
 		} else {
 			switch f.Type {
@@ -1115,7 +1180,7 @@ func writeGoQueryMethod(w *strings.Builder, svcType, methodName string, ep Endpo
 			case "bool":
 				fmt.Fprintf(w, "\tif %s != nil {\n\t\tq.Set(%q, strconv.FormatBool(*%s))\n\t}\n", paramName, f.Name, paramName)
 			default:
-				fmt.Fprintf(w, "\tif %s != \"\" {\n\t\tq.Set(%q, %s)\n\t}\n", paramName, f.Name, paramName)
+				fmt.Fprintf(w, "\tif %s != \"\" {\n\t\tq.Set(%q, %s)\n\t}\n", paramName, f.Name, goQueryValueExpr(spec, f, paramName))
 			}
 		}
 	}

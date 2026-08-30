@@ -67,15 +67,26 @@ func generateDocRust(spec *Spec, outDir string) {
 
 	if len(spec.Enums) > 0 {
 		w.WriteString("## Enums\n\n")
-		w.WriteString("String aliases; the listed constants are the accepted values.\n\n")
+		w.WriteString("Each is a real Rust enum with a trailing fallback variant (normally `Unknown`, ")
+		w.WriteString("renamed only if a wire value is itself named \"unknown\"), so a wire value newer ")
+		w.WriteString("than this SDK deserializes instead of failing. `as_str()` returns the wire string ")
+		w.WriteString("(including for the fallback); `is_known()` reports whether it is the fallback.\n\n")
 		for _, name := range sortedKeys(spec.Enums) {
+			values := spec.Enums[name]
+			variants := make([]string, len(values))
+			for i, v := range values {
+				variants[i] = pascalCase(v)
+			}
+			unknown := rustUnknownVariantName(variants)
+
 			fmt.Fprintf(&w, "### `%s`\n\n", name)
 			w.WriteString("```rust\n")
-			fmt.Fprintf(&w, "pub type %s = String;\n", name)
-			for _, v := range spec.Enums[name] {
-				constName := screamingSnake(name) + "_" + screamingSnake(v)
-				fmt.Fprintf(&w, "pub const %s: &str = %q;\n", constName, v)
+			fmt.Fprintf(&w, "pub enum %s {\n", name)
+			for _, variant := range variants {
+				fmt.Fprintf(&w, "    %s,\n", variant)
 			}
+			fmt.Fprintf(&w, "    %s(String),\n", unknown)
+			w.WriteString("}\n")
 			w.WriteString("```\n\n")
 		}
 	}
