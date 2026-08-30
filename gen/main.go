@@ -16,6 +16,7 @@ func main() {
 	rustOut := flag.String("rust-out", "rust/src", "Rust output directory")
 	docOut := flag.String("doc-out", ".", "api.md output directory")
 	docsOut := flag.String("docs-out", "docs", "language-specific docs output directory (ts.md, go.md, rust.md)")
+	contractOut := flag.String("contract-out", "../contract-snapshot.json", "structural contract snapshot output path")
 	flag.Parse()
 
 	spec := loadSpec(*specPath)
@@ -27,6 +28,9 @@ func main() {
 	generateDocTS(spec, *docsOut)
 	generateDocGo(spec, *docsOut)
 	generateDocRust(spec, *docsOut)
+	if err := generateContractSnapshot(spec, *contractOut); err != nil {
+		fatalf("generate contract snapshot: %v", err)
+	}
 	fmt.Println("generation complete")
 }
 

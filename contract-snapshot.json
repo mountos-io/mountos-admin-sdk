@@ -1,0 +1,2292 @@
+{
+  "version": "1",
+  "types": {
+    "Account": {
+      "fields": {
+        "createdAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": false
+        },
+        "description": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "iconUrl": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "id": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "isActive": {
+          "type": "bool",
+          "required": false,
+          "optional": false
+        },
+        "liveVolume": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "locked": {
+          "type": "bool",
+          "required": false,
+          "optional": false
+        },
+        "name": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "providerInfo": {
+          "type": "object",
+          "required": false,
+          "optional": true
+        },
+        "quotaExcessPct": {
+          "type": "int32",
+          "required": false,
+          "optional": false
+        },
+        "quotaLimit": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "retention": {
+          "type": "RetentionPolicy",
+          "required": false,
+          "optional": true
+        },
+        "totalVolume": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "updatedAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "AlertCountResponse": {
+      "fields": {
+        "active": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "criticalCount": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "infoCount": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "recent": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "warningCount": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "AuditLog": {
+      "fields": {
+        "accountId": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "createdAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": true
+        },
+        "createdBy": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "data": {
+          "type": "json",
+          "required": false,
+          "optional": true
+        },
+        "description": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "id": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "node": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "regionClusterId": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "regionId": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "subject": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "success": {
+          "type": "bool",
+          "required": false,
+          "optional": false
+        },
+        "title": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "updatedAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": true
+        }
+      }
+    },
+    "BackfillFailure": {
+      "fields": {
+        "error": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "shardId": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "BlockMember": {
+      "fields": {
+        "name": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "regionClusterId": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "BlockVolume": {
+      "fields": {
+        "clusterName": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "clusterReady": {
+          "type": "bool",
+          "required": false,
+          "optional": false
+        },
+        "clusterUuid": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "createdAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": false
+        },
+        "id": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "isActive": {
+          "type": "bool",
+          "required": false,
+          "optional": false
+        },
+        "memberState": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "name": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "pairId": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "regionClusterId": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "shardId": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "updatedAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "ClientSession": {
+      "fields": {
+        "account": {
+          "type": "Ref",
+          "required": false,
+          "optional": false
+        },
+        "appVersion": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "clientType": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "connectedAt": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "disconnectedAt": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "forkName": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "hostname": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "id": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "ipAddr": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "isActive": {
+          "type": "bool",
+          "required": false,
+          "optional": false
+        },
+        "isTemporaryFork": {
+          "type": "bool",
+          "required": false,
+          "optional": false
+        },
+        "lastHeartbeat": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "metadata": {
+          "type": "json",
+          "required": false,
+          "optional": true
+        },
+        "metrics": {
+          "type": "json",
+          "required": false,
+          "optional": true
+        },
+        "mountMode": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "mountPath": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "osName": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "osVersion": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "region": {
+          "type": "Ref",
+          "required": false,
+          "optional": false
+        },
+        "regionCluster": {
+          "type": "Ref",
+          "required": false,
+          "optional": true
+        },
+        "status": {
+          "type": "ClientSessionStatus",
+          "required": false,
+          "optional": false
+        },
+        "user": {
+          "type": "Ref",
+          "required": false,
+          "optional": true
+        },
+        "volume": {
+          "type": "VolumeRef",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "CompatibleStorage": {
+      "fields": {
+        "id": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "name": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "providerType": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "storageType": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "uuid": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "volumes": {
+          "type": "CompatibleVolume[]",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "CompatibleVolume": {
+      "fields": {
+        "id": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "name": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "DashboardStats": {
+      "fields": {
+        "activeSessionCount": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "regionBreakdown": {
+          "type": "RegionVolumeMetrics[]",
+          "required": false,
+          "optional": false
+        },
+        "regionCount": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "storageCount": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "totalQuotaLimit": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "totalVolumeUsed": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "userCount": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "volumeCount": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "DashboardUser": {
+      "fields": {
+        "accountId": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "email": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "exp": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "id": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "name": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "role": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "userId": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "username": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "volumeId": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        }
+      }
+    },
+    "DiscoverEndpoint": {
+      "fields": {
+        "addr": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "nodeId": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "status": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "DiscoverMetaResponse": {
+      "fields": {
+        "endpoints": {
+          "type": "DiscoverEndpoint[]",
+          "required": false,
+          "optional": false
+        },
+        "region": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "regionId": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "Fork": {
+      "fields": {
+        "childrenCount": {
+          "type": "int32",
+          "required": false,
+          "optional": false
+        },
+        "createdAt": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "createdBy": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "fid": {
+          "type": "int32",
+          "required": false,
+          "optional": false
+        },
+        "inactive": {
+          "type": "bool",
+          "required": false,
+          "optional": true
+        },
+        "inactiveAt": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "name": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "parentFid": {
+          "type": "int32",
+          "required": false,
+          "optional": false
+        },
+        "parentName": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "size": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "snapshotTs": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "status": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "ForkEntryDetail": {
+      "fields": {
+        "creatorId": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "ctime": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "generation": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "inode": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "kind": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "mode": {
+          "type": "int32",
+          "required": false,
+          "optional": true
+        },
+        "mtime": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "name": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "owner": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "path": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "size": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "updaterId": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "xattrs": {
+          "type": "object",
+          "required": false,
+          "optional": true
+        }
+      }
+    },
+    "ForkEntryVersion": {
+      "fields": {
+        "contentHash": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "generation": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "mtime": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "size": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "updaterId": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        }
+      }
+    },
+    "ForkTreeEntry": {
+      "fields": {
+        "creatorId": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "ctime": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "inode": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "kind": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "mtime": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "name": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "size": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "updaterId": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        }
+      }
+    },
+    "ForkTreeMatch": {
+      "fields": {
+        "inode": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "kind": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "mtime": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "path": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "size": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "GCWorkerEvent": {
+      "fields": {
+        "createdAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": true
+        },
+        "durationMs": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "eventTime": {
+          "type": "datetime",
+          "required": false,
+          "optional": false
+        },
+        "goal": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "id": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "nodeId": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "ops": {
+          "type": "object",
+          "required": false,
+          "optional": false
+        },
+        "regionClusterId": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "sid": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "subject": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        }
+      }
+    },
+    "GCWorkerEventBucket": {
+      "fields": {
+        "bucketStart": {
+          "type": "datetime",
+          "required": false,
+          "optional": false
+        },
+        "count": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "goal": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "GCWorkerEventGoalsResponse": {
+      "fields": {
+        "goals": {
+          "type": "string[]",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "GCWorkerEventHistogramResponse": {
+      "fields": {
+        "buckets": {
+          "type": "GCWorkerEventBucket[]",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "LicenseDetails": {
+      "fields": {
+        "contact": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "daysRemaining": {
+          "type": "int",
+          "required": false,
+          "optional": false
+        },
+        "distribution": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "distributionRef": {
+          "type": "string[]",
+          "required": false,
+          "optional": true
+        },
+        "expiredAccessDays": {
+          "type": "int",
+          "required": false,
+          "optional": false
+        },
+        "expiredAccessDaysLeft": {
+          "type": "int",
+          "required": false,
+          "optional": false
+        },
+        "expiredAccessEndsAt": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "expiresAt": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "graceDaysLeft": {
+          "type": "int",
+          "required": false,
+          "optional": false
+        },
+        "graceEndsAt": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "gracePeriodDays": {
+          "type": "int",
+          "required": false,
+          "optional": false
+        },
+        "issuedAt": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "licenseId": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "licenseType": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "licensee": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "maxAccounts": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "maxNodes": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "maxRegions": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "maxStorageBytes": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "maxUsers": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "maxVolumes": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "quota": {
+          "type": "LicenseQuota",
+          "required": false,
+          "optional": false
+        },
+        "status": {
+          "type": "LicenseStatus",
+          "required": false,
+          "optional": false
+        },
+        "unlimitedStorage": {
+          "type": "bool",
+          "required": false,
+          "optional": true
+        }
+      }
+    },
+    "LicenseList": {
+      "fields": {
+        "items": {
+          "type": "LicenseRecord[]",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "LicenseLoadResult": {
+      "fields": {
+        "ignored": {
+          "type": "int",
+          "required": false,
+          "optional": false
+        },
+        "loaded": {
+          "type": "int",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "LicenseQuota": {
+      "fields": {
+        "generation": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "lastTransitionAtMs": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "liveVolume": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "state": {
+          "type": "LicenseQuotaState",
+          "required": false,
+          "optional": false
+        },
+        "totalVolume": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "LicenseRecord": {
+      "fields": {
+        "expiresAt": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "insertedAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": false
+        },
+        "issuedAt": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "key": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "licensee": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "maxStorageBytes": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "status": {
+          "type": "LicenseStatus",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "LicenseTerms": {
+      "fields": {
+        "terms": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "MetricsTarget": {
+      "fields": {
+        "labels": {
+          "type": "object",
+          "required": false,
+          "optional": false
+        },
+        "targets": {
+          "type": "string[]",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "MetricsTokenResponse": {
+      "fields": {
+        "token": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "MoveVolumeFailure": {
+      "fields": {
+        "error": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "volumeId": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "NodeStatsSample": {
+      "fields": {
+        "dbConnsFree": {
+          "type": "int",
+          "required": false,
+          "optional": true
+        },
+        "dbConnsIdle": {
+          "type": "int",
+          "required": false,
+          "optional": true
+        },
+        "dbConnsInUse": {
+          "type": "int",
+          "required": false,
+          "optional": true
+        },
+        "dbConnsInUse15m": {
+          "type": "float",
+          "required": false,
+          "optional": true
+        },
+        "dbConnsInUse1m": {
+          "type": "float",
+          "required": false,
+          "optional": true
+        },
+        "dbConnsInUse5m": {
+          "type": "float",
+          "required": false,
+          "optional": true
+        },
+        "dbConnsMax": {
+          "type": "int",
+          "required": false,
+          "optional": true
+        },
+        "dbLatency15mUs": {
+          "type": "float",
+          "required": false,
+          "optional": true
+        },
+        "dbLatency1mUs": {
+          "type": "float",
+          "required": false,
+          "optional": true
+        },
+        "dbLatency5mUs": {
+          "type": "float",
+          "required": false,
+          "optional": true
+        },
+        "dbPingAvgUs": {
+          "type": "float",
+          "required": false,
+          "optional": true
+        },
+        "dbPingMaxUs": {
+          "type": "float",
+          "required": false,
+          "optional": true
+        },
+        "dbPingMinUs": {
+          "type": "float",
+          "required": false,
+          "optional": true
+        },
+        "dbPingStdDevUs": {
+          "type": "float",
+          "required": false,
+          "optional": true
+        },
+        "dbQueriesPerSec": {
+          "type": "float",
+          "required": false,
+          "optional": true
+        },
+        "diskTotalBytes": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "diskUsedBytes": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "intervalMs": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "loadAvg1": {
+          "type": "float",
+          "required": false,
+          "optional": false
+        },
+        "loadAvg15": {
+          "type": "float",
+          "required": false,
+          "optional": false
+        },
+        "loadAvg5": {
+          "type": "float",
+          "required": false,
+          "optional": false
+        },
+        "memUsage": {
+          "type": "float",
+          "required": false,
+          "optional": false
+        },
+        "netRxBytesPerSec": {
+          "type": "float",
+          "required": false,
+          "optional": false
+        },
+        "netTxBytesPerSec": {
+          "type": "float",
+          "required": false,
+          "optional": false
+        },
+        "processCount": {
+          "type": "int",
+          "required": false,
+          "optional": false
+        },
+        "readIops": {
+          "type": "float",
+          "required": false,
+          "optional": false
+        },
+        "timestampMs": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "writeIops": {
+          "type": "float",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "Pair": {
+      "fields": {
+        "drainStartedAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": true
+        },
+        "id": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "memberA": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "memberB": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "pendingSyncJobsA": {
+          "type": "int32",
+          "required": false,
+          "optional": true
+        },
+        "pendingSyncJobsB": {
+          "type": "int32",
+          "required": false,
+          "optional": true
+        },
+        "placementGroupA": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "placementGroupB": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "retiredAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": true
+        },
+        "state": {
+          "type": "PairState",
+          "required": false,
+          "optional": false
+        },
+        "storageId": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "syncedAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": true
+        }
+      }
+    },
+    "PoolMember": {
+      "fields": {
+        "id": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "memberState": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "name": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "regionClusterId": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "regionId": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "Ref": {
+      "fields": {
+        "id": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "name": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "Region": {
+      "fields": {
+        "accountId": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "createdAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": false
+        },
+        "exportId": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "id": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "isActive": {
+          "type": "bool",
+          "required": false,
+          "optional": false
+        },
+        "liveVolume": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "name": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "totalVolume": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "updatedAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "RegionAlert": {
+      "fields": {
+        "alertId": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "category": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "createdAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": true
+        },
+        "description": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "eventTime": {
+          "type": "datetime",
+          "required": false,
+          "optional": false
+        },
+        "id": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "nodeId": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "regionClusterId": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "resolvedAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": true
+        },
+        "severity": {
+          "type": "int",
+          "required": false,
+          "optional": false
+        },
+        "source": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "title": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "RegionCluster": {
+      "fields": {
+        "createdAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": false
+        },
+        "defaultCluster": {
+          "type": "bool",
+          "required": false,
+          "optional": false
+        },
+        "exportId": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "id": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "isActive": {
+          "type": "bool",
+          "required": false,
+          "optional": false
+        },
+        "isReady": {
+          "type": "bool",
+          "required": false,
+          "optional": false
+        },
+        "name": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "regionId": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "updatedAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "RegionVolumeMetrics": {
+      "fields": {
+        "regionId": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "regionName": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "totalQuotaLimit": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "totalVolumeUsed": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "volumeCount": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "RetentionPolicy": {
+      "fields": {
+        "clientSessionDays": {
+          "type": "int32",
+          "required": false,
+          "optional": true
+        }
+      }
+    },
+    "ServiceAlert": {
+      "fields": {
+        "account": {
+          "type": "Ref",
+          "required": false,
+          "optional": true
+        },
+        "alertId": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "category": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "createdAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": true
+        },
+        "description": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "eventTime": {
+          "type": "datetime",
+          "required": false,
+          "optional": false
+        },
+        "id": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "nodeId": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "region": {
+          "type": "Ref",
+          "required": false,
+          "optional": true
+        },
+        "resolvedAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": true
+        },
+        "severity": {
+          "type": "int",
+          "required": false,
+          "optional": false
+        },
+        "source": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "title": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "ServiceNode": {
+      "fields": {
+        "advertiseAddr": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "binaryVersion": {
+          "type": "int32",
+          "required": false,
+          "optional": true
+        },
+        "id": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "instanceId": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "instanceInfo": {
+          "type": "object",
+          "required": false,
+          "optional": true
+        },
+        "isActive": {
+          "type": "bool",
+          "required": false,
+          "optional": false
+        },
+        "lastHeartbeat": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "memUsage": {
+          "type": "float",
+          "required": false,
+          "optional": true
+        },
+        "metadata": {
+          "type": "object",
+          "required": false,
+          "optional": true
+        },
+        "metricsEndpoint": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "nodeId": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "regionClusterId": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "regionId": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "rpcAddr": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "serviceType": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "status": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "sysLoad": {
+          "type": "int",
+          "required": false,
+          "optional": true
+        }
+      }
+    },
+    "SessionSummary": {
+      "fields": {
+        "byOsName": {
+          "type": "SessionSummaryFacet[]",
+          "required": false,
+          "optional": false
+        },
+        "byPlatform": {
+          "type": "SessionSummaryFacet[]",
+          "required": false,
+          "optional": false
+        },
+        "byStatus": {
+          "type": "SessionSummaryStatusEntry[]",
+          "required": false,
+          "optional": false
+        },
+        "degradedCount": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "hostCount": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "regionCount": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "volumeCount": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "SessionSummaryFacet": {
+      "fields": {
+        "count": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "label": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "SessionSummaryStatusEntry": {
+      "fields": {
+        "clientType": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "count": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "status": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "Storage": {
+      "fields": {
+        "account": {
+          "type": "Ref",
+          "required": false,
+          "optional": false
+        },
+        "base": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "blockRegion": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "blockSize": {
+          "type": "int32",
+          "required": false,
+          "optional": true
+        },
+        "bucket": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "createdAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": false
+        },
+        "description": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "directAccess": {
+          "type": "bool",
+          "required": false,
+          "optional": true
+        },
+        "endpoint": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "id": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "isActive": {
+          "type": "bool",
+          "required": false,
+          "optional": false
+        },
+        "name": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "physicalFingerprint": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "providerType": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "region": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "regionInfo": {
+          "type": "Ref",
+          "required": false,
+          "optional": false
+        },
+        "storageType": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "updatedAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": false
+        },
+        "uuid": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "UpdateConfigResult": {
+      "fields": {
+        "activePairCountAfter": {
+          "type": "int32",
+          "required": false,
+          "optional": false
+        },
+        "activePairCountBefore": {
+          "type": "int32",
+          "required": false,
+          "optional": false
+        },
+        "id": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "pairsFormed": {
+          "type": "int32",
+          "required": false,
+          "optional": false
+        },
+        "pairsNeeded": {
+          "type": "int32",
+          "required": false,
+          "optional": false
+        },
+        "partial": {
+          "type": "bool",
+          "required": false,
+          "optional": false
+        },
+        "reason": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "targetK": {
+          "type": "int32",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "User": {
+      "fields": {
+        "accountId": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "email": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "id": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "isActive": {
+          "type": "bool",
+          "required": false,
+          "optional": false
+        },
+        "name": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "username": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "UserLite": {
+      "fields": {
+        "id": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "name": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "username": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "Volume": {
+      "fields": {
+        "account": {
+          "type": "Ref",
+          "required": false,
+          "optional": false
+        },
+        "compaction": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "createdAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": false
+        },
+        "description": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "encryption": {
+          "type": "bool",
+          "required": false,
+          "optional": false
+        },
+        "id": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "isActive": {
+          "type": "bool",
+          "required": false,
+          "optional": false
+        },
+        "isCleanupMetaEnabled": {
+          "type": "bool",
+          "required": false,
+          "optional": false
+        },
+        "isCleanupStorageEnabled": {
+          "type": "bool",
+          "required": false,
+          "optional": false
+        },
+        "isCleanupVaultEnabled": {
+          "type": "bool",
+          "required": false,
+          "optional": false
+        },
+        "liveInactiveVolume": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "liveVolume": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "locked": {
+          "type": "bool",
+          "required": false,
+          "optional": false
+        },
+        "name": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "pendingVolume": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "quotaLimit": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "region": {
+          "type": "Ref",
+          "required": false,
+          "optional": false
+        },
+        "regionCluster": {
+          "type": "Ref",
+          "required": false,
+          "optional": true
+        },
+        "retention": {
+          "type": "VolumeRetentionPolicy",
+          "required": false,
+          "optional": false
+        },
+        "storage": {
+          "type": "Ref",
+          "required": false,
+          "optional": false
+        },
+        "storageType": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "totalVolume": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "updatedAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": false
+        },
+        "versioning": {
+          "type": "VolumeVersioningPolicy",
+          "required": false,
+          "optional": false
+        },
+        "volumeType": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "VolumeApiKey": {
+      "fields": {
+        "apiKey": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "createdAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": true
+        },
+        "lastUsedAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": true
+        },
+        "name": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        }
+      }
+    },
+    "VolumeRef": {
+      "fields": {
+        "id": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "name": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "type": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        }
+      }
+    },
+    "VolumeRetentionPolicy": {
+      "fields": {
+        "dataDays": {
+          "type": "int32",
+          "required": false,
+          "optional": true
+        },
+        "eventLogDays": {
+          "type": "int32",
+          "required": false,
+          "optional": true
+        },
+        "forkGraceDays": {
+          "type": "int32",
+          "required": false,
+          "optional": true
+        },
+        "graceDays": {
+          "type": "int32",
+          "required": false,
+          "optional": true
+        }
+      }
+    },
+    "VolumeSizePoint": {
+      "fields": {
+        "bucketEnd": {
+          "type": "datetime",
+          "required": false,
+          "optional": false
+        },
+        "liveInactiveVolume": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "liveVolume": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "pendingVolume": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "totalVolume": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "VolumeVersioningPolicy": {
+      "fields": {
+        "contentWindowSeconds": {
+          "type": "int32",
+          "required": false,
+          "optional": true
+        }
+      }
+    }
+  },
+  "enums": {
+    "ClientSessionStatus": [
+      "connected",
+      "active",
+      "degraded",
+      "disconnected",
+      "expired",
+      "unknown"
+    ],
+    "LicenseQuotaState": [
+      "ok",
+      "exceeded"
+    ],
+    "LicenseStatus": [
+      "valid",
+      "expiring",
+      "grace",
+      "expired_access",
+      "expired"
+    ],
+    "PairState": [
+      "active",
+      "draining",
+      "synced_drained",
+      "retired"
+    ]
+  }
+}
