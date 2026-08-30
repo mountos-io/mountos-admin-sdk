@@ -97,8 +97,36 @@ func TestListPairs(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ListPairs: %v", err)
 	}
-	if len(pairs) != 2 || pairs[1].State != "draining" || pairs[1].PendingSyncJobsA != 3 {
+	if len(pairs) != 2 || pairs[1].State != "draining" || pairs[1].PendingSyncJobsA == nil || *pairs[1].PendingSyncJobsA != 3 {
 		t.Fatalf("unexpected pairs: %+v", pairs)
+	}
+}
+
+// TestPairPendingSyncJobsNullVsZero proves R3-010's fix: PendingSyncJobsA/B
+// is a *int32, so a wire "null" (not yet observed) and a wire "0" (confirmed
+// zero backlog) decode to distinct Go values, a nil pointer versus a pointer
+// to zero, instead of collapsing onto the same int32 zero value.
+func TestPairPendingSyncJobsNullVsZero(t *testing.T) {
+	_, srv := newFixtureServer(t, map[string]any{
+		"GET /api/v1/storages/7/pairs": []map[string]any{
+			{"id": "p1", "storageId": "s1", "state": "active", "memberA": "bv1", "memberB": "bv2", "pendingSyncJobsA": nil, "pendingSyncJobsB": 0},
+		},
+	})
+	defer srv.Close()
+	c := newTestClient(t, srv.URL)
+
+	pairs, err := c.Storages.ListPairs(context.Background(), 7, "", false)
+	if err != nil {
+		t.Fatalf("ListPairs: %v", err)
+	}
+	if len(pairs) != 1 {
+		t.Fatalf("expected 1 pair, got %+v", pairs)
+	}
+	if pairs[0].PendingSyncJobsA != nil {
+		t.Fatalf("expected PendingSyncJobsA nil (not observed), got %v", *pairs[0].PendingSyncJobsA)
+	}
+	if pairs[0].PendingSyncJobsB == nil || *pairs[0].PendingSyncJobsB != 0 {
+		t.Fatalf("expected PendingSyncJobsB non-nil zero (confirmed empty), got %+v", pairs[0].PendingSyncJobsB)
 	}
 }
 

@@ -248,8 +248,8 @@ type Storage struct {
 	Base                string `json:"base,omitempty"`
 	PhysicalFingerprint string `json:"physicalFingerprint,omitempty"`
 	BlockRegion         string `json:"blockRegion,omitempty"`
-	BlockSize           int32  `json:"blockSize,omitempty"`
-	DirectAccess        bool   `json:"directAccess,omitempty"`
+	BlockSize           *int32 `json:"blockSize,omitempty"`
+	DirectAccess        *bool  `json:"directAccess,omitempty"`
 	IsActive            bool   `json:"isActive"`
 	CreatedAt           string `json:"createdAt"`
 	UpdatedAt           string `json:"updatedAt"`
@@ -287,13 +287,13 @@ type Pair struct {
 	State            PairState `json:"state"`
 	MemberA          string    `json:"memberA,omitempty"`
 	MemberB          string    `json:"memberB,omitempty"`
-	PlacementGroupA  int64     `json:"placementGroupA,omitempty"`
-	PlacementGroupB  int64     `json:"placementGroupB,omitempty"`
+	PlacementGroupA  *int64    `json:"placementGroupA,omitempty"`
+	PlacementGroupB  *int64    `json:"placementGroupB,omitempty"`
 	DrainStartedAt   string    `json:"drainStartedAt,omitempty"`
 	SyncedAt         string    `json:"syncedAt,omitempty"`
 	RetiredAt        string    `json:"retiredAt,omitempty"`
-	PendingSyncJobsA int32     `json:"pendingSyncJobsA,omitempty"`
-	PendingSyncJobsB int32     `json:"pendingSyncJobsB,omitempty"`
+	PendingSyncJobsA *int32    `json:"pendingSyncJobsA,omitempty"`
+	PendingSyncJobsB *int32    `json:"pendingSyncJobsB,omitempty"`
 }
 
 type PoolMember struct {
@@ -357,11 +357,11 @@ type Fork struct {
 	ParentFid     int32  `json:"parentFid"`
 	ParentName    string `json:"parentName"`
 	SnapshotTs    int64  `json:"snapshotTs"`
-	CreatedBy     int64  `json:"createdBy,omitempty"`
+	CreatedBy     *int64 `json:"createdBy,omitempty"`
 	CreatedAt     int64  `json:"createdAt"`
 	ChildrenCount int32  `json:"childrenCount"`
-	Inactive      bool   `json:"inactive,omitempty"`
-	InactiveAt    int64  `json:"inactiveAt,omitempty"`
+	Inactive      *bool  `json:"inactive,omitempty"`
+	InactiveAt    *int64 `json:"inactiveAt,omitempty"`
 	Status        string `json:"status"`
 	Size          int64  `json:"size"`
 }
@@ -373,8 +373,8 @@ type ForkTreeEntry struct {
 	Size      int64  `json:"size"`
 	Mtime     int64  `json:"mtime"`
 	Ctime     int64  `json:"ctime"`
-	CreatorID int64  `json:"creatorId,omitempty"`
-	UpdaterID int64  `json:"updaterId,omitempty"`
+	CreatorID *int64 `json:"creatorId,omitempty"`
+	UpdaterID *int64 `json:"updaterId,omitempty"`
 }
 
 type ForkEntryDetail struct {
@@ -387,17 +387,17 @@ type ForkEntryDetail struct {
 	Ctime      int64          `json:"ctime"`
 	Generation int64          `json:"generation"`
 	Owner      string         `json:"owner,omitempty"`
-	Mode       int32          `json:"mode,omitempty"`
+	Mode       *int32         `json:"mode,omitempty"`
 	Xattrs     map[string]any `json:"xattrs,omitempty"`
-	CreatorID  int64          `json:"creatorId,omitempty"`
-	UpdaterID  int64          `json:"updaterId,omitempty"`
+	CreatorID  *int64         `json:"creatorId,omitempty"`
+	UpdaterID  *int64         `json:"updaterId,omitempty"`
 }
 
 type ForkEntryVersion struct {
 	Generation  int64  `json:"generation"`
 	Size        int64  `json:"size"`
 	Mtime       int64  `json:"mtime"`
-	UpdaterID   int64  `json:"updaterId,omitempty"`
+	UpdaterID   *int64 `json:"updaterId,omitempty"`
 	ContentHash string `json:"contentHash,omitempty"`
 }
 
@@ -418,9 +418,9 @@ type AuditLog struct {
 	Data            json.RawMessage `json:"data,omitempty"`
 	CreatedBy       string          `json:"createdBy,omitempty"`
 	Node            string          `json:"node,omitempty"`
-	AccountID       int64           `json:"accountId,omitempty"`
-	RegionID        int64           `json:"regionId,omitempty"`
-	RegionClusterID int64           `json:"regionClusterId,omitempty"`
+	AccountID       *int64          `json:"accountId,omitempty"`
+	RegionID        *int64          `json:"regionId,omitempty"`
+	RegionClusterID *int64          `json:"regionClusterId,omitempty"`
 	CreatedAt       string          `json:"createdAt,omitempty"`
 	UpdatedAt       string          `json:"updatedAt,omitempty"`
 }
@@ -428,7 +428,7 @@ type AuditLog struct {
 type ServiceNode struct {
 	ID              int64          `json:"id"`
 	RegionID        int64          `json:"regionId"`
-	RegionClusterID int64          `json:"regionClusterId,omitempty"`
+	RegionClusterID *int64         `json:"regionClusterId,omitempty"`
 	ServiceType     string         `json:"serviceType"`
 	NodeID          string         `json:"nodeId"`
 	AdvertiseAddr   string         `json:"advertiseAddr"`
@@ -438,11 +438,11 @@ type ServiceNode struct {
 	InstanceID      string         `json:"instanceId,omitempty"`
 	InstanceInfo    map[string]any `json:"instanceInfo,omitempty"`
 	Status          string         `json:"status"`
-	LastHeartbeat   int64          `json:"lastHeartbeat,omitempty"`
+	LastHeartbeat   *int64         `json:"lastHeartbeat,omitempty"`
 	IsActive        bool           `json:"isActive"`
 	MemUsage        float64        `json:"memUsage,omitempty"`
-	SysLoad         int            `json:"sysLoad,omitempty"`
-	BinaryVersion   int32          `json:"binaryVersion,omitempty"`
+	SysLoad         *int           `json:"sysLoad,omitempty"`
+	BinaryVersion   *int32         `json:"binaryVersion,omitempty"`
 }
 
 type ClientSession struct {
@@ -465,9 +465,9 @@ type ClientSession struct {
 	Metadata        json.RawMessage     `json:"metadata,omitempty"`
 	Metrics         json.RawMessage     `json:"metrics,omitempty"`
 	Status          ClientSessionStatus `json:"status"`
-	LastHeartbeat   int64               `json:"lastHeartbeat,omitempty"`
-	ConnectedAt     int64               `json:"connectedAt,omitempty"`
-	DisconnectedAt  int64               `json:"disconnectedAt,omitempty"`
+	LastHeartbeat   *int64              `json:"lastHeartbeat,omitempty"`
+	ConnectedAt     *int64              `json:"connectedAt,omitempty"`
+	DisconnectedAt  *int64              `json:"disconnectedAt,omitempty"`
 	IsActive        bool                `json:"isActive"`
 }
 
@@ -531,7 +531,7 @@ type LicenseDetails struct {
 	Quota                 LicenseQuota  `json:"quota"`
 	Distribution          string        `json:"distribution,omitempty"`
 	DistributionRef       []string      `json:"distributionRef,omitempty"`
-	UnlimitedStorage      bool          `json:"unlimitedStorage,omitempty"`
+	UnlimitedStorage      *bool         `json:"unlimitedStorage,omitempty"`
 }
 
 type LicenseTerms struct {
@@ -576,7 +576,7 @@ type RegionAlert struct {
 	AlertID         string `json:"alertId"`
 	Source          string `json:"source"`
 	NodeID          string `json:"nodeId"`
-	RegionClusterID int64  `json:"regionClusterId,omitempty"`
+	RegionClusterID *int64 `json:"regionClusterId,omitempty"`
 	Severity        int    `json:"severity"`
 	Category        string `json:"category"`
 	Title           string `json:"title"`
@@ -589,9 +589,9 @@ type RegionAlert struct {
 type GCWorkerEvent struct {
 	ID              int64          `json:"id"`
 	NodeID          string         `json:"nodeId"`
-	RegionClusterID int64          `json:"regionClusterId,omitempty"`
+	RegionClusterID *int64         `json:"regionClusterId,omitempty"`
 	Goal            string         `json:"goal"`
-	Sid             int64          `json:"sid,omitempty"`
+	Sid             *int64         `json:"sid,omitempty"`
 	Subject         string         `json:"subject,omitempty"`
 	Ops             map[string]any `json:"ops"`
 	DurationMs      int64          `json:"durationMs"`
@@ -637,10 +637,10 @@ type DashboardUser struct {
 	Email     string `json:"email,omitempty"`
 	Role      string `json:"role"`
 	Username  string `json:"username,omitempty"`
-	AccountID int64  `json:"accountId,omitempty"`
-	UserID    int64  `json:"userId,omitempty"`
-	VolumeID  int64  `json:"volumeId,omitempty"`
-	Exp       int64  `json:"exp,omitempty"`
+	AccountID *int64 `json:"accountId,omitempty"`
+	UserID    *int64 `json:"userId,omitempty"`
+	VolumeID  *int64 `json:"volumeId,omitempty"`
+	Exp       *int64 `json:"exp,omitempty"`
 }
 
 type DiscoverEndpoint struct {
@@ -690,16 +690,16 @@ type NodeStatsSample struct {
 	NetRxBytesPerSec float64 `json:"netRxBytesPerSec"`
 	NetTxBytesPerSec float64 `json:"netTxBytesPerSec"`
 	ProcessCount     int     `json:"processCount"`
-	DiskUsedBytes    int64   `json:"diskUsedBytes,omitempty"`
-	DiskTotalBytes   int64   `json:"diskTotalBytes,omitempty"`
+	DiskUsedBytes    *int64  `json:"diskUsedBytes,omitempty"`
+	DiskTotalBytes   *int64  `json:"diskTotalBytes,omitempty"`
 	DbLatency1mUs    float64 `json:"dbLatency1mUs,omitempty"`
 	DbLatency5mUs    float64 `json:"dbLatency5mUs,omitempty"`
 	DbLatency15mUs   float64 `json:"dbLatency15mUs,omitempty"`
 	DbQueriesPerSec  float64 `json:"dbQueriesPerSec,omitempty"`
-	DbConnsInUse     int     `json:"dbConnsInUse,omitempty"`
-	DbConnsMax       int     `json:"dbConnsMax,omitempty"`
-	DbConnsIdle      int     `json:"dbConnsIdle,omitempty"`
-	DbConnsFree      int     `json:"dbConnsFree,omitempty"`
+	DbConnsInUse     *int    `json:"dbConnsInUse,omitempty"`
+	DbConnsMax       *int    `json:"dbConnsMax,omitempty"`
+	DbConnsIdle      *int    `json:"dbConnsIdle,omitempty"`
+	DbConnsFree      *int    `json:"dbConnsFree,omitempty"`
 	DbConnsInUse1m   float64 `json:"dbConnsInUse1m,omitempty"`
 	DbConnsInUse5m   float64 `json:"dbConnsInUse5m,omitempty"`
 	DbConnsInUse15m  float64 `json:"dbConnsInUse15m,omitempty"`
@@ -723,7 +723,7 @@ type RegionVolumeMetrics struct {
 }
 
 type RetentionPolicy struct {
-	ClientSessionDays int32 `json:"clientSessionDays,omitempty"`
+	ClientSessionDays *int32 `json:"clientSessionDays,omitempty"`
 }
 
 type SessionSummaryFacet struct {
@@ -757,10 +757,10 @@ type VolumeRef struct {
 }
 
 type VolumeRetentionPolicy struct {
-	DataDays      int32 `json:"dataDays,omitempty"`
-	GraceDays     int32 `json:"graceDays,omitempty"`
-	ForkGraceDays int32 `json:"forkGraceDays,omitempty"`
-	EventLogDays  int32 `json:"eventLogDays,omitempty"`
+	DataDays      *int32 `json:"dataDays,omitempty"`
+	GraceDays     *int32 `json:"graceDays,omitempty"`
+	ForkGraceDays *int32 `json:"forkGraceDays,omitempty"`
+	EventLogDays  *int32 `json:"eventLogDays,omitempty"`
 }
 
 type VolumeSizePoint struct {
@@ -772,7 +772,7 @@ type VolumeSizePoint struct {
 }
 
 type VolumeVersioningPolicy struct {
-	ContentWindowSeconds int32 `json:"contentWindowSeconds,omitempty"`
+	ContentWindowSeconds *int32 `json:"contentWindowSeconds,omitempty"`
 }
 
 // Accounts

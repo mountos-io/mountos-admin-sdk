@@ -398,13 +398,16 @@ func writeGoStruct(w *strings.Builder, name string, fields []string, isRequest b
 		gn := goFieldName(f.Name)
 		gt := goType(f.Type)
 		// Request body fields that aren't required (both the explicit "?"
-		// tier and bare/unmarked fields) get a pointer on bool/int types so
-		// callers can distinguish "not set" from zero - mirrors
-		// goOptionalQueryType for query params, and matches TS (writeTSInterface,
-		// !f.Required) and Rust (writeRustStruct, !f.Required) so all three
-		// languages can express an explicit falsy/zero value on the same
-		// fields instead of only Go silently dropping it via omitempty.
-		if isRequest && !f.Required {
+		// tier and bare/unmarked fields), and model/response fields marked
+		// "?", get a pointer on bool/int types so callers can distinguish
+		// "not set"/"not observed" from a genuine zero value - mirrors
+		// goOptionalQueryType for query params, and matches TS
+		// (writeTSInterface) and Rust (writeRustStruct), which both gate
+		// their own optional-wrapping on f.Optional regardless of isRequest.
+		// A slice/map is left unwrapped: a nil slice/map already signals
+		// "absent" in Go idiom, so a pointer on top would be redundant.
+		wantsPointer := (isRequest && !f.Required) || (!isRequest && f.Optional)
+		if wantsPointer {
 			switch f.Type {
 			case "bool", "int", "int32", "int64":
 				gt = "*" + gt

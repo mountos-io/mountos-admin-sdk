@@ -50,7 +50,8 @@ func SignDashboardUser(user *DashboardUser, hmacSecret string) (string, error) {
 	}
 
 	u := *user
-	u.Exp = time.Now().Add(defaultDashboardUserTTL).Unix()
+	exp := time.Now().Add(defaultDashboardUserTTL).Unix()
+	u.Exp = &exp
 
 	payload, err := json.Marshal(u)
 	if err != nil {
