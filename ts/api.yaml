@@ -260,6 +260,32 @@ types:
     - "partial: bool"
     - "reason: string?"
 
+  # Per-volume block-placement pair-count config: a single volume's own
+  # working-set size within its storage's node-pair fleet, distinct from
+  # UpdateConfigResult/getConfig above (the storage's fleet-wide k). id is
+  # the volume's own int64 shard id, matching Volume.id. pairIds are Pair.id
+  # strings (the volume's current candidate set).
+  VolumeBlockPlacementConfig:
+    - "id: int64"
+    - "targetPairCount: int32"
+    - "currentEpoch: int64"
+    - "pairIds: string[]"
+
+  # Response shape for Volumes.updatePairConfig - the volume-scoped analog
+  # of UpdateConfigResult. Partial (pairsAdded < needed, reason set) mirrors
+  # UpdateConfigResult's own partial-fulfillment convention: pool/cluster
+  # exhaustion, never a same-cluster fallback.
+  VolumeBlockPlacementResizeResult:
+    - "id: int64"
+    - "targetPairCount: int32"
+    - "pairCountBefore: int32"
+    - "pairsAdded: int32"
+    - "pairsRemoved: int32"
+    - "pairCountAfter: int32"
+    - "epoch: int64"
+    - "partial: bool"
+    - "reason: string?"
+
   # A volume currently sitting on a compatible (same physicalFingerprint) storage,
   # eligible to move onto the storage being viewed.
   CompatibleVolume:
@@ -1366,6 +1392,27 @@ resources:
           - "quotaLimit: int64!"
         response:
           - "id: int64"
+
+      # Per-volume block-placement pair-count config: a volume's own target
+      # pair count, current epoch, and current candidate pair set. Distinct
+      # from Storages.updateConfig/getConfig above (the storage's fleet-wide
+      # k) - this is the volume's own working-set size within that fleet.
+      # AuthZ: no adminOnly on either action - gated by
+      # EnforceUserRoleVolumeAccess (routes_appserv.go), so both an admin
+      # and the volume's own owning account may call it, mirroring
+      # updateQuota/edit above. Every updatePairConfig call is
+      # audit-logged, whichever caller made it.
+      - action: getPairConfig
+        method: GET
+        path: /:volumeId/pair-config
+        responseType: VolumeBlockPlacementConfig
+
+      - action: updatePairConfig
+        method: PUT
+        path: /:volumeId/pair-config
+        request:
+          - "targetPairCount: int32!"
+        responseType: VolumeBlockPlacementResizeResult
 
       - action: stats
         method: GET

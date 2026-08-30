@@ -877,6 +877,33 @@ pub struct VolumeApiKey {
 }
 ```
 
+### `VolumeBlockPlacementConfig`
+
+```rust
+pub struct VolumeBlockPlacementConfig {
+    pub id: i64,
+    pub target_pair_count: i32,
+    pub current_epoch: i64,
+    pub pair_ids: Vec<String>,
+}
+```
+
+### `VolumeBlockPlacementResizeResult`
+
+```rust
+pub struct VolumeBlockPlacementResizeResult {
+    pub id: i64,
+    pub target_pair_count: i32,
+    pub pair_count_before: i32,
+    pub pairs_added: i32,
+    pub pairs_removed: i32,
+    pub pair_count_after: i32,
+    pub epoch: i64,
+    pub partial: bool,
+    pub reason: Option<String>,
+}
+```
+
 ### `VolumeRef`
 
 ```rust
@@ -1825,6 +1852,26 @@ Request body:
 ```rust
 pub struct UpdateVolumeQuotaRequest {
     pub quota_limit: i64,
+}
+```
+
+#### `get_pair_config` - GET /api/v1/volumes/:volumeId/pair-config
+
+```rust
+pub async fn get_pair_config(&self, volume_id: i64) -> Result<VolumeBlockPlacementConfig, Error>
+```
+
+#### `update_pair_config` - PUT /api/v1/volumes/:volumeId/pair-config
+
+```rust
+pub async fn update_pair_config(&self, volume_id: i64, req: &UpdateVolumePairConfigRequest) -> Result<VolumeBlockPlacementResizeResult, Error>
+```
+
+Request body:
+
+```rust
+pub struct UpdateVolumePairConfigRequest {
+    pub target_pair_count: i32,
 }
 ```
 

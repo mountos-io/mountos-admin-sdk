@@ -332,6 +332,25 @@ type Volume struct {
 	UpdatedAt               string                 `json:"updatedAt"`
 }
 
+type VolumeBlockPlacementConfig struct {
+	ID              int64    `json:"id"`
+	TargetPairCount int32    `json:"targetPairCount"`
+	CurrentEpoch    int64    `json:"currentEpoch"`
+	PairIds         []string `json:"pairIds"`
+}
+
+type VolumeBlockPlacementResizeResult struct {
+	ID              int64  `json:"id"`
+	TargetPairCount int32  `json:"targetPairCount"`
+	PairCountBefore int32  `json:"pairCountBefore"`
+	PairsAdded      int32  `json:"pairsAdded"`
+	PairsRemoved    int32  `json:"pairsRemoved"`
+	PairCountAfter  int32  `json:"pairCountAfter"`
+	Epoch           int64  `json:"epoch"`
+	Partial         bool   `json:"partial"`
+	Reason          string `json:"reason,omitempty"`
+}
+
 type Fork struct {
 	Fid           int32  `json:"fid"`
 	Name          string `json:"name"`
@@ -1074,6 +1093,10 @@ type GenerateSttKeyVolumeResponse struct {
 
 type UpdateVolumeQuotaRequest struct {
 	QuotaLimit int64 `json:"quotaLimit"`
+}
+
+type UpdateVolumePairConfigRequest struct {
+	TargetPairCount int32 `json:"targetPairCount"`
 }
 
 type StatsVolumeResponse struct {

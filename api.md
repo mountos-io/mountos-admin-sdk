@@ -625,6 +625,20 @@ Request:
 ```
 Response data: `{ "id": int64 }`
 
+### GET /api/v1/volumes/:volumeId/pair-config
+Param: `volumeId`
+Response data: `VolumeBlockPlacementConfig`
+
+### PUT /api/v1/volumes/:volumeId/pair-config
+Param: `volumeId`
+Request:
+```
+{
+  "targetPairCount": int32(required)
+}
+```
+Response data: `VolumeBlockPlacementResizeResult`
+
 ### GET /api/v1/volumes/:volumeId/stats
 Param: `volumeId`
 Response data: `{ "volumeId": string, "liveVolume": int64, "totalVolume": int64, "pendingVolume": int64, "liveInactiveVolume": int64 }`
@@ -1499,6 +1513,31 @@ Response data: `GCWorkerEventGoalsResponse`
   "name"?: string,
   "createdAt"?: RFC3339,
   "lastUsedAt"?: RFC3339
+}
+```
+
+### VolumeBlockPlacementConfig Type
+```
+{
+  "id": int64,
+  "targetPairCount": int32,
+  "currentEpoch": int64,
+  "pairIds": string[]
+}
+```
+
+### VolumeBlockPlacementResizeResult Type
+```
+{
+  "id": int64,
+  "targetPairCount": int32,
+  "pairCountBefore": int32,
+  "pairsAdded": int32,
+  "pairsRemoved": int32,
+  "pairCountAfter": int32,
+  "epoch": int64,
+  "partial": bool,
+  "reason"?: string
 }
 ```
 

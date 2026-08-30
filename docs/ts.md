@@ -833,6 +833,33 @@ interface VolumeApiKey {
 }
 ```
 
+### `VolumeBlockPlacementConfig`
+
+```typescript
+interface VolumeBlockPlacementConfig {
+  id: number;
+  targetPairCount: number;
+  currentEpoch: number;
+  pairIds: string[];
+}
+```
+
+### `VolumeBlockPlacementResizeResult`
+
+```typescript
+interface VolumeBlockPlacementResizeResult {
+  id: number;
+  targetPairCount: number;
+  pairCountBefore: number;
+  pairsAdded: number;
+  pairsRemoved: number;
+  pairCountAfter: number;
+  epoch: number;
+  partial: boolean;
+  reason?: string;
+}
+```
+
 ### `VolumeRef`
 
 ```typescript
@@ -1633,6 +1660,26 @@ Request body:
 ```typescript
 {
   quotaLimit: number;
+}
+```
+
+#### `getPairConfig` - GET /api/v1/volumes/:volumeId/pair-config
+
+```typescript
+client.volumes.getPairConfig(volumeId: number, signal?: AbortSignal): Promise<VolumeBlockPlacementConfig>;
+```
+
+#### `updatePairConfig` - PUT /api/v1/volumes/:volumeId/pair-config
+
+```typescript
+client.volumes.updatePairConfig(volumeId: number, req: UpdateVolumePairConfigRequest, signal?: AbortSignal): Promise<VolumeBlockPlacementResizeResult>;
+```
+
+Request body:
+
+```typescript
+{
+  targetPairCount: number;
 }
 ```
 

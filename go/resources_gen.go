@@ -622,6 +622,22 @@ func (s *VolumesService) UpdateQuota(ctx context.Context, volumeID int64, req *U
 	return decodeJSON[IDResponse](data)
 }
 
+func (s *VolumesService) GetPairConfig(ctx context.Context, volumeID int64) (*VolumeBlockPlacementConfig, error) {
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/volumes/%s/pair-config", strconv.FormatInt(volumeID, 10)))
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[VolumeBlockPlacementConfig](data)
+}
+
+func (s *VolumesService) UpdatePairConfig(ctx context.Context, volumeID int64, req *UpdateVolumePairConfigRequest) (*VolumeBlockPlacementResizeResult, error) {
+	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/volumes/%s/pair-config", strconv.FormatInt(volumeID, 10)), req)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[VolumeBlockPlacementResizeResult](data)
+}
+
 func (s *VolumesService) Stats(ctx context.Context, volumeID int64) (*StatsVolumeResponse, error) {
 	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/volumes/%s/stats", strconv.FormatInt(volumeID, 10)))
 	if err != nil {

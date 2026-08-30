@@ -895,6 +895,33 @@ type VolumeApiKey struct {
 }
 ```
 
+### `VolumeBlockPlacementConfig`
+
+```go
+type VolumeBlockPlacementConfig struct {
+    ID                       int64                    `json:"id"`
+    TargetPairCount          int32                    `json:"targetPairCount"`
+    CurrentEpoch             int64                    `json:"currentEpoch"`
+    PairIds                  []string                 `json:"pairIds"`
+}
+```
+
+### `VolumeBlockPlacementResizeResult`
+
+```go
+type VolumeBlockPlacementResizeResult struct {
+    ID                       int64                    `json:"id"`
+    TargetPairCount          int32                    `json:"targetPairCount"`
+    PairCountBefore          int32                    `json:"pairCountBefore"`
+    PairsAdded               int32                    `json:"pairsAdded"`
+    PairsRemoved             int32                    `json:"pairsRemoved"`
+    PairCountAfter           int32                    `json:"pairCountAfter"`
+    Epoch                    int64                    `json:"epoch"`
+    Partial                  bool                     `json:"partial"`
+    Reason                   string                   `json:"reason,omitempty"`
+}
+```
+
 ### `VolumeRef`
 
 ```go
@@ -1843,6 +1870,26 @@ Request body:
 ```go
 type UpdateVolumeQuotaRequest struct {
     QuotaLimit               int64                    `json:"quotaLimit"`
+}
+```
+
+#### `GetPairConfig` - GET /api/v1/volumes/:volumeId/pair-config
+
+```go
+func (s *VolumesService) GetPairConfig(ctx context.Context, volumeID int64) (*VolumeBlockPlacementConfig, error)
+```
+
+#### `UpdatePairConfig` - PUT /api/v1/volumes/:volumeId/pair-config
+
+```go
+func (s *VolumesService) UpdatePairConfig(ctx context.Context, volumeID int64, req *UpdateVolumePairConfigRequest) (*VolumeBlockPlacementResizeResult, error)
+```
+
+Request body:
+
+```go
+type UpdateVolumePairConfigRequest struct {
+    TargetPairCount          int32                    `json:"targetPairCount"`
 }
 ```
 

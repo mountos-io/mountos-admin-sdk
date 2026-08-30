@@ -578,6 +578,36 @@ pub struct Volume {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct VolumeBlockPlacementConfig {
+    pub id: i64,
+    #[serde(rename = "targetPairCount")]
+    pub target_pair_count: i32,
+    #[serde(rename = "currentEpoch")]
+    pub current_epoch: i64,
+    #[serde(rename = "pairIds")]
+    pub pair_ids: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct VolumeBlockPlacementResizeResult {
+    pub id: i64,
+    #[serde(rename = "targetPairCount")]
+    pub target_pair_count: i32,
+    #[serde(rename = "pairCountBefore")]
+    pub pair_count_before: i32,
+    #[serde(rename = "pairsAdded")]
+    pub pairs_added: i32,
+    #[serde(rename = "pairsRemoved")]
+    pub pairs_removed: i32,
+    #[serde(rename = "pairCountAfter")]
+    pub pair_count_after: i32,
+    pub epoch: i64,
+    pub partial: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reason: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Fork {
     pub fid: i32,
     pub name: String,
@@ -1688,6 +1718,12 @@ pub struct GenerateSttKeyVolumeResponse {
 pub struct UpdateVolumeQuotaRequest {
     #[serde(rename = "quotaLimit")]
     pub quota_limit: i64,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct UpdateVolumePairConfigRequest {
+    #[serde(rename = "targetPairCount")]
+    pub target_pair_count: i32,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

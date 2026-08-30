@@ -481,6 +481,14 @@ impl VolumesService {
         self.inner.put(&format!("/api/v1/volumes/{}/quota", volume_id), req).await
     }
 
+    pub async fn get_pair_config(&self, volume_id: i64) -> Result<VolumeBlockPlacementConfig, Error> {
+        self.inner.get(&format!("/api/v1/volumes/{}/pair-config", volume_id), &[]).await
+    }
+
+    pub async fn update_pair_config(&self, volume_id: i64, req: &UpdateVolumePairConfigRequest) -> Result<VolumeBlockPlacementResizeResult, Error> {
+        self.inner.put(&format!("/api/v1/volumes/{}/pair-config", volume_id), req).await
+    }
+
     pub async fn stats(&self, volume_id: i64) -> Result<StatsVolumeResponse, Error> {
         self.inner.get(&format!("/api/v1/volumes/{}/stats", volume_id), &[]).await
     }

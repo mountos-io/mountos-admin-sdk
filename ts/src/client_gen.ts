@@ -15,16 +15,17 @@ import type {
   VolumeListOptions, EditVolumeRequest, MoveVolumeClusterRequest, DeactivateVolumeRequest, 
   GenerateVolumeAPIKeysRequest, VolumeApiKey, RevokeVolumeAPIKeyRequest, 
   RevokeVolumeAPIKeysByUserRequest, GenerateVolumeSttKeyRequest, UpdateVolumeQuotaRequest, 
-  VolumeSizePoint, CreateVolumeForkRequest, Fork, DeleteVolumeForkRequest, 
-  RestoreVolumeForkRequest, ForkTreeEntry, VolumeForkTreeListOptions, ForkEntryDetail, 
-  ForkEntryVersion, VolumeForkEntryListOptions, ForkTreeMatch, VolumeForkSearchListOptions, 
-  AuditLog, AuditLogListOptions, RegionAuditLogListOptions, ServiceNode, NodeStatsSample, 
-  ClientSession, ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, 
-  MetricsTarget, GenerateMetricTokenRequest, MetricsTokenResponse, DashboardStats, 
-  LicenseDetails, LicenseTerms, LoadLicenseRequest, LicenseLoadResult, LicenseList, 
-  ServiceAlert, AlertListOptions, AlertCountResponse, RegionAlert, RegionAlertListOptions, 
-  GCWorkerEvent, GCWorkerEventListOptions, GCWorkerEventHistogramResponse, 
-  GCWorkerEventGoalsResponse,
+  VolumeBlockPlacementConfig, UpdateVolumePairConfigRequest, 
+  VolumeBlockPlacementResizeResult, VolumeSizePoint, CreateVolumeForkRequest, Fork, 
+  DeleteVolumeForkRequest, RestoreVolumeForkRequest, ForkTreeEntry, 
+  VolumeForkTreeListOptions, ForkEntryDetail, ForkEntryVersion, VolumeForkEntryListOptions, 
+  ForkTreeMatch, VolumeForkSearchListOptions, AuditLog, AuditLogListOptions, 
+  RegionAuditLogListOptions, ServiceNode, NodeStatsSample, ClientSession, 
+  ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, MetricsTarget, 
+  GenerateMetricTokenRequest, MetricsTokenResponse, DashboardStats, LicenseDetails, 
+  LicenseTerms, LoadLicenseRequest, LicenseLoadResult, LicenseList, ServiceAlert, 
+  AlertListOptions, AlertCountResponse, RegionAlert, RegionAlertListOptions, GCWorkerEvent, 
+  GCWorkerEventListOptions, GCWorkerEventHistogramResponse, GCWorkerEventGoalsResponse,
 } from './types_gen.js'
 
 export type RequestFn = <T>(method: string, path: string, body?: unknown, signal?: AbortSignal) => Promise<T>
@@ -384,6 +385,14 @@ export class VolumesResource {
 
   updateQuota(volumeId: number, req: UpdateVolumeQuotaRequest, signal?: AbortSignal): Promise<{ id: number }> {
     return this.client.request('PUT', `/api/v1/volumes/${volumeId}/quota`, req, signal)
+  }
+
+  getPairConfig(volumeId: number, signal?: AbortSignal): Promise<VolumeBlockPlacementConfig> {
+    return this.client.request('GET', `/api/v1/volumes/${volumeId}/pair-config`, undefined, signal)
+  }
+
+  updatePairConfig(volumeId: number, req: UpdateVolumePairConfigRequest, signal?: AbortSignal): Promise<VolumeBlockPlacementResizeResult> {
+    return this.client.request('PUT', `/api/v1/volumes/${volumeId}/pair-config`, req, signal)
   }
 
   stats(volumeId: number, signal?: AbortSignal): Promise<{ volumeId: string; liveVolume: number; totalVolume: number; pendingVolume: number; liveInactiveVolume: number }> {

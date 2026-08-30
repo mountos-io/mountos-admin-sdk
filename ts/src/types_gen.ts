@@ -194,6 +194,25 @@ export interface Volume {
   updatedAt: string
 }
 
+export interface VolumeBlockPlacementConfig {
+  id: number
+  targetPairCount: number
+  currentEpoch: number
+  pairIds: string[]
+}
+
+export interface VolumeBlockPlacementResizeResult {
+  id: number
+  targetPairCount: number
+  pairCountBefore: number
+  pairsAdded: number
+  pairsRemoved: number
+  pairCountAfter: number
+  epoch: number
+  partial: boolean
+  reason?: string
+}
+
 export interface Fork {
   fid: number
   name: string
@@ -831,6 +850,10 @@ export interface GenerateVolumeSttKeyRequest {
 
 export interface UpdateVolumeQuotaRequest {
   quotaLimit: number
+}
+
+export interface UpdateVolumePairConfigRequest {
+  targetPairCount: number
 }
 
 export interface CreateVolumeForkRequest {

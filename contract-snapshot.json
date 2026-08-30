@@ -2180,6 +2180,79 @@
         }
       }
     },
+    "VolumeBlockPlacementConfig": {
+      "fields": {
+        "currentEpoch": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "id": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "pairIds": {
+          "type": "string[]",
+          "required": false,
+          "optional": false
+        },
+        "targetPairCount": {
+          "type": "int32",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "VolumeBlockPlacementResizeResult": {
+      "fields": {
+        "epoch": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "id": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "pairCountAfter": {
+          "type": "int32",
+          "required": false,
+          "optional": false
+        },
+        "pairCountBefore": {
+          "type": "int32",
+          "required": false,
+          "optional": false
+        },
+        "pairsAdded": {
+          "type": "int32",
+          "required": false,
+          "optional": false
+        },
+        "pairsRemoved": {
+          "type": "int32",
+          "required": false,
+          "optional": false
+        },
+        "partial": {
+          "type": "bool",
+          "required": false,
+          "optional": false
+        },
+        "reason": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "targetPairCount": {
+          "type": "int32",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
     "VolumeRef": {
       "fields": {
         "id": {
