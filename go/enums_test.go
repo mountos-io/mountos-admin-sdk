@@ -11,33 +11,33 @@ import (
 	sdk "github.com/mountos-io/mountos-admin-sdk/go"
 )
 
-func TestPairState_IsValid(t *testing.T) {
-	for _, v := range []sdk.PairState{
-		sdk.PairStateActive, sdk.PairStateDraining, sdk.PairStateSyncedDrained, sdk.PairStateRetired,
+func TestCopysetState_IsValid(t *testing.T) {
+	for _, v := range []sdk.CopysetState{
+		sdk.CopysetStateActive, sdk.CopysetStateDraining, sdk.CopysetStateSyncedDrained, sdk.CopysetStateRetired,
 	} {
 		if !v.IsValid() {
-			t.Errorf("PairState(%q).IsValid() = false, want true", v)
+			t.Errorf("CopysetState(%q).IsValid() = false, want true", v)
 		}
 	}
-	if sdk.PairState("bogus").IsValid() {
-		t.Error(`PairState("bogus").IsValid() = true, want false`)
+	if sdk.CopysetState("bogus").IsValid() {
+		t.Error(`CopysetState("bogus").IsValid() = true, want false`)
 	}
 }
 
-func TestParsePairState(t *testing.T) {
-	for _, want := range []sdk.PairState{
-		sdk.PairStateActive, sdk.PairStateDraining, sdk.PairStateSyncedDrained, sdk.PairStateRetired,
+func TestParseCopysetState(t *testing.T) {
+	for _, want := range []sdk.CopysetState{
+		sdk.CopysetStateActive, sdk.CopysetStateDraining, sdk.CopysetStateSyncedDrained, sdk.CopysetStateRetired,
 	} {
-		got, err := sdk.ParsePairState(string(want))
+		got, err := sdk.ParseCopysetState(string(want))
 		if err != nil {
-			t.Errorf("ParsePairState(%q): unexpected error: %v", want, err)
+			t.Errorf("ParseCopysetState(%q): unexpected error: %v", want, err)
 		}
 		if got != want {
-			t.Errorf("ParsePairState(%q) = %q, want %q", want, got, want)
+			t.Errorf("ParseCopysetState(%q) = %q, want %q", want, got, want)
 		}
 	}
-	if _, err := sdk.ParsePairState("bogus"); err == nil {
-		t.Error(`ParsePairState("bogus") returned no error, want one`)
+	if _, err := sdk.ParseCopysetState("bogus"); err == nil {
+		t.Error(`ParseCopysetState("bogus") returned no error, want one`)
 	}
 }
 
@@ -96,21 +96,21 @@ func TestLicenseQuotaState_IsValid(t *testing.T) {
 	}
 }
 
-// TestPairState_String proves the enum's String method returns the wire
+// TestCopysetState_String proves the enum's String method returns the wire
 // value, matching the pre-existing print/format expectations a plain string
 // alias used to satisfy implicitly.
-func TestPairState_String(t *testing.T) {
-	if got := sdk.PairStateDraining.String(); got != "draining" {
-		t.Errorf("PairStateDraining.String() = %q, want %q", got, "draining")
+func TestCopysetState_String(t *testing.T) {
+	if got := sdk.CopysetStateDraining.String(); got != "draining" {
+		t.Errorf("CopysetStateDraining.String() = %q, want %q", got, "draining")
 	}
 }
 
-// TestPairState_JSONRoundTrip proves the defined type still marshals and
+// TestCopysetState_JSONRoundTrip proves the defined type still marshals and
 // unmarshals as a plain JSON string, unaffected by the switch away from a
 // bare string alias.
-func TestPairState_JSONRoundTrip(t *testing.T) {
+func TestCopysetState_JSONRoundTrip(t *testing.T) {
 	type wrapper struct {
-		State sdk.PairState `json:"state"`
+		State sdk.CopysetState `json:"state"`
 	}
 	data := []byte(`{"state":"synced_drained"}`)
 
@@ -118,11 +118,11 @@ func TestPairState_JSONRoundTrip(t *testing.T) {
 	if err := json.Unmarshal(data, &got); err != nil {
 		t.Fatalf("unmarshal: %v", err)
 	}
-	if got.State != sdk.PairStateSyncedDrained {
-		t.Fatalf("unmarshalled state = %q, want %q", got.State, sdk.PairStateSyncedDrained)
+	if got.State != sdk.CopysetStateSyncedDrained {
+		t.Fatalf("unmarshalled state = %q, want %q", got.State, sdk.CopysetStateSyncedDrained)
 	}
 
-	out, err := json.Marshal(wrapper{State: sdk.PairStateSyncedDrained})
+	out, err := json.Marshal(wrapper{State: sdk.CopysetStateSyncedDrained})
 	if err != nil {
 		t.Fatalf("marshal: %v", err)
 	}

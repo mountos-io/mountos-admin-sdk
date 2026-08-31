@@ -70,7 +70,7 @@ type IDResponse struct {
 
 ## Enums
 
-Each is a defined string type (not a plain alias), with a `Parse<Name>` constructor and an `IsValid`/`String` method - use `Parse<Name>` for a value read from outside the package (a request, a config file, etc.) rather than a bare conversion.
+Each is a defined string type (not a plain alias), with a `Parse<Name>` constructor and an `IsValid`/`String` method - use `Parse<Name>` for a value read from outside the package (a request, a config file, etc.) rather than a bare conversion. Decoding a response field from JSON never fails: an unrecognized wire value assigns as-is rather than erroring, so a server newer than this SDK still decodes - the same forward-compatibility policy as the Rust SDK's explicit `Unknown` variant. `IsValid` is the Go analog of Rust's `is_known()`.
 
 ### `ClientSessionStatus`
 
@@ -89,6 +89,23 @@ const (
 func (v ClientSessionStatus) String() string
 func (v ClientSessionStatus) IsValid() bool
 func ParseClientSessionStatus(s string) (ClientSessionStatus, error)
+```
+
+### `CopysetState`
+
+```go
+type CopysetState string
+
+const (
+    CopysetStateActive CopysetState = "active"
+    CopysetStateDraining CopysetState = "draining"
+    CopysetStateSyncedDrained CopysetState = "synced_drained"
+    CopysetStateRetired CopysetState = "retired"
+)
+
+func (v CopysetState) String() string
+func (v CopysetState) IsValid() bool
+func ParseCopysetState(s string) (CopysetState, error)
 ```
 
 ### `LicenseQuotaState`
@@ -124,23 +141,6 @@ func (v LicenseStatus) IsValid() bool
 func ParseLicenseStatus(s string) (LicenseStatus, error)
 ```
 
-### `PairState`
-
-```go
-type PairState string
-
-const (
-    PairStateActive PairState = "active"
-    PairStateDraining PairState = "draining"
-    PairStateSyncedDrained PairState = "synced_drained"
-    PairStateRetired PairState = "retired"
-)
-
-func (v PairState) String() string
-func (v PairState) IsValid() bool
-func ParsePairState(s string) (PairState, error)
-```
-
 ## Types
 
 ### `Account`
@@ -173,6 +173,7 @@ type AlertCountResponse struct {
     InfoCount                int64                    `json:"infoCount"`
     WarningCount             int64                    `json:"warningCount"`
     CriticalCount            int64                    `json:"criticalCount"`
+    AsOf                     string                   `json:"asOf"`
 }
 ```
 
@@ -190,7 +191,7 @@ type AuditLog struct {
     Node                     string                   `json:"node,omitempty"`
     AccountID                int64                    `json:"accountId,omitempty"`
     RegionID                 int64                    `json:"regionId,omitempty"`
-    RegionClusterID          int64                    `json:"regionClusterId,omitempty"`
+    MetadataClusterID        int64                    `json:"metadataClusterId,omitempty"`
     CreatedAt                string                   `json:"createdAt,omitempty"`
     UpdatedAt                string                   `json:"updatedAt,omitempty"`
 }
@@ -229,7 +230,7 @@ type BlockVolume struct {
     CreatedAt                string                   `json:"createdAt"`
     UpdatedAt                string                   `json:"updatedAt"`
     MemberState              string                   `json:"memberState,omitempty"`
-    PairID                   string                   `json:"pairId,omitempty"`
+    CopysetID                string                   `json:"copysetId,omitempty"`
 }
 ```
 
@@ -240,7 +241,7 @@ type ClientSession struct {
     ID                       int64                    `json:"id"`
     Account                  Ref                      `json:"account"`
     Region                   Ref                      `json:"region"`
-    RegionCluster            Ref                      `json:"regionCluster,omitempty"`
+    MetadataCluster          Ref                      `json:"metadataCluster,omitempty"`
     Volume                   VolumeRef                `json:"volume"`
     User                     Ref                      `json:"user,omitempty"`
     ClientType               string                   `json:"clientType"`
@@ -282,6 +283,27 @@ type CompatibleStorage struct {
 type CompatibleVolume struct {
     ID                       string                   `json:"id"`
     Name                     string                   `json:"name"`
+}
+```
+
+### `Copyset`
+
+```go
+type Copyset struct {
+    ID                       string                   `json:"id"`
+    StorageID                string                   `json:"storageId"`
+    State                    CopysetState             `json:"state"`
+    MemberA                  string                   `json:"memberA,omitempty"`
+    MemberB                  string                   `json:"memberB,omitempty"`
+    PlacementGroupA          int64                    `json:"placementGroupA,omitempty"`
+    PlacementGroupB          int64                    `json:"placementGroupB,omitempty"`
+    DrainStartedAt           string                   `json:"drainStartedAt,omitempty"`
+    SyncedAt                 string                   `json:"syncedAt,omitempty"`
+    RetiredAt                string                   `json:"retiredAt,omitempty"`
+    PendingSyncJobsA         int32                    `json:"pendingSyncJobsA,omitempty"`
+    PendingSyncJobsB         int32                    `json:"pendingSyncJobsB,omitempty"`
+    DrainInitiatedBy         int64                    `json:"drainInitiatedBy,omitempty"`
+    Tags                     []string                 `json:"tags"`
 }
 ```
 
@@ -420,7 +442,7 @@ type ForkTreeMatch struct {
 type GCWorkerEvent struct {
     ID                       int64                    `json:"id"`
     NodeID                   string                   `json:"nodeId"`
-    RegionClusterID          int64                    `json:"regionClusterId,omitempty"`
+    MetadataClusterID        int64                    `json:"metadataClusterId,omitempty"`
     Goal                     string                   `json:"goal"`
     Sid                      int64                    `json:"sid,omitempty"`
     Subject                  string                   `json:"subject,omitempty"`
@@ -539,6 +561,22 @@ type LicenseTerms struct {
 }
 ```
 
+### `MetadataCluster`
+
+```go
+type MetadataCluster struct {
+    ID                       int64                    `json:"id"`
+    ExportID                 string                   `json:"exportId"`
+    RegionID                 int64                    `json:"regionId"`
+    Name                     string                   `json:"name"`
+    DefaultCluster           bool                     `json:"defaultCluster"`
+    IsReady                  bool                     `json:"isReady"`
+    IsActive                 bool                     `json:"isActive"`
+    CreatedAt                string                   `json:"createdAt"`
+    UpdatedAt                string                   `json:"updatedAt"`
+}
+```
+
 ### `MetricsTarget`
 
 ```go
@@ -600,25 +638,6 @@ type NodeStatsSample struct {
 }
 ```
 
-### `Pair`
-
-```go
-type Pair struct {
-    ID                       string                   `json:"id"`
-    StorageID                string                   `json:"storageId"`
-    State                    PairState                `json:"state"`
-    MemberA                  string                   `json:"memberA,omitempty"`
-    MemberB                  string                   `json:"memberB,omitempty"`
-    PlacementGroupA          int64                    `json:"placementGroupA,omitempty"`
-    PlacementGroupB          int64                    `json:"placementGroupB,omitempty"`
-    DrainStartedAt           string                   `json:"drainStartedAt,omitempty"`
-    SyncedAt                 string                   `json:"syncedAt,omitempty"`
-    RetiredAt                string                   `json:"retiredAt,omitempty"`
-    PendingSyncJobsA         int32                    `json:"pendingSyncJobsA,omitempty"`
-    PendingSyncJobsB         int32                    `json:"pendingSyncJobsB,omitempty"`
-}
-```
-
 ### `PoolMember`
 
 ```go
@@ -664,7 +683,7 @@ type RegionAlert struct {
     AlertID                  string                   `json:"alertId"`
     Source                   string                   `json:"source"`
     NodeID                   string                   `json:"nodeId"`
-    RegionClusterID          int64                    `json:"regionClusterId,omitempty"`
+    MetadataClusterID        int64                    `json:"metadataClusterId,omitempty"`
     Severity                 int                      `json:"severity"`
     Category                 string                   `json:"category"`
     Title                    string                   `json:"title"`
@@ -672,22 +691,6 @@ type RegionAlert struct {
     EventTime                string                   `json:"eventTime"`
     ResolvedAt               string                   `json:"resolvedAt,omitempty"`
     CreatedAt                string                   `json:"createdAt,omitempty"`
-}
-```
-
-### `RegionCluster`
-
-```go
-type RegionCluster struct {
-    ID                       int64                    `json:"id"`
-    ExportID                 string                   `json:"exportId"`
-    RegionID                 int64                    `json:"regionId"`
-    Name                     string                   `json:"name"`
-    DefaultCluster           bool                     `json:"defaultCluster"`
-    IsReady                  bool                     `json:"isReady"`
-    IsActive                 bool                     `json:"isActive"`
-    CreatedAt                string                   `json:"createdAt"`
-    UpdatedAt                string                   `json:"updatedAt"`
 }
 ```
 
@@ -737,7 +740,7 @@ type ServiceAlert struct {
 type ServiceNode struct {
     ID                       int64                    `json:"id"`
     RegionID                 int64                    `json:"regionId"`
-    RegionClusterID          int64                    `json:"regionClusterId,omitempty"`
+    MetadataClusterID        int64                    `json:"metadataClusterId,omitempty"`
     ServiceType              string                   `json:"serviceType"`
     NodeID                   string                   `json:"nodeId"`
     AdvertiseAddr            string                   `json:"advertiseAddr"`
@@ -820,10 +823,10 @@ type Storage struct {
 type UpdateConfigResult struct {
     ID                       string                   `json:"id"`
     TargetK                  int32                    `json:"targetK"`
-    ActivePairCountBefore    int32                    `json:"activePairCountBefore"`
-    PairsNeeded              int32                    `json:"pairsNeeded"`
-    PairsFormed              int32                    `json:"pairsFormed"`
-    ActivePairCountAfter     int32                    `json:"activePairCountAfter"`
+    ActiveCopysetCountBefore int32                    `json:"activeCopysetCountBefore"`
+    CopysetsNeeded           int32                    `json:"copysetsNeeded"`
+    CopysetsFormed           int32                    `json:"copysetsFormed"`
+    ActiveCopysetCountAfter  int32                    `json:"activeCopysetCountAfter"`
     Partial                  bool                     `json:"partial"`
     Reason                   string                   `json:"reason,omitempty"`
 }
@@ -860,7 +863,7 @@ type Volume struct {
     Account                  Ref                      `json:"account"`
     Storage                  Ref                      `json:"storage"`
     Region                   Ref                      `json:"region"`
-    RegionCluster            Ref                      `json:"regionCluster,omitempty"`
+    MetadataCluster          Ref                      `json:"metadataCluster,omitempty"`
     Name                     string                   `json:"name"`
     Description              string                   `json:"description,omitempty"`
     VolumeType               string                   `json:"volumeType"`
@@ -900,9 +903,9 @@ type VolumeApiKey struct {
 ```go
 type VolumeBlockPlacementConfig struct {
     ID                       int64                    `json:"id"`
-    TargetPairCount          int32                    `json:"targetPairCount"`
+    TargetCopysetCount       int32                    `json:"targetCopysetCount"`
     CurrentEpoch             int64                    `json:"currentEpoch"`
-    PairIds                  []string                 `json:"pairIds"`
+    CopysetIds               []string                 `json:"copysetIds"`
 }
 ```
 
@@ -911,11 +914,11 @@ type VolumeBlockPlacementConfig struct {
 ```go
 type VolumeBlockPlacementResizeResult struct {
     ID                       int64                    `json:"id"`
-    TargetPairCount          int32                    `json:"targetPairCount"`
-    PairCountBefore          int32                    `json:"pairCountBefore"`
-    PairsAdded               int32                    `json:"pairsAdded"`
-    PairsRemoved             int32                    `json:"pairsRemoved"`
-    PairCountAfter           int32                    `json:"pairCountAfter"`
+    TargetCopysetCount       int32                    `json:"targetCopysetCount"`
+    CopysetCountBefore       int32                    `json:"copysetCountBefore"`
+    CopysetsAdded            int32                    `json:"copysetsAdded"`
+    CopysetsRemoved          int32                    `json:"copysetsRemoved"`
+    CopysetCountAfter        int32                    `json:"copysetCountAfter"`
     Epoch                    int64                    `json:"epoch"`
     Partial                  bool                     `json:"partial"`
     Reason                   string                   `json:"reason,omitempty"`
@@ -1220,7 +1223,7 @@ Accessor: `client.Clusters`
 #### `List` - GET /api/v1/clusters/list
 
 ```go
-func (s *ClustersService) List(ctx context.Context, opts ClusterListOptions) (*PaginatedResponse[RegionCluster], error)
+func (s *ClustersService) List(ctx context.Context, opts ClusterListOptions) (*PaginatedResponse[MetadataCluster], error)
 ```
 
 Query params:
@@ -1235,20 +1238,20 @@ type ClusterListOptions struct {
 }
 ```
 
-### RegionClusters
+### MetadataClusters
 
-Accessor: `client.RegionClusters`
+Accessor: `client.MetadataClusters`
 
 #### `Create` - POST /api/v1/regions/:regionId/clusters/create
 
 ```go
-func (s *RegionClustersService) Create(ctx context.Context, regionID int64, req *CreateRegionClusterRequest) (*IDResponse, error)
+func (s *MetadataClustersService) Create(ctx context.Context, regionID int64, req *CreateMetadataClusterRequest) (*IDResponse, error)
 ```
 
 Request body:
 
 ```go
-type CreateRegionClusterRequest struct {
+type CreateMetadataClusterRequest struct {
     Name                     string                   `json:"name"`
 }
 ```
@@ -1256,13 +1259,13 @@ type CreateRegionClusterRequest struct {
 #### `List` - GET /api/v1/regions/:regionId/clusters/list
 
 ```go
-func (s *RegionClustersService) List(ctx context.Context, regionID int64, opts *RegionClusterListOptions) (*PaginatedResponse[RegionCluster], error)
+func (s *MetadataClustersService) List(ctx context.Context, regionID int64, opts *MetadataClusterListOptions) (*PaginatedResponse[MetadataCluster], error)
 ```
 
 Query params:
 
 ```go
-type RegionClusterListOptions struct {
+type MetadataClusterListOptions struct {
     IsActive             *bool        `url:"isActive"`
     Page                 int          `url:"page"` // default: 1
     Limit                int          `url:"limit"` // default: 20
@@ -1272,19 +1275,19 @@ type RegionClusterListOptions struct {
 #### `Get` - GET /api/v1/regions/:regionId/clusters/:clusterId
 
 ```go
-func (s *RegionClustersService) Get(ctx context.Context, regionID int64, clusterID int64) (*RegionCluster, error)
+func (s *MetadataClustersService) Get(ctx context.Context, regionID int64, clusterID int64) (*MetadataCluster, error)
 ```
 
 #### `Edit` - PUT /api/v1/regions/:regionId/clusters/:clusterId
 
 ```go
-func (s *RegionClustersService) Edit(ctx context.Context, regionID int64, clusterID int64, req *EditRegionClusterRequest) (*IDResponse, error)
+func (s *MetadataClustersService) Edit(ctx context.Context, regionID int64, clusterID int64, req *EditMetadataClusterRequest) (*IDResponse, error)
 ```
 
 Request body:
 
 ```go
-type EditRegionClusterRequest struct {
+type EditMetadataClusterRequest struct {
     Name                     string                   `json:"name"`
 }
 ```
@@ -1292,19 +1295,19 @@ type EditRegionClusterRequest struct {
 #### `SetDefault` - POST /api/v1/regions/:regionId/clusters/:clusterId/set-default
 
 ```go
-func (s *RegionClustersService) SetDefault(ctx context.Context, regionID int64, clusterID int64) (*IDResponse, error)
+func (s *MetadataClustersService) SetDefault(ctx context.Context, regionID int64, clusterID int64) (*IDResponse, error)
 ```
 
 #### `SetReady` - POST /api/v1/regions/:regionId/clusters/:clusterId/set-ready
 
 ```go
-func (s *RegionClustersService) SetReady(ctx context.Context, regionID int64, clusterID int64, req *SetRegionClusterReadyRequest) (*SetReadyRegionClusterResponse, error)
+func (s *MetadataClustersService) SetReady(ctx context.Context, regionID int64, clusterID int64, req *SetMetadataClusterReadyRequest) (*SetReadyMetadataClusterResponse, error)
 ```
 
 Request body:
 
 ```go
-type SetRegionClusterReadyRequest struct {
+type SetMetadataClusterReadyRequest struct {
     Ready                    bool                     `json:"ready"`
 }
 ```
@@ -1312,7 +1315,7 @@ type SetRegionClusterReadyRequest struct {
 Response body:
 
 ```go
-type SetReadyRegionClusterResponse struct {
+type SetReadyMetadataClusterResponse struct {
     ID                       int64                    `json:"id"`
     Ready                    bool                     `json:"ready"`
 }
@@ -1321,7 +1324,7 @@ type SetReadyRegionClusterResponse struct {
 #### `Deactivate` - POST /api/v1/regions/:regionId/clusters/:clusterId/deactivate
 
 ```go
-func (s *RegionClustersService) Deactivate(ctx context.Context, regionID int64, clusterID int64) (*IDResponse, error)
+func (s *MetadataClustersService) Deactivate(ctx context.Context, regionID int64, clusterID int64) (*IDResponse, error)
 ```
 
 ### Storages
@@ -1543,37 +1546,37 @@ type GetConfigStorageResponse struct {
 }
 ```
 
-#### `ListPairs` - GET /api/v1/storages/:storageId/pairs
+#### `ListCopysets` - GET /api/v1/storages/:storageId/copysets
 
 ```go
-func (s *StoragesService) ListPairs(ctx context.Context, storageID int64, state string, includeRetired bool) ([]Pair, error)
+func (s *StoragesService) ListCopysets(ctx context.Context, storageID int64, state string, includeRetired bool) ([]Copyset, error)
 ```
 
-#### `GetPairStatus` - GET /api/v1/storages/:storageId/pairs/:pairId
+#### `GetCopysetStatus` - GET /api/v1/storages/:storageId/copysets/:copysetId
 
 ```go
-func (s *StoragesService) GetPairStatus(ctx context.Context, storageID int64, pairID string) (*Pair, error)
+func (s *StoragesService) GetCopysetStatus(ctx context.Context, storageID int64, copysetID string) (*Copyset, error)
 ```
 
-#### `DrainPair` - POST /api/v1/storages/:storageId/pairs/:pairId/drain
+#### `DrainCopyset` - POST /api/v1/storages/:storageId/copysets/:copysetId/drain
 
 ```go
-func (s *StoragesService) DrainPair(ctx context.Context, storageID int64, pairID string) (*DrainPairStorageResponse, error)
+func (s *StoragesService) DrainCopyset(ctx context.Context, storageID int64, copysetID string) (*DrainCopysetStorageResponse, error)
 ```
 
 Response body:
 
 ```go
-type DrainPairStorageResponse struct {
+type DrainCopysetStorageResponse struct {
     ID                       string                   `json:"id"`
     State                    string                   `json:"state"`
 }
 ```
 
-#### `CancelDrain` - POST /api/v1/storages/:storageId/pairs/:pairId/cancel-drain
+#### `CancelDrain` - POST /api/v1/storages/:storageId/copysets/:copysetId/cancel-drain
 
 ```go
-func (s *StoragesService) CancelDrain(ctx context.Context, storageID int64, pairID string) (*CancelDrainStorageResponse, error)
+func (s *StoragesService) CancelDrain(ctx context.Context, storageID int64, copysetID string) (*CancelDrainStorageResponse, error)
 ```
 
 Response body:
@@ -1582,6 +1585,20 @@ Response body:
 type CancelDrainStorageResponse struct {
     ID                       string                   `json:"id"`
     State                    string                   `json:"state"`
+}
+```
+
+#### `UpdateTags` - PUT /api/v1/storages/:storageId/copysets/:copysetId/tags
+
+```go
+func (s *StoragesService) UpdateTags(ctx context.Context, storageID int64, copysetID string, req *UpdateStorageTagsRequest) (*Copyset, error)
+```
+
+Request body:
+
+```go
+type UpdateStorageTagsRequest struct {
+    Tags                     []string                 `json:"tags,omitempty"`
 }
 ```
 
@@ -1596,7 +1613,7 @@ Request body:
 ```go
 type RegisterStorageMemberRequest struct {
     RegionClusterID          int64                    `json:"regionClusterId"`
-    Name                     string                   `json:"name"`
+    Name                     string                   `json:"name,omitempty"`
 }
 ```
 
@@ -1648,8 +1665,8 @@ type CreateVolumeRequest struct {
     Versioning               VolumeVersioningPolicy   `json:"versioning,omitempty"`
     Compaction               string                   `json:"compaction,omitempty"`
     QuotaLimit               *int64                   `json:"quotaLimit,omitempty"`
-    RegionClusterID          *int64                   `json:"regionClusterId,omitempty"`
-    RegionClusterUUID        string                   `json:"regionClusterUuid,omitempty"`
+    MetadataClusterID        *int64                   `json:"metadataClusterId,omitempty"`
+    MetadataClusterUUID      string                   `json:"metadataClusterUuid,omitempty"`
 }
 ```
 
@@ -1674,7 +1691,7 @@ Query params:
 type VolumeListOptions struct {
     AccountID            int64        `url:"accountId"`
     RegionID             *int64       `url:"regionId"`
-    RegionClusterID      *int64       `url:"regionClusterId"`
+    MetadataClusterID    *int64       `url:"metadataClusterId"`
     StorageID            *int64       `url:"storageId"`
     VolumeType           string       `url:"volumeType"`
     Locked               *bool        `url:"locked"`
@@ -1873,23 +1890,23 @@ type UpdateVolumeQuotaRequest struct {
 }
 ```
 
-#### `GetPairConfig` - GET /api/v1/volumes/:volumeId/pair-config
+#### `GetCopysetConfig` - GET /api/v1/volumes/:volumeId/copyset-config
 
 ```go
-func (s *VolumesService) GetPairConfig(ctx context.Context, volumeID int64) (*VolumeBlockPlacementConfig, error)
+func (s *VolumesService) GetCopysetConfig(ctx context.Context, volumeID int64) (*VolumeBlockPlacementConfig, error)
 ```
 
-#### `UpdatePairConfig` - PUT /api/v1/volumes/:volumeId/pair-config
+#### `UpdateCopysetConfig` - PUT /api/v1/volumes/:volumeId/copyset-config
 
 ```go
-func (s *VolumesService) UpdatePairConfig(ctx context.Context, volumeID int64, req *UpdateVolumePairConfigRequest) (*VolumeBlockPlacementResizeResult, error)
+func (s *VolumesService) UpdateCopysetConfig(ctx context.Context, volumeID int64, req *UpdateVolumeCopysetConfigRequest) (*VolumeBlockPlacementResizeResult, error)
 ```
 
 Request body:
 
 ```go
-type UpdateVolumePairConfigRequest struct {
-    TargetPairCount          int32                    `json:"targetPairCount"`
+type UpdateVolumeCopysetConfigRequest struct {
+    TargetCopysetCount       int32                    `json:"targetCopysetCount"`
 }
 ```
 
@@ -2074,7 +2091,7 @@ Query params:
 type AuditLogListOptions struct {
     AccountID            int64        `url:"accountId"`
     RegionID             *int64       `url:"regionId"`
-    RegionClusterID      *int64       `url:"regionClusterId"`
+    MetadataClusterID    *int64       `url:"metadataClusterId"`
     Cursor               int64        `url:"cursor"`
     Limit                int          `url:"limit"` // default: 20
     Subject              string       `url:"subject"`
@@ -2096,7 +2113,7 @@ Query params:
 
 ```go
 type RegionAuditLogListOptions struct {
-    RegionClusterID      *int64       `url:"regionClusterId"`
+    MetadataClusterID    *int64       `url:"metadataClusterId"`
     Cursor               int64        `url:"cursor"`
     Limit                int          `url:"limit"` // default: 20
     Subject              string       `url:"subject"`
@@ -2111,7 +2128,7 @@ Accessor: `client.ServiceNodes`
 #### `List` - GET /api/v1/regions/:regionId/nodes
 
 ```go
-func (s *ServiceNodesService) List(ctx context.Context, regionID int64, serviceType string, status string, inactiveHours int, regionClusterID int64) ([]ServiceNode, error)
+func (s *ServiceNodesService) List(ctx context.Context, regionID int64, serviceType string, status string, inactiveHours int, metadataClusterID int64) ([]ServiceNode, error)
 ```
 
 #### `Stats` - GET /api/v1/regions/:regionId/nodes/:nodeId/stats
@@ -2161,7 +2178,7 @@ Query params:
 type ClientSessionListOptions struct {
     AccountID            int64        `url:"accountId"`
     RegionID             *int64       `url:"regionId"`
-    RegionClusterID      *int64       `url:"regionClusterId"`
+    MetadataClusterID    *int64       `url:"metadataClusterId"`
     VolumeID             *int64       `url:"volumeId"`
     UserID               *int64       `url:"userId"`
     ClientType           string       `url:"clientType"`
@@ -2184,7 +2201,7 @@ func (s *ClientSessionsService) Get(ctx context.Context, sessionID int64) (*Clie
 #### `Summary` - GET /api/v1/client-sessions/summary
 
 ```go
-func (s *ClientSessionsService) Summary(ctx context.Context, accountID int64, regionID *int64, regionClusterID *int64, volumeID *int64, userID *int64) (*SessionSummary, error)
+func (s *ClientSessionsService) Summary(ctx context.Context, accountID int64, regionID *int64, metadataClusterID *int64, volumeID *int64, userID *int64) (*SessionSummary, error)
 ```
 
 ### Discover
@@ -2330,7 +2347,7 @@ type RegionAlertListOptions struct {
     Severity             *int         `url:"severity"`
     Category             string       `url:"category"`
     NodeID               string       `url:"nodeId"`
-    RegionClusterID      *int64       `url:"regionClusterId"`
+    MetadataClusterID    *int64       `url:"metadataClusterId"`
     Since                string       `url:"since"`
     Page                 int          `url:"page"` // default: 1
     Limit                int          `url:"limit"` // default: 20
@@ -2340,7 +2357,7 @@ type RegionAlertListOptions struct {
 #### `Count` - GET /api/v1/regions/:regionId/alerts/count
 
 ```go
-func (s *RegionAlertsService) Count(ctx context.Context, regionID int64, regionClusterID *int64) (*AlertCountResponse, error)
+func (s *RegionAlertsService) Count(ctx context.Context, regionID int64, metadataClusterID *int64) (*AlertCountResponse, error)
 ```
 
 #### `Resolve` - POST /api/v1/regions/:regionId/alerts/:alertId/resolve
@@ -2374,7 +2391,7 @@ type GCWorkerEventListOptions struct {
     NodeID               string       `url:"nodeId"`
     Goal                 string       `url:"goal"`
     Sid                  *int64       `url:"sid"`
-    RegionClusterID      *int64       `url:"regionClusterId"`
+    MetadataClusterID    *int64       `url:"metadataClusterId"`
     Since                string       `url:"since"`
     Page                 int          `url:"page"` // default: 1
     Limit                int          `url:"limit"` // default: 20
@@ -2384,7 +2401,7 @@ type GCWorkerEventListOptions struct {
 #### `Histogram` - GET /api/v1/regions/:regionId/gc-worker-events/histogram
 
 ```go
-func (s *GCWorkerEventsService) Histogram(ctx context.Context, regionID int64, nodeID string, goal string, sid *int64, regionClusterID *int64, since string, bucketSeconds *int64) (*GCWorkerEventHistogramResponse, error)
+func (s *GCWorkerEventsService) Histogram(ctx context.Context, regionID int64, nodeID string, goal string, sid *int64, metadataClusterID *int64, since string, bucketSeconds *int64) (*GCWorkerEventHistogramResponse, error)
 ```
 
 #### `Goals` - GET /api/v1/regions/:regionId/gc-worker-events/goals

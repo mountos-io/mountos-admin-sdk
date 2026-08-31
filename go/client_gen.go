@@ -16,7 +16,7 @@ type Client struct {
 	Users              *UsersService
 	Regions            *RegionsService
 	Clusters           *ClustersService
-	RegionClusters     *RegionClustersService
+	MetadataClusters   *MetadataClustersService
 	Storages           *StoragesService
 	Volumes            *VolumesService
 	VolumeForkTrees    *VolumeForkTreesService
@@ -55,7 +55,7 @@ func NewClient(cfg Config) (*Client, error) {
 	c.Users = &UsersService{c: c}
 	c.Regions = &RegionsService{c: c}
 	c.Clusters = &ClustersService{c: c}
-	c.RegionClusters = &RegionClustersService{c: c}
+	c.MetadataClusters = &MetadataClustersService{c: c}
 	c.Storages = &StoragesService{c: c}
 	c.Volumes = &VolumesService{c: c}
 	c.VolumeForkTrees = &VolumeForkTreesService{c: c}

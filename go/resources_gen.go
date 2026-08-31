@@ -199,7 +199,7 @@ func (s *RegionsService) Deactivate(ctx context.Context, regionID int64) (*IDRes
 
 type ClustersService struct{ c *Client }
 
-func (s *ClustersService) List(ctx context.Context, opts ClusterListOptions) (*PaginatedResponse[RegionCluster], error) {
+func (s *ClustersService) List(ctx context.Context, opts ClusterListOptions) (*PaginatedResponse[MetadataCluster], error) {
 	q := url.Values{}
 	{
 		q.Set("accountId", strconv.FormatInt(opts.AccountID, 10))
@@ -215,12 +215,12 @@ func (s *ClustersService) List(ctx context.Context, opts ClusterListOptions) (*P
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[PaginatedResponse[RegionCluster]](data)
+	return decodeJSON[PaginatedResponse[MetadataCluster]](data)
 }
 
-type RegionClustersService struct{ c *Client }
+type MetadataClustersService struct{ c *Client }
 
-func (s *RegionClustersService) Create(ctx context.Context, regionID int64, req *CreateRegionClusterRequest) (*IDResponse, error) {
+func (s *MetadataClustersService) Create(ctx context.Context, regionID int64, req *CreateMetadataClusterRequest) (*IDResponse, error) {
 	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%s/clusters/create", strconv.FormatInt(regionID, 10)), req)
 	if err != nil {
 		return nil, err
@@ -228,7 +228,7 @@ func (s *RegionClustersService) Create(ctx context.Context, regionID int64, req 
 	return decodeJSON[IDResponse](data)
 }
 
-func (s *RegionClustersService) List(ctx context.Context, regionID int64, opts *RegionClusterListOptions) (*PaginatedResponse[RegionCluster], error) {
+func (s *MetadataClustersService) List(ctx context.Context, regionID int64, opts *MetadataClusterListOptions) (*PaginatedResponse[MetadataCluster], error) {
 	q := url.Values{}
 	if opts != nil {
 		if opts.IsActive != nil {
@@ -244,18 +244,18 @@ func (s *RegionClustersService) List(ctx context.Context, regionID int64, opts *
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[PaginatedResponse[RegionCluster]](data)
+	return decodeJSON[PaginatedResponse[MetadataCluster]](data)
 }
 
-func (s *RegionClustersService) Get(ctx context.Context, regionID int64, clusterID int64) (*RegionCluster, error) {
+func (s *MetadataClustersService) Get(ctx context.Context, regionID int64, clusterID int64) (*MetadataCluster, error) {
 	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/regions/%s/clusters/%s", strconv.FormatInt(regionID, 10), strconv.FormatInt(clusterID, 10)))
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[RegionCluster](data)
+	return decodeJSON[MetadataCluster](data)
 }
 
-func (s *RegionClustersService) Edit(ctx context.Context, regionID int64, clusterID int64, req *EditRegionClusterRequest) (*IDResponse, error) {
+func (s *MetadataClustersService) Edit(ctx context.Context, regionID int64, clusterID int64, req *EditMetadataClusterRequest) (*IDResponse, error) {
 	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/regions/%s/clusters/%s", strconv.FormatInt(regionID, 10), strconv.FormatInt(clusterID, 10)), req)
 	if err != nil {
 		return nil, err
@@ -263,7 +263,7 @@ func (s *RegionClustersService) Edit(ctx context.Context, regionID int64, cluste
 	return decodeJSON[IDResponse](data)
 }
 
-func (s *RegionClustersService) SetDefault(ctx context.Context, regionID int64, clusterID int64) (*IDResponse, error) {
+func (s *MetadataClustersService) SetDefault(ctx context.Context, regionID int64, clusterID int64) (*IDResponse, error) {
 	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%s/clusters/%s/set-default", strconv.FormatInt(regionID, 10), strconv.FormatInt(clusterID, 10)), nil)
 	if err != nil {
 		return nil, err
@@ -271,15 +271,15 @@ func (s *RegionClustersService) SetDefault(ctx context.Context, regionID int64, 
 	return decodeJSON[IDResponse](data)
 }
 
-func (s *RegionClustersService) SetReady(ctx context.Context, regionID int64, clusterID int64, req *SetRegionClusterReadyRequest) (*SetReadyRegionClusterResponse, error) {
+func (s *MetadataClustersService) SetReady(ctx context.Context, regionID int64, clusterID int64, req *SetMetadataClusterReadyRequest) (*SetReadyMetadataClusterResponse, error) {
 	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%s/clusters/%s/set-ready", strconv.FormatInt(regionID, 10), strconv.FormatInt(clusterID, 10)), req)
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[SetReadyRegionClusterResponse](data)
+	return decodeJSON[SetReadyMetadataClusterResponse](data)
 }
 
-func (s *RegionClustersService) Deactivate(ctx context.Context, regionID int64, clusterID int64) (*IDResponse, error) {
+func (s *MetadataClustersService) Deactivate(ctx context.Context, regionID int64, clusterID int64) (*IDResponse, error) {
 	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/regions/%s/clusters/%s/deactivate", strconv.FormatInt(regionID, 10), strconv.FormatInt(clusterID, 10)), nil)
 	if err != nil {
 		return nil, err
@@ -412,7 +412,7 @@ func (s *StoragesService) GetConfig(ctx context.Context, storageID int64) (*GetC
 	return decodeJSON[GetConfigStorageResponse](data)
 }
 
-func (s *StoragesService) ListPairs(ctx context.Context, storageID int64, state string, includeRetired bool) ([]Pair, error) {
+func (s *StoragesService) ListCopysets(ctx context.Context, storageID int64, state string, includeRetired bool) ([]Copyset, error) {
 	q := url.Values{}
 	if state != "" {
 		q.Set("state", state)
@@ -420,7 +420,7 @@ func (s *StoragesService) ListPairs(ctx context.Context, storageID int64, state 
 	if includeRetired {
 		q.Set("includeRetired", strconv.FormatBool(includeRetired))
 	}
-	path := fmt.Sprintf("/api/v1/storages/%s/pairs", strconv.FormatInt(storageID, 10))
+	path := fmt.Sprintf("/api/v1/storages/%s/copysets", strconv.FormatInt(storageID, 10))
 	if qs := q.Encode(); qs != "" {
 		path += "?" + qs
 	}
@@ -428,35 +428,43 @@ func (s *StoragesService) ListPairs(ctx context.Context, storageID int64, state 
 	if err != nil {
 		return nil, err
 	}
-	result, err := decodeJSON[[]Pair](data)
+	result, err := decodeJSON[[]Copyset](data)
 	if err != nil {
 		return nil, err
 	}
 	return *result, nil
 }
 
-func (s *StoragesService) GetPairStatus(ctx context.Context, storageID int64, pairID string) (*Pair, error) {
-	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/storages/%s/pairs/%s", strconv.FormatInt(storageID, 10), url.PathEscape(pairID)))
+func (s *StoragesService) GetCopysetStatus(ctx context.Context, storageID int64, copysetID string) (*Copyset, error) {
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/storages/%s/copysets/%s", strconv.FormatInt(storageID, 10), url.PathEscape(copysetID)))
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[Pair](data)
+	return decodeJSON[Copyset](data)
 }
 
-func (s *StoragesService) DrainPair(ctx context.Context, storageID int64, pairID string) (*DrainPairStorageResponse, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/pairs/%s/drain", strconv.FormatInt(storageID, 10), url.PathEscape(pairID)), nil)
+func (s *StoragesService) DrainCopyset(ctx context.Context, storageID int64, copysetID string) (*DrainCopysetStorageResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/copysets/%s/drain", strconv.FormatInt(storageID, 10), url.PathEscape(copysetID)), nil)
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[DrainPairStorageResponse](data)
+	return decodeJSON[DrainCopysetStorageResponse](data)
 }
 
-func (s *StoragesService) CancelDrain(ctx context.Context, storageID int64, pairID string) (*CancelDrainStorageResponse, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/pairs/%s/cancel-drain", strconv.FormatInt(storageID, 10), url.PathEscape(pairID)), nil)
+func (s *StoragesService) CancelDrain(ctx context.Context, storageID int64, copysetID string) (*CancelDrainStorageResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/copysets/%s/cancel-drain", strconv.FormatInt(storageID, 10), url.PathEscape(copysetID)), nil)
 	if err != nil {
 		return nil, err
 	}
 	return decodeJSON[CancelDrainStorageResponse](data)
+}
+
+func (s *StoragesService) UpdateTags(ctx context.Context, storageID int64, copysetID string, req *UpdateStorageTagsRequest) (*Copyset, error) {
+	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/storages/%s/copysets/%s/tags", strconv.FormatInt(storageID, 10), url.PathEscape(copysetID)), req)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[Copyset](data)
 }
 
 func (s *StoragesService) RegisterMember(ctx context.Context, storageID int64, req *RegisterStorageMemberRequest) (*PoolMember, error) {
@@ -500,8 +508,8 @@ func (s *VolumesService) List(ctx context.Context, opts VolumeListOptions) (*Pag
 		if opts.RegionID != nil {
 			q.Set("regionId", strconv.FormatInt(*opts.RegionID, 10))
 		}
-		if opts.RegionClusterID != nil {
-			q.Set("regionClusterId", strconv.FormatInt(*opts.RegionClusterID, 10))
+		if opts.MetadataClusterID != nil {
+			q.Set("metadataClusterId", strconv.FormatInt(*opts.MetadataClusterID, 10))
 		}
 		if opts.StorageID != nil {
 			q.Set("storageId", strconv.FormatInt(*opts.StorageID, 10))
@@ -622,16 +630,16 @@ func (s *VolumesService) UpdateQuota(ctx context.Context, volumeID int64, req *U
 	return decodeJSON[IDResponse](data)
 }
 
-func (s *VolumesService) GetPairConfig(ctx context.Context, volumeID int64) (*VolumeBlockPlacementConfig, error) {
-	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/volumes/%s/pair-config", strconv.FormatInt(volumeID, 10)))
+func (s *VolumesService) GetCopysetConfig(ctx context.Context, volumeID int64) (*VolumeBlockPlacementConfig, error) {
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/volumes/%s/copyset-config", strconv.FormatInt(volumeID, 10)))
 	if err != nil {
 		return nil, err
 	}
 	return decodeJSON[VolumeBlockPlacementConfig](data)
 }
 
-func (s *VolumesService) UpdatePairConfig(ctx context.Context, volumeID int64, req *UpdateVolumePairConfigRequest) (*VolumeBlockPlacementResizeResult, error) {
-	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/volumes/%s/pair-config", strconv.FormatInt(volumeID, 10)), req)
+func (s *VolumesService) UpdateCopysetConfig(ctx context.Context, volumeID int64, req *UpdateVolumeCopysetConfigRequest) (*VolumeBlockPlacementResizeResult, error) {
+	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/volumes/%s/copyset-config", strconv.FormatInt(volumeID, 10)), req)
 	if err != nil {
 		return nil, err
 	}
@@ -834,8 +842,8 @@ func (s *AuditLogsService) List(ctx context.Context, opts AuditLogListOptions) (
 		if opts.RegionID != nil {
 			q.Set("regionId", strconv.FormatInt(*opts.RegionID, 10))
 		}
-		if opts.RegionClusterID != nil {
-			q.Set("regionClusterId", strconv.FormatInt(*opts.RegionClusterID, 10))
+		if opts.MetadataClusterID != nil {
+			q.Set("metadataClusterId", strconv.FormatInt(*opts.MetadataClusterID, 10))
 		}
 		if opts.Cursor > 0 {
 			q.Set("cursor", strconv.FormatInt(opts.Cursor, 10))
@@ -866,8 +874,8 @@ type RegionAuditLogsService struct{ c *Client }
 func (s *RegionAuditLogsService) List(ctx context.Context, regionID int64, opts *RegionAuditLogListOptions) (*CursorPaginatedResponse[AuditLog], error) {
 	q := url.Values{}
 	if opts != nil {
-		if opts.RegionClusterID != nil {
-			q.Set("regionClusterId", strconv.FormatInt(*opts.RegionClusterID, 10))
+		if opts.MetadataClusterID != nil {
+			q.Set("metadataClusterId", strconv.FormatInt(*opts.MetadataClusterID, 10))
 		}
 		if opts.Cursor > 0 {
 			q.Set("cursor", strconv.FormatInt(opts.Cursor, 10))
@@ -895,7 +903,7 @@ func (s *RegionAuditLogsService) List(ctx context.Context, regionID int64, opts 
 
 type ServiceNodesService struct{ c *Client }
 
-func (s *ServiceNodesService) List(ctx context.Context, regionID int64, serviceType string, status string, inactiveHours int, regionClusterID int64) ([]ServiceNode, error) {
+func (s *ServiceNodesService) List(ctx context.Context, regionID int64, serviceType string, status string, inactiveHours int, metadataClusterID int64) ([]ServiceNode, error) {
 	q := url.Values{}
 	if serviceType != "" {
 		q.Set("serviceType", serviceType)
@@ -906,8 +914,8 @@ func (s *ServiceNodesService) List(ctx context.Context, regionID int64, serviceT
 	if inactiveHours != 0 {
 		q.Set("inactiveHours", strconv.Itoa(inactiveHours))
 	}
-	if regionClusterID != 0 {
-		q.Set("regionClusterId", strconv.FormatInt(regionClusterID, 10))
+	if metadataClusterID != 0 {
+		q.Set("metadataClusterId", strconv.FormatInt(metadataClusterID, 10))
 	}
 	path := fmt.Sprintf("/api/v1/regions/%s/nodes", strconv.FormatInt(regionID, 10))
 	if qs := q.Encode(); qs != "" {
@@ -978,8 +986,8 @@ func (s *ClientSessionsService) List(ctx context.Context, opts ClientSessionList
 		if opts.RegionID != nil {
 			q.Set("regionId", strconv.FormatInt(*opts.RegionID, 10))
 		}
-		if opts.RegionClusterID != nil {
-			q.Set("regionClusterId", strconv.FormatInt(*opts.RegionClusterID, 10))
+		if opts.MetadataClusterID != nil {
+			q.Set("metadataClusterId", strconv.FormatInt(*opts.MetadataClusterID, 10))
 		}
 		if opts.VolumeID != nil {
 			q.Set("volumeId", strconv.FormatInt(*opts.VolumeID, 10))
@@ -1022,14 +1030,14 @@ func (s *ClientSessionsService) Get(ctx context.Context, sessionID int64) (*Clie
 	return decodeJSON[ClientSession](data)
 }
 
-func (s *ClientSessionsService) Summary(ctx context.Context, accountID int64, regionID *int64, regionClusterID *int64, volumeID *int64, userID *int64) (*SessionSummary, error) {
+func (s *ClientSessionsService) Summary(ctx context.Context, accountID int64, regionID *int64, metadataClusterID *int64, volumeID *int64, userID *int64) (*SessionSummary, error) {
 	q := url.Values{}
 	q.Set("accountId", strconv.FormatInt(accountID, 10))
 	if regionID != nil {
 		q.Set("regionId", strconv.FormatInt(*regionID, 10))
 	}
-	if regionClusterID != nil {
-		q.Set("regionClusterId", strconv.FormatInt(*regionClusterID, 10))
+	if metadataClusterID != nil {
+		q.Set("metadataClusterId", strconv.FormatInt(*metadataClusterID, 10))
 	}
 	if volumeID != nil {
 		q.Set("volumeId", strconv.FormatInt(*volumeID, 10))
@@ -1193,8 +1201,8 @@ func (s *RegionAlertsService) List(ctx context.Context, regionID int64, opts *Re
 		if opts.NodeID != "" {
 			q.Set("nodeId", opts.NodeID)
 		}
-		if opts.RegionClusterID != nil {
-			q.Set("regionClusterId", strconv.FormatInt(*opts.RegionClusterID, 10))
+		if opts.MetadataClusterID != nil {
+			q.Set("metadataClusterId", strconv.FormatInt(*opts.MetadataClusterID, 10))
 		}
 		if opts.Since != "" {
 			q.Set("since", opts.Since)
@@ -1212,10 +1220,10 @@ func (s *RegionAlertsService) List(ctx context.Context, regionID int64, opts *Re
 	return decodeJSON[PaginatedResponse[RegionAlert]](data)
 }
 
-func (s *RegionAlertsService) Count(ctx context.Context, regionID int64, regionClusterID *int64) (*AlertCountResponse, error) {
+func (s *RegionAlertsService) Count(ctx context.Context, regionID int64, metadataClusterID *int64) (*AlertCountResponse, error) {
 	q := url.Values{}
-	if regionClusterID != nil {
-		q.Set("regionClusterId", strconv.FormatInt(*regionClusterID, 10))
+	if metadataClusterID != nil {
+		q.Set("metadataClusterId", strconv.FormatInt(*metadataClusterID, 10))
 	}
 	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/regions/%s/alerts/count", strconv.FormatInt(regionID, 10))+"?"+q.Encode())
 	if err != nil {
@@ -1246,8 +1254,8 @@ func (s *GCWorkerEventsService) List(ctx context.Context, regionID int64, opts *
 		if opts.Sid != nil {
 			q.Set("sid", strconv.FormatInt(*opts.Sid, 10))
 		}
-		if opts.RegionClusterID != nil {
-			q.Set("regionClusterId", strconv.FormatInt(*opts.RegionClusterID, 10))
+		if opts.MetadataClusterID != nil {
+			q.Set("metadataClusterId", strconv.FormatInt(*opts.MetadataClusterID, 10))
 		}
 		if opts.Since != "" {
 			q.Set("since", opts.Since)
@@ -1265,7 +1273,7 @@ func (s *GCWorkerEventsService) List(ctx context.Context, regionID int64, opts *
 	return decodeJSON[PaginatedResponse[GCWorkerEvent]](data)
 }
 
-func (s *GCWorkerEventsService) Histogram(ctx context.Context, regionID int64, nodeID string, goal string, sid *int64, regionClusterID *int64, since string, bucketSeconds *int64) (*GCWorkerEventHistogramResponse, error) {
+func (s *GCWorkerEventsService) Histogram(ctx context.Context, regionID int64, nodeID string, goal string, sid *int64, metadataClusterID *int64, since string, bucketSeconds *int64) (*GCWorkerEventHistogramResponse, error) {
 	q := url.Values{}
 	if nodeID != "" {
 		q.Set("nodeId", nodeID)
@@ -1276,8 +1284,8 @@ func (s *GCWorkerEventsService) Histogram(ctx context.Context, regionID int64, n
 	if sid != nil {
 		q.Set("sid", strconv.FormatInt(*sid, 10))
 	}
-	if regionClusterID != nil {
-		q.Set("regionClusterId", strconv.FormatInt(*regionClusterID, 10))
+	if metadataClusterID != nil {
+		q.Set("metadataClusterId", strconv.FormatInt(*metadataClusterID, 10))
 	}
 	if since != "" {
 		q.Set("since", since)

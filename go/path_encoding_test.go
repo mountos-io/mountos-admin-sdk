@@ -17,29 +17,29 @@ import (
 )
 
 func TestStringPathParamsAreURLEncoded(t *testing.T) {
-	const rawPairID = "pair/id with spaces/café"
-	const wantEscaped = "pair%2Fid%20with%20spaces%2Fcaf%C3%A9"
+	const rawCopysetID = "copyset/id with spaces/café"
+	const wantEscaped = "copyset%2Fid%20with%20spaces%2Fcaf%C3%A9"
 
 	var requestURI string
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		requestURI = r.RequestURI
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(`{"status":"success","message":"ok","data":{"id":"` + rawPairID + `","storageId":"s1","state":"active"}}`))
+		_, _ = w.Write([]byte(`{"status":"success","message":"ok","data":{"id":"` + rawCopysetID + `","storageId":"s1","state":"active"}}`))
 	}))
 	defer srv.Close()
 	client := newTestClient(t, srv.URL)
 
-	pair, err := client.Storages.GetPairStatus(context.Background(), 7, rawPairID)
+	copyset, err := client.Storages.GetCopysetStatus(context.Background(), 7, rawCopysetID)
 	if err != nil {
-		t.Fatalf("GetPairStatus: %v", err)
+		t.Fatalf("GetCopysetStatus: %v", err)
 	}
-	if pair.ID != rawPairID {
-		t.Fatalf("got pair id %q, want %q", pair.ID, rawPairID)
+	if copyset.ID != rawCopysetID {
+		t.Fatalf("got copyset id %q, want %q", copyset.ID, rawCopysetID)
 	}
 	if !strings.Contains(requestURI, wantEscaped) {
 		t.Fatalf("request URI %q does not contain escaped segment %q", requestURI, wantEscaped)
 	}
-	if strings.Contains(requestURI, "/pairs/pair/") {
+	if strings.Contains(requestURI, "/copysets/copyset/") {
 		t.Fatalf("request URI %q sent the '/' unescaped, splitting the path", requestURI)
 	}
 }

@@ -5,27 +5,28 @@ import type {
   CreateAccountRequest, Account, AccountListOptions, EditAccountRequest, RetentionPolicy, 
   UpdateAccountQuotaRequest, AddUserRequest, User, UserListOptions, BulkUserRequest, 
   UserLite, EditUserRequest, CreateRegionRequest, Region, RegionListOptions, 
-  EditRegionRequest, RegionCluster, ClusterListOptions, CreateRegionClusterRequest, 
-  RegionClusterListOptions, EditRegionClusterRequest, SetRegionClusterReadyRequest, 
+  EditRegionRequest, MetadataCluster, ClusterListOptions, CreateMetadataClusterRequest, 
+  MetadataClusterListOptions, EditMetadataClusterRequest, SetMetadataClusterReadyRequest, 
   CreateStorageRequest, BlockMember, Storage, StorageListOptions, BlockVolume, 
   EditStorageRequest, TestStorageNewBucketRequest, CompatibleStorage, 
   MoveStorageVolumesRequest, MoveVolumeFailure, UpdateStorageConfigRequest, 
-  UpdateConfigResult, Pair, RegisterStorageMemberRequest, PoolMember, BackfillFailure, 
-  CreateVolumeRequest, VolumeRetentionPolicy, VolumeVersioningPolicy, Volume, 
-  VolumeListOptions, EditVolumeRequest, MoveVolumeClusterRequest, DeactivateVolumeRequest, 
-  GenerateVolumeAPIKeysRequest, VolumeApiKey, RevokeVolumeAPIKeyRequest, 
-  RevokeVolumeAPIKeysByUserRequest, GenerateVolumeSttKeyRequest, UpdateVolumeQuotaRequest, 
-  VolumeBlockPlacementConfig, UpdateVolumePairConfigRequest, 
-  VolumeBlockPlacementResizeResult, VolumeSizePoint, CreateVolumeForkRequest, Fork, 
-  DeleteVolumeForkRequest, RestoreVolumeForkRequest, ForkTreeEntry, 
-  VolumeForkTreeListOptions, ForkEntryDetail, ForkEntryVersion, VolumeForkEntryListOptions, 
-  ForkTreeMatch, VolumeForkSearchListOptions, AuditLog, AuditLogListOptions, 
-  RegionAuditLogListOptions, ServiceNode, NodeStatsSample, ClientSession, 
-  ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, MetricsTarget, 
-  GenerateMetricTokenRequest, MetricsTokenResponse, DashboardStats, LicenseDetails, 
-  LicenseTerms, LoadLicenseRequest, LicenseLoadResult, LicenseList, ServiceAlert, 
-  AlertListOptions, AlertCountResponse, RegionAlert, RegionAlertListOptions, GCWorkerEvent, 
-  GCWorkerEventListOptions, GCWorkerEventHistogramResponse, GCWorkerEventGoalsResponse,
+  UpdateConfigResult, Copyset, UpdateStorageTagsRequest, RegisterStorageMemberRequest, 
+  PoolMember, BackfillFailure, CreateVolumeRequest, VolumeRetentionPolicy, 
+  VolumeVersioningPolicy, Volume, VolumeListOptions, EditVolumeRequest, 
+  MoveVolumeClusterRequest, DeactivateVolumeRequest, GenerateVolumeAPIKeysRequest, 
+  VolumeApiKey, RevokeVolumeAPIKeyRequest, RevokeVolumeAPIKeysByUserRequest, 
+  GenerateVolumeSttKeyRequest, UpdateVolumeQuotaRequest, VolumeBlockPlacementConfig, 
+  UpdateVolumeCopysetConfigRequest, VolumeBlockPlacementResizeResult, VolumeSizePoint, 
+  CreateVolumeForkRequest, Fork, DeleteVolumeForkRequest, RestoreVolumeForkRequest, 
+  ForkTreeEntry, VolumeForkTreeListOptions, ForkEntryDetail, ForkEntryVersion, 
+  VolumeForkEntryListOptions, ForkTreeMatch, VolumeForkSearchListOptions, AuditLog, 
+  AuditLogListOptions, RegionAuditLogListOptions, ServiceNode, NodeStatsSample, 
+  ClientSession, ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, 
+  MetricsTarget, GenerateMetricTokenRequest, MetricsTokenResponse, DashboardStats, 
+  LicenseDetails, LicenseTerms, LoadLicenseRequest, LicenseLoadResult, LicenseList, 
+  ServiceAlert, AlertListOptions, AlertCountResponse, RegionAlert, RegionAlertListOptions, 
+  GCWorkerEvent, GCWorkerEventListOptions, GCWorkerEventHistogramResponse, 
+  GCWorkerEventGoalsResponse,
 } from './types_gen.js'
 
 export type RequestFn = <T>(method: string, path: string, body?: unknown, signal?: AbortSignal) => Promise<T>
@@ -43,7 +44,7 @@ export interface AdminClient {
   readonly users: UsersResource
   readonly regions: RegionsResource
   readonly clusters: ClustersResource
-  readonly regionClusters: RegionClustersResource
+  readonly metadataClusters: MetadataClustersResource
   readonly storages: StoragesResource
   readonly volumes: VolumesResource
   readonly volumeForkTrees: VolumeForkTreesResource
@@ -70,7 +71,7 @@ export function createClient(request: RequestFn): AdminClient {
   let _users: UsersResource | undefined
   let _regions: RegionsResource | undefined
   let _clusters: ClustersResource | undefined
-  let _regionClusters: RegionClustersResource | undefined
+  let _metadataClusters: MetadataClustersResource | undefined
   let _storages: StoragesResource | undefined
   let _volumes: VolumesResource | undefined
   let _volumeForkTrees: VolumeForkTreesResource | undefined
@@ -94,7 +95,7 @@ export function createClient(request: RequestFn): AdminClient {
     get users() { return _users ??= new UsersResource(client) },
     get regions() { return _regions ??= new RegionsResource(client) },
     get clusters() { return _clusters ??= new ClustersResource(client) },
-    get regionClusters() { return _regionClusters ??= new RegionClustersResource(client) },
+    get metadataClusters() { return _metadataClusters ??= new MetadataClustersResource(client) },
     get storages() { return _storages ??= new StoragesResource(client) },
     get volumes() { return _volumes ??= new VolumesResource(client) },
     get volumeForkTrees() { return _volumeForkTrees ??= new VolumeForkTreesResource(client) },
@@ -207,27 +208,27 @@ export class RegionsResource {
 export class ClustersResource {
   constructor(private client: Client) {}
 
-  list(opts: ClusterListOptions, signal?: AbortSignal): Promise<PaginatedResponse<RegionCluster>> {
+  list(opts: ClusterListOptions, signal?: AbortSignal): Promise<PaginatedResponse<MetadataCluster>> {
     return this.client.request('GET', `/api/v1/clusters/list${queryString({ accountId: opts.accountId, regionId: opts.regionId, isActive: opts.isActive, page: opts.page, limit: opts.limit })}`, undefined, signal)
   }
 }
 
-export class RegionClustersResource {
+export class MetadataClustersResource {
   constructor(private client: Client) {}
 
-  create(regionId: number, req: CreateRegionClusterRequest, signal?: AbortSignal): Promise<{ id: number }> {
+  create(regionId: number, req: CreateMetadataClusterRequest, signal?: AbortSignal): Promise<{ id: number }> {
     return this.client.request('POST', `/api/v1/regions/${regionId}/clusters/create`, req, signal)
   }
 
-  list(regionId: number, opts?: RegionClusterListOptions, signal?: AbortSignal): Promise<PaginatedResponse<RegionCluster>> {
+  list(regionId: number, opts?: MetadataClusterListOptions, signal?: AbortSignal): Promise<PaginatedResponse<MetadataCluster>> {
     return this.client.request('GET', `/api/v1/regions/${regionId}/clusters/list` + queryString({ isActive: opts?.isActive, page: opts?.page, limit: opts?.limit }), undefined, signal)
   }
 
-  get(regionId: number, clusterId: number, signal?: AbortSignal): Promise<RegionCluster> {
+  get(regionId: number, clusterId: number, signal?: AbortSignal): Promise<MetadataCluster> {
     return this.client.request('GET', `/api/v1/regions/${regionId}/clusters/${clusterId}`, undefined, signal)
   }
 
-  edit(regionId: number, clusterId: number, req: EditRegionClusterRequest, signal?: AbortSignal): Promise<{ id: number }> {
+  edit(regionId: number, clusterId: number, req: EditMetadataClusterRequest, signal?: AbortSignal): Promise<{ id: number }> {
     return this.client.request('PUT', `/api/v1/regions/${regionId}/clusters/${clusterId}`, req, signal)
   }
 
@@ -235,7 +236,7 @@ export class RegionClustersResource {
     return this.client.request('POST', `/api/v1/regions/${regionId}/clusters/${clusterId}/set-default`, undefined, signal)
   }
 
-  setReady(regionId: number, clusterId: number, req: SetRegionClusterReadyRequest, signal?: AbortSignal): Promise<{ id: number; ready: boolean }> {
+  setReady(regionId: number, clusterId: number, req: SetMetadataClusterReadyRequest, signal?: AbortSignal): Promise<{ id: number; ready: boolean }> {
     return this.client.request('POST', `/api/v1/regions/${regionId}/clusters/${clusterId}/set-ready`, req, signal)
   }
 
@@ -295,20 +296,24 @@ export class StoragesResource {
     return this.client.request('GET', `/api/v1/storages/${storageId}/config`, undefined, signal)
   }
 
-  listPairs(storageId: number, state?: string, includeRetired?: boolean, signal?: AbortSignal): Promise<Pair[]> {
-    return this.client.request('GET', `/api/v1/storages/${storageId}/pairs${queryString({ state: state, includeRetired: includeRetired })}`, undefined, signal)
+  listCopysets(storageId: number, state?: string, includeRetired?: boolean, signal?: AbortSignal): Promise<Copyset[]> {
+    return this.client.request('GET', `/api/v1/storages/${storageId}/copysets${queryString({ state: state, includeRetired: includeRetired })}`, undefined, signal)
   }
 
-  getPairStatus(storageId: number, pairId: string, signal?: AbortSignal): Promise<Pair> {
-    return this.client.request('GET', `/api/v1/storages/${storageId}/pairs/${encodeURIComponent(pairId)}`, undefined, signal)
+  getCopysetStatus(storageId: number, copysetId: string, signal?: AbortSignal): Promise<Copyset> {
+    return this.client.request('GET', `/api/v1/storages/${storageId}/copysets/${encodeURIComponent(copysetId)}`, undefined, signal)
   }
 
-  drainPair(storageId: number, pairId: string, signal?: AbortSignal): Promise<{ id: string; state: string }> {
-    return this.client.request('POST', `/api/v1/storages/${storageId}/pairs/${encodeURIComponent(pairId)}/drain`, undefined, signal)
+  drainCopyset(storageId: number, copysetId: string, signal?: AbortSignal): Promise<{ id: string; state: string }> {
+    return this.client.request('POST', `/api/v1/storages/${storageId}/copysets/${encodeURIComponent(copysetId)}/drain`, undefined, signal)
   }
 
-  cancelDrain(storageId: number, pairId: string, signal?: AbortSignal): Promise<{ id: string; state: string }> {
-    return this.client.request('POST', `/api/v1/storages/${storageId}/pairs/${encodeURIComponent(pairId)}/cancel-drain`, undefined, signal)
+  cancelDrain(storageId: number, copysetId: string, signal?: AbortSignal): Promise<{ id: string; state: string }> {
+    return this.client.request('POST', `/api/v1/storages/${storageId}/copysets/${encodeURIComponent(copysetId)}/cancel-drain`, undefined, signal)
+  }
+
+  updateTags(storageId: number, copysetId: string, req: UpdateStorageTagsRequest, signal?: AbortSignal): Promise<Copyset> {
+    return this.client.request('PUT', `/api/v1/storages/${storageId}/copysets/${encodeURIComponent(copysetId)}/tags`, req, signal)
   }
 
   registerMember(storageId: number, req: RegisterStorageMemberRequest, signal?: AbortSignal): Promise<PoolMember> {
@@ -332,7 +337,7 @@ export class VolumesResource {
   }
 
   list(opts: VolumeListOptions, signal?: AbortSignal): Promise<PaginatedResponse<Volume>> {
-    return this.client.request('GET', `/api/v1/volumes/list${queryString({ accountId: opts.accountId, regionId: opts.regionId, regionClusterId: opts.regionClusterId, storageId: opts.storageId, volumeType: opts.volumeType, locked: opts.locked, isActive: opts.isActive, page: opts.page, limit: opts.limit })}`, undefined, signal)
+    return this.client.request('GET', `/api/v1/volumes/list${queryString({ accountId: opts.accountId, regionId: opts.regionId, metadataClusterId: opts.metadataClusterId, storageId: opts.storageId, volumeType: opts.volumeType, locked: opts.locked, isActive: opts.isActive, page: opts.page, limit: opts.limit })}`, undefined, signal)
   }
 
   get(volumeId: number, signal?: AbortSignal): Promise<Volume> {
@@ -387,12 +392,12 @@ export class VolumesResource {
     return this.client.request('PUT', `/api/v1/volumes/${volumeId}/quota`, req, signal)
   }
 
-  getPairConfig(volumeId: number, signal?: AbortSignal): Promise<VolumeBlockPlacementConfig> {
-    return this.client.request('GET', `/api/v1/volumes/${volumeId}/pair-config`, undefined, signal)
+  getCopysetConfig(volumeId: number, signal?: AbortSignal): Promise<VolumeBlockPlacementConfig> {
+    return this.client.request('GET', `/api/v1/volumes/${volumeId}/copyset-config`, undefined, signal)
   }
 
-  updatePairConfig(volumeId: number, req: UpdateVolumePairConfigRequest, signal?: AbortSignal): Promise<VolumeBlockPlacementResizeResult> {
-    return this.client.request('PUT', `/api/v1/volumes/${volumeId}/pair-config`, req, signal)
+  updateCopysetConfig(volumeId: number, req: UpdateVolumeCopysetConfigRequest, signal?: AbortSignal): Promise<VolumeBlockPlacementResizeResult> {
+    return this.client.request('PUT', `/api/v1/volumes/${volumeId}/copyset-config`, req, signal)
   }
 
   stats(volumeId: number, signal?: AbortSignal): Promise<{ volumeId: string; liveVolume: number; totalVolume: number; pendingVolume: number; liveInactiveVolume: number }> {
@@ -474,7 +479,7 @@ export class AuditLogsResource {
     return this.client.request('GET', `/api/v1/audit-logs/list${queryString({
       accountId: opts.accountId,
       regionId: opts.regionId,
-      regionClusterId: opts.regionClusterId,
+      metadataClusterId: opts.metadataClusterId,
       cursor: opts.cursor,
       limit: opts.limit,
       subject: opts.subject,
@@ -488,7 +493,7 @@ export class RegionAuditLogsResource {
 
   list(regionId: number, opts?: RegionAuditLogListOptions, signal?: AbortSignal): Promise<CursorPaginatedResponse<AuditLog>> {
     return this.client.request('GET', `/api/v1/regions/${regionId}/audit-logs/list${queryString({
-      regionClusterId: opts?.regionClusterId,
+      metadataClusterId: opts?.metadataClusterId,
       cursor: opts?.cursor,
       limit: opts?.limit,
       subject: opts?.subject,
@@ -500,8 +505,8 @@ export class RegionAuditLogsResource {
 export class ServiceNodesResource {
   constructor(private client: Client) {}
 
-  list(regionId: number, serviceType?: string, status?: string, inactiveHours?: number, regionClusterId?: number, signal?: AbortSignal): Promise<ServiceNode[]> {
-    return this.client.request('GET', `/api/v1/regions/${regionId}/nodes${queryString({ serviceType: serviceType, status: status, inactiveHours: inactiveHours, regionClusterId: regionClusterId })}`, undefined, signal)
+  list(regionId: number, serviceType?: string, status?: string, inactiveHours?: number, metadataClusterId?: number, signal?: AbortSignal): Promise<ServiceNode[]> {
+    return this.client.request('GET', `/api/v1/regions/${regionId}/nodes${queryString({ serviceType: serviceType, status: status, inactiveHours: inactiveHours, metadataClusterId: metadataClusterId })}`, undefined, signal)
   }
 
   stats(regionId: number, nodeId: string, signal?: AbortSignal): Promise<string> {
@@ -525,15 +530,15 @@ export class ClientSessionsResource {
   constructor(private client: Client) {}
 
   list(opts: ClientSessionListOptions, signal?: AbortSignal): Promise<PaginatedResponse<ClientSession>> {
-    return this.client.request('GET', `/api/v1/client-sessions/list${queryString({ accountId: opts.accountId, regionId: opts.regionId, regionClusterId: opts.regionClusterId, volumeId: opts.volumeId, userId: opts.userId, clientType: opts.clientType, status: opts.status, isActive: opts.isActive, osName: opts.osName, platform: opts.platform, search: opts.search, page: opts.page, limit: opts.limit })}`, undefined, signal)
+    return this.client.request('GET', `/api/v1/client-sessions/list${queryString({ accountId: opts.accountId, regionId: opts.regionId, metadataClusterId: opts.metadataClusterId, volumeId: opts.volumeId, userId: opts.userId, clientType: opts.clientType, status: opts.status, isActive: opts.isActive, osName: opts.osName, platform: opts.platform, search: opts.search, page: opts.page, limit: opts.limit })}`, undefined, signal)
   }
 
   get(sessionId: number, signal?: AbortSignal): Promise<ClientSession> {
     return this.client.request('GET', `/api/v1/client-sessions/${sessionId}`, undefined, signal)
   }
 
-  summary(accountId: number, regionId?: number, regionClusterId?: number, volumeId?: number, userId?: number, signal?: AbortSignal): Promise<SessionSummary> {
-    return this.client.request('GET', `/api/v1/client-sessions/summary${queryString({ accountId: accountId, regionId: regionId, regionClusterId: regionClusterId, volumeId: volumeId, userId: userId })}`, undefined, signal)
+  summary(accountId: number, regionId?: number, metadataClusterId?: number, volumeId?: number, userId?: number, signal?: AbortSignal): Promise<SessionSummary> {
+    return this.client.request('GET', `/api/v1/client-sessions/summary${queryString({ accountId: accountId, regionId: regionId, metadataClusterId: metadataClusterId, volumeId: volumeId, userId: userId })}`, undefined, signal)
   }
 }
 
@@ -605,11 +610,11 @@ export class RegionAlertsResource {
   constructor(private client: Client) {}
 
   list(regionId: number, opts?: RegionAlertListOptions, signal?: AbortSignal): Promise<PaginatedResponse<RegionAlert>> {
-    return this.client.request('GET', `/api/v1/regions/${regionId}/alerts/list` + queryString({ active: opts?.active, severity: opts?.severity, category: opts?.category, nodeId: opts?.nodeId, regionClusterId: opts?.regionClusterId, since: opts?.since, page: opts?.page, limit: opts?.limit }), undefined, signal)
+    return this.client.request('GET', `/api/v1/regions/${regionId}/alerts/list` + queryString({ active: opts?.active, severity: opts?.severity, category: opts?.category, nodeId: opts?.nodeId, metadataClusterId: opts?.metadataClusterId, since: opts?.since, page: opts?.page, limit: opts?.limit }), undefined, signal)
   }
 
-  count(regionId: number, regionClusterId?: number, signal?: AbortSignal): Promise<AlertCountResponse> {
-    return this.client.request('GET', `/api/v1/regions/${regionId}/alerts/count${queryString({ regionClusterId: regionClusterId })}`, undefined, signal)
+  count(regionId: number, metadataClusterId?: number, signal?: AbortSignal): Promise<AlertCountResponse> {
+    return this.client.request('GET', `/api/v1/regions/${regionId}/alerts/count${queryString({ metadataClusterId: metadataClusterId })}`, undefined, signal)
   }
 
   resolve(regionId: number, alertId: string, signal?: AbortSignal): Promise<{ alertId: string }> {
@@ -621,11 +626,11 @@ export class GCWorkerEventsResource {
   constructor(private client: Client) {}
 
   list(regionId: number, opts?: GCWorkerEventListOptions, signal?: AbortSignal): Promise<PaginatedResponse<GCWorkerEvent>> {
-    return this.client.request('GET', `/api/v1/regions/${regionId}/gc-worker-events/list` + queryString({ nodeId: opts?.nodeId, goal: opts?.goal, sid: opts?.sid, regionClusterId: opts?.regionClusterId, since: opts?.since, page: opts?.page, limit: opts?.limit }), undefined, signal)
+    return this.client.request('GET', `/api/v1/regions/${regionId}/gc-worker-events/list` + queryString({ nodeId: opts?.nodeId, goal: opts?.goal, sid: opts?.sid, metadataClusterId: opts?.metadataClusterId, since: opts?.since, page: opts?.page, limit: opts?.limit }), undefined, signal)
   }
 
-  histogram(regionId: number, nodeId?: string, goal?: string, sid?: number, regionClusterId?: number, since?: string, bucketSeconds?: number, signal?: AbortSignal): Promise<GCWorkerEventHistogramResponse> {
-    return this.client.request('GET', `/api/v1/regions/${regionId}/gc-worker-events/histogram${queryString({ nodeId: nodeId, goal: goal, sid: sid, regionClusterId: regionClusterId, since: since, bucketSeconds: bucketSeconds })}`, undefined, signal)
+  histogram(regionId: number, nodeId?: string, goal?: string, sid?: number, metadataClusterId?: number, since?: string, bucketSeconds?: number, signal?: AbortSignal): Promise<GCWorkerEventHistogramResponse> {
+    return this.client.request('GET', `/api/v1/regions/${regionId}/gc-worker-events/histogram${queryString({ nodeId: nodeId, goal: goal, sid: sid, metadataClusterId: metadataClusterId, since: since, bucketSeconds: bucketSeconds })}`, undefined, signal)
   }
 
   goals(regionId: number, nodeId?: string, signal?: AbortSignal): Promise<GCWorkerEventGoalsResponse> {

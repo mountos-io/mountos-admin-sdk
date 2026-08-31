@@ -14,7 +14,7 @@ import type { AddressInfo } from 'node:net'
 import { createServerClient } from '../dist/index.js'
 
 test('string path params are URL-encoded on the wire', async () => {
-  const rawPairId = 'pair/id with spaces/café'
+  const rawCopysetId = 'copyset/id with spaces/café'
 
   let requestURL = ''
   const server = http.createServer((req, res) => {
@@ -22,7 +22,7 @@ test('string path params are URL-encoded on the wire', async () => {
     res.setHeader('content-type', 'application/json')
     res.end(JSON.stringify({
       status: 'success', message: 'ok',
-      data: { id: rawPairId, storageId: 's1', state: 'active' },
+      data: { id: rawCopysetId, storageId: 's1', state: 'active' },
     }))
   })
   await new Promise<void>(resolve => server.listen(0, resolve))
@@ -32,10 +32,10 @@ test('string path params are URL-encoded on the wire', async () => {
   const client = createServerClient({ baseUrl: `http://127.0.0.1:${port}`, privateKey })
 
   try {
-    const pair = await client.storages.getPairStatus(7, rawPairId)
-    assert.equal(pair.id, rawPairId)
-    assert.match(requestURL, /pair%2Fid%20with%20spaces%2Fcaf%C3%A9/)
-    assert.doesNotMatch(requestURL, /\/pairs\/pair\//)
+    const copyset = await client.storages.getCopysetStatus(7, rawCopysetId)
+    assert.equal(copyset.id, rawCopysetId)
+    assert.match(requestURL, /copyset%2Fid%20with%20spaces%2Fcaf%C3%A9/)
+    assert.doesNotMatch(requestURL, /\/copysets\/copyset\//)
   } finally {
     await new Promise<void>(resolve => server.close(() => resolve()))
   }

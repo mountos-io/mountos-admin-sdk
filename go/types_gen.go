@@ -47,6 +47,12 @@ type IDResponse struct {
 }
 
 // ClientSessionStatus is a closed set of wire values (see ParseClientSessionStatus/IsValid).
+//
+// Decoding a ClientSessionStatus field from JSON never fails: an unrecognized string (a value
+// a newer server has added since this SDK was generated) assigns as-is
+// rather than erroring, the same forward-compatibility policy as the Rust
+// SDK's explicit Unknown variant. Call IsValid to tell a recognized value
+// from one this SDK predates - the Go analog of Rust's is_known().
 type ClientSessionStatus string
 
 const (
@@ -61,7 +67,9 @@ const (
 // String returns v's wire value.
 func (v ClientSessionStatus) String() string { return string(v) }
 
-// IsValid reports whether v is one of ClientSessionStatus's defined wire values.
+// IsValid reports whether v is one of ClientSessionStatus's defined wire values, i.e. was
+// recognized when this SDK was generated (false for a value only a newer
+// server knows about).
 func (v ClientSessionStatus) IsValid() bool {
 	switch v {
 	case ClientSessionStatusConnected, ClientSessionStatusActive, ClientSessionStatusDegraded, ClientSessionStatusDisconnected, ClientSessionStatusExpired, ClientSessionStatusUnknown:
@@ -82,7 +90,55 @@ func ParseClientSessionStatus(s string) (ClientSessionStatus, error) {
 	return v, nil
 }
 
+// CopysetState is a closed set of wire values (see ParseCopysetState/IsValid).
+//
+// Decoding a CopysetState field from JSON never fails: an unrecognized string (a value
+// a newer server has added since this SDK was generated) assigns as-is
+// rather than erroring, the same forward-compatibility policy as the Rust
+// SDK's explicit Unknown variant. Call IsValid to tell a recognized value
+// from one this SDK predates - the Go analog of Rust's is_known().
+type CopysetState string
+
+const (
+	CopysetStateActive        CopysetState = "active"
+	CopysetStateDraining      CopysetState = "draining"
+	CopysetStateSyncedDrained CopysetState = "synced_drained"
+	CopysetStateRetired       CopysetState = "retired"
+)
+
+// String returns v's wire value.
+func (v CopysetState) String() string { return string(v) }
+
+// IsValid reports whether v is one of CopysetState's defined wire values, i.e. was
+// recognized when this SDK was generated (false for a value only a newer
+// server knows about).
+func (v CopysetState) IsValid() bool {
+	switch v {
+	case CopysetStateActive, CopysetStateDraining, CopysetStateSyncedDrained, CopysetStateRetired:
+		return true
+	default:
+		return false
+	}
+}
+
+// ParseCopysetState validates s as one of CopysetState's defined wire values, returning an
+// error if s is not recognized - use this instead of a bare conversion
+// when s came from outside this package (a request, a config file, etc.).
+func ParseCopysetState(s string) (CopysetState, error) {
+	v := CopysetState(s)
+	if !v.IsValid() {
+		return "", fmt.Errorf("invalid CopysetState %q", s)
+	}
+	return v, nil
+}
+
 // LicenseQuotaState is a closed set of wire values (see ParseLicenseQuotaState/IsValid).
+//
+// Decoding a LicenseQuotaState field from JSON never fails: an unrecognized string (a value
+// a newer server has added since this SDK was generated) assigns as-is
+// rather than erroring, the same forward-compatibility policy as the Rust
+// SDK's explicit Unknown variant. Call IsValid to tell a recognized value
+// from one this SDK predates - the Go analog of Rust's is_known().
 type LicenseQuotaState string
 
 const (
@@ -93,7 +149,9 @@ const (
 // String returns v's wire value.
 func (v LicenseQuotaState) String() string { return string(v) }
 
-// IsValid reports whether v is one of LicenseQuotaState's defined wire values.
+// IsValid reports whether v is one of LicenseQuotaState's defined wire values, i.e. was
+// recognized when this SDK was generated (false for a value only a newer
+// server knows about).
 func (v LicenseQuotaState) IsValid() bool {
 	switch v {
 	case LicenseQuotaStateOk, LicenseQuotaStateExceeded:
@@ -115,6 +173,12 @@ func ParseLicenseQuotaState(s string) (LicenseQuotaState, error) {
 }
 
 // LicenseStatus is a closed set of wire values (see ParseLicenseStatus/IsValid).
+//
+// Decoding a LicenseStatus field from JSON never fails: an unrecognized string (a value
+// a newer server has added since this SDK was generated) assigns as-is
+// rather than erroring, the same forward-compatibility policy as the Rust
+// SDK's explicit Unknown variant. Call IsValid to tell a recognized value
+// from one this SDK predates - the Go analog of Rust's is_known().
 type LicenseStatus string
 
 const (
@@ -128,7 +192,9 @@ const (
 // String returns v's wire value.
 func (v LicenseStatus) String() string { return string(v) }
 
-// IsValid reports whether v is one of LicenseStatus's defined wire values.
+// IsValid reports whether v is one of LicenseStatus's defined wire values, i.e. was
+// recognized when this SDK was generated (false for a value only a newer
+// server knows about).
 func (v LicenseStatus) IsValid() bool {
 	switch v {
 	case LicenseStatusValid, LicenseStatusExpiring, LicenseStatusGrace, LicenseStatusExpiredAccess, LicenseStatusExpired:
@@ -145,40 +211,6 @@ func ParseLicenseStatus(s string) (LicenseStatus, error) {
 	v := LicenseStatus(s)
 	if !v.IsValid() {
 		return "", fmt.Errorf("invalid LicenseStatus %q", s)
-	}
-	return v, nil
-}
-
-// PairState is a closed set of wire values (see ParsePairState/IsValid).
-type PairState string
-
-const (
-	PairStateActive        PairState = "active"
-	PairStateDraining      PairState = "draining"
-	PairStateSyncedDrained PairState = "synced_drained"
-	PairStateRetired       PairState = "retired"
-)
-
-// String returns v's wire value.
-func (v PairState) String() string { return string(v) }
-
-// IsValid reports whether v is one of PairState's defined wire values.
-func (v PairState) IsValid() bool {
-	switch v {
-	case PairStateActive, PairStateDraining, PairStateSyncedDrained, PairStateRetired:
-		return true
-	default:
-		return false
-	}
-}
-
-// ParsePairState validates s as one of PairState's defined wire values, returning an
-// error if s is not recognized - use this instead of a bare conversion
-// when s came from outside this package (a request, a config file, etc.).
-func ParsePairState(s string) (PairState, error) {
-	v := PairState(s)
-	if !v.IsValid() {
-		return "", fmt.Errorf("invalid PairState %q", s)
 	}
 	return v, nil
 }
@@ -221,7 +253,7 @@ type Region struct {
 	UpdatedAt   string `json:"updatedAt"`
 }
 
-type RegionCluster struct {
+type MetadataCluster struct {
 	ID             int64  `json:"id"`
 	ExportID       string `json:"exportId"`
 	RegionID       int64  `json:"regionId"`
@@ -267,33 +299,35 @@ type BlockVolume struct {
 	CreatedAt       string `json:"createdAt"`
 	UpdatedAt       string `json:"updatedAt"`
 	MemberState     string `json:"memberState,omitempty"`
-	PairID          string `json:"pairId,omitempty"`
+	CopysetID       string `json:"copysetId,omitempty"`
 }
 
 type UpdateConfigResult struct {
-	ID                    string `json:"id"`
-	TargetK               int32  `json:"targetK"`
-	ActivePairCountBefore int32  `json:"activePairCountBefore"`
-	PairsNeeded           int32  `json:"pairsNeeded"`
-	PairsFormed           int32  `json:"pairsFormed"`
-	ActivePairCountAfter  int32  `json:"activePairCountAfter"`
-	Partial               bool   `json:"partial"`
-	Reason                string `json:"reason,omitempty"`
+	ID                       string `json:"id"`
+	TargetK                  int32  `json:"targetK"`
+	ActiveCopysetCountBefore int32  `json:"activeCopysetCountBefore"`
+	CopysetsNeeded           int32  `json:"copysetsNeeded"`
+	CopysetsFormed           int32  `json:"copysetsFormed"`
+	ActiveCopysetCountAfter  int32  `json:"activeCopysetCountAfter"`
+	Partial                  bool   `json:"partial"`
+	Reason                   string `json:"reason,omitempty"`
 }
 
-type Pair struct {
-	ID               string    `json:"id"`
-	StorageID        string    `json:"storageId"`
-	State            PairState `json:"state"`
-	MemberA          string    `json:"memberA,omitempty"`
-	MemberB          string    `json:"memberB,omitempty"`
-	PlacementGroupA  *int64    `json:"placementGroupA,omitempty"`
-	PlacementGroupB  *int64    `json:"placementGroupB,omitempty"`
-	DrainStartedAt   string    `json:"drainStartedAt,omitempty"`
-	SyncedAt         string    `json:"syncedAt,omitempty"`
-	RetiredAt        string    `json:"retiredAt,omitempty"`
-	PendingSyncJobsA *int32    `json:"pendingSyncJobsA,omitempty"`
-	PendingSyncJobsB *int32    `json:"pendingSyncJobsB,omitempty"`
+type Copyset struct {
+	ID               string       `json:"id"`
+	StorageID        string       `json:"storageId"`
+	State            CopysetState `json:"state"`
+	MemberA          string       `json:"memberA,omitempty"`
+	MemberB          string       `json:"memberB,omitempty"`
+	PlacementGroupA  *int64       `json:"placementGroupA,omitempty"`
+	PlacementGroupB  *int64       `json:"placementGroupB,omitempty"`
+	DrainStartedAt   string       `json:"drainStartedAt,omitempty"`
+	SyncedAt         string       `json:"syncedAt,omitempty"`
+	RetiredAt        string       `json:"retiredAt,omitempty"`
+	PendingSyncJobsA *int32       `json:"pendingSyncJobsA,omitempty"`
+	PendingSyncJobsB *int32       `json:"pendingSyncJobsB,omitempty"`
+	DrainInitiatedBy *int64       `json:"drainInitiatedBy,omitempty"`
+	Tags             []string     `json:"tags"`
 }
 
 type PoolMember struct {
@@ -309,7 +343,7 @@ type Volume struct {
 	Account                 Ref                    `json:"account"`
 	Storage                 Ref                    `json:"storage"`
 	Region                  Ref                    `json:"region"`
-	RegionCluster           Ref                    `json:"regionCluster,omitempty"`
+	MetadataCluster         Ref                    `json:"metadataCluster,omitempty"`
 	Name                    string                 `json:"name"`
 	Description             string                 `json:"description,omitempty"`
 	VolumeType              string                 `json:"volumeType"`
@@ -333,22 +367,22 @@ type Volume struct {
 }
 
 type VolumeBlockPlacementConfig struct {
-	ID              int64    `json:"id"`
-	TargetPairCount int32    `json:"targetPairCount"`
-	CurrentEpoch    int64    `json:"currentEpoch"`
-	PairIds         []string `json:"pairIds"`
+	ID                 int64    `json:"id"`
+	TargetCopysetCount int32    `json:"targetCopysetCount"`
+	CurrentEpoch       int64    `json:"currentEpoch"`
+	CopysetIds         []string `json:"copysetIds"`
 }
 
 type VolumeBlockPlacementResizeResult struct {
-	ID              int64  `json:"id"`
-	TargetPairCount int32  `json:"targetPairCount"`
-	PairCountBefore int32  `json:"pairCountBefore"`
-	PairsAdded      int32  `json:"pairsAdded"`
-	PairsRemoved    int32  `json:"pairsRemoved"`
-	PairCountAfter  int32  `json:"pairCountAfter"`
-	Epoch           int64  `json:"epoch"`
-	Partial         bool   `json:"partial"`
-	Reason          string `json:"reason,omitempty"`
+	ID                 int64  `json:"id"`
+	TargetCopysetCount int32  `json:"targetCopysetCount"`
+	CopysetCountBefore int32  `json:"copysetCountBefore"`
+	CopysetsAdded      int32  `json:"copysetsAdded"`
+	CopysetsRemoved    int32  `json:"copysetsRemoved"`
+	CopysetCountAfter  int32  `json:"copysetCountAfter"`
+	Epoch              int64  `json:"epoch"`
+	Partial            bool   `json:"partial"`
+	Reason             string `json:"reason,omitempty"`
 }
 
 type Fork struct {
@@ -410,46 +444,46 @@ type ForkTreeMatch struct {
 }
 
 type AuditLog struct {
-	ID              int64           `json:"id"`
-	Title           string          `json:"title"`
-	Description     string          `json:"description,omitempty"`
-	Subject         string          `json:"subject,omitempty"`
-	Success         bool            `json:"success"`
-	Data            json.RawMessage `json:"data,omitempty"`
-	CreatedBy       string          `json:"createdBy,omitempty"`
-	Node            string          `json:"node,omitempty"`
-	AccountID       *int64          `json:"accountId,omitempty"`
-	RegionID        *int64          `json:"regionId,omitempty"`
-	RegionClusterID *int64          `json:"regionClusterId,omitempty"`
-	CreatedAt       string          `json:"createdAt,omitempty"`
-	UpdatedAt       string          `json:"updatedAt,omitempty"`
+	ID                int64           `json:"id"`
+	Title             string          `json:"title"`
+	Description       string          `json:"description,omitempty"`
+	Subject           string          `json:"subject,omitempty"`
+	Success           bool            `json:"success"`
+	Data              json.RawMessage `json:"data,omitempty"`
+	CreatedBy         string          `json:"createdBy,omitempty"`
+	Node              string          `json:"node,omitempty"`
+	AccountID         *int64          `json:"accountId,omitempty"`
+	RegionID          *int64          `json:"regionId,omitempty"`
+	MetadataClusterID *int64          `json:"metadataClusterId,omitempty"`
+	CreatedAt         string          `json:"createdAt,omitempty"`
+	UpdatedAt         string          `json:"updatedAt,omitempty"`
 }
 
 type ServiceNode struct {
-	ID              int64          `json:"id"`
-	RegionID        int64          `json:"regionId"`
-	RegionClusterID *int64         `json:"regionClusterId,omitempty"`
-	ServiceType     string         `json:"serviceType"`
-	NodeID          string         `json:"nodeId"`
-	AdvertiseAddr   string         `json:"advertiseAddr"`
-	RpcAddr         string         `json:"rpcAddr,omitempty"`
-	Metadata        map[string]any `json:"metadata,omitempty"`
-	MetricsEndpoint string         `json:"metricsEndpoint,omitempty"`
-	InstanceID      string         `json:"instanceId,omitempty"`
-	InstanceInfo    map[string]any `json:"instanceInfo,omitempty"`
-	Status          string         `json:"status"`
-	LastHeartbeat   *int64         `json:"lastHeartbeat,omitempty"`
-	IsActive        bool           `json:"isActive"`
-	MemUsage        float64        `json:"memUsage,omitempty"`
-	SysLoad         *int           `json:"sysLoad,omitempty"`
-	BinaryVersion   *int32         `json:"binaryVersion,omitempty"`
+	ID                int64          `json:"id"`
+	RegionID          int64          `json:"regionId"`
+	MetadataClusterID *int64         `json:"metadataClusterId,omitempty"`
+	ServiceType       string         `json:"serviceType"`
+	NodeID            string         `json:"nodeId"`
+	AdvertiseAddr     string         `json:"advertiseAddr"`
+	RpcAddr           string         `json:"rpcAddr,omitempty"`
+	Metadata          map[string]any `json:"metadata,omitempty"`
+	MetricsEndpoint   string         `json:"metricsEndpoint,omitempty"`
+	InstanceID        string         `json:"instanceId,omitempty"`
+	InstanceInfo      map[string]any `json:"instanceInfo,omitempty"`
+	Status            string         `json:"status"`
+	LastHeartbeat     *int64         `json:"lastHeartbeat,omitempty"`
+	IsActive          bool           `json:"isActive"`
+	MemUsage          float64        `json:"memUsage,omitempty"`
+	SysLoad           *int           `json:"sysLoad,omitempty"`
+	BinaryVersion     *int32         `json:"binaryVersion,omitempty"`
 }
 
 type ClientSession struct {
 	ID              int64               `json:"id"`
 	Account         Ref                 `json:"account"`
 	Region          Ref                 `json:"region"`
-	RegionCluster   Ref                 `json:"regionCluster,omitempty"`
+	MetadataCluster Ref                 `json:"metadataCluster,omitempty"`
 	Volume          VolumeRef           `json:"volume"`
 	User            Ref                 `json:"user,omitempty"`
 	ClientType      string              `json:"clientType"`
@@ -564,39 +598,40 @@ type ServiceAlert struct {
 }
 
 type AlertCountResponse struct {
-	Active        int64 `json:"active"`
-	Recent        int64 `json:"recent"`
-	InfoCount     int64 `json:"infoCount"`
-	WarningCount  int64 `json:"warningCount"`
-	CriticalCount int64 `json:"criticalCount"`
+	Active        int64  `json:"active"`
+	Recent        int64  `json:"recent"`
+	InfoCount     int64  `json:"infoCount"`
+	WarningCount  int64  `json:"warningCount"`
+	CriticalCount int64  `json:"criticalCount"`
+	AsOf          string `json:"asOf"`
 }
 
 type RegionAlert struct {
-	ID              int64  `json:"id"`
-	AlertID         string `json:"alertId"`
-	Source          string `json:"source"`
-	NodeID          string `json:"nodeId"`
-	RegionClusterID *int64 `json:"regionClusterId,omitempty"`
-	Severity        int    `json:"severity"`
-	Category        string `json:"category"`
-	Title           string `json:"title"`
-	Description     string `json:"description,omitempty"`
-	EventTime       string `json:"eventTime"`
-	ResolvedAt      string `json:"resolvedAt,omitempty"`
-	CreatedAt       string `json:"createdAt,omitempty"`
+	ID                int64  `json:"id"`
+	AlertID           string `json:"alertId"`
+	Source            string `json:"source"`
+	NodeID            string `json:"nodeId"`
+	MetadataClusterID *int64 `json:"metadataClusterId,omitempty"`
+	Severity          int    `json:"severity"`
+	Category          string `json:"category"`
+	Title             string `json:"title"`
+	Description       string `json:"description,omitempty"`
+	EventTime         string `json:"eventTime"`
+	ResolvedAt        string `json:"resolvedAt,omitempty"`
+	CreatedAt         string `json:"createdAt,omitempty"`
 }
 
 type GCWorkerEvent struct {
-	ID              int64          `json:"id"`
-	NodeID          string         `json:"nodeId"`
-	RegionClusterID *int64         `json:"regionClusterId,omitempty"`
-	Goal            string         `json:"goal"`
-	Sid             *int64         `json:"sid,omitempty"`
-	Subject         string         `json:"subject,omitempty"`
-	Ops             map[string]any `json:"ops"`
-	DurationMs      int64          `json:"durationMs"`
-	EventTime       string         `json:"eventTime"`
-	CreatedAt       string         `json:"createdAt,omitempty"`
+	ID                int64          `json:"id"`
+	NodeID            string         `json:"nodeId"`
+	MetadataClusterID *int64         `json:"metadataClusterId,omitempty"`
+	Goal              string         `json:"goal"`
+	Sid               *int64         `json:"sid,omitempty"`
+	Subject           string         `json:"subject,omitempty"`
+	Ops               map[string]any `json:"ops"`
+	DurationMs        int64          `json:"durationMs"`
+	EventTime         string         `json:"eventTime"`
+	CreatedAt         string         `json:"createdAt,omitempty"`
 }
 
 type GCWorkerEventHistogramResponse struct {
@@ -865,26 +900,26 @@ type ClusterListOptions struct {
 	Limit     int
 }
 
-// RegionClusters
+// MetadataClusters
 
-type CreateRegionClusterRequest struct {
+type CreateMetadataClusterRequest struct {
 	Name string `json:"name"`
 }
 
-type EditRegionClusterRequest struct {
+type EditMetadataClusterRequest struct {
 	Name string `json:"name"`
 }
 
-type SetRegionClusterReadyRequest struct {
+type SetMetadataClusterReadyRequest struct {
 	Ready bool `json:"ready"`
 }
 
-type SetReadyRegionClusterResponse struct {
+type SetReadyMetadataClusterResponse struct {
 	ID    int64 `json:"id"`
 	Ready bool  `json:"ready"`
 }
 
-type RegionClusterListOptions struct {
+type MetadataClusterListOptions struct {
 	IsActive *bool
 	Page     int
 	Limit    int
@@ -975,7 +1010,7 @@ type GetConfigStorageResponse struct {
 	EpochPolicyVersion int32  `json:"epochPolicyVersion"`
 }
 
-type DrainPairStorageResponse struct {
+type DrainCopysetStorageResponse struct {
 	ID    string `json:"id"`
 	State string `json:"state"`
 }
@@ -985,9 +1020,13 @@ type CancelDrainStorageResponse struct {
 	State string `json:"state"`
 }
 
+type UpdateStorageTagsRequest struct {
+	Tags []string `json:"tags,omitempty"`
+}
+
 type RegisterStorageMemberRequest struct {
 	RegionClusterID int64  `json:"regionClusterId"`
-	Name            string `json:"name"`
+	Name            string `json:"name,omitempty"`
 }
 
 type BackfillFingerprintsStorageResponse struct {
@@ -1012,19 +1051,19 @@ type StorageListOptions struct {
 // Volumes
 
 type CreateVolumeRequest struct {
-	AccountID         int64                  `json:"accountId"`
-	StorageID         int64                  `json:"storageId"`
-	Name              string                 `json:"name"`
-	Description       string                 `json:"description,omitempty"`
-	VolumeType        string                 `json:"volumeType"`
-	Encryption        *bool                  `json:"encryption,omitempty"`
-	EncryptionKey     string                 `json:"encryptionKey,omitempty"`
-	Retention         VolumeRetentionPolicy  `json:"retention,omitempty"`
-	Versioning        VolumeVersioningPolicy `json:"versioning,omitempty"`
-	Compaction        string                 `json:"compaction,omitempty"`
-	QuotaLimit        *int64                 `json:"quotaLimit,omitempty"`
-	RegionClusterID   *int64                 `json:"regionClusterId,omitempty"`
-	RegionClusterUUID string                 `json:"regionClusterUuid,omitempty"`
+	AccountID           int64                  `json:"accountId"`
+	StorageID           int64                  `json:"storageId"`
+	Name                string                 `json:"name"`
+	Description         string                 `json:"description,omitempty"`
+	VolumeType          string                 `json:"volumeType"`
+	Encryption          *bool                  `json:"encryption,omitempty"`
+	EncryptionKey       string                 `json:"encryptionKey,omitempty"`
+	Retention           VolumeRetentionPolicy  `json:"retention,omitempty"`
+	Versioning          VolumeVersioningPolicy `json:"versioning,omitempty"`
+	Compaction          string                 `json:"compaction,omitempty"`
+	QuotaLimit          *int64                 `json:"quotaLimit,omitempty"`
+	MetadataClusterID   *int64                 `json:"metadataClusterId,omitempty"`
+	MetadataClusterUUID string                 `json:"metadataClusterUuid,omitempty"`
 }
 
 type CreateVolumeResponse struct {
@@ -1095,8 +1134,8 @@ type UpdateVolumeQuotaRequest struct {
 	QuotaLimit int64 `json:"quotaLimit"`
 }
 
-type UpdateVolumePairConfigRequest struct {
-	TargetPairCount int32 `json:"targetPairCount"`
+type UpdateVolumeCopysetConfigRequest struct {
+	TargetCopysetCount int32 `json:"targetCopysetCount"`
 }
 
 type StatsVolumeResponse struct {
@@ -1132,15 +1171,15 @@ type RestoreVolumeForkRequest struct {
 }
 
 type VolumeListOptions struct {
-	AccountID       int64
-	RegionID        *int64
-	RegionClusterID *int64
-	StorageID       *int64
-	VolumeType      string
-	Locked          *bool
-	IsActive        *bool
-	Page            int
-	Limit           int
+	AccountID         int64
+	RegionID          *int64
+	MetadataClusterID *int64
+	StorageID         *int64
+	VolumeType        string
+	Locked            *bool
+	IsActive          *bool
+	Page              int
+	Limit             int
 }
 
 // VolumeForkTrees
@@ -1177,23 +1216,23 @@ type VolumeForkSearchListOptions struct {
 // AuditLogs
 
 type AuditLogListOptions struct {
-	AccountID       int64
-	RegionID        *int64
-	RegionClusterID *int64
-	Cursor          int64
-	Limit           int
-	Subject         string
-	CreatedBy       string
+	AccountID         int64
+	RegionID          *int64
+	MetadataClusterID *int64
+	Cursor            int64
+	Limit             int
+	Subject           string
+	CreatedBy         string
 }
 
 // RegionAuditLogs
 
 type RegionAuditLogListOptions struct {
-	RegionClusterID *int64
-	Cursor          int64
-	Limit           int
-	Subject         string
-	Node            string
+	MetadataClusterID *int64
+	Cursor            int64
+	Limit             int
+	Subject           string
+	Node              string
 }
 
 // ServiceNodes
@@ -1208,19 +1247,19 @@ type StatsHistoryServiceNodeResponse struct {
 // ClientSessions
 
 type ClientSessionListOptions struct {
-	AccountID       int64
-	RegionID        *int64
-	RegionClusterID *int64
-	VolumeID        *int64
-	UserID          *int64
-	ClientType      string
-	Status          ClientSessionStatus
-	IsActive        *bool
-	OsName          string
-	Platform        string
-	Search          string
-	Page            int
-	Limit           int
+	AccountID         int64
+	RegionID          *int64
+	MetadataClusterID *int64
+	VolumeID          *int64
+	UserID            *int64
+	ClientType        string
+	Status            ClientSessionStatus
+	IsActive          *bool
+	OsName            string
+	Platform          string
+	Search            string
+	Page              int
+	Limit             int
 }
 
 // Discover
@@ -1263,26 +1302,26 @@ type ResolveRegionAlertResponse struct {
 }
 
 type RegionAlertListOptions struct {
-	Active          *bool
-	Severity        *int
-	Category        string
-	NodeID          string
-	RegionClusterID *int64
-	Since           string
-	Page            int
-	Limit           int
+	Active            *bool
+	Severity          *int
+	Category          string
+	NodeID            string
+	MetadataClusterID *int64
+	Since             string
+	Page              int
+	Limit             int
 }
 
 // GCWorkerEvents
 
 type GCWorkerEventListOptions struct {
-	NodeID          string
-	Goal            string
-	Sid             *int64
-	RegionClusterID *int64
-	Since           string
-	Page            int
-	Limit           int
+	NodeID            string
+	Goal              string
+	Sid               *int64
+	MetadataClusterID *int64
+	Since             string
+	Page              int
+	Limit             int
 }
 
 // Vault

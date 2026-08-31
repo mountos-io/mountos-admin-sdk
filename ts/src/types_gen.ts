@@ -39,11 +39,11 @@ export interface ListOptions {
 
 export type ClientSessionStatus = 'connected' | 'active' | 'degraded' | 'disconnected' | 'expired' | 'unknown'
 
+export type CopysetState = 'active' | 'draining' | 'synced_drained' | 'retired'
+
 export type LicenseQuotaState = 'ok' | 'exceeded'
 
 export type LicenseStatus = 'valid' | 'expiring' | 'grace' | 'expired_access' | 'expired'
-
-export type PairState = 'active' | 'draining' | 'synced_drained' | 'retired'
 
 export interface Account {
   id: number
@@ -83,7 +83,7 @@ export interface Region {
   updatedAt: string
 }
 
-export interface RegionCluster {
+export interface MetadataCluster {
   id: number
   exportId: string
   regionId: number
@@ -129,24 +129,24 @@ export interface BlockVolume {
   createdAt: string
   updatedAt: string
   memberState?: string
-  pairId?: string
+  copysetId?: string
 }
 
 export interface UpdateConfigResult {
   id: string
   targetK: number
-  activePairCountBefore: number
-  pairsNeeded: number
-  pairsFormed: number
-  activePairCountAfter: number
+  activeCopysetCountBefore: number
+  copysetsNeeded: number
+  copysetsFormed: number
+  activeCopysetCountAfter: number
   partial: boolean
   reason?: string
 }
 
-export interface Pair {
+export interface Copyset {
   id: string
   storageId: string
-  state: PairState
+  state: CopysetState
   memberA?: string
   memberB?: string
   placementGroupA?: number
@@ -156,6 +156,8 @@ export interface Pair {
   retiredAt?: string
   pendingSyncJobsA?: number
   pendingSyncJobsB?: number
+  drainInitiatedBy?: number
+  tags: string[]
 }
 
 export interface PoolMember {
@@ -171,7 +173,7 @@ export interface Volume {
   account: Ref
   storage: Ref
   region: Ref
-  regionCluster?: Ref
+  metadataCluster?: Ref
   name: string
   description?: string
   volumeType: string
@@ -196,18 +198,18 @@ export interface Volume {
 
 export interface VolumeBlockPlacementConfig {
   id: number
-  targetPairCount: number
+  targetCopysetCount: number
   currentEpoch: number
-  pairIds: string[]
+  copysetIds: string[]
 }
 
 export interface VolumeBlockPlacementResizeResult {
   id: number
-  targetPairCount: number
-  pairCountBefore: number
-  pairsAdded: number
-  pairsRemoved: number
-  pairCountAfter: number
+  targetCopysetCount: number
+  copysetCountBefore: number
+  copysetsAdded: number
+  copysetsRemoved: number
+  copysetCountAfter: number
   epoch: number
   partial: boolean
   reason?: string
@@ -282,7 +284,7 @@ export interface AuditLog {
   node?: string
   accountId?: number
   regionId?: number
-  regionClusterId?: number
+  metadataClusterId?: number
   createdAt?: string
   updatedAt?: string
 }
@@ -290,7 +292,7 @@ export interface AuditLog {
 export interface ServiceNode {
   id: number
   regionId: number
-  regionClusterId?: number
+  metadataClusterId?: number
   serviceType: string
   nodeId: string
   advertiseAddr: string
@@ -311,7 +313,7 @@ export interface ClientSession {
   id: number
   account: Ref
   region: Ref
-  regionCluster?: Ref
+  metadataCluster?: Ref
   volume: VolumeRef
   user?: Ref
   clientType: string
@@ -431,6 +433,7 @@ export interface AlertCountResponse {
   infoCount: number
   warningCount: number
   criticalCount: number
+  asOf: string
 }
 
 export interface RegionAlert {
@@ -438,7 +441,7 @@ export interface RegionAlert {
   alertId: string
   source: string
   nodeId: string
-  regionClusterId?: number
+  metadataClusterId?: number
   severity: number
   category: string
   title: string
@@ -451,7 +454,7 @@ export interface RegionAlert {
 export interface GCWorkerEvent {
   id: number
   nodeId: string
-  regionClusterId?: number
+  metadataClusterId?: number
   goal: string
   sid?: number
   subject?: string
@@ -715,21 +718,21 @@ export interface ClusterListOptions extends ListOptions {
   isActive?: boolean
 }
 
-// RegionClusters
+// MetadataClusters
 
-export interface CreateRegionClusterRequest {
+export interface CreateMetadataClusterRequest {
   name: string
 }
 
-export interface EditRegionClusterRequest {
+export interface EditMetadataClusterRequest {
   name: string
 }
 
-export interface SetRegionClusterReadyRequest {
+export interface SetMetadataClusterReadyRequest {
   ready: boolean
 }
 
-export interface RegionClusterListOptions extends ListOptions {
+export interface MetadataClusterListOptions extends ListOptions {
   isActive?: boolean
 }
 
@@ -779,9 +782,13 @@ export interface UpdateStorageConfigRequest {
   k: number
 }
 
+export interface UpdateStorageTagsRequest {
+  tags?: string[]
+}
+
 export interface RegisterStorageMemberRequest {
   regionClusterId: number
-  name: string
+  name?: string
 }
 
 export interface StorageListOptions extends ListOptions {
@@ -808,8 +815,8 @@ export interface CreateVolumeRequest {
   versioning?: VolumeVersioningPolicy
   compaction?: string
   quotaLimit?: number
-  regionClusterId?: number
-  regionClusterUuid?: string
+  metadataClusterId?: number
+  metadataClusterUuid?: string
 }
 
 export interface EditVolumeRequest {
@@ -852,8 +859,8 @@ export interface UpdateVolumeQuotaRequest {
   quotaLimit: number
 }
 
-export interface UpdateVolumePairConfigRequest {
-  targetPairCount: number
+export interface UpdateVolumeCopysetConfigRequest {
+  targetCopysetCount: number
 }
 
 export interface CreateVolumeForkRequest {
@@ -875,7 +882,7 @@ export interface RestoreVolumeForkRequest {
 export interface VolumeListOptions extends ListOptions {
   accountId: number
   regionId?: number
-  regionClusterId?: number
+  metadataClusterId?: number
   storageId?: number
   volumeType?: string
   locked?: boolean
@@ -918,7 +925,7 @@ export interface VolumeForkSearchListOptions {
 export interface AuditLogListOptions {
   accountId: number
   regionId?: number
-  regionClusterId?: number
+  metadataClusterId?: number
   cursor?: number
   limit?: number
   subject?: string
@@ -928,7 +935,7 @@ export interface AuditLogListOptions {
 // RegionAuditLogs
 
 export interface RegionAuditLogListOptions {
-  regionClusterId?: number
+  metadataClusterId?: number
   cursor?: number
   limit?: number
   subject?: string
@@ -944,7 +951,7 @@ export interface RegionAuditLogListOptions {
 export interface ClientSessionListOptions extends ListOptions {
   accountId: number
   regionId?: number
-  regionClusterId?: number
+  metadataClusterId?: number
   volumeId?: number
   userId?: number
   clientType?: string
@@ -989,7 +996,7 @@ export interface RegionAlertListOptions extends ListOptions {
   severity?: number
   category?: string
   nodeId?: string
-  regionClusterId?: number
+  metadataClusterId?: number
   since?: string
 }
 
@@ -999,7 +1006,7 @@ export interface GCWorkerEventListOptions extends ListOptions {
   nodeId?: string
   goal?: string
   sid?: number
-  regionClusterId?: number
+  metadataClusterId?: number
   since?: string
 }
 

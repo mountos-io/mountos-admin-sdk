@@ -88,6 +88,18 @@ pub enum ClientSessionStatus {
 }
 ```
 
+### `CopysetState`
+
+```rust
+pub enum CopysetState {
+    Active,
+    Draining,
+    SyncedDrained,
+    Retired,
+    Unknown(String),
+}
+```
+
 ### `LicenseQuotaState`
 
 ```rust
@@ -107,18 +119,6 @@ pub enum LicenseStatus {
     Grace,
     ExpiredAccess,
     Expired,
-    Unknown(String),
-}
-```
-
-### `PairState`
-
-```rust
-pub enum PairState {
-    Active,
-    Draining,
-    SyncedDrained,
-    Retired,
     Unknown(String),
 }
 ```
@@ -155,6 +155,7 @@ pub struct AlertCountResponse {
     pub info_count: i64,
     pub warning_count: i64,
     pub critical_count: i64,
+    pub as_of: String,
 }
 ```
 
@@ -172,7 +173,7 @@ pub struct AuditLog {
     pub node: Option<String>,
     pub account_id: Option<i64>,
     pub region_id: Option<i64>,
-    pub region_cluster_id: Option<i64>,
+    pub metadata_cluster_id: Option<i64>,
     pub created_at: Option<String>,
     pub updated_at: Option<String>,
 }
@@ -211,7 +212,7 @@ pub struct BlockVolume {
     pub created_at: String,
     pub updated_at: String,
     pub member_state: Option<String>,
-    pub pair_id: Option<String>,
+    pub copyset_id: Option<String>,
 }
 ```
 
@@ -222,7 +223,7 @@ pub struct ClientSession {
     pub id: i64,
     pub account: Ref,
     pub region: Ref,
-    pub region_cluster: Option<Ref>,
+    pub metadata_cluster: Option<Ref>,
     pub volume: VolumeRef,
     pub user: Option<Ref>,
     pub client_type: String,
@@ -264,6 +265,27 @@ pub struct CompatibleStorage {
 pub struct CompatibleVolume {
     pub id: String,
     pub name: String,
+}
+```
+
+### `Copyset`
+
+```rust
+pub struct Copyset {
+    pub id: String,
+    pub storage_id: String,
+    pub state: CopysetState,
+    pub member_a: Option<String>,
+    pub member_b: Option<String>,
+    pub placement_group_a: Option<i64>,
+    pub placement_group_b: Option<i64>,
+    pub drain_started_at: Option<String>,
+    pub synced_at: Option<String>,
+    pub retired_at: Option<String>,
+    pub pending_sync_jobs_a: Option<i32>,
+    pub pending_sync_jobs_b: Option<i32>,
+    pub drain_initiated_by: Option<i64>,
+    pub tags: Vec<String>,
 }
 ```
 
@@ -402,7 +424,7 @@ pub struct ForkTreeMatch {
 pub struct GCWorkerEvent {
     pub id: i64,
     pub node_id: String,
-    pub region_cluster_id: Option<i64>,
+    pub metadata_cluster_id: Option<i64>,
     pub goal: String,
     pub sid: Option<i64>,
     pub subject: Option<String>,
@@ -521,6 +543,22 @@ pub struct LicenseTerms {
 }
 ```
 
+### `MetadataCluster`
+
+```rust
+pub struct MetadataCluster {
+    pub id: i64,
+    pub export_id: String,
+    pub region_id: i64,
+    pub name: String,
+    pub default_cluster: bool,
+    pub is_ready: bool,
+    pub is_active: bool,
+    pub created_at: String,
+    pub updated_at: String,
+}
+```
+
 ### `MetricsTarget`
 
 ```rust
@@ -582,25 +620,6 @@ pub struct NodeStatsSample {
 }
 ```
 
-### `Pair`
-
-```rust
-pub struct Pair {
-    pub id: String,
-    pub storage_id: String,
-    pub state: PairState,
-    pub member_a: Option<String>,
-    pub member_b: Option<String>,
-    pub placement_group_a: Option<i64>,
-    pub placement_group_b: Option<i64>,
-    pub drain_started_at: Option<String>,
-    pub synced_at: Option<String>,
-    pub retired_at: Option<String>,
-    pub pending_sync_jobs_a: Option<i32>,
-    pub pending_sync_jobs_b: Option<i32>,
-}
-```
-
 ### `PoolMember`
 
 ```rust
@@ -646,7 +665,7 @@ pub struct RegionAlert {
     pub alert_id: String,
     pub source: String,
     pub node_id: String,
-    pub region_cluster_id: Option<i64>,
+    pub metadata_cluster_id: Option<i64>,
     pub severity: i64,
     pub category: String,
     pub title: String,
@@ -654,22 +673,6 @@ pub struct RegionAlert {
     pub event_time: String,
     pub resolved_at: Option<String>,
     pub created_at: Option<String>,
-}
-```
-
-### `RegionCluster`
-
-```rust
-pub struct RegionCluster {
-    pub id: i64,
-    pub export_id: String,
-    pub region_id: i64,
-    pub name: String,
-    pub default_cluster: bool,
-    pub is_ready: bool,
-    pub is_active: bool,
-    pub created_at: String,
-    pub updated_at: String,
 }
 ```
 
@@ -719,7 +722,7 @@ pub struct ServiceAlert {
 pub struct ServiceNode {
     pub id: i64,
     pub region_id: i64,
-    pub region_cluster_id: Option<i64>,
+    pub metadata_cluster_id: Option<i64>,
     pub service_type: String,
     pub node_id: String,
     pub advertise_addr: String,
@@ -802,10 +805,10 @@ pub struct Storage {
 pub struct UpdateConfigResult {
     pub id: String,
     pub target_k: i32,
-    pub active_pair_count_before: i32,
-    pub pairs_needed: i32,
-    pub pairs_formed: i32,
-    pub active_pair_count_after: i32,
+    pub active_copyset_count_before: i32,
+    pub copysets_needed: i32,
+    pub copysets_formed: i32,
+    pub active_copyset_count_after: i32,
     pub partial: bool,
     pub reason: Option<String>,
 }
@@ -842,7 +845,7 @@ pub struct Volume {
     pub account: Ref,
     pub storage: Ref,
     pub region: Ref,
-    pub region_cluster: Option<Ref>,
+    pub metadata_cluster: Option<Ref>,
     pub name: String,
     pub description: Option<String>,
     pub volume_type: String,
@@ -882,9 +885,9 @@ pub struct VolumeApiKey {
 ```rust
 pub struct VolumeBlockPlacementConfig {
     pub id: i64,
-    pub target_pair_count: i32,
+    pub target_copyset_count: i32,
     pub current_epoch: i64,
-    pub pair_ids: Vec<String>,
+    pub copyset_ids: Vec<String>,
 }
 ```
 
@@ -893,11 +896,11 @@ pub struct VolumeBlockPlacementConfig {
 ```rust
 pub struct VolumeBlockPlacementResizeResult {
     pub id: i64,
-    pub target_pair_count: i32,
-    pub pair_count_before: i32,
-    pub pairs_added: i32,
-    pub pairs_removed: i32,
-    pub pair_count_after: i32,
+    pub target_copyset_count: i32,
+    pub copyset_count_before: i32,
+    pub copysets_added: i32,
+    pub copysets_removed: i32,
+    pub copyset_count_after: i32,
     pub epoch: i64,
     pub partial: bool,
     pub reason: Option<String>,
@@ -1202,7 +1205,7 @@ Accessor: `client.clusters`
 #### `list` - GET /api/v1/clusters/list
 
 ```rust
-pub async fn list(&self, opts: &ClusterListOptions) -> Result<PaginatedResponse<RegionCluster>, Error>
+pub async fn list(&self, opts: &ClusterListOptions) -> Result<PaginatedResponse<MetadataCluster>, Error>
 ```
 
 Query params:
@@ -1217,20 +1220,20 @@ pub struct ClusterListOptions {
 }
 ```
 
-### RegionClusters
+### MetadataClusters
 
-Accessor: `client.region_clusters`
+Accessor: `client.metadata_clusters`
 
 #### `create` - POST /api/v1/regions/:regionId/clusters/create
 
 ```rust
-pub async fn create(&self, region_id: i64, req: &CreateRegionClusterRequest) -> Result<IdResponse, Error>
+pub async fn create(&self, region_id: i64, req: &CreateMetadataClusterRequest) -> Result<IdResponse, Error>
 ```
 
 Request body:
 
 ```rust
-pub struct CreateRegionClusterRequest {
+pub struct CreateMetadataClusterRequest {
     pub name: String,
 }
 ```
@@ -1238,13 +1241,13 @@ pub struct CreateRegionClusterRequest {
 #### `list` - GET /api/v1/regions/:regionId/clusters/list
 
 ```rust
-pub async fn list(&self, region_id: i64, opts: Option<&RegionClusterListOptions>) -> Result<PaginatedResponse<RegionCluster>, Error>
+pub async fn list(&self, region_id: i64, opts: Option<&MetadataClusterListOptions>) -> Result<PaginatedResponse<MetadataCluster>, Error>
 ```
 
 Query params:
 
 ```rust
-pub struct RegionClusterListOptions {
+pub struct MetadataClusterListOptions {
     pub is_active: Option<bool>,
     pub page: Option<i64>,
     pub limit: Option<i64>,
@@ -1254,19 +1257,19 @@ pub struct RegionClusterListOptions {
 #### `get` - GET /api/v1/regions/:regionId/clusters/:clusterId
 
 ```rust
-pub async fn get(&self, region_id: i64, cluster_id: i64) -> Result<RegionCluster, Error>
+pub async fn get(&self, region_id: i64, cluster_id: i64) -> Result<MetadataCluster, Error>
 ```
 
 #### `edit` - PUT /api/v1/regions/:regionId/clusters/:clusterId
 
 ```rust
-pub async fn edit(&self, region_id: i64, cluster_id: i64, req: &EditRegionClusterRequest) -> Result<IdResponse, Error>
+pub async fn edit(&self, region_id: i64, cluster_id: i64, req: &EditMetadataClusterRequest) -> Result<IdResponse, Error>
 ```
 
 Request body:
 
 ```rust
-pub struct EditRegionClusterRequest {
+pub struct EditMetadataClusterRequest {
     pub name: String,
 }
 ```
@@ -1280,13 +1283,13 @@ pub async fn set_default(&self, region_id: i64, cluster_id: i64) -> Result<IdRes
 #### `set_ready` - POST /api/v1/regions/:regionId/clusters/:clusterId/set-ready
 
 ```rust
-pub async fn set_ready(&self, region_id: i64, cluster_id: i64, req: &SetRegionClusterReadyRequest) -> Result<SetReadyRegionClusterResponse, Error>
+pub async fn set_ready(&self, region_id: i64, cluster_id: i64, req: &SetMetadataClusterReadyRequest) -> Result<SetReadyMetadataClusterResponse, Error>
 ```
 
 Request body:
 
 ```rust
-pub struct SetRegionClusterReadyRequest {
+pub struct SetMetadataClusterReadyRequest {
     pub ready: bool,
 }
 ```
@@ -1294,7 +1297,7 @@ pub struct SetRegionClusterReadyRequest {
 Response body:
 
 ```rust
-pub struct SetReadyRegionClusterResponse {
+pub struct SetReadyMetadataClusterResponse {
     pub id: i64,
     pub ready: bool,
 }
@@ -1525,37 +1528,37 @@ pub struct GetConfigStorageResponse {
 }
 ```
 
-#### `list_pairs` - GET /api/v1/storages/:storageId/pairs
+#### `list_copysets` - GET /api/v1/storages/:storageId/copysets
 
 ```rust
-pub async fn list_pairs(&self, storage_id: i64, state: Option<&str>, include_retired: Option<bool>) -> Result<Vec<Pair>, Error>
+pub async fn list_copysets(&self, storage_id: i64, state: Option<&str>, include_retired: Option<bool>) -> Result<Vec<Copyset>, Error>
 ```
 
-#### `get_pair_status` - GET /api/v1/storages/:storageId/pairs/:pairId
+#### `get_copyset_status` - GET /api/v1/storages/:storageId/copysets/:copysetId
 
 ```rust
-pub async fn get_pair_status(&self, storage_id: i64, pair_id: &str) -> Result<Pair, Error>
+pub async fn get_copyset_status(&self, storage_id: i64, copyset_id: &str) -> Result<Copyset, Error>
 ```
 
-#### `drain_pair` - POST /api/v1/storages/:storageId/pairs/:pairId/drain
+#### `drain_copyset` - POST /api/v1/storages/:storageId/copysets/:copysetId/drain
 
 ```rust
-pub async fn drain_pair(&self, storage_id: i64, pair_id: &str) -> Result<DrainPairStorageResponse, Error>
+pub async fn drain_copyset(&self, storage_id: i64, copyset_id: &str) -> Result<DrainCopysetStorageResponse, Error>
 ```
 
 Response body:
 
 ```rust
-pub struct DrainPairStorageResponse {
+pub struct DrainCopysetStorageResponse {
     pub id: String,
     pub state: String,
 }
 ```
 
-#### `cancel_drain` - POST /api/v1/storages/:storageId/pairs/:pairId/cancel-drain
+#### `cancel_drain` - POST /api/v1/storages/:storageId/copysets/:copysetId/cancel-drain
 
 ```rust
-pub async fn cancel_drain(&self, storage_id: i64, pair_id: &str) -> Result<CancelDrainStorageResponse, Error>
+pub async fn cancel_drain(&self, storage_id: i64, copyset_id: &str) -> Result<CancelDrainStorageResponse, Error>
 ```
 
 Response body:
@@ -1564,6 +1567,20 @@ Response body:
 pub struct CancelDrainStorageResponse {
     pub id: String,
     pub state: String,
+}
+```
+
+#### `update_tags` - PUT /api/v1/storages/:storageId/copysets/:copysetId/tags
+
+```rust
+pub async fn update_tags(&self, storage_id: i64, copyset_id: &str, req: &UpdateStorageTagsRequest) -> Result<Copyset, Error>
+```
+
+Request body:
+
+```rust
+pub struct UpdateStorageTagsRequest {
+    pub tags: Option<Vec<String>>,
 }
 ```
 
@@ -1578,7 +1595,7 @@ Request body:
 ```rust
 pub struct RegisterStorageMemberRequest {
     pub region_cluster_id: i64,
-    pub name: String,
+    pub name: Option<String>,
 }
 ```
 
@@ -1630,8 +1647,8 @@ pub struct CreateVolumeRequest {
     pub versioning: Option<VolumeVersioningPolicy>,
     pub compaction: Option<String>,
     pub quota_limit: Option<i64>,
-    pub region_cluster_id: Option<i64>,
-    pub region_cluster_uuid: Option<String>,
+    pub metadata_cluster_id: Option<i64>,
+    pub metadata_cluster_uuid: Option<String>,
 }
 ```
 
@@ -1656,7 +1673,7 @@ Query params:
 pub struct VolumeListOptions {
     pub account_id: i64,
     pub region_id: Option<i64>,
-    pub region_cluster_id: Option<i64>,
+    pub metadata_cluster_id: Option<i64>,
     pub storage_id: Option<i64>,
     pub volume_type: Option<String>,
     pub locked: Option<bool>,
@@ -1855,23 +1872,23 @@ pub struct UpdateVolumeQuotaRequest {
 }
 ```
 
-#### `get_pair_config` - GET /api/v1/volumes/:volumeId/pair-config
+#### `get_copyset_config` - GET /api/v1/volumes/:volumeId/copyset-config
 
 ```rust
-pub async fn get_pair_config(&self, volume_id: i64) -> Result<VolumeBlockPlacementConfig, Error>
+pub async fn get_copyset_config(&self, volume_id: i64) -> Result<VolumeBlockPlacementConfig, Error>
 ```
 
-#### `update_pair_config` - PUT /api/v1/volumes/:volumeId/pair-config
+#### `update_copyset_config` - PUT /api/v1/volumes/:volumeId/copyset-config
 
 ```rust
-pub async fn update_pair_config(&self, volume_id: i64, req: &UpdateVolumePairConfigRequest) -> Result<VolumeBlockPlacementResizeResult, Error>
+pub async fn update_copyset_config(&self, volume_id: i64, req: &UpdateVolumeCopysetConfigRequest) -> Result<VolumeBlockPlacementResizeResult, Error>
 ```
 
 Request body:
 
 ```rust
-pub struct UpdateVolumePairConfigRequest {
-    pub target_pair_count: i32,
+pub struct UpdateVolumeCopysetConfigRequest {
+    pub target_copyset_count: i32,
 }
 ```
 
@@ -2056,7 +2073,7 @@ Query params:
 pub struct AuditLogListOptions {
     pub account_id: i64,
     pub region_id: Option<i64>,
-    pub region_cluster_id: Option<i64>,
+    pub metadata_cluster_id: Option<i64>,
     pub cursor: Option<i64>,
     pub limit: Option<i64>,
     pub subject: Option<String>,
@@ -2078,7 +2095,7 @@ Query params:
 
 ```rust
 pub struct RegionAuditLogListOptions {
-    pub region_cluster_id: Option<i64>,
+    pub metadata_cluster_id: Option<i64>,
     pub cursor: Option<i64>,
     pub limit: Option<i64>,
     pub subject: Option<String>,
@@ -2093,7 +2110,7 @@ Accessor: `client.service_nodes`
 #### `list` - GET /api/v1/regions/:regionId/nodes
 
 ```rust
-pub async fn list(&self, region_id: i64, service_type: Option<&str>, status: Option<&str>, inactive_hours: Option<i64>, region_cluster_id: Option<i64>) -> Result<Vec<ServiceNode>, Error>
+pub async fn list(&self, region_id: i64, service_type: Option<&str>, status: Option<&str>, inactive_hours: Option<i64>, metadata_cluster_id: Option<i64>) -> Result<Vec<ServiceNode>, Error>
 ```
 
 #### `stats` - GET /api/v1/regions/:regionId/nodes/:nodeId/stats
@@ -2143,7 +2160,7 @@ Query params:
 pub struct ClientSessionListOptions {
     pub account_id: i64,
     pub region_id: Option<i64>,
-    pub region_cluster_id: Option<i64>,
+    pub metadata_cluster_id: Option<i64>,
     pub volume_id: Option<i64>,
     pub user_id: Option<i64>,
     pub client_type: Option<String>,
@@ -2166,7 +2183,7 @@ pub async fn get(&self, session_id: i64) -> Result<ClientSession, Error>
 #### `summary` - GET /api/v1/client-sessions/summary
 
 ```rust
-pub async fn summary(&self, account_id: i64, region_id: Option<i64>, region_cluster_id: Option<i64>, volume_id: Option<i64>, user_id: Option<i64>) -> Result<SessionSummary, Error>
+pub async fn summary(&self, account_id: i64, region_id: Option<i64>, metadata_cluster_id: Option<i64>, volume_id: Option<i64>, user_id: Option<i64>) -> Result<SessionSummary, Error>
 ```
 
 ### Discover
@@ -2312,7 +2329,7 @@ pub struct RegionAlertListOptions {
     pub severity: Option<i64>,
     pub category: Option<String>,
     pub node_id: Option<String>,
-    pub region_cluster_id: Option<i64>,
+    pub metadata_cluster_id: Option<i64>,
     pub since: Option<String>,
     pub page: Option<i64>,
     pub limit: Option<i64>,
@@ -2322,7 +2339,7 @@ pub struct RegionAlertListOptions {
 #### `count` - GET /api/v1/regions/:regionId/alerts/count
 
 ```rust
-pub async fn count(&self, region_id: i64, region_cluster_id: Option<i64>) -> Result<AlertCountResponse, Error>
+pub async fn count(&self, region_id: i64, metadata_cluster_id: Option<i64>) -> Result<AlertCountResponse, Error>
 ```
 
 #### `resolve` - POST /api/v1/regions/:regionId/alerts/:alertId/resolve
@@ -2356,7 +2373,7 @@ pub struct GCWorkerEventListOptions {
     pub node_id: Option<String>,
     pub goal: Option<String>,
     pub sid: Option<i64>,
-    pub region_cluster_id: Option<i64>,
+    pub metadata_cluster_id: Option<i64>,
     pub since: Option<String>,
     pub page: Option<i64>,
     pub limit: Option<i64>,
@@ -2366,7 +2383,7 @@ pub struct GCWorkerEventListOptions {
 #### `histogram` - GET /api/v1/regions/:regionId/gc-worker-events/histogram
 
 ```rust
-pub async fn histogram(&self, region_id: i64, node_id: Option<&str>, goal: Option<&str>, sid: Option<i64>, region_cluster_id: Option<i64>, since: Option<&str>, bucket_seconds: Option<i64>) -> Result<GCWorkerEventHistogramResponse, Error>
+pub async fn histogram(&self, region_id: i64, node_id: Option<&str>, goal: Option<&str>, sid: Option<i64>, metadata_cluster_id: Option<i64>, since: Option<&str>, bucket_seconds: Option<i64>) -> Result<GCWorkerEventHistogramResponse, Error>
 ```
 
 #### `goals` - GET /api/v1/regions/:regionId/gc-worker-events/goals

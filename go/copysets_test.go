@@ -1,7 +1,7 @@
-// Fixture/mock-server contract test for the block HA-pair placement admin
+// Fixture/mock-server contract test for the block copyset placement admin
 // surface (admin-sdk.md §5 step 2): exercises the generated client against
 // an httptest.Server, no live appserv. Covers the "accepted, not completed"
-// response shapes (drainPair/cancelDrain/updateConfig) and regression-guards
+// response shapes (drainCopyset/cancelDrain/updateConfig) and regression-guards
 // the reactivateMember GET-vs-POST generator bug (a no-request endpoint with
 // a named responseType on a mutating method was silently generated as GET
 // in all three SDK languages until fixed alongside this test).
@@ -83,9 +83,9 @@ func TestGetConfigReadsBackK(t *testing.T) {
 	}
 }
 
-func TestListPairs(t *testing.T) {
+func TestListCopysets(t *testing.T) {
 	_, srv := newFixtureServer(t, map[string]any{
-		"GET /api/v1/storages/7/pairs": []map[string]any{
+		"GET /api/v1/storages/7/copysets": []map[string]any{
 			{"id": "p1", "storageId": "s1", "state": "active", "memberA": "bv1", "memberB": "bv2"},
 			{"id": "p2", "storageId": "s1", "state": "draining", "memberA": "bv3", "memberB": "bv4", "pendingSyncJobsA": 3, "pendingSyncJobsB": 0},
 		},
@@ -93,55 +93,55 @@ func TestListPairs(t *testing.T) {
 	defer srv.Close()
 	c := newTestClient(t, srv.URL)
 
-	pairs, err := c.Storages.ListPairs(context.Background(), 7, "", false)
+	copysets, err := c.Storages.ListCopysets(context.Background(), 7, "", false)
 	if err != nil {
-		t.Fatalf("ListPairs: %v", err)
+		t.Fatalf("ListCopysets: %v", err)
 	}
-	if len(pairs) != 2 || pairs[1].State != "draining" || pairs[1].PendingSyncJobsA == nil || *pairs[1].PendingSyncJobsA != 3 {
-		t.Fatalf("unexpected pairs: %+v", pairs)
+	if len(copysets) != 2 || copysets[1].State != "draining" || copysets[1].PendingSyncJobsA == nil || *copysets[1].PendingSyncJobsA != 3 {
+		t.Fatalf("unexpected copysets: %+v", copysets)
 	}
 }
 
-// TestPairPendingSyncJobsNullVsZero proves R3-010's fix: PendingSyncJobsA/B
+// TestCopysetPendingSyncJobsNullVsZero proves R3-010's fix: PendingSyncJobsA/B
 // is a *int32, so a wire "null" (not yet observed) and a wire "0" (confirmed
 // zero backlog) decode to distinct Go values, a nil pointer versus a pointer
 // to zero, instead of collapsing onto the same int32 zero value.
-func TestPairPendingSyncJobsNullVsZero(t *testing.T) {
+func TestCopysetPendingSyncJobsNullVsZero(t *testing.T) {
 	_, srv := newFixtureServer(t, map[string]any{
-		"GET /api/v1/storages/7/pairs": []map[string]any{
+		"GET /api/v1/storages/7/copysets": []map[string]any{
 			{"id": "p1", "storageId": "s1", "state": "active", "memberA": "bv1", "memberB": "bv2", "pendingSyncJobsA": nil, "pendingSyncJobsB": 0},
 		},
 	})
 	defer srv.Close()
 	c := newTestClient(t, srv.URL)
 
-	pairs, err := c.Storages.ListPairs(context.Background(), 7, "", false)
+	copysets, err := c.Storages.ListCopysets(context.Background(), 7, "", false)
 	if err != nil {
-		t.Fatalf("ListPairs: %v", err)
+		t.Fatalf("ListCopysets: %v", err)
 	}
-	if len(pairs) != 1 {
-		t.Fatalf("expected 1 pair, got %+v", pairs)
+	if len(copysets) != 1 {
+		t.Fatalf("expected 1 copyset, got %+v", copysets)
 	}
-	if pairs[0].PendingSyncJobsA != nil {
-		t.Fatalf("expected PendingSyncJobsA nil (not observed), got %v", *pairs[0].PendingSyncJobsA)
+	if copysets[0].PendingSyncJobsA != nil {
+		t.Fatalf("expected PendingSyncJobsA nil (not observed), got %v", *copysets[0].PendingSyncJobsA)
 	}
-	if pairs[0].PendingSyncJobsB == nil || *pairs[0].PendingSyncJobsB != 0 {
-		t.Fatalf("expected PendingSyncJobsB non-nil zero (confirmed empty), got %+v", pairs[0].PendingSyncJobsB)
+	if copysets[0].PendingSyncJobsB == nil || *copysets[0].PendingSyncJobsB != 0 {
+		t.Fatalf("expected PendingSyncJobsB non-nil zero (confirmed empty), got %+v", copysets[0].PendingSyncJobsB)
 	}
 }
 
-func TestDrainPairIdempotentAck(t *testing.T) {
+func TestDrainCopysetIdempotentAck(t *testing.T) {
 	// D9: response reads "draining", not "drained" - an accepted-transition
 	// ack, never a completion promise.
 	_, srv := newFixtureServer(t, map[string]any{
-		"POST /api/v1/storages/7/pairs/p1/drain": map[string]any{"id": "p1", "state": "draining"},
+		"POST /api/v1/storages/7/copysets/p1/drain": map[string]any{"id": "p1", "state": "draining"},
 	})
 	defer srv.Close()
 	c := newTestClient(t, srv.URL)
 
-	res, err := c.Storages.DrainPair(context.Background(), 7, "p1")
+	res, err := c.Storages.DrainCopyset(context.Background(), 7, "p1")
 	if err != nil {
-		t.Fatalf("DrainPair: %v", err)
+		t.Fatalf("DrainCopyset: %v", err)
 	}
 	if res.State != "draining" {
 		t.Fatalf("expected state=draining, got %q", res.State)
@@ -150,7 +150,7 @@ func TestDrainPairIdempotentAck(t *testing.T) {
 
 func TestCancelDrain(t *testing.T) {
 	_, srv := newFixtureServer(t, map[string]any{
-		"POST /api/v1/storages/7/pairs/p1/cancel-drain": map[string]any{"id": "p1", "state": "active"},
+		"POST /api/v1/storages/7/copysets/p1/cancel-drain": map[string]any{"id": "p1", "state": "active"},
 	})
 	defer srv.Close()
 	c := newTestClient(t, srv.URL)
@@ -167,8 +167,8 @@ func TestCancelDrain(t *testing.T) {
 func TestUpdateConfigPartialSurfacesReason(t *testing.T) {
 	_, srv := newFixtureServer(t, map[string]any{
 		"PUT /api/v1/storages/7/config": map[string]any{
-			"id": "s1", "targetK": 3, "activePairCountBefore": 1, "pairsNeeded": 2,
-			"pairsFormed": 1, "activePairCountAfter": 2, "partial": true,
+			"id": "s1", "targetK": 3, "activeCopysetCountBefore": 1, "copysetsNeeded": 2,
+			"copysetsFormed": 1, "activeCopysetCountAfter": 2, "partial": true,
 			"reason": "placement cluster B has no unused members",
 		},
 	})
@@ -182,7 +182,7 @@ func TestUpdateConfigPartialSurfacesReason(t *testing.T) {
 	if !res.Partial || res.Reason == "" {
 		t.Fatalf("expected partial=true with a reason, got %+v", res)
 	}
-	if res.TargetK != 3 || res.ActivePairCountBefore != 1 || res.PairsNeeded != 2 || res.PairsFormed != 1 || res.ActivePairCountAfter != 2 {
+	if res.TargetK != 3 || res.ActiveCopysetCountBefore != 1 || res.CopysetsNeeded != 2 || res.CopysetsFormed != 1 || res.ActiveCopysetCountAfter != 2 {
 		t.Fatalf("unexpected explicit before/needed/formed/after fields: %+v", res)
 	}
 }
@@ -213,7 +213,7 @@ func TestReactivateMemberSendsPost(t *testing.T) {
 	}
 }
 
-func TestRegisterMemberRequiredName(t *testing.T) {
+func TestRegisterMemberExplicitName(t *testing.T) {
 	fs, srv := newFixtureServer(t, map[string]any{
 		"POST /api/v1/storages/7/members": map[string]any{
 			"id": "bv5", "name": "new-member", "regionId": 1, "regionClusterId": 3, "memberState": "active",
@@ -231,5 +231,29 @@ func TestRegisterMemberRequiredName(t *testing.T) {
 	}
 	if got := fs.calls[0].body["name"]; got != "new-member" {
 		t.Fatalf("expected name in request body, got %+v", fs.calls[0].body)
+	}
+}
+
+// TestRegisterMemberOmittedName confirms name is optional on the wire: an
+// omitted Name never sends a "name" key at all (omitempty), letting the
+// server auto-fill it.
+func TestRegisterMemberOmittedName(t *testing.T) {
+	fs, srv := newFixtureServer(t, map[string]any{
+		"POST /api/v1/storages/7/members": map[string]any{
+			"id": "bv6", "name": "auto-generated", "regionId": 1, "regionClusterId": 3, "memberState": "active",
+		},
+	})
+	defer srv.Close()
+	c := newTestClient(t, srv.URL)
+
+	res, err := c.Storages.RegisterMember(context.Background(), 7, &sdk.RegisterStorageMemberRequest{RegionClusterID: 3})
+	if err != nil {
+		t.Fatalf("RegisterMember: %v", err)
+	}
+	if res.Name != "auto-generated" {
+		t.Fatalf("unexpected member: %+v", res)
+	}
+	if _, ok := fs.calls[0].body["name"]; ok {
+		t.Fatalf("expected no name key in request body when omitted, got %+v", fs.calls[0].body)
 	}
 }

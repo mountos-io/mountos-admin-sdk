@@ -339,7 +339,7 @@ func writeGoEnum(w *strings.Builder, name string, values []string) {
 		constNames[i] = name + pascalCase(v)
 	}
 
-	fmt.Fprintf(w, "// %s is a closed set of wire values (see Parse%s/IsValid).\ntype %s string\n\nconst (\n", name, name, name)
+	fmt.Fprintf(w, "// %s is a closed set of wire values (see Parse%s/IsValid).\n//\n// Decoding a %s field from JSON never fails: an unrecognized string (a value\n// a newer server has added since this SDK was generated) assigns as-is\n// rather than erroring, the same forward-compatibility policy as the Rust\n// SDK's explicit Unknown variant. Call IsValid to tell a recognized value\n// from one this SDK predates - the Go analog of Rust's is_known().\ntype %s string\n\nconst (\n", name, name, name, name)
 	for i, v := range values {
 		fmt.Fprintf(w, "\t%s %s = %q\n", constNames[i], name, v)
 	}
@@ -347,7 +347,7 @@ func writeGoEnum(w *strings.Builder, name string, values []string) {
 
 	fmt.Fprintf(w, "// String returns v's wire value.\nfunc (v %s) String() string { return string(v) }\n\n", name)
 
-	fmt.Fprintf(w, "// IsValid reports whether v is one of %s's defined wire values.\nfunc (v %s) IsValid() bool {\n\tswitch v {\n\tcase %s:\n\t\treturn true\n\tdefault:\n\t\treturn false\n\t}\n}\n\n",
+	fmt.Fprintf(w, "// IsValid reports whether v is one of %s's defined wire values, i.e. was\n// recognized when this SDK was generated (false for a value only a newer\n// server knows about).\nfunc (v %s) IsValid() bool {\n\tswitch v {\n\tcase %s:\n\t\treturn true\n\tdefault:\n\t\treturn false\n\t}\n}\n\n",
 		name, name, strings.Join(constNames, ", "))
 
 	fmt.Fprintf(w, "// Parse%s validates s as one of %s's defined wire values, returning an\n// error if s is not recognized - use this instead of a bare conversion\n// when s came from outside this package (a request, a config file, etc.).\nfunc Parse%s(s string) (%s, error) {\n\tv := %s(s)\n\tif !v.IsValid() {\n\t\treturn \"\", fmt.Errorf(\"invalid %s %%q\", s)\n\t}\n\treturn v, nil\n}\n\n",

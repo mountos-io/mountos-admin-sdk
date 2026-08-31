@@ -4,18 +4,18 @@
 //! original string rather than a hard parse failure, and the round trip back
 //! to JSON must reproduce the original wire string.
 
-use mountos_admin_sdk::{ClientSessionStatus, PairState};
+use mountos_admin_sdk::{ClientSessionStatus, CopysetState};
 
 #[test]
-fn pair_state_deserializes_known_values() {
+fn copyset_state_deserializes_known_values() {
     for (wire, want) in [
-        ("active", PairState::Active),
-        ("draining", PairState::Draining),
-        ("synced_drained", PairState::SyncedDrained),
-        ("retired", PairState::Retired),
+        ("active", CopysetState::Active),
+        ("draining", CopysetState::Draining),
+        ("synced_drained", CopysetState::SyncedDrained),
+        ("retired", CopysetState::Retired),
     ] {
         let json = format!("\"{wire}\"");
-        let got: PairState = serde_json::from_str(&json).expect("deserialize known value");
+        let got: CopysetState = serde_json::from_str(&json).expect("deserialize known value");
         assert_eq!(got, want, "wire value {wire:?}");
         assert!(got.is_known());
         assert_eq!(got.as_str(), wire);
@@ -23,26 +23,26 @@ fn pair_state_deserializes_known_values() {
 }
 
 #[test]
-fn pair_state_deserializes_unknown_value_to_fallback() {
-    let got: PairState = serde_json::from_str("\"future_state\"").expect("deserialize unknown value");
-    assert_eq!(got, PairState::Unknown("future_state".to_string()));
+fn copyset_state_deserializes_unknown_value_to_fallback() {
+    let got: CopysetState = serde_json::from_str("\"future_state\"").expect("deserialize unknown value");
+    assert_eq!(got, CopysetState::Unknown("future_state".to_string()));
     assert!(!got.is_known());
     assert_eq!(got.as_str(), "future_state");
 }
 
 #[test]
-fn pair_state_serialize_round_trips_known_and_unknown() {
-    let known = PairState::Draining;
+fn copyset_state_serialize_round_trips_known_and_unknown() {
+    let known = CopysetState::Draining;
     assert_eq!(serde_json::to_string(&known).unwrap(), "\"draining\"");
 
-    let unknown = PairState::Unknown("future_state".to_string());
+    let unknown = CopysetState::Unknown("future_state".to_string());
     assert_eq!(serde_json::to_string(&unknown).unwrap(), "\"future_state\"");
 }
 
 #[test]
-fn pair_state_display_matches_as_str() {
-    assert_eq!(PairState::Retired.to_string(), "retired");
-    assert_eq!(PairState::Unknown("x".to_string()).to_string(), "x");
+fn copyset_state_display_matches_as_str() {
+    assert_eq!(CopysetState::Retired.to_string(), "retired");
+    assert_eq!(CopysetState::Unknown("x".to_string()).to_string(), "x");
 }
 
 // ClientSessionStatus has a legitimate wire value literally named "unknown"

@@ -15,8 +15,8 @@ test('assertSafeIntegers passes safe nested values', () => {
 
 test('assertSafeIntegers throws on an out-of-range integer, with a path', () => {
   assert.throws(
-    () => assertSafeIntegers({ pairs: [{ placementGroupA: 9007199254740993 }] }),
-    (err: unknown) => err instanceof UnsafeIntegerError && err.message.includes('$.pairs[0].placementGroupA'),
+    () => assertSafeIntegers({ copysets: [{ placementGroupA: 9007199254740993 }] }),
+    (err: unknown) => err instanceof UnsafeIntegerError && err.message.includes('$.copysets[0].placementGroupA'),
   )
 })
 
@@ -41,7 +41,7 @@ test('a real response carrying an unsafe int64 rejects loudly instead of returni
 
   try {
     const client = createServerClient({ baseUrl: 'http://example.invalid', privateKey: fakePrivateKey() })
-    await assert.rejects(() => client.storages.getPairStatus(7, 'p1'), UnsafeIntegerError)
+    await assert.rejects(() => client.storages.getCopysetStatus(7, 'p1'), UnsafeIntegerError)
   } finally {
     globalThis.fetch = originalFetch
   }
@@ -57,8 +57,8 @@ test('a response with only safe integers resolves normally', async () => {
 
   try {
     const client = createServerClient({ baseUrl: 'http://example.invalid', privateKey: fakePrivateKey() })
-    const pair = await client.storages.getPairStatus(7, 'p1')
-    assert.equal(pair.placementGroupA, 2)
+    const copyset = await client.storages.getCopysetStatus(7, 'p1')
+    assert.equal(copyset.placementGroupA, 2)
   } finally {
     globalThis.fetch = originalFetch
   }

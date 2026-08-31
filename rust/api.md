@@ -41,11 +41,11 @@ Cursor-paginated responses nest in `data`:
 
 `ClientSessionStatus`: "connected" | "active" | "degraded" | "disconnected" | "expired" | "unknown"
 
+`CopysetState`: "active" | "draining" | "synced_drained" | "retired"
+
 `LicenseQuotaState`: "ok" | "exceeded"
 
 `LicenseStatus`: "valid" | "expiring" | "grace" | "expired_access" | "expired"
-
-`PairState`: "active" | "draining" | "synced_drained" | "retired"
 
 ---
 
@@ -249,9 +249,9 @@ Response data: `{ "id": int64 }`
 
 ### GET /api/v1/clusters/list
 Query: `accountId=int64(required)`, `regionId=int64`, `isActive=bool`, `page=int(default 1)`, `limit=int(default 100)`
-Response data: `{ "items": RegionCluster[], "pagination": PaginationMeta }`
+Response data: `{ "items": MetadataCluster[], "pagination": PaginationMeta }`
 
-### RegionCluster Type
+### MetadataCluster Type
 ```
 {
   "id": int64,
@@ -268,7 +268,7 @@ Response data: `{ "items": RegionCluster[], "pagination": PaginationMeta }`
 
 ---
 
-## RegionClusters
+## MetadataClusters
 
 ### POST /api/v1/regions/:regionId/clusters/create
 Param: `regionId`
@@ -283,12 +283,12 @@ Response data: `{ "id": int64 }`
 ### GET /api/v1/regions/:regionId/clusters/list
 Param: `regionId`
 Query: `isActive=bool`, `page=int(default 1)`, `limit=int(default 20)`
-Response data: `{ "items": RegionCluster[], "pagination": PaginationMeta }`
+Response data: `{ "items": MetadataCluster[], "pagination": PaginationMeta }`
 
 ### GET /api/v1/regions/:regionId/clusters/:clusterId
 Param: `regionId`
 Param: `clusterId`
-Response data: `RegionCluster`
+Response data: `MetadataCluster`
 
 ### PUT /api/v1/regions/:regionId/clusters/:clusterId
 Param: `regionId`
@@ -426,25 +426,36 @@ Response data: `UpdateConfigResult`
 Param: `storageId`
 Response data: `{ "id": string, "k": int32, "algorithmVersion": int32, "epochPolicyVersion": int32 }`
 
-### GET /api/v1/storages/:storageId/pairs
+### GET /api/v1/storages/:storageId/copysets
 Param: `storageId`
 Query: `state=string`, `includeRetired=bool`
-Response data: `Pair[]`
+Response data: `Copyset[]`
 
-### GET /api/v1/storages/:storageId/pairs/:pairId
+### GET /api/v1/storages/:storageId/copysets/:copysetId
 Param: `storageId`
-Param: `pairId`
-Response data: `Pair`
+Param: `copysetId`
+Response data: `Copyset`
 
-### POST /api/v1/storages/:storageId/pairs/:pairId/drain
+### POST /api/v1/storages/:storageId/copysets/:copysetId/drain
 Param: `storageId`
-Param: `pairId`
+Param: `copysetId`
 Response data: `{ "id": string, "state": string }`
 
-### POST /api/v1/storages/:storageId/pairs/:pairId/cancel-drain
+### POST /api/v1/storages/:storageId/copysets/:copysetId/cancel-drain
 Param: `storageId`
-Param: `pairId`
+Param: `copysetId`
 Response data: `{ "id": string, "state": string }`
+
+### PUT /api/v1/storages/:storageId/copysets/:copysetId/tags
+Param: `storageId`
+Param: `copysetId`
+Request:
+```
+{
+  "tags"?: string[]
+}
+```
+Response data: `Copyset`
 
 ### POST /api/v1/storages/:storageId/members
 Param: `storageId`
@@ -452,7 +463,7 @@ Request:
 ```
 {
   "regionClusterId": int64(required),
-  "name": string(required)
+  "name"?: string
 }
 ```
 Response data: `PoolMember`
@@ -509,14 +520,14 @@ Request:
   "versioning"?: VolumeVersioningPolicy,
   "compaction"?: string,
   "quotaLimit"?: int64,
-  "regionClusterId"?: int64,
-  "regionClusterUuid"?: string
+  "metadataClusterId"?: int64,
+  "metadataClusterUuid"?: string
 }
 ```
 Response data: `{ "id": int64, "encryptionKey?": string }`
 
 ### GET /api/v1/volumes/list
-Query: `accountId=int64(required)`, `regionId=int64`, `regionClusterId=int64`, `storageId=int64`, `volumeType=string`, `locked=bool`, `isActive=bool`, `page=int(default 1)`, `limit=int(default 10)`
+Query: `accountId=int64(required)`, `regionId=int64`, `metadataClusterId=int64`, `storageId=int64`, `volumeType=string`, `locked=bool`, `isActive=bool`, `page=int(default 1)`, `limit=int(default 10)`
 Response data: `{ "items": Volume[], "pagination": PaginationMeta }`
 
 ### GET /api/v1/volumes/:volumeId
@@ -625,16 +636,16 @@ Request:
 ```
 Response data: `{ "id": int64 }`
 
-### GET /api/v1/volumes/:volumeId/pair-config
+### GET /api/v1/volumes/:volumeId/copyset-config
 Param: `volumeId`
 Response data: `VolumeBlockPlacementConfig`
 
-### PUT /api/v1/volumes/:volumeId/pair-config
+### PUT /api/v1/volumes/:volumeId/copyset-config
 Param: `volumeId`
 Request:
 ```
 {
-  "targetPairCount": int32(required)
+  "targetCopysetCount": int32(required)
 }
 ```
 Response data: `VolumeBlockPlacementResizeResult`
@@ -696,7 +707,7 @@ Response data: `Fork`
   "account": Ref,
   "storage": Ref,
   "region": Ref,
-  "regionCluster"?: Ref,
+  "metadataCluster"?: Ref,
   "name": string,
   "description"?: string,
   "volumeType": string,
@@ -805,7 +816,7 @@ Response data: `{ "items": ForkTreeMatch[], "nextCursor": int64|null }`
 ## AuditLogs
 
 ### GET /api/v1/audit-logs/list
-Query: `accountId=int64(required)`, `regionId=int64`, `regionClusterId=int64`, `cursor=int64`, `limit=int(default 20)`, `subject=string`, `createdBy=string`
+Query: `accountId=int64(required)`, `regionId=int64`, `metadataClusterId=int64`, `cursor=int64`, `limit=int(default 20)`, `subject=string`, `createdBy=string`
 Response data: `{ "items": AuditLog[], "nextCursor": int64|null }`
 
 ### AuditLog Type
@@ -821,7 +832,7 @@ Response data: `{ "items": AuditLog[], "nextCursor": int64|null }`
   "node"?: string,
   "accountId"?: int64,
   "regionId"?: int64,
-  "regionClusterId"?: int64,
+  "metadataClusterId"?: int64,
   "createdAt"?: RFC3339,
   "updatedAt"?: RFC3339
 }
@@ -833,7 +844,7 @@ Response data: `{ "items": AuditLog[], "nextCursor": int64|null }`
 
 ### GET /api/v1/regions/:regionId/audit-logs/list
 Param: `regionId`
-Query: `regionClusterId=int64`, `cursor=int64`, `limit=int(default 20)`, `subject=string`, `node=string`
+Query: `metadataClusterId=int64`, `cursor=int64`, `limit=int(default 20)`, `subject=string`, `node=string`
 Response data: `{ "items": AuditLog[], "nextCursor": int64|null }`
 
 ---
@@ -842,7 +853,7 @@ Response data: `{ "items": AuditLog[], "nextCursor": int64|null }`
 
 ### GET /api/v1/regions/:regionId/nodes
 Param: `regionId`
-Query: `serviceType=string`, `status=string`, `inactiveHours=int`, `regionClusterId=int64`
+Query: `serviceType=string`, `status=string`, `inactiveHours=int`, `metadataClusterId=int64`
 Response data: `ServiceNode[]`
 
 ### GET /api/v1/regions/:regionId/nodes/:nodeId/stats
@@ -860,7 +871,7 @@ Response data: `{ "intervalMs": int64, "samples": NodeStatsSample[] }`
 {
   "id": int64,
   "regionId": int64,
-  "regionClusterId"?: int64,
+  "metadataClusterId"?: int64,
   "serviceType": string,
   "nodeId": string,
   "advertiseAddr": string,
@@ -891,7 +902,7 @@ Response data: `ServiceNode[]`
 ## ClientSessions
 
 ### GET /api/v1/client-sessions/list
-Query: `accountId=int64(required)`, `regionId=int64`, `regionClusterId=int64`, `volumeId=int64`, `userId=int64`, `clientType=string`, `status=ClientSessionStatus`, `isActive=bool`, `osName=string`, `platform=string`, `search=string`, `page=int(default 1)`, `limit=int(default 20)`
+Query: `accountId=int64(required)`, `regionId=int64`, `metadataClusterId=int64`, `volumeId=int64`, `userId=int64`, `clientType=string`, `status=ClientSessionStatus`, `isActive=bool`, `osName=string`, `platform=string`, `search=string`, `page=int(default 1)`, `limit=int(default 20)`
 Response data: `{ "items": ClientSession[], "pagination": PaginationMeta }`
 
 ### GET /api/v1/client-sessions/:sessionId
@@ -899,7 +910,7 @@ Param: `sessionId`
 Response data: `ClientSession`
 
 ### GET /api/v1/client-sessions/summary
-Query: `accountId=int64(required)`, `regionId=int64`, `regionClusterId=int64`, `volumeId=int64`, `userId=int64`
+Query: `accountId=int64(required)`, `regionId=int64`, `metadataClusterId=int64`, `volumeId=int64`, `userId=int64`
 Response data: `SessionSummary`
 
 ### ClientSession Type
@@ -908,7 +919,7 @@ Response data: `SessionSummary`
   "id": int64,
   "account": Ref,
   "region": Ref,
-  "regionCluster"?: Ref,
+  "metadataCluster"?: Ref,
   "volume": VolumeRef,
   "user"?: Ref,
   "clientType": string,
@@ -1063,12 +1074,12 @@ Response data: `{ "alertId": string }`
 
 ### GET /api/v1/regions/:regionId/alerts/list
 Param: `regionId`
-Query: `active=bool(default true)`, `severity=int`, `category=string`, `nodeId=string`, `regionClusterId=int64`, `since=string`, `page=int(default 1)`, `limit=int(default 20)`
+Query: `active=bool(default true)`, `severity=int`, `category=string`, `nodeId=string`, `metadataClusterId=int64`, `since=string`, `page=int(default 1)`, `limit=int(default 20)`
 Response data: `{ "items": RegionAlert[], "pagination": PaginationMeta }`
 
 ### GET /api/v1/regions/:regionId/alerts/count
 Param: `regionId`
-Query: `regionClusterId=int64`
+Query: `metadataClusterId=int64`
 Response data: `AlertCountResponse`
 
 ### POST /api/v1/regions/:regionId/alerts/:alertId/resolve
@@ -1083,7 +1094,7 @@ Response data: `{ "alertId": string }`
   "alertId": string,
   "source": string,
   "nodeId": string,
-  "regionClusterId"?: int64,
+  "metadataClusterId"?: int64,
   "severity": int,
   "category": string,
   "title": string,
@@ -1100,12 +1111,12 @@ Response data: `{ "alertId": string }`
 
 ### GET /api/v1/regions/:regionId/gc-worker-events/list
 Param: `regionId`
-Query: `nodeId=string`, `goal=string`, `sid=int64`, `regionClusterId=int64`, `since=string`, `page=int(default 1)`, `limit=int(default 20)`
+Query: `nodeId=string`, `goal=string`, `sid=int64`, `metadataClusterId=int64`, `since=string`, `page=int(default 1)`, `limit=int(default 20)`
 Response data: `{ "items": GCWorkerEvent[], "pagination": PaginationMeta }`
 
 ### GET /api/v1/regions/:regionId/gc-worker-events/histogram
 Param: `regionId`
-Query: `nodeId=string`, `goal=string`, `sid=int64`, `regionClusterId=int64`, `since=string`, `bucketSeconds=int64(default 900)`
+Query: `nodeId=string`, `goal=string`, `sid=int64`, `metadataClusterId=int64`, `since=string`, `bucketSeconds=int64(default 900)`
 Response data: `GCWorkerEventHistogramResponse`
 
 ### GET /api/v1/regions/:regionId/gc-worker-events/goals
@@ -1118,7 +1129,7 @@ Response data: `GCWorkerEventGoalsResponse`
 {
   "id": int64,
   "nodeId": string,
-  "regionClusterId"?: int64,
+  "metadataClusterId"?: int64,
   "goal": string,
   "sid"?: int64,
   "subject"?: string,
@@ -1146,7 +1157,8 @@ Response data: `GCWorkerEventGoalsResponse`
   "recent": int64,
   "infoCount": int64,
   "warningCount": int64,
-  "criticalCount": int64
+  "criticalCount": int64,
+  "asOf": RFC3339
 }
 ```
 
@@ -1180,7 +1192,7 @@ Response data: `GCWorkerEventGoalsResponse`
   "createdAt": RFC3339,
   "updatedAt": RFC3339,
   "memberState"?: string,
-  "pairId"?: string
+  "copysetId"?: string
 }
 ```
 
@@ -1201,6 +1213,26 @@ Response data: `GCWorkerEventGoalsResponse`
 {
   "id": string,
   "name": string
+}
+```
+
+### Copyset Type
+```
+{
+  "id": string,
+  "storageId": string,
+  "state": CopysetState,
+  "memberA"?: string,
+  "memberB"?: string,
+  "placementGroupA"?: int64,
+  "placementGroupB"?: int64,
+  "drainStartedAt"?: RFC3339,
+  "syncedAt"?: RFC3339,
+  "retiredAt"?: RFC3339,
+  "pendingSyncJobsA"?: int32,
+  "pendingSyncJobsB"?: int32,
+  "drainInitiatedBy"?: int64,
+  "tags": string[]
 }
 ```
 
@@ -1398,24 +1430,6 @@ Response data: `GCWorkerEventGoalsResponse`
 }
 ```
 
-### Pair Type
-```
-{
-  "id": string,
-  "storageId": string,
-  "state": PairState,
-  "memberA"?: string,
-  "memberB"?: string,
-  "placementGroupA"?: int64,
-  "placementGroupB"?: int64,
-  "drainStartedAt"?: RFC3339,
-  "syncedAt"?: RFC3339,
-  "retiredAt"?: RFC3339,
-  "pendingSyncJobsA"?: int32,
-  "pendingSyncJobsB"?: int32
-}
-```
-
 ### PoolMember Type
 ```
 {
@@ -1488,10 +1502,10 @@ Response data: `GCWorkerEventGoalsResponse`
 {
   "id": string,
   "targetK": int32,
-  "activePairCountBefore": int32,
-  "pairsNeeded": int32,
-  "pairsFormed": int32,
-  "activePairCountAfter": int32,
+  "activeCopysetCountBefore": int32,
+  "copysetsNeeded": int32,
+  "copysetsFormed": int32,
+  "activeCopysetCountAfter": int32,
   "partial": bool,
   "reason"?: string
 }
@@ -1520,9 +1534,9 @@ Response data: `GCWorkerEventGoalsResponse`
 ```
 {
   "id": int64,
-  "targetPairCount": int32,
+  "targetCopysetCount": int32,
   "currentEpoch": int64,
-  "pairIds": string[]
+  "copysetIds": string[]
 }
 ```
 
@@ -1530,11 +1544,11 @@ Response data: `GCWorkerEventGoalsResponse`
 ```
 {
   "id": int64,
-  "targetPairCount": int32,
-  "pairCountBefore": int32,
-  "pairsAdded": int32,
-  "pairsRemoved": int32,
-  "pairCountAfter": int32,
+  "targetCopysetCount": int32,
+  "copysetCountBefore": int32,
+  "copysetsAdded": int32,
+  "copysetsRemoved": int32,
+  "copysetCountAfter": int32,
   "epoch": int64,
   "partial": bool,
   "reason"?: string

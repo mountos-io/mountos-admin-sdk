@@ -82,6 +82,11 @@
           "required": false,
           "optional": false
         },
+        "asOf": {
+          "type": "datetime",
+          "required": false,
+          "optional": false
+        },
         "criticalCount": {
           "type": "int64",
           "required": false,
@@ -136,13 +141,13 @@
           "required": false,
           "optional": false
         },
-        "node": {
-          "type": "string",
+        "metadataClusterId": {
+          "type": "int64",
           "required": false,
           "optional": true
         },
-        "regionClusterId": {
-          "type": "int64",
+        "node": {
+          "type": "string",
           "required": false,
           "optional": true
         },
@@ -218,6 +223,11 @@
           "required": false,
           "optional": true
         },
+        "copysetId": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
         "createdAt": {
           "type": "datetime",
           "required": false,
@@ -239,11 +249,6 @@
           "optional": true
         },
         "name": {
-          "type": "string",
-          "required": false,
-          "optional": true
-        },
-        "pairId": {
           "type": "string",
           "required": false,
           "optional": true
@@ -332,6 +337,11 @@
           "required": false,
           "optional": true
         },
+        "metadataCluster": {
+          "type": "Ref",
+          "required": false,
+          "optional": true
+        },
         "metrics": {
           "type": "json",
           "required": false,
@@ -361,11 +371,6 @@
           "type": "Ref",
           "required": false,
           "optional": false
-        },
-        "regionCluster": {
-          "type": "Ref",
-          "required": false,
-          "optional": true
         },
         "status": {
           "type": "ClientSessionStatus",
@@ -427,6 +432,80 @@
         },
         "name": {
           "type": "string",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "Copyset": {
+      "fields": {
+        "drainInitiatedBy": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "drainStartedAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": true
+        },
+        "id": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "memberA": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "memberB": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "pendingSyncJobsA": {
+          "type": "int32",
+          "required": false,
+          "optional": true
+        },
+        "pendingSyncJobsB": {
+          "type": "int32",
+          "required": false,
+          "optional": true
+        },
+        "placementGroupA": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "placementGroupB": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "retiredAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": true
+        },
+        "state": {
+          "type": "CopysetState",
+          "required": false,
+          "optional": false
+        },
+        "storageId": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "syncedAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": true
+        },
+        "tags": {
+          "type": "string[]",
           "required": false,
           "optional": false
         }
@@ -825,6 +904,11 @@
           "required": false,
           "optional": false
         },
+        "metadataClusterId": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
         "nodeId": {
           "type": "string",
           "required": false,
@@ -834,11 +918,6 @@
           "type": "object",
           "required": false,
           "optional": false
-        },
-        "regionClusterId": {
-          "type": "int64",
-          "required": false,
-          "optional": true
         },
         "sid": {
           "type": "int64",
@@ -1113,6 +1192,55 @@
         }
       }
     },
+    "MetadataCluster": {
+      "fields": {
+        "createdAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": false
+        },
+        "defaultCluster": {
+          "type": "bool",
+          "required": false,
+          "optional": false
+        },
+        "exportId": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "id": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "isActive": {
+          "type": "bool",
+          "required": false,
+          "optional": false
+        },
+        "isReady": {
+          "type": "bool",
+          "required": false,
+          "optional": false
+        },
+        "name": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "regionId": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "updatedAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
     "MetricsTarget": {
       "fields": {
         "labels": {
@@ -1294,70 +1422,6 @@
         }
       }
     },
-    "Pair": {
-      "fields": {
-        "drainStartedAt": {
-          "type": "datetime",
-          "required": false,
-          "optional": true
-        },
-        "id": {
-          "type": "string",
-          "required": false,
-          "optional": false
-        },
-        "memberA": {
-          "type": "string",
-          "required": false,
-          "optional": true
-        },
-        "memberB": {
-          "type": "string",
-          "required": false,
-          "optional": true
-        },
-        "pendingSyncJobsA": {
-          "type": "int32",
-          "required": false,
-          "optional": true
-        },
-        "pendingSyncJobsB": {
-          "type": "int32",
-          "required": false,
-          "optional": true
-        },
-        "placementGroupA": {
-          "type": "int64",
-          "required": false,
-          "optional": true
-        },
-        "placementGroupB": {
-          "type": "int64",
-          "required": false,
-          "optional": true
-        },
-        "retiredAt": {
-          "type": "datetime",
-          "required": false,
-          "optional": true
-        },
-        "state": {
-          "type": "PairState",
-          "required": false,
-          "optional": false
-        },
-        "storageId": {
-          "type": "string",
-          "required": false,
-          "optional": false
-        },
-        "syncedAt": {
-          "type": "datetime",
-          "required": false,
-          "optional": true
-        }
-      }
-    },
     "PoolMember": {
       "fields": {
         "id": {
@@ -1482,15 +1546,15 @@
           "required": false,
           "optional": false
         },
+        "metadataClusterId": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
         "nodeId": {
           "type": "string",
           "required": false,
           "optional": false
-        },
-        "regionClusterId": {
-          "type": "int64",
-          "required": false,
-          "optional": true
         },
         "resolvedAt": {
           "type": "datetime",
@@ -1509,55 +1573,6 @@
         },
         "title": {
           "type": "string",
-          "required": false,
-          "optional": false
-        }
-      }
-    },
-    "RegionCluster": {
-      "fields": {
-        "createdAt": {
-          "type": "datetime",
-          "required": false,
-          "optional": false
-        },
-        "defaultCluster": {
-          "type": "bool",
-          "required": false,
-          "optional": false
-        },
-        "exportId": {
-          "type": "string",
-          "required": false,
-          "optional": false
-        },
-        "id": {
-          "type": "int64",
-          "required": false,
-          "optional": false
-        },
-        "isActive": {
-          "type": "bool",
-          "required": false,
-          "optional": false
-        },
-        "isReady": {
-          "type": "bool",
-          "required": false,
-          "optional": false
-        },
-        "name": {
-          "type": "string",
-          "required": false,
-          "optional": false
-        },
-        "regionId": {
-          "type": "int64",
-          "required": false,
-          "optional": false
-        },
-        "updatedAt": {
-          "type": "datetime",
           "required": false,
           "optional": false
         }
@@ -1717,6 +1732,11 @@
           "required": false,
           "optional": true
         },
+        "metadataClusterId": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
         "metricsEndpoint": {
           "type": "string",
           "required": false,
@@ -1726,11 +1746,6 @@
           "type": "string",
           "required": false,
           "optional": false
-        },
-        "regionClusterId": {
-          "type": "int64",
-          "required": false,
-          "optional": true
         },
         "regionId": {
           "type": "int64",
@@ -1932,28 +1947,28 @@
     },
     "UpdateConfigResult": {
       "fields": {
-        "activePairCountAfter": {
+        "activeCopysetCountAfter": {
           "type": "int32",
           "required": false,
           "optional": false
         },
-        "activePairCountBefore": {
+        "activeCopysetCountBefore": {
+          "type": "int32",
+          "required": false,
+          "optional": false
+        },
+        "copysetsFormed": {
+          "type": "int32",
+          "required": false,
+          "optional": false
+        },
+        "copysetsNeeded": {
           "type": "int32",
           "required": false,
           "optional": false
         },
         "id": {
           "type": "string",
-          "required": false,
-          "optional": false
-        },
-        "pairsFormed": {
-          "type": "int32",
-          "required": false,
-          "optional": false
-        },
-        "pairsNeeded": {
-          "type": "int32",
           "required": false,
           "optional": false
         },
@@ -2094,6 +2109,11 @@
           "required": false,
           "optional": false
         },
+        "metadataCluster": {
+          "type": "Ref",
+          "required": false,
+          "optional": true
+        },
         "name": {
           "type": "string",
           "required": false,
@@ -2113,11 +2133,6 @@
           "type": "Ref",
           "required": false,
           "optional": false
-        },
-        "regionCluster": {
-          "type": "Ref",
-          "required": false,
-          "optional": true
         },
         "retention": {
           "type": "VolumeRetentionPolicy",
@@ -2182,6 +2197,11 @@
     },
     "VolumeBlockPlacementConfig": {
       "fields": {
+        "copysetIds": {
+          "type": "string[]",
+          "required": false,
+          "optional": false
+        },
         "currentEpoch": {
           "type": "int64",
           "required": false,
@@ -2192,12 +2212,7 @@
           "required": false,
           "optional": false
         },
-        "pairIds": {
-          "type": "string[]",
-          "required": false,
-          "optional": false
-        },
-        "targetPairCount": {
+        "targetCopysetCount": {
           "type": "int32",
           "required": false,
           "optional": false
@@ -2206,6 +2221,26 @@
     },
     "VolumeBlockPlacementResizeResult": {
       "fields": {
+        "copysetCountAfter": {
+          "type": "int32",
+          "required": false,
+          "optional": false
+        },
+        "copysetCountBefore": {
+          "type": "int32",
+          "required": false,
+          "optional": false
+        },
+        "copysetsAdded": {
+          "type": "int32",
+          "required": false,
+          "optional": false
+        },
+        "copysetsRemoved": {
+          "type": "int32",
+          "required": false,
+          "optional": false
+        },
         "epoch": {
           "type": "int64",
           "required": false,
@@ -2213,26 +2248,6 @@
         },
         "id": {
           "type": "int64",
-          "required": false,
-          "optional": false
-        },
-        "pairCountAfter": {
-          "type": "int32",
-          "required": false,
-          "optional": false
-        },
-        "pairCountBefore": {
-          "type": "int32",
-          "required": false,
-          "optional": false
-        },
-        "pairsAdded": {
-          "type": "int32",
-          "required": false,
-          "optional": false
-        },
-        "pairsRemoved": {
-          "type": "int32",
           "required": false,
           "optional": false
         },
@@ -2246,7 +2261,7 @@
           "required": false,
           "optional": true
         },
-        "targetPairCount": {
+        "targetCopysetCount": {
           "type": "int32",
           "required": false,
           "optional": false
@@ -2344,6 +2359,12 @@
       "expired",
       "unknown"
     ],
+    "CopysetState": [
+      "active",
+      "draining",
+      "synced_drained",
+      "retired"
+    ],
     "LicenseQuotaState": [
       "ok",
       "exceeded"
@@ -2354,12 +2375,6 @@
       "grace",
       "expired_access",
       "expired"
-    ],
-    "PairState": [
-      "active",
-      "draining",
-      "synced_drained",
-      "retired"
     ]
   }
 }

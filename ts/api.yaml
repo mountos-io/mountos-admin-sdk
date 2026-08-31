@@ -58,8 +58,8 @@ enums:
     - expired
     - unknown
 
-  # Block HA-pair lifecycle (spec/appserv.md §5b).
-  PairState:
+  # Block copyset lifecycle (spec/appserv.md §5b).
+  CopysetState:
     - active
     - draining
     - synced_drained
@@ -143,7 +143,7 @@ types:
     - "createdAt: datetime"
     - "updatedAt: datetime"
 
-  RegionCluster:
+  MetadataCluster:
     - "id: int64"
     - "exportId: string"
     - "regionId: int64"
@@ -181,14 +181,18 @@ types:
     - "createdAt: datetime"
     - "updatedAt: datetime"
 
-  # One block-volume member of a block storage on create: a region-cluster placement
-  # and an optional operator-facing name tag. 1 originator + up to 2 HA members.
+  # One block-volume member of a block storage on create: a failure-domain
+  # cluster placement (block_volumes.region_cluster_id - blockserv-owned pair
+  # diversity, distinct from the region_clusters/metadata_clusters sharding
+  # table renamed elsewhere in this API) and an optional operator-facing name
+  # tag. 1 originator + up to 2 HA members.
   BlockMember:
     - "name: string?"
     - "regionClusterId: int64"
 
   # A provisioned block-volume member. id is the BLOCK_VOLUME_ID env value and
-  # clusterUuid the REGION_CLUSTER_ID env value an operator gives its blockserv.
+  # clusterUuid the METADATA_CLUSTER_ID env value (or the deprecated
+  # REGION_CLUSTER_ID) an operator gives its blockserv.
   BlockVolume:
     - "id: string"
     - "name: string?"
@@ -200,42 +204,52 @@ types:
     - "isActive: bool"
     - "createdAt: datetime"
     - "updatedAt: datetime"
-    # Pool-membership state for the block HA-pair placement redesign, mirroring
-    # block_volumes.member_state/pair_sid (appserv.md §4). pairId is absent/null
+    # Pool-membership state for the block copyset placement redesign, mirroring
+    # block_volumes.member_state/copyset_sid (appserv.md §4). copysetId is absent/null
     # while unpaired (member_state == "detached"). NOTE: listBlockVolumes'
     # handler does not populate these yet as of this writing (only the new
-    # pairs endpoints below do) - flagged to mos-appserv, needed for
-    # admin-client to find/reactivate a detached member outside a pair view.
+    # copysets endpoints below do) - flagged to mos-appserv, needed for
+    # admin-client to find/reactivate a detached member outside a copyset view.
     - "memberState: string?" # active | retiring | detached
-    - "pairId: string?"
+    - "copysetId: string?"
 
-  # One pair of block-volume members under the deterministic HA-pair placement
-  # redesign (spec/appserv.md §5b). id/storageId/memberA/memberB are opaque
-  # external ids (string), matching BlockVolume.id - NOT the int64 shard id
-  # used in the :storageId URL path param. memberA/memberB and the placement
-  # groups are absent only in the defensive 0/1-member edge case; a normally
-  # formed pair always has both.
-  Pair:
+  # A copyset provides High Availability (HA) through two nodes holding
+  # identical copies. One copyset of block-volume members under the
+  # deterministic copyset placement redesign (spec/appserv.md §5b).
+  # id/storageId/memberA/memberB are opaque external ids (string), matching
+  # BlockVolume.id - NOT the int64 shard id used in the :storageId URL path
+  # param. memberA/memberB and the placement groups are absent only in the
+  # defensive 0/1-member edge case; a normally formed copyset always has both.
+  Copyset:
     - "id: string"
     - "storageId: string"
-    - "state: PairState"
+    - "state: CopysetState"
     - "memberA: string?" # BlockVolume.id
     - "memberB: string?" # BlockVolume.id
-    - "placementGroupA: int64?" # region_cluster_id
-    - "placementGroupB: int64?" # region_cluster_id
+    - "placementGroupA: int64?" # block_volumes.region_cluster_id
+    - "placementGroupB: int64?" # block_volumes.region_cluster_id
     - "drainStartedAt: datetime?"
     - "syncedAt: datetime?"
     - "retiredAt: datetime?"
     # nullable, drain-only (D5): appserv's reconciler only polls draining
-    # pairs, so these are its last-observed values, null otherwise.
+    # copysets, so these are its last-observed values, null otherwise.
     - "pendingSyncJobsA: int32?"
     - "pendingSyncJobsB: int32?"
+    # Audit-surface actor id: the dashboard user who called drainCopyset. Null
+    # when the copyset has never drained or the caller had no DB-backed actor id
+    # (opaque admin/SDK token).
+    - "drainInitiatedBy: int64?"
+    # Unindexed/unsearchable operator labels (updateTags), the one
+    # concretely-named use case for the copyset's escape-hatch config -
+    # never a substitute for a real, queryable field. Always present, an
+    # empty array when unset, never null.
+    - "tags: string[]"
 
   # Response shape for registerMember/reactivateMember - deliberately
   # narrower than the full BlockVolume view (no clusterName/clusterUuid/
   # shardId/clusterReady/createdAt/updatedAt): both call sites always return
-  # a freshly poolable member with pairId implicitly 0/unpaired, so there's
-  # no pair to reference and the extra fields would just be zero-value noise.
+  # a freshly poolable member with copysetId implicitly 0/unpaired, so there's
+  # no copyset to reference and the extra fields would just be zero-value noise.
   PoolMember:
     - "id: string"
     - "name: string"
@@ -245,43 +259,43 @@ types:
 
   # Response shape for updateConfig. Every count a caller could want is
   # explicit so none has to be inferred from a delta: targetK is the
-  # absolute K requested; activePairCountBefore/After are the storage's
-  # active-or-draining pair count immediately before/after this call
-  # (After = Before + pairsFormed); pairsNeeded is how many additional
-  # pairs this call actually needed (targetK - activePairCountBefore,
-  # floored at 0); pairsFormed is the delta this call actually created.
+  # absolute K requested; activeCopysetCountBefore/After are the storage's
+  # active-or-draining copyset count immediately before/after this call
+  # (After = Before + copysetsFormed); copysetsNeeded is how many additional
+  # copysets this call actually needed (targetK - activeCopysetCountBefore,
+  # floored at 0); copysetsFormed is the delta this call actually created.
   UpdateConfigResult:
     - "id: string"
     - "targetK: int32"
-    - "activePairCountBefore: int32"
-    - "pairsNeeded: int32"
-    - "pairsFormed: int32"
-    - "activePairCountAfter: int32"
+    - "activeCopysetCountBefore: int32"
+    - "copysetsNeeded: int32"
+    - "copysetsFormed: int32"
+    - "activeCopysetCountAfter: int32"
     - "partial: bool"
     - "reason: string?"
 
-  # Per-volume block-placement pair-count config: a single volume's own
-  # working-set size within its storage's node-pair fleet, distinct from
+  # Per-volume block-placement copyset-count config: a single volume's own
+  # working-set size within its storage's copyset fleet, distinct from
   # UpdateConfigResult/getConfig above (the storage's fleet-wide k). id is
-  # the volume's own int64 shard id, matching Volume.id. pairIds are Pair.id
+  # the volume's own int64 shard id, matching Volume.id. copysetIds are Copyset.id
   # strings (the volume's current candidate set).
   VolumeBlockPlacementConfig:
     - "id: int64"
-    - "targetPairCount: int32"
+    - "targetCopysetCount: int32"
     - "currentEpoch: int64"
-    - "pairIds: string[]"
+    - "copysetIds: string[]"
 
-  # Response shape for Volumes.updatePairConfig - the volume-scoped analog
-  # of UpdateConfigResult. Partial (pairsAdded < needed, reason set) mirrors
+  # Response shape for Volumes.updateCopysetConfig - the volume-scoped analog
+  # of UpdateConfigResult. Partial (copysetsAdded < needed, reason set) mirrors
   # UpdateConfigResult's own partial-fulfillment convention: pool/cluster
   # exhaustion, never a same-cluster fallback.
   VolumeBlockPlacementResizeResult:
     - "id: int64"
-    - "targetPairCount: int32"
-    - "pairCountBefore: int32"
-    - "pairsAdded: int32"
-    - "pairsRemoved: int32"
-    - "pairCountAfter: int32"
+    - "targetCopysetCount: int32"
+    - "copysetCountBefore: int32"
+    - "copysetsAdded: int32"
+    - "copysetsRemoved: int32"
+    - "copysetCountAfter: int32"
     - "epoch: int64"
     - "partial: bool"
     - "reason: string?"
@@ -315,7 +329,7 @@ types:
     - "account: Ref"
     - "storage: Ref"
     - "region: Ref"
-    - "regionCluster: Ref?"
+    - "metadataCluster: Ref?"
     - "name: string"
     - "description: string?"
     # Immutable storage personality picked at create time. One of:
@@ -449,7 +463,7 @@ types:
     - "node: string?"
     - "accountId: int64?"
     - "regionId: int64?"
-    - "regionClusterId: int64?"
+    - "metadataClusterId: int64?"
     - "createdAt: datetime?"
     - "updatedAt: datetime?"
 
@@ -473,7 +487,7 @@ types:
     - "alertId: string"
     - "source: string"
     - "nodeId: string"
-    - "regionClusterId: int64?"
+    - "metadataClusterId: int64?"
     - "severity: int"
     - "category: string"
     - "title: string"
@@ -488,11 +502,15 @@ types:
     - "infoCount: int64"
     - "warningCount: int64"
     - "criticalCount: int64"
+    # Snapshot time of this count, RFC3339 UTC. Each appserv instance caches
+    # this summary independently for a short TTL, so asOf tells a poller how
+    # stale its copy is.
+    - "asOf: datetime"
 
   GCWorkerEvent:
     - "id: int64"
     - "nodeId: string"
-    - "regionClusterId: int64?"
+    - "metadataClusterId: int64?"
     - "goal: string"
     - "sid: int64?"
     - "subject: string?"
@@ -515,7 +533,7 @@ types:
   ServiceNode:
     - "id: int64"
     - "regionId: int64"
-    - "regionClusterId: int64?"
+    - "metadataClusterId: int64?"
     - "serviceType: string"
     - "nodeId: string"
     - "advertiseAddr: string"
@@ -577,7 +595,7 @@ types:
     - "id: int64"
     - "account: Ref"
     - "region: Ref"
-    - "regionCluster: Ref?"
+    - "metadataCluster: Ref?"
     - "volume: VolumeRef"
     - "user: Ref?"
     - "clientType: string"
@@ -927,9 +945,9 @@ resources:
           - "isActive: bool"
           - "page: int=1"
           - "limit: int=100"
-        responseType: RegionCluster
+        responseType: MetadataCluster
 
-  - name: RegionClusters
+  - name: MetadataClusters
     path: /regions/:regionId/clusters
     endpoints:
       - action: create
@@ -948,12 +966,12 @@ resources:
           - "isActive: bool"
           - "page: int=1"
           - "limit: int=20"
-        responseType: RegionCluster
+        responseType: MetadataCluster
 
       - action: get
         method: GET
         path: /:clusterId
-        responseType: RegionCluster
+        responseType: MetadataCluster
 
       - action: edit
         method: PUT
@@ -987,7 +1005,7 @@ resources:
   - name: Storages
     path: /storages
     pathParamTypes:
-      pairId: string
+      copysetId: string
       blockVolumeId: string
     endpoints:
       - action: create
@@ -1114,22 +1132,22 @@ resources:
           - "moved: string[]"
           - "failures: MoveVolumeFailure[]"
 
-      # ── Block HA-pair placement admin surface (spec/appserv.md §7) ──
+      # ── Block copyset placement admin surface (spec/appserv.md §7) ──
       # Nested under /storages/:storageId/..., matching listBlockVolumes'
-      # existing style rather than a first-class top-level "pairs" resource
+      # existing style rather than a first-class top-level "copysets" resource
       # (decided and documented in spec/admin-sdk.md §4: every action here is
       # storage-scoped, same as block-volumes already is, and there is no
-      # cross-storage pair query anywhere in scope).
+      # cross-storage copyset query anywhere in scope).
       #
-      # AuthZ: every action below - mutating (updateConfig, drainPair,
-      # cancelDrain, registerMember, reactivateMember) and read (listPairs,
-      # getPairStatus, getConfig) - is gated by the EnforceUserRoleAccountID
+      # AuthZ: every action below - mutating (updateConfig, drainCopyset,
+      # cancelDrain, registerMember, reactivateMember) and read (listCopysets,
+      # getCopysetStatus, getConfig) - is gated by the EnforceUserRoleAccountID
       # account-scope check (routes_appserv.go); mutating actions also
       # require adminOnly. Matches listBlockVolumes, which enforces the same
       # account-scope check on its own read.
 
       # Idempotently re-runs auto-pairing toward k every call (a no-op at the
-      # current k). recomputePairs as a separate endpoint was REMOVED (D7) -
+      # current k). recomputeCopysets as a separate endpoint was REMOVED (D7) -
       # redundant with calling this at the current k.
       - action: updateConfig
         method: PUT
@@ -1141,7 +1159,7 @@ resources:
       # The read-back half of updateConfig{k} (D40): a storage's current
       # target K plus the placement-config values needed to interpret it.
       # mos-adminclient had no way to reach this without re-deriving K from
-      # listPairs' pair count, which is wrong once a drain or auto-pairing
+      # listCopysets' copyset count, which is wrong once a drain or auto-pairing
       # partial has run. 404s if the storage has never been paired (no
       # config row minted yet) - never a zero-value k.
       - action: getConfig
@@ -1153,58 +1171,70 @@ resources:
           - "algorithmVersion: int32"
           - "epochPolicyVersion: int32"
 
-      # Defaults to non-retired pairs only - state, given, filters to
-      # exactly that PairState; includeRetired=true drops the default
+      # Defaults to non-retired copysets only - state, given, filters to
+      # exactly that CopysetState; includeRetired=true drops the default
       # filter entirely (full audit history). At most one of the two
       # is meaningful at a time; state wins if both are given.
-      - action: listPairs
+      - action: listCopysets
         method: GET
-        path: /:storageId/pairs
+        path: /:storageId/copysets
         query:
           - "state: string"
           - "includeRetired: bool"
-        responseType: Pair
+        responseType: Copyset
         responseArray: true
 
-      - action: getPairStatus
+      - action: getCopysetStatus
         method: GET
-        path: /:storageId/pairs/:pairId
-        responseType: Pair
+        path: /:storageId/copysets/:copysetId
+        responseType: Copyset
 
-      # Accepted-transition ack, NOT completion - poll getPairStatus.
-      # IDEMPOTENT (D9): a second call on an already-draining/beyond pair
+      # Accepted-transition ack, NOT completion - poll getCopysetStatus.
+      # IDEMPOTENT (D9): a second call on an already-draining/beyond copyset
       # returns the CURRENT state as success, not a 409 - draining is an
       # observed state, not a contended resource.
-      - action: drainPair
+      - action: drainCopyset
         method: POST
-        path: /:storageId/pairs/:pairId/drain
+        path: /:storageId/copysets/:copysetId/drain
         response:
           - "id: string"
           - "state: string"
 
       # Only valid while draining (D27) - fails (409) once synced_drained;
-      # reads have already stopped and the pair is committed to retiring by
+      # reads have already stopped and the copyset is committed to retiring by
       # then, un-retiring is a different, riskier operation not offered here.
       - action: cancelDrain
         method: POST
-        path: /:storageId/pairs/:pairId/cancel-drain
+        path: /:storageId/copysets/:copysetId/cancel-drain
         response:
           - "id: string"
           - "state: string"
 
+      # Whole-array replace of the copyset's unindexed/unsearchable operator
+      # tags (Copyset.tags). No CAS: tag edits are rare and don't race the
+      # copyset's own state machine, so a last-write-wins overwrite is enough.
+      - action: updateTags
+        method: PUT
+        path: /:storageId/copysets/:copysetId/tags
+        request:
+          - "tags: string[]?"
+        responseType: Copyset
+
       # Moves member provisioning into its own pooling step, out of create's
       # create-time-only flow (D24). Immediately poolable: the handler
-      # reactivates the freshly created member in the same call.
+      # reactivates the freshly created member in the same call. name is
+      # optional: an omitted/empty value auto-fills server-side (an
+      # adjective-noun-hex label), never generated client-side.
       - action: registerMember
         method: POST
         path: /:storageId/members
         request:
           - "regionClusterId: int64!"
-          - "name: string!"
+          - "name: string?"
         responseType: PoolMember
 
       # The ONLY way a 'detached' member becomes poolable again (D24) -
-      # without this, a drained pair's nodes are permanently stranded.
+      # without this, a drained copyset's nodes are permanently stranded.
       - action: reactivateMember
         method: POST
         path: /:storageId/members/:blockVolumeId/reactivate
@@ -1246,8 +1276,8 @@ resources:
           # Optional cluster pin. Omit to land on the region's default cluster.
           # If set, the cluster must belong to the storage's region, be
           # is_active=TRUE and is_ready=TRUE; otherwise create fails 4xx.
-          - "regionClusterId: int64"
-          - "regionClusterUuid: string"
+          - "metadataClusterId: int64"
+          - "metadataClusterUuid: string"
         response:
           - "id: int64"
           - "encryptionKey: string?"
@@ -1259,7 +1289,7 @@ resources:
         query:
           - "accountId: int64!"
           - "regionId: int64"
-          - "regionClusterId: int64"
+          - "metadataClusterId: int64"
           - "storageId: int64"
           - "volumeType: string"
           - "locked: bool"
@@ -1393,25 +1423,25 @@ resources:
         response:
           - "id: int64"
 
-      # Per-volume block-placement pair-count config: a volume's own target
-      # pair count, current epoch, and current candidate pair set. Distinct
+      # Per-volume block-placement copyset-count config: a volume's own target
+      # copyset count, current epoch, and current candidate copyset set. Distinct
       # from Storages.updateConfig/getConfig above (the storage's fleet-wide
       # k) - this is the volume's own working-set size within that fleet.
       # AuthZ: no adminOnly on either action - gated by
       # EnforceUserRoleVolumeAccess (routes_appserv.go), so both an admin
       # and the volume's own owning account may call it, mirroring
-      # updateQuota/edit above. Every updatePairConfig call is
+      # updateQuota/edit above. Every updateCopysetConfig call is
       # audit-logged, whichever caller made it.
-      - action: getPairConfig
+      - action: getCopysetConfig
         method: GET
-        path: /:volumeId/pair-config
+        path: /:volumeId/copyset-config
         responseType: VolumeBlockPlacementConfig
 
-      - action: updatePairConfig
+      - action: updateCopysetConfig
         method: PUT
-        path: /:volumeId/pair-config
+        path: /:volumeId/copyset-config
         request:
-          - "targetPairCount: int32!"
+          - "targetCopysetCount: int32!"
         responseType: VolumeBlockPlacementResizeResult
 
       - action: stats
@@ -1559,7 +1589,7 @@ resources:
         query:
           - "accountId: int64!"
           - "regionId: int64"
-          - "regionClusterId: int64"
+          - "metadataClusterId: int64"
           - "cursor: int64"
           - "limit: int=20"
           - "subject: string"
@@ -1574,7 +1604,7 @@ resources:
         path: /list
         pagination: cursor
         query:
-          - "regionClusterId: int64"
+          - "metadataClusterId: int64"
           - "cursor: int64"
           - "limit: int=20"
           - "subject: string"
@@ -1593,7 +1623,7 @@ resources:
           - "serviceType: string"
           - "status: string"
           - "inactiveHours: int"
-          - "regionClusterId: int64"
+          - "metadataClusterId: int64"
         responseType: ServiceNode
         responseArray: true
 
@@ -1633,7 +1663,7 @@ resources:
         query:
           - "accountId: int64!"
           - "regionId: int64"
-          - "regionClusterId: int64"
+          - "metadataClusterId: int64"
           - "volumeId: int64"
           - "userId: int64"
           - "clientType: string"
@@ -1657,7 +1687,7 @@ resources:
         query:
           - "accountId: int64!"
           - "regionId: int64"
-          - "regionClusterId: int64"
+          - "metadataClusterId: int64"
           - "volumeId: int64"
           - "userId: int64"
         responseType: SessionSummary
@@ -1775,7 +1805,7 @@ resources:
           - "severity: int"
           - "category: string"
           - "nodeId: string"
-          - "regionClusterId: int64"
+          - "metadataClusterId: int64"
           - "since: string"
           - "page: int=1"
           - "limit: int=20"
@@ -1785,7 +1815,7 @@ resources:
         method: GET
         path: /count
         query:
-          - "regionClusterId: int64?"
+          - "metadataClusterId: int64?"
         responseType: AlertCountResponse
 
       - action: resolve
@@ -1807,7 +1837,7 @@ resources:
           - "nodeId: string"
           - "goal: string"
           - "sid: int64"
-          - "regionClusterId: int64"
+          - "metadataClusterId: int64"
           - "since: string"
           - "page: int=1"
           - "limit: int=20"
@@ -1820,7 +1850,7 @@ resources:
           - "nodeId: string"
           - "goal: string"
           - "sid: int64"
-          - "regionClusterId: int64"
+          - "metadataClusterId: int64"
           - "since: string"
           - "bucketSeconds: int64=900"
         responseType: GCWorkerEventHistogramResponse

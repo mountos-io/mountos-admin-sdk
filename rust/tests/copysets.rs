@@ -1,8 +1,8 @@
-//! Fixture/mock-server contract test for the block HA-pair placement admin
+//! Fixture/mock-server contract test for the block copyset placement admin
 //! surface (admin-sdk.md §5 step 2): exercises the generated client against
 //! a hand-rolled single-request TCP fixture, no live appserv and no new
 //! dev-dependency (no mock-server crate available under `cargo --locked`).
-//! Covers the "accepted, not completed" response shapes (drainPair/
+//! Covers the "accepted, not completed" response shapes (drainCopyset/
 //! cancelDrain/updateConfig) and regression-guards the reactivateMember
 //! GET-vs-POST generator bug (a no-request endpoint with a named
 //! responseType on a mutating method was silently generated as GET in all
@@ -11,7 +11,7 @@
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
 use mountos_admin_sdk::{
-    Client, Config, PairState, RegisterStorageMemberRequest, UpdateStorageConfigRequest,
+    Client, Config, CopysetState, RegisterStorageMemberRequest, UpdateStorageConfigRequest,
 };
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
@@ -117,31 +117,31 @@ async fn get_config_reads_back_k() {
 }
 
 #[tokio::test]
-async fn list_pairs_full_state_per_pair() {
+async fn list_copysets_full_state_per_copyset() {
     let (base_url, handle) = fixture_server(serde_json::json!([
-        {"id": "p1", "storageId": "s1", "state": "active", "memberA": "bv1", "memberB": "bv2"},
-        {"id": "p2", "storageId": "s1", "state": "draining", "memberA": "bv3", "memberB": "bv4", "pendingSyncJobsA": 3, "pendingSyncJobsB": 0},
+        {"id": "p1", "storageId": "s1", "state": "active", "memberA": "bv1", "memberB": "bv2", "tags": []},
+        {"id": "p2", "storageId": "s1", "state": "draining", "memberA": "bv3", "memberB": "bv4", "pendingSyncJobsA": 3, "pendingSyncJobsB": 0, "tags": ["east"]},
     ]));
     let client = test_client(base_url);
 
-    let pairs = client.storages.list_pairs(7, None, None).await.expect("list_pairs");
-    assert_eq!(pairs.len(), 2);
-    assert_eq!(pairs[1].state, PairState::Draining);
-    assert_eq!(pairs[1].pending_sync_jobs_a, Some(3));
+    let copysets = client.storages.list_copysets(7, None, None).await.expect("list_copysets");
+    assert_eq!(copysets.len(), 2);
+    assert_eq!(copysets[1].state, CopysetState::Draining);
+    assert_eq!(copysets[1].pending_sync_jobs_a, Some(3));
 
     let recorded = handle.join().expect("server thread");
     assert_eq!(recorded.method, "GET");
-    assert_eq!(recorded.path, "/api/v1/storages/7/pairs");
+    assert_eq!(recorded.path, "/api/v1/storages/7/copysets");
 }
 
 #[tokio::test]
-async fn drain_pair_idempotent_ack() {
+async fn drain_copyset_idempotent_ack() {
     // D9: response reads "draining", not "drained" - an accepted-transition
     // ack, never a completion promise.
     let (base_url, handle) = fixture_server(serde_json::json!({"id": "p1", "state": "draining"}));
     let client = test_client(base_url);
 
-    let res = client.storages.drain_pair(7, "p1").await.expect("drain_pair");
+    let res = client.storages.drain_copyset(7, "p1").await.expect("drain_copyset");
     assert_eq!(res.state, "draining");
     assert_eq!(handle.join().unwrap().method, "POST");
 }
@@ -153,14 +153,14 @@ async fn cancel_drain_active_again() {
 
     let res = client.storages.cancel_drain(7, "p1").await.expect("cancel_drain");
     assert_eq!(res.state, "active");
-    assert_eq!(handle.join().unwrap().path, "/api/v1/storages/7/pairs/p1/cancel-drain");
+    assert_eq!(handle.join().unwrap().path, "/api/v1/storages/7/copysets/p1/cancel-drain");
 }
 
 #[tokio::test]
 async fn update_config_partial_surfaces_reason() {
     let (base_url, handle) = fixture_server(serde_json::json!({
-        "id": "s1", "targetK": 3, "activePairCountBefore": 1, "pairsNeeded": 2,
-        "pairsFormed": 1, "activePairCountAfter": 2, "partial": true,
+        "id": "s1", "targetK": 3, "activeCopysetCountBefore": 1, "copysetsNeeded": 2,
+        "copysetsFormed": 1, "activeCopysetCountAfter": 2, "partial": true,
         "reason": "placement cluster B has no unused members",
     }));
     let client = test_client(base_url);
@@ -173,10 +173,10 @@ async fn update_config_partial_surfaces_reason() {
     assert!(res.partial);
     assert_eq!(res.reason.as_deref(), Some("placement cluster B has no unused members"));
     assert_eq!(res.target_k, 3);
-    assert_eq!(res.active_pair_count_before, 1);
-    assert_eq!(res.pairs_needed, 2);
-    assert_eq!(res.pairs_formed, 1);
-    assert_eq!(res.active_pair_count_after, 2);
+    assert_eq!(res.active_copyset_count_before, 1);
+    assert_eq!(res.copysets_needed, 2);
+    assert_eq!(res.copysets_formed, 1);
+    assert_eq!(res.active_copyset_count_after, 2);
     assert_eq!(handle.join().unwrap().body.unwrap()["k"], 3);
 }
 
@@ -198,7 +198,7 @@ async fn reactivate_member_sends_post() {
 }
 
 #[tokio::test]
-async fn register_member_required_name() {
+async fn register_member_explicit_name() {
     let (base_url, handle) = fixture_server(serde_json::json!({
         "id": "bv5", "name": "new-member", "regionId": 1, "regionClusterId": 3, "memberState": "active",
     }));
@@ -206,11 +206,31 @@ async fn register_member_required_name() {
 
     let res = client
         .storages
-        .register_member(7, &RegisterStorageMemberRequest { region_cluster_id: 3, name: "new-member".into() })
+        .register_member(7, &RegisterStorageMemberRequest { region_cluster_id: 3, name: Some("new-member".into()) })
         .await
         .expect("register_member");
     assert_eq!(res.member_state, "active");
     assert_eq!(handle.join().unwrap().body.unwrap()["name"], "new-member");
+}
+
+// name is optional on the wire: None must be dropped from the request body
+// entirely (never sent as `"name": null`), letting the server auto-fill it.
+#[tokio::test]
+async fn register_member_omitted_name() {
+    let (base_url, handle) = fixture_server(serde_json::json!({
+        "id": "bv6", "name": "auto-generated", "regionId": 1, "regionClusterId": 3, "memberState": "active",
+    }));
+    let client = test_client(base_url);
+
+    let res = client
+        .storages
+        .register_member(7, &RegisterStorageMemberRequest { region_cluster_id: 3, name: None })
+        .await
+        .expect("register_member");
+    assert_eq!(res.member_state, "active");
+    assert_eq!(res.name, "auto-generated");
+    let body = handle.join().unwrap().body.unwrap();
+    assert!(body.get("name").is_none(), "expected no name key in request body when omitted, got {body:?}");
 }
 
 // Regression coverage for the generator emitting crate::http::encode_segment
@@ -222,19 +242,19 @@ async fn register_member_required_name() {
 // escaped "%2F" apart from a real segment boundary.
 #[tokio::test]
 async fn string_path_params_are_url_encoded() {
-    let raw_pair_id = "pair/id with spaces/café";
+    let raw_copyset_id = "copyset/id with spaces/café";
     let (base_url, handle) = fixture_server(serde_json::json!({
-        "id": raw_pair_id, "storageId": "s1", "state": "active",
+        "id": raw_copyset_id, "storageId": "s1", "state": "active", "tags": [],
     }));
     let client = test_client(base_url);
 
-    let pair = client.storages.get_pair_status(7, raw_pair_id).await.expect("get_pair_status");
-    assert_eq!(pair.id, raw_pair_id);
+    let copyset = client.storages.get_copyset_status(7, raw_copyset_id).await.expect("get_copyset_status");
+    assert_eq!(copyset.id, raw_copyset_id);
 
     let path = handle.join().unwrap().path;
     assert!(
-        path.contains("pair%2Fid%20with%20spaces%2Fcaf%C3%A9"),
+        path.contains("copyset%2Fid%20with%20spaces%2Fcaf%C3%A9"),
         "request path {path:?} did not contain the escaped segment"
     );
-    assert!(!path.contains("/pairs/pair/"), "request path {path:?} sent the '/' unescaped, splitting the path");
+    assert!(!path.contains("/copysets/copyset/"), "request path {path:?} sent the '/' unescaped, splitting the path");
 }

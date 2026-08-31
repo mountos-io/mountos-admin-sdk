@@ -129,6 +129,75 @@ impl<'de> Deserialize<'de> for ClientSessionStatus {
     }
 }
 
+/// `CopysetState` values accepted/returned on the wire. `Unknown` preserves a
+/// value this SDK does not recognize yet, for forward compatibility with
+/// a server that has introduced a new CopysetState value.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CopysetState {
+    Active,
+    Draining,
+    SyncedDrained,
+    Retired,
+    /// A value not defined when this SDK was generated.
+    Unknown(String),
+}
+
+impl CopysetState {
+    /// Returns the wire string for this value.
+    pub fn as_str(&self) -> &str {
+        match self {
+            CopysetState::Active => "active",
+            CopysetState::Draining => "draining",
+            CopysetState::SyncedDrained => "synced_drained",
+            CopysetState::Retired => "retired",
+            CopysetState::Unknown(s) => s.as_str(),
+        }
+    }
+
+    /// Reports whether this is one of the values defined when this SDK was
+    /// generated (false for `Unknown`).
+    pub fn is_known(&self) -> bool {
+        !matches!(self, CopysetState::Unknown(_))
+    }
+}
+
+impl std::fmt::Display for CopysetState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+impl From<&str> for CopysetState {
+    fn from(s: &str) -> Self {
+        match s {
+            "active" => CopysetState::Active,
+            "draining" => CopysetState::Draining,
+            "synced_drained" => CopysetState::SyncedDrained,
+            "retired" => CopysetState::Retired,
+            other => CopysetState::Unknown(other.to_string()),
+        }
+    }
+}
+
+impl Serialize for CopysetState {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de> Deserialize<'de> for CopysetState {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        Ok(CopysetState::from(s.as_str()))
+    }
+}
+
 /// `LicenseQuotaState` values accepted/returned on the wire. `Unknown` preserves a
 /// value this SDK does not recognize yet, for forward compatibility with
 /// a server that has introduced a new LicenseQuotaState value.
@@ -264,75 +333,6 @@ impl<'de> Deserialize<'de> for LicenseStatus {
     }
 }
 
-/// `PairState` values accepted/returned on the wire. `Unknown` preserves a
-/// value this SDK does not recognize yet, for forward compatibility with
-/// a server that has introduced a new PairState value.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum PairState {
-    Active,
-    Draining,
-    SyncedDrained,
-    Retired,
-    /// A value not defined when this SDK was generated.
-    Unknown(String),
-}
-
-impl PairState {
-    /// Returns the wire string for this value.
-    pub fn as_str(&self) -> &str {
-        match self {
-            PairState::Active => "active",
-            PairState::Draining => "draining",
-            PairState::SyncedDrained => "synced_drained",
-            PairState::Retired => "retired",
-            PairState::Unknown(s) => s.as_str(),
-        }
-    }
-
-    /// Reports whether this is one of the values defined when this SDK was
-    /// generated (false for `Unknown`).
-    pub fn is_known(&self) -> bool {
-        !matches!(self, PairState::Unknown(_))
-    }
-}
-
-impl std::fmt::Display for PairState {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(self.as_str())
-    }
-}
-
-impl From<&str> for PairState {
-    fn from(s: &str) -> Self {
-        match s {
-            "active" => PairState::Active,
-            "draining" => PairState::Draining,
-            "synced_drained" => PairState::SyncedDrained,
-            "retired" => PairState::Retired,
-            other => PairState::Unknown(other.to_string()),
-        }
-    }
-}
-
-impl Serialize for PairState {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        serializer.serialize_str(self.as_str())
-    }
-}
-
-impl<'de> Deserialize<'de> for PairState {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let s = String::deserialize(deserializer)?;
-        Ok(PairState::from(s.as_str()))
-    }
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Account {
     pub id: i64,
@@ -394,7 +394,7 @@ pub struct Region {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct RegionCluster {
+pub struct MetadataCluster {
     pub id: i64,
     #[serde(rename = "exportId")]
     pub export_id: String,
@@ -473,8 +473,8 @@ pub struct BlockVolume {
     pub updated_at: String,
     #[serde(rename = "memberState", skip_serializing_if = "Option::is_none")]
     pub member_state: Option<String>,
-    #[serde(rename = "pairId", skip_serializing_if = "Option::is_none")]
-    pub pair_id: Option<String>,
+    #[serde(rename = "copysetId", skip_serializing_if = "Option::is_none")]
+    pub copyset_id: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -482,25 +482,25 @@ pub struct UpdateConfigResult {
     pub id: String,
     #[serde(rename = "targetK")]
     pub target_k: i32,
-    #[serde(rename = "activePairCountBefore")]
-    pub active_pair_count_before: i32,
-    #[serde(rename = "pairsNeeded")]
-    pub pairs_needed: i32,
-    #[serde(rename = "pairsFormed")]
-    pub pairs_formed: i32,
-    #[serde(rename = "activePairCountAfter")]
-    pub active_pair_count_after: i32,
+    #[serde(rename = "activeCopysetCountBefore")]
+    pub active_copyset_count_before: i32,
+    #[serde(rename = "copysetsNeeded")]
+    pub copysets_needed: i32,
+    #[serde(rename = "copysetsFormed")]
+    pub copysets_formed: i32,
+    #[serde(rename = "activeCopysetCountAfter")]
+    pub active_copyset_count_after: i32,
     pub partial: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reason: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Pair {
+pub struct Copyset {
     pub id: String,
     #[serde(rename = "storageId")]
     pub storage_id: String,
-    pub state: PairState,
+    pub state: CopysetState,
     #[serde(rename = "memberA", skip_serializing_if = "Option::is_none")]
     pub member_a: Option<String>,
     #[serde(rename = "memberB", skip_serializing_if = "Option::is_none")]
@@ -519,6 +519,9 @@ pub struct Pair {
     pub pending_sync_jobs_a: Option<i32>,
     #[serde(rename = "pendingSyncJobsB", skip_serializing_if = "Option::is_none")]
     pub pending_sync_jobs_b: Option<i32>,
+    #[serde(rename = "drainInitiatedBy", skip_serializing_if = "Option::is_none")]
+    pub drain_initiated_by: Option<i64>,
+    pub tags: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -539,8 +542,8 @@ pub struct Volume {
     pub account: Ref,
     pub storage: Ref,
     pub region: Ref,
-    #[serde(rename = "regionCluster", skip_serializing_if = "Option::is_none")]
-    pub region_cluster: Option<Ref>,
+    #[serde(rename = "metadataCluster", skip_serializing_if = "Option::is_none")]
+    pub metadata_cluster: Option<Ref>,
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -580,27 +583,27 @@ pub struct Volume {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VolumeBlockPlacementConfig {
     pub id: i64,
-    #[serde(rename = "targetPairCount")]
-    pub target_pair_count: i32,
+    #[serde(rename = "targetCopysetCount")]
+    pub target_copyset_count: i32,
     #[serde(rename = "currentEpoch")]
     pub current_epoch: i64,
-    #[serde(rename = "pairIds")]
-    pub pair_ids: Vec<String>,
+    #[serde(rename = "copysetIds")]
+    pub copyset_ids: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VolumeBlockPlacementResizeResult {
     pub id: i64,
-    #[serde(rename = "targetPairCount")]
-    pub target_pair_count: i32,
-    #[serde(rename = "pairCountBefore")]
-    pub pair_count_before: i32,
-    #[serde(rename = "pairsAdded")]
-    pub pairs_added: i32,
-    #[serde(rename = "pairsRemoved")]
-    pub pairs_removed: i32,
-    #[serde(rename = "pairCountAfter")]
-    pub pair_count_after: i32,
+    #[serde(rename = "targetCopysetCount")]
+    pub target_copyset_count: i32,
+    #[serde(rename = "copysetCountBefore")]
+    pub copyset_count_before: i32,
+    #[serde(rename = "copysetsAdded")]
+    pub copysets_added: i32,
+    #[serde(rename = "copysetsRemoved")]
+    pub copysets_removed: i32,
+    #[serde(rename = "copysetCountAfter")]
+    pub copyset_count_after: i32,
     pub epoch: i64,
     pub partial: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -706,8 +709,8 @@ pub struct AuditLog {
     pub account_id: Option<i64>,
     #[serde(rename = "regionId", skip_serializing_if = "Option::is_none")]
     pub region_id: Option<i64>,
-    #[serde(rename = "regionClusterId", skip_serializing_if = "Option::is_none")]
-    pub region_cluster_id: Option<i64>,
+    #[serde(rename = "metadataClusterId", skip_serializing_if = "Option::is_none")]
+    pub metadata_cluster_id: Option<i64>,
     #[serde(rename = "createdAt", skip_serializing_if = "Option::is_none")]
     pub created_at: Option<String>,
     #[serde(rename = "updatedAt", skip_serializing_if = "Option::is_none")]
@@ -719,8 +722,8 @@ pub struct ServiceNode {
     pub id: i64,
     #[serde(rename = "regionId")]
     pub region_id: i64,
-    #[serde(rename = "regionClusterId", skip_serializing_if = "Option::is_none")]
-    pub region_cluster_id: Option<i64>,
+    #[serde(rename = "metadataClusterId", skip_serializing_if = "Option::is_none")]
+    pub metadata_cluster_id: Option<i64>,
     #[serde(rename = "serviceType")]
     pub service_type: String,
     #[serde(rename = "nodeId")]
@@ -755,8 +758,8 @@ pub struct ClientSession {
     pub id: i64,
     pub account: Ref,
     pub region: Ref,
-    #[serde(rename = "regionCluster", skip_serializing_if = "Option::is_none")]
-    pub region_cluster: Option<Ref>,
+    #[serde(rename = "metadataCluster", skip_serializing_if = "Option::is_none")]
+    pub metadata_cluster: Option<Ref>,
     pub volume: VolumeRef,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<Ref>,
@@ -951,6 +954,8 @@ pub struct AlertCountResponse {
     pub warning_count: i64,
     #[serde(rename = "criticalCount")]
     pub critical_count: i64,
+    #[serde(rename = "asOf")]
+    pub as_of: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -961,8 +966,8 @@ pub struct RegionAlert {
     pub source: String,
     #[serde(rename = "nodeId")]
     pub node_id: String,
-    #[serde(rename = "regionClusterId", skip_serializing_if = "Option::is_none")]
-    pub region_cluster_id: Option<i64>,
+    #[serde(rename = "metadataClusterId", skip_serializing_if = "Option::is_none")]
+    pub metadata_cluster_id: Option<i64>,
     pub severity: i64,
     pub category: String,
     pub title: String,
@@ -981,8 +986,8 @@ pub struct GCWorkerEvent {
     pub id: i64,
     #[serde(rename = "nodeId")]
     pub node_id: String,
-    #[serde(rename = "regionClusterId", skip_serializing_if = "Option::is_none")]
-    pub region_cluster_id: Option<i64>,
+    #[serde(rename = "metadataClusterId", skip_serializing_if = "Option::is_none")]
+    pub metadata_cluster_id: Option<i64>,
     pub goal: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sid: Option<i64>,
@@ -1387,31 +1392,31 @@ pub struct ClusterListOptions {
     pub limit: Option<i64>,
 }
 
-// RegionClusters
+// MetadataClusters
 
 #[derive(Debug, Clone, Serialize)]
-pub struct CreateRegionClusterRequest {
+pub struct CreateMetadataClusterRequest {
     pub name: String,
 }
 
 #[derive(Debug, Clone, Serialize)]
-pub struct EditRegionClusterRequest {
+pub struct EditMetadataClusterRequest {
     pub name: String,
 }
 
 #[derive(Debug, Clone, Serialize)]
-pub struct SetRegionClusterReadyRequest {
+pub struct SetMetadataClusterReadyRequest {
     pub ready: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SetReadyRegionClusterResponse {
+pub struct SetReadyMetadataClusterResponse {
     pub id: i64,
     pub ready: bool,
 }
 
 #[derive(Debug, Clone, Default)]
-pub struct RegionClusterListOptions {
+pub struct MetadataClusterListOptions {
     pub is_active: Option<bool>,
     pub page: Option<i64>,
     pub limit: Option<i64>,
@@ -1542,7 +1547,7 @@ pub struct GetConfigStorageResponse {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DrainPairStorageResponse {
+pub struct DrainCopysetStorageResponse {
     pub id: String,
     pub state: String,
 }
@@ -1554,10 +1559,17 @@ pub struct CancelDrainStorageResponse {
 }
 
 #[derive(Debug, Clone, Serialize)]
+pub struct UpdateStorageTagsRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tags: Option<Vec<String>>,
+}
+
+#[derive(Debug, Clone, Serialize)]
 pub struct RegisterStorageMemberRequest {
     #[serde(rename = "regionClusterId")]
     pub region_cluster_id: i64,
-    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -1607,10 +1619,10 @@ pub struct CreateVolumeRequest {
     pub compaction: Option<String>,
     #[serde(rename = "quotaLimit", skip_serializing_if = "Option::is_none")]
     pub quota_limit: Option<i64>,
-    #[serde(rename = "regionClusterId", skip_serializing_if = "Option::is_none")]
-    pub region_cluster_id: Option<i64>,
-    #[serde(rename = "regionClusterUuid", skip_serializing_if = "Option::is_none")]
-    pub region_cluster_uuid: Option<String>,
+    #[serde(rename = "metadataClusterId", skip_serializing_if = "Option::is_none")]
+    pub metadata_cluster_id: Option<i64>,
+    #[serde(rename = "metadataClusterUuid", skip_serializing_if = "Option::is_none")]
+    pub metadata_cluster_uuid: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -1721,9 +1733,9 @@ pub struct UpdateVolumeQuotaRequest {
 }
 
 #[derive(Debug, Clone, Serialize)]
-pub struct UpdateVolumePairConfigRequest {
-    #[serde(rename = "targetPairCount")]
-    pub target_pair_count: i32,
+pub struct UpdateVolumeCopysetConfigRequest {
+    #[serde(rename = "targetCopysetCount")]
+    pub target_copyset_count: i32,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -1780,7 +1792,7 @@ pub struct RestoreVolumeForkRequest {
 pub struct VolumeListOptions {
     pub account_id: i64,
     pub region_id: Option<i64>,
-    pub region_cluster_id: Option<i64>,
+    pub metadata_cluster_id: Option<i64>,
     pub storage_id: Option<i64>,
     pub volume_type: Option<String>,
     pub locked: Option<bool>,
@@ -1829,7 +1841,7 @@ pub struct VolumeForkSearchListOptions {
 pub struct AuditLogListOptions {
     pub account_id: i64,
     pub region_id: Option<i64>,
-    pub region_cluster_id: Option<i64>,
+    pub metadata_cluster_id: Option<i64>,
     pub cursor: Option<i64>,
     pub limit: Option<i64>,
     pub subject: Option<String>,
@@ -1840,7 +1852,7 @@ pub struct AuditLogListOptions {
 
 #[derive(Debug, Clone, Default)]
 pub struct RegionAuditLogListOptions {
-    pub region_cluster_id: Option<i64>,
+    pub metadata_cluster_id: Option<i64>,
     pub cursor: Option<i64>,
     pub limit: Option<i64>,
     pub subject: Option<String>,
@@ -1864,7 +1876,7 @@ pub struct StatsHistoryServiceNodeResponse {
 pub struct ClientSessionListOptions {
     pub account_id: i64,
     pub region_id: Option<i64>,
-    pub region_cluster_id: Option<i64>,
+    pub metadata_cluster_id: Option<i64>,
     pub volume_id: Option<i64>,
     pub user_id: Option<i64>,
     pub client_type: Option<String>,
@@ -1930,7 +1942,7 @@ pub struct RegionAlertListOptions {
     pub severity: Option<i64>,
     pub category: Option<String>,
     pub node_id: Option<String>,
-    pub region_cluster_id: Option<i64>,
+    pub metadata_cluster_id: Option<i64>,
     pub since: Option<String>,
     pub page: Option<i64>,
     pub limit: Option<i64>,
@@ -1943,7 +1955,7 @@ pub struct GCWorkerEventListOptions {
     pub node_id: Option<String>,
     pub goal: Option<String>,
     pub sid: Option<i64>,
-    pub region_cluster_id: Option<i64>,
+    pub metadata_cluster_id: Option<i64>,
     pub since: Option<String>,
     pub page: Option<i64>,
     pub limit: Option<i64>,

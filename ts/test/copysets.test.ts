@@ -1,7 +1,7 @@
-// Fixture/mock-server contract test for the block HA-pair placement admin
+// Fixture/mock-server contract test for the block copyset placement admin
 // surface (admin-sdk.md §5 step 2): exercises the generated client against
 // a hand-written fake RequestFn, no live appserv. Covers the "accepted, not
-// completed" response shapes (drainPair/cancelDrain/updateConfig) and
+// completed" response shapes (drainCopyset/cancelDrain/updateConfig) and
 // regression-guards the reactivateMember GET-vs-POST generator bug (a
 // no-request endpoint with a named responseType on a mutating method was
 // silently generated as GET in all three SDK languages until fixed
@@ -39,41 +39,41 @@ test('getConfig: read-back half of updateConfig (D40)', async () => {
   assert.equal(calls[0].method, 'GET')
 })
 
-test('listPairs: full state per pair, no per-pair follow-up call needed', async () => {
+test('listCopysets: full state per copyset, no per-copyset follow-up call needed', async () => {
   const { client, calls } = fakeClient({
-    'GET /api/v1/storages/7/pairs': [
+    'GET /api/v1/storages/7/copysets': [
       { id: 'p1', storageId: 's1', state: 'active', memberA: 'bv1', memberB: 'bv2', placementGroupA: 1, placementGroupB: 2 },
       { id: 'p2', storageId: 's1', state: 'draining', memberA: 'bv3', memberB: 'bv4', pendingSyncJobsA: 3, pendingSyncJobsB: 0 },
     ],
   })
-  const pairs = await client.storages.listPairs(7)
-  assert.equal(pairs.length, 2)
-  assert.equal(pairs[1].state, 'draining')
-  assert.equal(pairs[1].pendingSyncJobsA, 3)
-  assert.deepEqual(calls, [{ method: 'GET', path: '/api/v1/storages/7/pairs', body: undefined }])
+  const copysets = await client.storages.listCopysets(7)
+  assert.equal(copysets.length, 2)
+  assert.equal(copysets[1].state, 'draining')
+  assert.equal(copysets[1].pendingSyncJobsA, 3)
+  assert.deepEqual(calls, [{ method: 'GET', path: '/api/v1/storages/7/copysets', body: undefined }])
 })
 
-test('getPairStatus: nullable drain-only fields absent on an active pair', async () => {
+test('getCopysetStatus: nullable drain-only fields absent on an active copyset', async () => {
   const { client } = fakeClient({
-    'GET /api/v1/storages/7/pairs/p1': { id: 'p1', storageId: 's1', state: 'active', memberA: 'bv1', memberB: 'bv2' },
+    'GET /api/v1/storages/7/copysets/p1': { id: 'p1', storageId: 's1', state: 'active', memberA: 'bv1', memberB: 'bv2' },
   })
-  const pair = await client.storages.getPairStatus(7, 'p1')
-  assert.equal(pair.state, 'active')
-  assert.equal(pair.pendingSyncJobsA, undefined)
+  const copyset = await client.storages.getCopysetStatus(7, 'p1')
+  assert.equal(copyset.state, 'active')
+  assert.equal(copyset.pendingSyncJobsA, undefined)
 })
 
-test('drainPair: idempotent-ack shape (D9) - state reads "draining", not "drained"', async () => {
+test('drainCopyset: idempotent-ack shape (D9) - state reads "draining", not "drained"', async () => {
   const { client, calls } = fakeClient({
-    'POST /api/v1/storages/7/pairs/p1/drain': { id: 'p1', state: 'draining' },
+    'POST /api/v1/storages/7/copysets/p1/drain': { id: 'p1', state: 'draining' },
   })
-  const res = await client.storages.drainPair(7, 'p1')
+  const res = await client.storages.drainCopyset(7, 'p1')
   assert.equal(res.state, 'draining')
   assert.equal(calls[0].method, 'POST')
 })
 
 test('cancelDrain (D27): active-again ack', async () => {
   const { client } = fakeClient({
-    'POST /api/v1/storages/7/pairs/p1/cancel-drain': { id: 'p1', state: 'active' },
+    'POST /api/v1/storages/7/copysets/p1/cancel-drain': { id: 'p1', state: 'active' },
   })
   const res = await client.storages.cancelDrain(7, 'p1')
   assert.equal(res.state, 'active')
@@ -82,8 +82,8 @@ test('cancelDrain (D27): active-again ack', async () => {
 test('updateConfig: partial-success surfaces reason, not swallowed', async () => {
   const { client, calls } = fakeClient({
     'PUT /api/v1/storages/7/config': {
-      id: 's1', targetK: 3, activePairCountBefore: 1, pairsNeeded: 2,
-      pairsFormed: 1, activePairCountAfter: 2, partial: true,
+      id: 's1', targetK: 3, activeCopysetCountBefore: 1, copysetsNeeded: 2,
+      copysetsFormed: 1, activeCopysetCountAfter: 2, partial: true,
       reason: 'placement cluster B has no unused members',
     },
   })
@@ -91,10 +91,10 @@ test('updateConfig: partial-success surfaces reason, not swallowed', async () =>
   assert.equal(res.partial, true)
   assert.equal(res.reason, 'placement cluster B has no unused members')
   assert.equal(res.targetK, 3)
-  assert.equal(res.activePairCountBefore, 1)
-  assert.equal(res.pairsNeeded, 2)
-  assert.equal(res.pairsFormed, 1)
-  assert.equal(res.activePairCountAfter, 2)
+  assert.equal(res.activeCopysetCountBefore, 1)
+  assert.equal(res.copysetsNeeded, 2)
+  assert.equal(res.copysetsFormed, 1)
+  assert.equal(res.activeCopysetCountAfter, 2)
   assert.deepEqual(calls[0].body, { k: 3 })
 })
 
@@ -109,7 +109,7 @@ test('reactivateMember: sends POST (regression guard for the responseType/no-req
   assert.equal(calls[0].method, 'POST')
 })
 
-test('registerMember: required name, immediately poolable (memberState active)', async () => {
+test('registerMember: explicit name, immediately poolable (memberState active)', async () => {
   const { client, calls } = fakeClient({
     'POST /api/v1/storages/7/members': {
       id: 'bv5', name: 'new-member', regionId: 1, regionClusterId: 3, memberState: 'active',
@@ -118,4 +118,16 @@ test('registerMember: required name, immediately poolable (memberState active)',
   const res = await client.storages.registerMember(7, { regionClusterId: 3, name: 'new-member' })
   assert.equal(res.memberState, 'active')
   assert.deepEqual(calls[0].body, { regionClusterId: 3, name: 'new-member' })
+})
+
+test('registerMember: omitted name auto-fills server-side', async () => {
+  const { client, calls } = fakeClient({
+    'POST /api/v1/storages/7/members': {
+      id: 'bv6', name: 'auto-generated', regionId: 1, regionClusterId: 3, memberState: 'active',
+    },
+  })
+  const res = await client.storages.registerMember(7, { regionClusterId: 3 })
+  assert.equal(res.memberState, 'active')
+  assert.equal(res.name, 'auto-generated')
+  assert.deepEqual(calls[0].body, { regionClusterId: 3 })
 })

@@ -61,6 +61,12 @@ type PaginationMeta             = { page: number; limit: number; total: number; 
 type ClientSessionStatus = "connected" | "active" | "degraded" | "disconnected" | "expired" | "unknown";
 ```
 
+### `CopysetState`
+
+```typescript
+type CopysetState = "active" | "draining" | "synced_drained" | "retired";
+```
+
 ### `LicenseQuotaState`
 
 ```typescript
@@ -71,12 +77,6 @@ type LicenseQuotaState = "ok" | "exceeded";
 
 ```typescript
 type LicenseStatus = "valid" | "expiring" | "grace" | "expired_access" | "expired";
-```
-
-### `PairState`
-
-```typescript
-type PairState = "active" | "draining" | "synced_drained" | "retired";
 ```
 
 ## Types
@@ -111,6 +111,7 @@ interface AlertCountResponse {
   infoCount: number;
   warningCount: number;
   criticalCount: number;
+  asOf: string;
 }
 ```
 
@@ -128,7 +129,7 @@ interface AuditLog {
   node?: string;
   accountId?: number;
   regionId?: number;
-  regionClusterId?: number;
+  metadataClusterId?: number;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -167,7 +168,7 @@ interface BlockVolume {
   createdAt: string;
   updatedAt: string;
   memberState?: string;
-  pairId?: string;
+  copysetId?: string;
 }
 ```
 
@@ -178,7 +179,7 @@ interface ClientSession {
   id: number;
   account: Ref;
   region: Ref;
-  regionCluster?: Ref;
+  metadataCluster?: Ref;
   volume: VolumeRef;
   user?: Ref;
   clientType: string;
@@ -220,6 +221,27 @@ interface CompatibleStorage {
 interface CompatibleVolume {
   id: string;
   name: string;
+}
+```
+
+### `Copyset`
+
+```typescript
+interface Copyset {
+  id: string;
+  storageId: string;
+  state: CopysetState;
+  memberA?: string;
+  memberB?: string;
+  placementGroupA?: number;
+  placementGroupB?: number;
+  drainStartedAt?: string;
+  syncedAt?: string;
+  retiredAt?: string;
+  pendingSyncJobsA?: number;
+  pendingSyncJobsB?: number;
+  drainInitiatedBy?: number;
+  tags: string[];
 }
 ```
 
@@ -358,7 +380,7 @@ interface ForkTreeMatch {
 interface GCWorkerEvent {
   id: number;
   nodeId: string;
-  regionClusterId?: number;
+  metadataClusterId?: number;
   goal: string;
   sid?: number;
   subject?: string;
@@ -477,6 +499,22 @@ interface LicenseTerms {
 }
 ```
 
+### `MetadataCluster`
+
+```typescript
+interface MetadataCluster {
+  id: number;
+  exportId: string;
+  regionId: number;
+  name: string;
+  defaultCluster: boolean;
+  isReady: boolean;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+```
+
 ### `MetricsTarget`
 
 ```typescript
@@ -538,25 +576,6 @@ interface NodeStatsSample {
 }
 ```
 
-### `Pair`
-
-```typescript
-interface Pair {
-  id: string;
-  storageId: string;
-  state: PairState;
-  memberA?: string;
-  memberB?: string;
-  placementGroupA?: number;
-  placementGroupB?: number;
-  drainStartedAt?: string;
-  syncedAt?: string;
-  retiredAt?: string;
-  pendingSyncJobsA?: number;
-  pendingSyncJobsB?: number;
-}
-```
-
 ### `PoolMember`
 
 ```typescript
@@ -602,7 +621,7 @@ interface RegionAlert {
   alertId: string;
   source: string;
   nodeId: string;
-  regionClusterId?: number;
+  metadataClusterId?: number;
   severity: number;
   category: string;
   title: string;
@@ -610,22 +629,6 @@ interface RegionAlert {
   eventTime: string;
   resolvedAt?: string;
   createdAt?: string;
-}
-```
-
-### `RegionCluster`
-
-```typescript
-interface RegionCluster {
-  id: number;
-  exportId: string;
-  regionId: number;
-  name: string;
-  defaultCluster: boolean;
-  isReady: boolean;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
 }
 ```
 
@@ -675,7 +678,7 @@ interface ServiceAlert {
 interface ServiceNode {
   id: number;
   regionId: number;
-  regionClusterId?: number;
+  metadataClusterId?: number;
   serviceType: string;
   nodeId: string;
   advertiseAddr: string;
@@ -758,10 +761,10 @@ interface Storage {
 interface UpdateConfigResult {
   id: string;
   targetK: number;
-  activePairCountBefore: number;
-  pairsNeeded: number;
-  pairsFormed: number;
-  activePairCountAfter: number;
+  activeCopysetCountBefore: number;
+  copysetsNeeded: number;
+  copysetsFormed: number;
+  activeCopysetCountAfter: number;
   partial: boolean;
   reason?: string;
 }
@@ -798,7 +801,7 @@ interface Volume {
   account: Ref;
   storage: Ref;
   region: Ref;
-  regionCluster?: Ref;
+  metadataCluster?: Ref;
   name: string;
   description?: string;
   volumeType: string;
@@ -838,9 +841,9 @@ interface VolumeApiKey {
 ```typescript
 interface VolumeBlockPlacementConfig {
   id: number;
-  targetPairCount: number;
+  targetCopysetCount: number;
   currentEpoch: number;
-  pairIds: string[];
+  copysetIds: string[];
 }
 ```
 
@@ -849,11 +852,11 @@ interface VolumeBlockPlacementConfig {
 ```typescript
 interface VolumeBlockPlacementResizeResult {
   id: number;
-  targetPairCount: number;
-  pairCountBefore: number;
-  pairsAdded: number;
-  pairsRemoved: number;
-  pairCountAfter: number;
+  targetCopysetCount: number;
+  copysetCountBefore: number;
+  copysetsAdded: number;
+  copysetsRemoved: number;
+  copysetCountAfter: number;
   epoch: number;
   partial: boolean;
   reason?: string;
@@ -1150,7 +1153,7 @@ Accessor: `client.clusters`
 #### `list` - GET /api/v1/clusters/list
 
 ```typescript
-client.clusters.list(opts: ClusterListOptions, signal?: AbortSignal): Promise<PaginatedResponse<RegionCluster>>;
+client.clusters.list(opts: ClusterListOptions, signal?: AbortSignal): Promise<PaginatedResponse<MetadataCluster>>;
 ```
 
 Query params:
@@ -1165,14 +1168,14 @@ Query params:
 }
 ```
 
-### RegionClusters
+### MetadataClusters
 
-Accessor: `client.regionClusters`
+Accessor: `client.metadataClusters`
 
 #### `create` - POST /api/v1/regions/:regionId/clusters/create
 
 ```typescript
-client.regionClusters.create(regionId: number, req: CreateRegionClusterRequest, signal?: AbortSignal): Promise<{ id: number }>;
+client.metadataClusters.create(regionId: number, req: CreateMetadataClusterRequest, signal?: AbortSignal): Promise<{ id: number }>;
 ```
 
 Request body:
@@ -1186,7 +1189,7 @@ Request body:
 #### `list` - GET /api/v1/regions/:regionId/clusters/list
 
 ```typescript
-client.regionClusters.list(regionId: number, opts?: RegionClusterListOptions, signal?: AbortSignal): Promise<PaginatedResponse<RegionCluster>>;
+client.metadataClusters.list(regionId: number, opts?: MetadataClusterListOptions, signal?: AbortSignal): Promise<PaginatedResponse<MetadataCluster>>;
 ```
 
 Query params:
@@ -1202,13 +1205,13 @@ Query params:
 #### `get` - GET /api/v1/regions/:regionId/clusters/:clusterId
 
 ```typescript
-client.regionClusters.get(regionId: number, clusterId: number, signal?: AbortSignal): Promise<RegionCluster>;
+client.metadataClusters.get(regionId: number, clusterId: number, signal?: AbortSignal): Promise<MetadataCluster>;
 ```
 
 #### `edit` - PUT /api/v1/regions/:regionId/clusters/:clusterId
 
 ```typescript
-client.regionClusters.edit(regionId: number, clusterId: number, req: EditRegionClusterRequest, signal?: AbortSignal): Promise<{ id: number }>;
+client.metadataClusters.edit(regionId: number, clusterId: number, req: EditMetadataClusterRequest, signal?: AbortSignal): Promise<{ id: number }>;
 ```
 
 Request body:
@@ -1222,13 +1225,13 @@ Request body:
 #### `setDefault` - POST /api/v1/regions/:regionId/clusters/:clusterId/set-default
 
 ```typescript
-client.regionClusters.setDefault(regionId: number, clusterId: number, signal?: AbortSignal): Promise<{ id: number }>;
+client.metadataClusters.setDefault(regionId: number, clusterId: number, signal?: AbortSignal): Promise<{ id: number }>;
 ```
 
 #### `setReady` - POST /api/v1/regions/:regionId/clusters/:clusterId/set-ready
 
 ```typescript
-client.regionClusters.setReady(regionId: number, clusterId: number, req: SetRegionClusterReadyRequest, signal?: AbortSignal): Promise<{ id: number; ready: boolean }>;
+client.metadataClusters.setReady(regionId: number, clusterId: number, req: SetMetadataClusterReadyRequest, signal?: AbortSignal): Promise<{ id: number; ready: boolean }>;
 ```
 
 Request body:
@@ -1242,7 +1245,7 @@ Request body:
 #### `deactivate` - POST /api/v1/regions/:regionId/clusters/:clusterId/deactivate
 
 ```typescript
-client.regionClusters.deactivate(regionId: number, clusterId: number, signal?: AbortSignal): Promise<{ id: number }>;
+client.metadataClusters.deactivate(regionId: number, clusterId: number, signal?: AbortSignal): Promise<{ id: number }>;
 ```
 
 ### Storages
@@ -1401,10 +1404,10 @@ Request body:
 client.storages.getConfig(storageId: number, signal?: AbortSignal): Promise<{ id: string; k: number; algorithmVersion: number; epochPolicyVersion: number }>;
 ```
 
-#### `listPairs` - GET /api/v1/storages/:storageId/pairs
+#### `listCopysets` - GET /api/v1/storages/:storageId/copysets
 
 ```typescript
-client.storages.listPairs(storageId: number, state?: string, includeRetired?: boolean, signal?: AbortSignal): Promise<Pair[]>;
+client.storages.listCopysets(storageId: number, state?: string, includeRetired?: boolean, signal?: AbortSignal): Promise<Copyset[]>;
 ```
 
 Query params:
@@ -1416,22 +1419,36 @@ Query params:
 }
 ```
 
-#### `getPairStatus` - GET /api/v1/storages/:storageId/pairs/:pairId
+#### `getCopysetStatus` - GET /api/v1/storages/:storageId/copysets/:copysetId
 
 ```typescript
-client.storages.getPairStatus(storageId: number, pairId: string, signal?: AbortSignal): Promise<Pair>;
+client.storages.getCopysetStatus(storageId: number, copysetId: string, signal?: AbortSignal): Promise<Copyset>;
 ```
 
-#### `drainPair` - POST /api/v1/storages/:storageId/pairs/:pairId/drain
+#### `drainCopyset` - POST /api/v1/storages/:storageId/copysets/:copysetId/drain
 
 ```typescript
-client.storages.drainPair(storageId: number, pairId: string, signal?: AbortSignal): Promise<{ id: string; state: string }>;
+client.storages.drainCopyset(storageId: number, copysetId: string, signal?: AbortSignal): Promise<{ id: string; state: string }>;
 ```
 
-#### `cancelDrain` - POST /api/v1/storages/:storageId/pairs/:pairId/cancel-drain
+#### `cancelDrain` - POST /api/v1/storages/:storageId/copysets/:copysetId/cancel-drain
 
 ```typescript
-client.storages.cancelDrain(storageId: number, pairId: string, signal?: AbortSignal): Promise<{ id: string; state: string }>;
+client.storages.cancelDrain(storageId: number, copysetId: string, signal?: AbortSignal): Promise<{ id: string; state: string }>;
+```
+
+#### `updateTags` - PUT /api/v1/storages/:storageId/copysets/:copysetId/tags
+
+```typescript
+client.storages.updateTags(storageId: number, copysetId: string, req: UpdateStorageTagsRequest, signal?: AbortSignal): Promise<Copyset>;
+```
+
+Request body:
+
+```typescript
+{
+  tags?: string[];
+}
 ```
 
 #### `registerMember` - POST /api/v1/storages/:storageId/members
@@ -1445,7 +1462,7 @@ Request body:
 ```typescript
 {
   regionClusterId: number;
-  name: string;
+  name?: string;
 }
 ```
 
@@ -1486,8 +1503,8 @@ Request body:
   versioning?: VolumeVersioningPolicy;
   compaction?: string;
   quotaLimit?: number;
-  regionClusterId?: number;
-  regionClusterUuid?: string;
+  metadataClusterId?: number;
+  metadataClusterUuid?: string;
 }
 ```
 
@@ -1503,7 +1520,7 @@ Query params:
 {
   accountId: number;
   regionId?: number;
-  regionClusterId?: number;
+  metadataClusterId?: number;
   storageId?: number;
   volumeType?: string;
   locked?: boolean;
@@ -1663,23 +1680,23 @@ Request body:
 }
 ```
 
-#### `getPairConfig` - GET /api/v1/volumes/:volumeId/pair-config
+#### `getCopysetConfig` - GET /api/v1/volumes/:volumeId/copyset-config
 
 ```typescript
-client.volumes.getPairConfig(volumeId: number, signal?: AbortSignal): Promise<VolumeBlockPlacementConfig>;
+client.volumes.getCopysetConfig(volumeId: number, signal?: AbortSignal): Promise<VolumeBlockPlacementConfig>;
 ```
 
-#### `updatePairConfig` - PUT /api/v1/volumes/:volumeId/pair-config
+#### `updateCopysetConfig` - PUT /api/v1/volumes/:volumeId/copyset-config
 
 ```typescript
-client.volumes.updatePairConfig(volumeId: number, req: UpdateVolumePairConfigRequest, signal?: AbortSignal): Promise<VolumeBlockPlacementResizeResult>;
+client.volumes.updateCopysetConfig(volumeId: number, req: UpdateVolumeCopysetConfigRequest, signal?: AbortSignal): Promise<VolumeBlockPlacementResizeResult>;
 ```
 
 Request body:
 
 ```typescript
 {
-  targetPairCount: number;
+  targetCopysetCount: number;
 }
 ```
 
@@ -1864,7 +1881,7 @@ Query params:
 {
   accountId: number;
   regionId?: number;
-  regionClusterId?: number;
+  metadataClusterId?: number;
   cursor?: number;
   limit?: number;  // default: 20
   subject?: string;
@@ -1886,7 +1903,7 @@ Query params:
 
 ```typescript
 {
-  regionClusterId?: number;
+  metadataClusterId?: number;
   cursor?: number;
   limit?: number;  // default: 20
   subject?: string;
@@ -1901,7 +1918,7 @@ Accessor: `client.serviceNodes`
 #### `list` - GET /api/v1/regions/:regionId/nodes
 
 ```typescript
-client.serviceNodes.list(regionId: number, serviceType?: string, status?: string, inactiveHours?: number, regionClusterId?: number, signal?: AbortSignal): Promise<ServiceNode[]>;
+client.serviceNodes.list(regionId: number, serviceType?: string, status?: string, inactiveHours?: number, metadataClusterId?: number, signal?: AbortSignal): Promise<ServiceNode[]>;
 ```
 
 Query params:
@@ -1911,7 +1928,7 @@ Query params:
   serviceType?: string;
   status?: string;
   inactiveHours?: number;
-  regionClusterId?: number;
+  metadataClusterId?: number;
 }
 ```
 
@@ -1964,7 +1981,7 @@ Query params:
 {
   accountId: number;
   regionId?: number;
-  regionClusterId?: number;
+  metadataClusterId?: number;
   volumeId?: number;
   userId?: number;
   clientType?: string;
@@ -1987,7 +2004,7 @@ client.clientSessions.get(sessionId: number, signal?: AbortSignal): Promise<Clie
 #### `summary` - GET /api/v1/client-sessions/summary
 
 ```typescript
-client.clientSessions.summary(accountId: number, regionId?: number, regionClusterId?: number, volumeId?: number, userId?: number, signal?: AbortSignal): Promise<SessionSummary>;
+client.clientSessions.summary(accountId: number, regionId?: number, metadataClusterId?: number, volumeId?: number, userId?: number, signal?: AbortSignal): Promise<SessionSummary>;
 ```
 
 Query params:
@@ -1996,7 +2013,7 @@ Query params:
 {
   accountId: number;
   regionId?: number;
-  regionClusterId?: number;
+  metadataClusterId?: number;
   volumeId?: number;
   userId?: number;
 }
@@ -2153,7 +2170,7 @@ Query params:
   severity?: number;
   category?: string;
   nodeId?: string;
-  regionClusterId?: number;
+  metadataClusterId?: number;
   since?: string;
   page?: number;  // default: 1
   limit?: number;  // default: 20
@@ -2163,14 +2180,14 @@ Query params:
 #### `count` - GET /api/v1/regions/:regionId/alerts/count
 
 ```typescript
-client.regionAlerts.count(regionId: number, regionClusterId?: number, signal?: AbortSignal): Promise<AlertCountResponse>;
+client.regionAlerts.count(regionId: number, metadataClusterId?: number, signal?: AbortSignal): Promise<AlertCountResponse>;
 ```
 
 Query params:
 
 ```typescript
 {
-  regionClusterId?: number;
+  metadataClusterId?: number;
 }
 ```
 
@@ -2197,7 +2214,7 @@ Query params:
   nodeId?: string;
   goal?: string;
   sid?: number;
-  regionClusterId?: number;
+  metadataClusterId?: number;
   since?: string;
   page?: number;  // default: 1
   limit?: number;  // default: 20
@@ -2207,7 +2224,7 @@ Query params:
 #### `histogram` - GET /api/v1/regions/:regionId/gc-worker-events/histogram
 
 ```typescript
-client.gcWorkerEvents.histogram(regionId: number, nodeId?: string, goal?: string, sid?: number, regionClusterId?: number, since?: string, bucketSeconds?: number, signal?: AbortSignal): Promise<GCWorkerEventHistogramResponse>;
+client.gcWorkerEvents.histogram(regionId: number, nodeId?: string, goal?: string, sid?: number, metadataClusterId?: number, since?: string, bucketSeconds?: number, signal?: AbortSignal): Promise<GCWorkerEventHistogramResponse>;
 ```
 
 Query params:
@@ -2217,7 +2234,7 @@ Query params:
   nodeId?: string;
   goal?: string;
   sid?: number;
-  regionClusterId?: number;
+  metadataClusterId?: number;
   since?: string;
   bucketSeconds?: number;  // default: 900
 }

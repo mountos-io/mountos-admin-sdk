@@ -14,7 +14,7 @@ pub struct Client {
     pub users: UsersService,
     pub regions: RegionsService,
     pub clusters: ClustersService,
-    pub region_clusters: RegionClustersService,
+    pub metadata_clusters: MetadataClustersService,
     pub storages: StoragesService,
     pub volumes: VolumesService,
     pub volume_fork_trees: VolumeForkTreesService,
@@ -44,7 +44,7 @@ impl Client {
             users: UsersService { inner: Arc::clone(&inner) },
             regions: RegionsService { inner: Arc::clone(&inner) },
             clusters: ClustersService { inner: Arc::clone(&inner) },
-            region_clusters: RegionClustersService { inner: Arc::clone(&inner) },
+            metadata_clusters: MetadataClustersService { inner: Arc::clone(&inner) },
             storages: StoragesService { inner: Arc::clone(&inner) },
             volumes: VolumesService { inner: Arc::clone(&inner) },
             volume_fork_trees: VolumeForkTreesService { inner: Arc::clone(&inner) },
@@ -207,7 +207,7 @@ pub struct ClustersService {
 }
 
 impl ClustersService {
-    pub async fn list(&self, opts: &ClusterListOptions) -> Result<PaginatedResponse<RegionCluster>, Error> {
+    pub async fn list(&self, opts: &ClusterListOptions) -> Result<PaginatedResponse<MetadataCluster>, Error> {
         let mut query: Vec<(&str, String)> = Vec::new();
         query.push(("accountId", opts.account_id.to_string()));
         if let Some(v) = &opts.region_id {
@@ -226,17 +226,17 @@ impl ClustersService {
     }
 }
 
-/// Operations on the `RegionClusters` resource.
-pub struct RegionClustersService {
+/// Operations on the `MetadataClusters` resource.
+pub struct MetadataClustersService {
     inner: Arc<ClientInner>,
 }
 
-impl RegionClustersService {
-    pub async fn create(&self, region_id: i64, req: &CreateRegionClusterRequest) -> Result<IdResponse, Error> {
+impl MetadataClustersService {
+    pub async fn create(&self, region_id: i64, req: &CreateMetadataClusterRequest) -> Result<IdResponse, Error> {
         self.inner.post(&format!("/api/v1/regions/{}/clusters/create", region_id), req).await
     }
 
-    pub async fn list(&self, region_id: i64, opts: Option<&RegionClusterListOptions>) -> Result<PaginatedResponse<RegionCluster>, Error> {
+    pub async fn list(&self, region_id: i64, opts: Option<&MetadataClusterListOptions>) -> Result<PaginatedResponse<MetadataCluster>, Error> {
         let mut query: Vec<(&str, String)> = Vec::new();
         if let Some(opts) = opts {
             if let Some(v) = &opts.is_active {
@@ -252,11 +252,11 @@ impl RegionClustersService {
         self.inner.get(&format!("/api/v1/regions/{}/clusters/list", region_id), &query).await
     }
 
-    pub async fn get(&self, region_id: i64, cluster_id: i64) -> Result<RegionCluster, Error> {
+    pub async fn get(&self, region_id: i64, cluster_id: i64) -> Result<MetadataCluster, Error> {
         self.inner.get(&format!("/api/v1/regions/{}/clusters/{}", region_id, cluster_id), &[]).await
     }
 
-    pub async fn edit(&self, region_id: i64, cluster_id: i64, req: &EditRegionClusterRequest) -> Result<IdResponse, Error> {
+    pub async fn edit(&self, region_id: i64, cluster_id: i64, req: &EditMetadataClusterRequest) -> Result<IdResponse, Error> {
         self.inner.put(&format!("/api/v1/regions/{}/clusters/{}", region_id, cluster_id), req).await
     }
 
@@ -264,7 +264,7 @@ impl RegionClustersService {
         self.inner.post_empty(&format!("/api/v1/regions/{}/clusters/{}/set-default", region_id, cluster_id)).await
     }
 
-    pub async fn set_ready(&self, region_id: i64, cluster_id: i64, req: &SetRegionClusterReadyRequest) -> Result<SetReadyRegionClusterResponse, Error> {
+    pub async fn set_ready(&self, region_id: i64, cluster_id: i64, req: &SetMetadataClusterReadyRequest) -> Result<SetReadyMetadataClusterResponse, Error> {
         self.inner.post(&format!("/api/v1/regions/{}/clusters/{}/set-ready", region_id, cluster_id), req).await
     }
 
@@ -353,7 +353,7 @@ impl StoragesService {
         self.inner.get(&format!("/api/v1/storages/{}/config", storage_id), &[]).await
     }
 
-    pub async fn list_pairs(&self, storage_id: i64, state: Option<&str>, include_retired: Option<bool>) -> Result<Vec<Pair>, Error> {
+    pub async fn list_copysets(&self, storage_id: i64, state: Option<&str>, include_retired: Option<bool>) -> Result<Vec<Copyset>, Error> {
         let mut query: Vec<(&str, String)> = Vec::new();
         if let Some(v) = state {
             query.push(("state", v.to_string()));
@@ -361,19 +361,23 @@ impl StoragesService {
         if let Some(v) = include_retired {
             query.push(("includeRetired", v.to_string()));
         }
-        self.inner.get(&format!("/api/v1/storages/{}/pairs", storage_id), &query).await
+        self.inner.get(&format!("/api/v1/storages/{}/copysets", storage_id), &query).await
     }
 
-    pub async fn get_pair_status(&self, storage_id: i64, pair_id: &str) -> Result<Pair, Error> {
-        self.inner.get(&format!("/api/v1/storages/{}/pairs/{}", storage_id, crate::http::encode_segment(pair_id)), &[]).await
+    pub async fn get_copyset_status(&self, storage_id: i64, copyset_id: &str) -> Result<Copyset, Error> {
+        self.inner.get(&format!("/api/v1/storages/{}/copysets/{}", storage_id, crate::http::encode_segment(copyset_id)), &[]).await
     }
 
-    pub async fn drain_pair(&self, storage_id: i64, pair_id: &str) -> Result<DrainPairStorageResponse, Error> {
-        self.inner.post_empty(&format!("/api/v1/storages/{}/pairs/{}/drain", storage_id, crate::http::encode_segment(pair_id))).await
+    pub async fn drain_copyset(&self, storage_id: i64, copyset_id: &str) -> Result<DrainCopysetStorageResponse, Error> {
+        self.inner.post_empty(&format!("/api/v1/storages/{}/copysets/{}/drain", storage_id, crate::http::encode_segment(copyset_id))).await
     }
 
-    pub async fn cancel_drain(&self, storage_id: i64, pair_id: &str) -> Result<CancelDrainStorageResponse, Error> {
-        self.inner.post_empty(&format!("/api/v1/storages/{}/pairs/{}/cancel-drain", storage_id, crate::http::encode_segment(pair_id))).await
+    pub async fn cancel_drain(&self, storage_id: i64, copyset_id: &str) -> Result<CancelDrainStorageResponse, Error> {
+        self.inner.post_empty(&format!("/api/v1/storages/{}/copysets/{}/cancel-drain", storage_id, crate::http::encode_segment(copyset_id))).await
+    }
+
+    pub async fn update_tags(&self, storage_id: i64, copyset_id: &str, req: &UpdateStorageTagsRequest) -> Result<Copyset, Error> {
+        self.inner.put(&format!("/api/v1/storages/{}/copysets/{}/tags", storage_id, crate::http::encode_segment(copyset_id)), req).await
     }
 
     pub async fn register_member(&self, storage_id: i64, req: &RegisterStorageMemberRequest) -> Result<PoolMember, Error> {
@@ -405,8 +409,8 @@ impl VolumesService {
         if let Some(v) = &opts.region_id {
             query.push(("regionId", v.to_string()));
         }
-        if let Some(v) = &opts.region_cluster_id {
-            query.push(("regionClusterId", v.to_string()));
+        if let Some(v) = &opts.metadata_cluster_id {
+            query.push(("metadataClusterId", v.to_string()));
         }
         if let Some(v) = &opts.storage_id {
             query.push(("storageId", v.to_string()));
@@ -481,12 +485,12 @@ impl VolumesService {
         self.inner.put(&format!("/api/v1/volumes/{}/quota", volume_id), req).await
     }
 
-    pub async fn get_pair_config(&self, volume_id: i64) -> Result<VolumeBlockPlacementConfig, Error> {
-        self.inner.get(&format!("/api/v1/volumes/{}/pair-config", volume_id), &[]).await
+    pub async fn get_copyset_config(&self, volume_id: i64) -> Result<VolumeBlockPlacementConfig, Error> {
+        self.inner.get(&format!("/api/v1/volumes/{}/copyset-config", volume_id), &[]).await
     }
 
-    pub async fn update_pair_config(&self, volume_id: i64, req: &UpdateVolumePairConfigRequest) -> Result<VolumeBlockPlacementResizeResult, Error> {
-        self.inner.put(&format!("/api/v1/volumes/{}/pair-config", volume_id), req).await
+    pub async fn update_copyset_config(&self, volume_id: i64, req: &UpdateVolumeCopysetConfigRequest) -> Result<VolumeBlockPlacementResizeResult, Error> {
+        self.inner.put(&format!("/api/v1/volumes/{}/copyset-config", volume_id), req).await
     }
 
     pub async fn stats(&self, volume_id: i64) -> Result<StatsVolumeResponse, Error> {
@@ -644,8 +648,8 @@ impl AuditLogsService {
         if let Some(v) = &opts.region_id {
             query.push(("regionId", v.to_string()));
         }
-        if let Some(v) = &opts.region_cluster_id {
-            query.push(("regionClusterId", v.to_string()));
+        if let Some(v) = &opts.metadata_cluster_id {
+            query.push(("metadataClusterId", v.to_string()));
         }
         if let Some(v) = &opts.cursor {
             query.push(("cursor", v.to_string()));
@@ -672,8 +676,8 @@ impl RegionAuditLogsService {
     pub async fn list(&self, region_id: i64, opts: Option<&RegionAuditLogListOptions>) -> Result<CursorPaginatedResponse<AuditLog>, Error> {
         let mut query: Vec<(&str, String)> = Vec::new();
         if let Some(opts) = opts {
-            if let Some(v) = &opts.region_cluster_id {
-                query.push(("regionClusterId", v.to_string()));
+            if let Some(v) = &opts.metadata_cluster_id {
+                query.push(("metadataClusterId", v.to_string()));
             }
             if let Some(v) = &opts.cursor {
                 query.push(("cursor", v.to_string()));
@@ -698,7 +702,7 @@ pub struct ServiceNodesService {
 }
 
 impl ServiceNodesService {
-    pub async fn list(&self, region_id: i64, service_type: Option<&str>, status: Option<&str>, inactive_hours: Option<i64>, region_cluster_id: Option<i64>) -> Result<Vec<ServiceNode>, Error> {
+    pub async fn list(&self, region_id: i64, service_type: Option<&str>, status: Option<&str>, inactive_hours: Option<i64>, metadata_cluster_id: Option<i64>) -> Result<Vec<ServiceNode>, Error> {
         let mut query: Vec<(&str, String)> = Vec::new();
         if let Some(v) = service_type {
             query.push(("serviceType", v.to_string()));
@@ -709,8 +713,8 @@ impl ServiceNodesService {
         if let Some(v) = inactive_hours {
             query.push(("inactiveHours", v.to_string()));
         }
-        if let Some(v) = region_cluster_id {
-            query.push(("regionClusterId", v.to_string()));
+        if let Some(v) = metadata_cluster_id {
+            query.push(("metadataClusterId", v.to_string()));
         }
         self.inner.get(&format!("/api/v1/regions/{}/nodes", region_id), &query).await
     }
@@ -758,8 +762,8 @@ impl ClientSessionsService {
         if let Some(v) = &opts.region_id {
             query.push(("regionId", v.to_string()));
         }
-        if let Some(v) = &opts.region_cluster_id {
-            query.push(("regionClusterId", v.to_string()));
+        if let Some(v) = &opts.metadata_cluster_id {
+            query.push(("metadataClusterId", v.to_string()));
         }
         if let Some(v) = &opts.volume_id {
             query.push(("volumeId", v.to_string()));
@@ -798,14 +802,14 @@ impl ClientSessionsService {
         self.inner.get(&format!("/api/v1/client-sessions/{}", session_id), &[]).await
     }
 
-    pub async fn summary(&self, account_id: i64, region_id: Option<i64>, region_cluster_id: Option<i64>, volume_id: Option<i64>, user_id: Option<i64>) -> Result<SessionSummary, Error> {
+    pub async fn summary(&self, account_id: i64, region_id: Option<i64>, metadata_cluster_id: Option<i64>, volume_id: Option<i64>, user_id: Option<i64>) -> Result<SessionSummary, Error> {
         let mut query: Vec<(&str, String)> = Vec::new();
         query.push(("accountId", account_id.to_string()));
         if let Some(v) = region_id {
             query.push(("regionId", v.to_string()));
         }
-        if let Some(v) = region_cluster_id {
-            query.push(("regionClusterId", v.to_string()));
+        if let Some(v) = metadata_cluster_id {
+            query.push(("metadataClusterId", v.to_string()));
         }
         if let Some(v) = volume_id {
             query.push(("volumeId", v.to_string()));
@@ -948,8 +952,8 @@ impl RegionAlertsService {
             if let Some(v) = &opts.node_id {
                 query.push(("nodeId", v.to_string()));
             }
-            if let Some(v) = &opts.region_cluster_id {
-                query.push(("regionClusterId", v.to_string()));
+            if let Some(v) = &opts.metadata_cluster_id {
+                query.push(("metadataClusterId", v.to_string()));
             }
             if let Some(v) = &opts.since {
                 query.push(("since", v.to_string()));
@@ -964,10 +968,10 @@ impl RegionAlertsService {
         self.inner.get(&format!("/api/v1/regions/{}/alerts/list", region_id), &query).await
     }
 
-    pub async fn count(&self, region_id: i64, region_cluster_id: Option<i64>) -> Result<AlertCountResponse, Error> {
+    pub async fn count(&self, region_id: i64, metadata_cluster_id: Option<i64>) -> Result<AlertCountResponse, Error> {
         let mut query: Vec<(&str, String)> = Vec::new();
-        if let Some(v) = region_cluster_id {
-            query.push(("regionClusterId", v.to_string()));
+        if let Some(v) = metadata_cluster_id {
+            query.push(("metadataClusterId", v.to_string()));
         }
         self.inner.get(&format!("/api/v1/regions/{}/alerts/count", region_id), &query).await
     }
@@ -995,8 +999,8 @@ impl GCWorkerEventsService {
             if let Some(v) = &opts.sid {
                 query.push(("sid", v.to_string()));
             }
-            if let Some(v) = &opts.region_cluster_id {
-                query.push(("regionClusterId", v.to_string()));
+            if let Some(v) = &opts.metadata_cluster_id {
+                query.push(("metadataClusterId", v.to_string()));
             }
             if let Some(v) = &opts.since {
                 query.push(("since", v.to_string()));
@@ -1011,7 +1015,7 @@ impl GCWorkerEventsService {
         self.inner.get(&format!("/api/v1/regions/{}/gc-worker-events/list", region_id), &query).await
     }
 
-    pub async fn histogram(&self, region_id: i64, node_id: Option<&str>, goal: Option<&str>, sid: Option<i64>, region_cluster_id: Option<i64>, since: Option<&str>, bucket_seconds: Option<i64>) -> Result<GCWorkerEventHistogramResponse, Error> {
+    pub async fn histogram(&self, region_id: i64, node_id: Option<&str>, goal: Option<&str>, sid: Option<i64>, metadata_cluster_id: Option<i64>, since: Option<&str>, bucket_seconds: Option<i64>) -> Result<GCWorkerEventHistogramResponse, Error> {
         let mut query: Vec<(&str, String)> = Vec::new();
         if let Some(v) = node_id {
             query.push(("nodeId", v.to_string()));
@@ -1022,8 +1026,8 @@ impl GCWorkerEventsService {
         if let Some(v) = sid {
             query.push(("sid", v.to_string()));
         }
-        if let Some(v) = region_cluster_id {
-            query.push(("regionClusterId", v.to_string()));
+        if let Some(v) = metadata_cluster_id {
+            query.push(("metadataClusterId", v.to_string()));
         }
         if let Some(v) = since {
             query.push(("since", v.to_string()));

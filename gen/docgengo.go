@@ -66,7 +66,11 @@ func generateDocGo(spec *Spec, outDir string) {
 		w.WriteString("## Enums\n\n")
 		w.WriteString("Each is a defined string type (not a plain alias), with a `Parse<Name>` ")
 		w.WriteString("constructor and an `IsValid`/`String` method - use `Parse<Name>` for a value read ")
-		w.WriteString("from outside the package (a request, a config file, etc.) rather than a bare conversion.\n\n")
+		w.WriteString("from outside the package (a request, a config file, etc.) rather than a bare conversion. ")
+		w.WriteString("Decoding a response field from JSON never fails: an unrecognized wire value assigns ")
+		w.WriteString("as-is rather than erroring, so a server newer than this SDK still decodes - the same ")
+		w.WriteString("forward-compatibility policy as the Rust SDK's explicit `Unknown` variant. `IsValid` is ")
+		w.WriteString("the Go analog of Rust's `is_known()`.\n\n")
 		for _, name := range sortedKeys(spec.Enums) {
 			values := spec.Enums[name]
 			fmt.Fprintf(&w, "### `%s`\n\n", name)
