@@ -28,6 +28,7 @@
 
 mod auth;
 mod client_gen;
+mod compat;
 mod dashboard_user;
 mod errors;
 mod http;
@@ -35,6 +36,7 @@ mod providers;
 mod types_gen;
 
 pub use client_gen::*;
+pub use compat::{DrainPairStorageResponse, Pair, PairState, UpdateVolumePairConfigRequest};
 pub use dashboard_user::sign_dashboard_user;
 pub use errors::Error;
 pub use providers::*;
