@@ -67,6 +67,11 @@ func newTestClient(t *testing.T, baseURL string) *sdk.Client {
 	return c
 }
 
+// strPtr builds a *string for constructing optional request fields, which
+// the generator pointer-wraps so callers can distinguish "not set" from an
+// explicitly empty string.
+func strPtr(s string) *string { return &s }
+
 func TestGetConfigReadsBackK(t *testing.T) {
 	_, srv := newFixtureServer(t, map[string]any{
 		"GET /api/v1/storages/7/config": map[string]any{"id": "s1", "k": 3, "algorithmVersion": 1, "epochPolicyVersion": 1},
@@ -179,7 +184,7 @@ func TestUpdateConfigPartialSurfacesReason(t *testing.T) {
 	if err != nil {
 		t.Fatalf("UpdateConfig: %v", err)
 	}
-	if !res.Partial || res.Reason == "" {
+	if !res.Partial || res.Reason == nil || *res.Reason == "" {
 		t.Fatalf("expected partial=true with a reason, got %+v", res)
 	}
 	if res.TargetK != 3 || res.ActiveCopysetCountBefore != 1 || res.CopysetsNeeded != 2 || res.CopysetsFormed != 1 || res.ActiveCopysetCountAfter != 2 {
@@ -222,7 +227,7 @@ func TestRegisterMemberExplicitName(t *testing.T) {
 	defer srv.Close()
 	c := newTestClient(t, srv.URL)
 
-	res, err := c.Storages.RegisterMember(context.Background(), 7, &sdk.RegisterStorageMemberRequest{RegionClusterID: 3, Name: "new-member"})
+	res, err := c.Storages.RegisterMember(context.Background(), 7, &sdk.RegisterStorageMemberRequest{RegionClusterID: 3, Name: strPtr("new-member")})
 	if err != nil {
 		t.Fatalf("RegisterMember: %v", err)
 	}

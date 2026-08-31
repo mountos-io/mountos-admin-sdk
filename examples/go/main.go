@@ -24,7 +24,7 @@ func main() {
   // --- Accounts ---
   acct, err := client.Accounts.Create(ctx, &sdk.CreateAccountRequest{
     Name:        "Acme Corp",
-    Description: "Demo account",
+    Description: ptr("Demo account"),
     ProviderInfo: map[string]any{"tier": "enterprise"},
   })
   if err != nil {
@@ -46,7 +46,7 @@ func main() {
 
   _, _ = client.Accounts.Edit(ctx, acct.ID, &sdk.EditAccountRequest{
     Name:        "Acme Corp Updated",
-    Description: "Updated description",
+    Description: ptr("Updated description"),
   })
 
   // --- Users ---
@@ -54,7 +54,7 @@ func main() {
     AccountID: acct.ID,
     Username:  fmt.Sprintf("alice-%d", acct.ID),
     Email:     fmt.Sprintf("alice-%d@acme.com", acct.ID),
-    Name:      "Alice Smith",
+    Name:      ptr("Alice Smith"),
   })
   if err != nil {
     log.Fatal("add user:", err)
@@ -96,10 +96,10 @@ func main() {
     StorageType:  "object",
     ProviderType: "s3",
     Endpoint:     "https://s3.us-east-1.amazonaws.com",
-    Bucket:       "my-mountos-bucket",
-    Region:       "us-east-1",
-    AccessKey:    "AKIAEXAMPLE",
-    SecretKey:    "secret",
+    Bucket:       ptr("my-mountos-bucket"),
+    Region:       ptr("us-east-1"),
+    AccessKey:    ptr("AKIAEXAMPLE"),
+    SecretKey:    ptr("secret"),
   })
   if err != nil {
     var sdkErr *sdk.Error
@@ -199,3 +199,7 @@ func envOrDefault(key, fallback string) string {
   }
   return fallback
 }
+
+// ptr addresses a literal for the SDK's optional (pointer-typed) request
+// fields, which distinguish "not set" from an explicit zero value.
+func ptr[T any](v T) *T { return &v }
