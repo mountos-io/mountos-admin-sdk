@@ -7,26 +7,25 @@ import type {
   UserLite, EditUserRequest, CreateRegionRequest, Region, RegionListOptions, 
   EditRegionRequest, MetadataCluster, ClusterListOptions, CreateMetadataClusterRequest, 
   MetadataClusterListOptions, EditMetadataClusterRequest, SetMetadataClusterReadyRequest, 
-  CreateStorageRequest, BlockMember, Storage, StorageListOptions, BlockVolume, 
-  EditStorageRequest, TestStorageNewBucketRequest, CompatibleStorage, 
-  MoveStorageVolumesRequest, MoveVolumeFailure, UpdateStorageConfigRequest, 
-  UpdateConfigResult, Copyset, UpdateStorageTagsRequest, RegisterStorageMemberRequest, 
-  PoolMember, BackfillFailure, CreateVolumeRequest, VolumeRetentionPolicy, 
-  VolumeVersioningPolicy, Volume, VolumeListOptions, EditVolumeRequest, 
-  MoveVolumeClusterRequest, DeactivateVolumeRequest, GenerateVolumeAPIKeysRequest, 
-  VolumeApiKey, RevokeVolumeAPIKeyRequest, RevokeVolumeAPIKeysByUserRequest, 
-  GenerateVolumeSttKeyRequest, UpdateVolumeQuotaRequest, VolumeBlockPlacementConfig, 
-  UpdateVolumeCopysetConfigRequest, VolumeBlockPlacementResizeResult, VolumeSizePoint, 
-  CreateVolumeForkRequest, Fork, DeleteVolumeForkRequest, RestoreVolumeForkRequest, 
-  ForkTreeEntry, VolumeForkTreeListOptions, ForkEntryDetail, ForkEntryVersion, 
-  VolumeForkEntryListOptions, ForkTreeMatch, VolumeForkSearchListOptions, AuditLog, 
-  AuditLogListOptions, RegionAuditLogListOptions, ServiceNode, NodeStatsSample, 
-  ClientSession, ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, 
-  MetricsTarget, GenerateMetricTokenRequest, MetricsTokenResponse, DashboardStats, 
-  LicenseDetails, LicenseTerms, LoadLicenseRequest, LicenseLoadResult, LicenseList, 
-  ServiceAlert, AlertListOptions, AlertCountResponse, RegionAlert, RegionAlertListOptions, 
-  GCWorkerEvent, GCWorkerEventListOptions, GCWorkerEventHistogramResponse, 
-  GCWorkerEventGoalsResponse,
+  CreateStorageRequest, Storage, StorageListOptions, BlockVolume, EditStorageRequest, 
+  TestStorageNewBucketRequest, CompatibleStorage, MoveStorageVolumesRequest, 
+  MoveVolumeFailure, Copyset, UpdateStorageTagsRequest, RegisterStorageCopysetRequest, 
+  AddStorageCopysetMemberRequest, PoolMember, BackfillFailure, CreateVolumeRequest, 
+  VolumeRetentionPolicy, VolumeVersioningPolicy, Volume, VolumeListOptions, 
+  EditVolumeRequest, MoveVolumeClusterRequest, DeactivateVolumeRequest, 
+  GenerateVolumeAPIKeysRequest, VolumeApiKey, RevokeVolumeAPIKeyRequest, 
+  RevokeVolumeAPIKeysByUserRequest, GenerateVolumeSttKeyRequest, UpdateVolumeQuotaRequest, 
+  VolumeBlockPlacementConfig, UpdateVolumeCopysetConfigRequest, 
+  VolumeBlockPlacementResizeResult, VolumeSizePoint, CreateVolumeForkRequest, Fork, 
+  DeleteVolumeForkRequest, RestoreVolumeForkRequest, ForkTreeEntry, 
+  VolumeForkTreeListOptions, ForkEntryDetail, ForkEntryVersion, VolumeForkEntryListOptions, 
+  ForkTreeMatch, VolumeForkSearchListOptions, AuditLog, AuditLogListOptions, 
+  RegionAuditLogListOptions, ServiceNode, NodeStatsSample, ClientSession, 
+  ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, MetricsTarget, 
+  GenerateMetricTokenRequest, MetricsTokenResponse, DashboardStats, LicenseDetails, 
+  LicenseTerms, LoadLicenseRequest, LicenseLoadResult, LicenseList, ServiceAlert, 
+  AlertListOptions, AlertCountResponse, RegionAlert, RegionAlertListOptions, GCWorkerEvent, 
+  GCWorkerEventListOptions, GCWorkerEventHistogramResponse, GCWorkerEventGoalsResponse,
 } from './types_gen.js'
 
 export type RequestFn = <T>(method: string, path: string, body?: unknown, signal?: AbortSignal) => Promise<T>
@@ -248,7 +247,7 @@ export class MetadataClustersResource {
 export class StoragesResource {
   constructor(private client: Client) {}
 
-  create(req: CreateStorageRequest, signal?: AbortSignal): Promise<{ id: number; blockVolumeIds?: string[] }> {
+  create(req: CreateStorageRequest, signal?: AbortSignal): Promise<{ id: number }> {
     return this.client.request('POST', '/api/v1/storages/create', req, signal)
   }
 
@@ -288,14 +287,6 @@ export class StoragesResource {
     return this.client.request('POST', `/api/v1/storages/${storageId}/move-volumes`, req, signal)
   }
 
-  updateConfig(storageId: number, req: UpdateStorageConfigRequest, signal?: AbortSignal): Promise<UpdateConfigResult> {
-    return this.client.request('PUT', `/api/v1/storages/${storageId}/config`, req, signal)
-  }
-
-  getConfig(storageId: number, signal?: AbortSignal): Promise<{ id: string; k: number; algorithmVersion: number; epochPolicyVersion: number }> {
-    return this.client.request('GET', `/api/v1/storages/${storageId}/config`, undefined, signal)
-  }
-
   listCopysets(storageId: number, state?: string, includeRetired?: boolean, signal?: AbortSignal): Promise<Copyset[]> {
     return this.client.request('GET', `/api/v1/storages/${storageId}/copysets${queryString({ state: state, includeRetired: includeRetired })}`, undefined, signal)
   }
@@ -316,8 +307,12 @@ export class StoragesResource {
     return this.client.request('PUT', `/api/v1/storages/${storageId}/copysets/${encodeURIComponent(copysetId)}/tags`, req, signal)
   }
 
-  registerMember(storageId: number, req: RegisterStorageMemberRequest, signal?: AbortSignal): Promise<PoolMember> {
-    return this.client.request('POST', `/api/v1/storages/${storageId}/members`, req, signal)
+  registerCopyset(storageId: number, req: RegisterStorageCopysetRequest, signal?: AbortSignal): Promise<Copyset> {
+    return this.client.request('POST', `/api/v1/storages/${storageId}/copysets`, req, signal)
+  }
+
+  addCopysetMember(storageId: number, copysetId: string, req: AddStorageCopysetMemberRequest, signal?: AbortSignal): Promise<PoolMember> {
+    return this.client.request('POST', `/api/v1/storages/${storageId}/copysets/${encodeURIComponent(copysetId)}/members`, req, signal)
   }
 
   reactivateMember(storageId: number, blockVolumeId: string, signal?: AbortSignal): Promise<PoolMember> {

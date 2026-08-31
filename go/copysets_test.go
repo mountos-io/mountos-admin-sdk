@@ -1,10 +1,10 @@
 // Fixture/mock-server contract test for the block copyset placement admin
-// surface (admin-sdk.md §5 step 2): exercises the generated client against
-// an httptest.Server, no live appserv. Covers the "accepted, not completed"
-// response shapes (drainCopyset/cancelDrain/updateConfig) and regression-guards
-// the reactivateMember GET-vs-POST generator bug (a no-request endpoint with
-// a named responseType on a mutating method was silently generated as GET
-// in all three SDK languages until fixed alongside this test).
+// surface: exercises the generated client against an httptest.Server, no
+// live appserv. Covers the "accepted, not completed" response shapes
+// (drainCopyset/cancelDrain) and regression-guards the reactivateMember
+// GET-vs-POST generator bug (a no-request endpoint with a named responseType
+// on a mutating method was silently generated as GET in all three SDK
+// languages until fixed alongside this test).
 package sdk_test
 
 import (
@@ -71,22 +71,6 @@ func newTestClient(t *testing.T, baseURL string) *sdk.Client {
 // the generator pointer-wraps so callers can distinguish "not set" from an
 // explicitly empty string.
 func strPtr(s string) *string { return &s }
-
-func TestGetConfigReadsBackK(t *testing.T) {
-	_, srv := newFixtureServer(t, map[string]any{
-		"GET /api/v1/storages/7/config": map[string]any{"id": "s1", "k": 3, "algorithmVersion": 1, "epochPolicyVersion": 1},
-	})
-	defer srv.Close()
-	c := newTestClient(t, srv.URL)
-
-	cfg, err := c.Storages.GetConfig(context.Background(), 7)
-	if err != nil {
-		t.Fatalf("GetConfig: %v", err)
-	}
-	if cfg.K != 3 {
-		t.Fatalf("expected k=3, got %+v", cfg)
-	}
-}
 
 func TestListCopysets(t *testing.T) {
 	_, srv := newFixtureServer(t, map[string]any{
@@ -169,29 +153,6 @@ func TestCancelDrain(t *testing.T) {
 	}
 }
 
-func TestUpdateConfigPartialSurfacesReason(t *testing.T) {
-	_, srv := newFixtureServer(t, map[string]any{
-		"PUT /api/v1/storages/7/config": map[string]any{
-			"id": "s1", "targetK": 3, "activeCopysetCountBefore": 1, "copysetsNeeded": 2,
-			"copysetsFormed": 1, "activeCopysetCountAfter": 2, "partial": true,
-			"reason": "placement cluster B has no unused members",
-		},
-	})
-	defer srv.Close()
-	c := newTestClient(t, srv.URL)
-
-	res, err := c.Storages.UpdateConfig(context.Background(), 7, &sdk.UpdateStorageConfigRequest{K: 3})
-	if err != nil {
-		t.Fatalf("UpdateConfig: %v", err)
-	}
-	if !res.Partial || res.Reason == nil || *res.Reason == "" {
-		t.Fatalf("expected partial=true with a reason, got %+v", res)
-	}
-	if res.TargetK != 3 || res.ActiveCopysetCountBefore != 1 || res.CopysetsNeeded != 2 || res.CopysetsFormed != 1 || res.ActiveCopysetCountAfter != 2 {
-		t.Fatalf("unexpected explicit before/needed/formed/after fields: %+v", res)
-	}
-}
-
 // Regression guard: reactivateMember is a mutating (POST) action with a
 // named responseType and no request body - a generator dispatch bug made
 // this silently emit a GET in all three SDK languages (fixed alongside
@@ -200,7 +161,7 @@ func TestUpdateConfigPartialSurfacesReason(t *testing.T) {
 func TestReactivateMemberSendsPost(t *testing.T) {
 	fs, srv := newFixtureServer(t, map[string]any{
 		"POST /api/v1/storages/7/members/bv1/reactivate": map[string]any{
-			"id": "bv1", "name": "originator", "regionId": 1, "regionClusterId": 2, "memberState": "active",
+			"id": "bv1", "name": "originator", "regionId": 1, "memberState": "active",
 		},
 	})
 	defer srv.Close()
@@ -218,47 +179,70 @@ func TestReactivateMemberSendsPost(t *testing.T) {
 	}
 }
 
-func TestRegisterMemberExplicitName(t *testing.T) {
+func TestRegisterCopysetExplicitNames(t *testing.T) {
 	fs, srv := newFixtureServer(t, map[string]any{
-		"POST /api/v1/storages/7/members": map[string]any{
-			"id": "bv5", "name": "new-member", "regionId": 1, "regionClusterId": 3, "memberState": "active",
+		"POST /api/v1/storages/7/copysets": map[string]any{
+			"id": "p5", "storageId": "s1", "state": "active", "memberA": "bv5", "memberB": "bv6",
 		},
 	})
 	defer srv.Close()
 	c := newTestClient(t, srv.URL)
 
-	res, err := c.Storages.RegisterMember(context.Background(), 7, &sdk.RegisterStorageMemberRequest{RegionClusterID: 3, Name: strPtr("new-member")})
+	res, err := c.Storages.RegisterCopyset(context.Background(), 7, &sdk.RegisterStorageCopysetRequest{NameA: strPtr("mos-block-a"), NameB: strPtr("mos-block-b")})
 	if err != nil {
-		t.Fatalf("RegisterMember: %v", err)
+		t.Fatalf("RegisterCopyset: %v", err)
 	}
-	if res.MemberState != "active" {
-		t.Fatalf("unexpected member: %+v", res)
+	if res.MemberA == nil || *res.MemberA != "bv5" || res.MemberB == nil || *res.MemberB != "bv6" {
+		t.Fatalf("unexpected copyset: %+v", res)
 	}
-	if got := fs.calls[0].body["name"]; got != "new-member" {
-		t.Fatalf("expected name in request body, got %+v", fs.calls[0].body)
+	if got := fs.calls[0].body["nameA"]; got != "mos-block-a" {
+		t.Fatalf("expected nameA in request body, got %+v", fs.calls[0].body)
 	}
 }
 
-// TestRegisterMemberOmittedName confirms name is optional on the wire: an
-// omitted Name never sends a "name" key at all (omitempty), letting the
-// server auto-fill it.
-func TestRegisterMemberOmittedName(t *testing.T) {
+// TestRegisterCopysetOmittedNames confirms both names are optional on the
+// wire: an omitted Name never sends its key at all (omitempty), letting the
+// server auto-fill it for that slot.
+func TestRegisterCopysetOmittedNames(t *testing.T) {
 	fs, srv := newFixtureServer(t, map[string]any{
-		"POST /api/v1/storages/7/members": map[string]any{
-			"id": "bv6", "name": "auto-generated", "regionId": 1, "regionClusterId": 3, "memberState": "active",
+		"POST /api/v1/storages/7/copysets": map[string]any{
+			"id": "p6", "storageId": "s1", "state": "active", "memberA": "bv7", "memberB": "bv8",
 		},
 	})
 	defer srv.Close()
 	c := newTestClient(t, srv.URL)
 
-	res, err := c.Storages.RegisterMember(context.Background(), 7, &sdk.RegisterStorageMemberRequest{RegionClusterID: 3})
+	_, err := c.Storages.RegisterCopyset(context.Background(), 7, &sdk.RegisterStorageCopysetRequest{})
 	if err != nil {
-		t.Fatalf("RegisterMember: %v", err)
+		t.Fatalf("RegisterCopyset: %v", err)
 	}
-	if res.Name != "auto-generated" {
+	if _, ok := fs.calls[0].body["nameA"]; ok {
+		t.Fatalf("expected no nameA key in request body when omitted, got %+v", fs.calls[0].body)
+	}
+	if _, ok := fs.calls[0].body["nameB"]; ok {
+		t.Fatalf("expected no nameB key in request body when omitted, got %+v", fs.calls[0].body)
+	}
+}
+
+// TestAddCopysetMember covers the narrow vacant-slot replacement path,
+// distinct from registerCopyset's atomic two-member creation.
+func TestAddCopysetMember(t *testing.T) {
+	fs, srv := newFixtureServer(t, map[string]any{
+		"POST /api/v1/storages/7/copysets/p1/members": map[string]any{
+			"id": "bv9", "name": "replacement", "regionId": 1, "memberState": "active",
+		},
+	})
+	defer srv.Close()
+	c := newTestClient(t, srv.URL)
+
+	res, err := c.Storages.AddCopysetMember(context.Background(), 7, "p1", &sdk.AddStorageCopysetMemberRequest{Name: strPtr("replacement")})
+	if err != nil {
+		t.Fatalf("AddCopysetMember: %v", err)
+	}
+	if res.Name != "replacement" {
 		t.Fatalf("unexpected member: %+v", res)
 	}
-	if _, ok := fs.calls[0].body["name"]; ok {
-		t.Fatalf("expected no name key in request body when omitted, got %+v", fs.calls[0].body)
+	if got := fs.calls[0].body["name"]; got != "replacement" {
+		t.Fatalf("expected name in request body, got %+v", fs.calls[0].body)
 	}
 }

@@ -192,37 +192,8 @@
         }
       }
     },
-    "BlockMember": {
-      "fields": {
-        "name": {
-          "type": "string",
-          "required": false,
-          "optional": true
-        },
-        "regionClusterId": {
-          "type": "int64",
-          "required": false,
-          "optional": false
-        }
-      }
-    },
     "BlockVolume": {
       "fields": {
-        "clusterName": {
-          "type": "string",
-          "required": false,
-          "optional": true
-        },
-        "clusterReady": {
-          "type": "bool",
-          "required": false,
-          "optional": false
-        },
-        "clusterUuid": {
-          "type": "string",
-          "required": false,
-          "optional": true
-        },
         "copysetId": {
           "type": "string",
           "required": false,
@@ -252,11 +223,6 @@
           "type": "string",
           "required": false,
           "optional": true
-        },
-        "regionClusterId": {
-          "type": "int64",
-          "required": false,
-          "optional": false
         },
         "shardId": {
           "type": "int64",
@@ -471,16 +437,6 @@
         },
         "pendingSyncJobsB": {
           "type": "int32",
-          "required": false,
-          "optional": true
-        },
-        "placementGroupA": {
-          "type": "int64",
-          "required": false,
-          "optional": true
-        },
-        "placementGroupB": {
-          "type": "int64",
           "required": false,
           "optional": true
         },
@@ -1449,11 +1405,6 @@
           "required": false,
           "optional": false
         },
-        "regionClusterId": {
-          "type": "int64",
-          "required": false,
-          "optional": false
-        },
         "regionId": {
           "type": "int64",
           "required": false,
@@ -1950,50 +1901,6 @@
         },
         "uuid": {
           "type": "string",
-          "required": false,
-          "optional": false
-        }
-      }
-    },
-    "UpdateConfigResult": {
-      "fields": {
-        "activeCopysetCountAfter": {
-          "type": "int32",
-          "required": false,
-          "optional": false
-        },
-        "activeCopysetCountBefore": {
-          "type": "int32",
-          "required": false,
-          "optional": false
-        },
-        "copysetsFormed": {
-          "type": "int32",
-          "required": false,
-          "optional": false
-        },
-        "copysetsNeeded": {
-          "type": "int32",
-          "required": false,
-          "optional": false
-        },
-        "id": {
-          "type": "string",
-          "required": false,
-          "optional": false
-        },
-        "partial": {
-          "type": "bool",
-          "required": false,
-          "optional": false
-        },
-        "reason": {
-          "type": "string",
-          "required": false,
-          "optional": true
-        },
-        "targetK": {
-          "type": "int32",
           "required": false,
           "optional": false
         }

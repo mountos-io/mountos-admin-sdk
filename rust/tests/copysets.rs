@@ -1,17 +1,17 @@
 //! Fixture/mock-server contract test for the block copyset placement admin
-//! surface (admin-sdk.md §5 step 2): exercises the generated client against
-//! a hand-rolled single-request TCP fixture, no live appserv and no new
-//! dev-dependency (no mock-server crate available under `cargo --locked`).
-//! Covers the "accepted, not completed" response shapes (drainCopyset/
-//! cancelDrain/updateConfig) and regression-guards the reactivateMember
-//! GET-vs-POST generator bug (a no-request endpoint with a named
-//! responseType on a mutating method was silently generated as GET in all
-//! three SDK languages until fixed alongside this test).
+//! surface: exercises the generated client against a hand-rolled
+//! single-request TCP fixture, no live appserv and no new dev-dependency
+//! (no mock-server crate available under `cargo --locked`). Covers the
+//! "accepted, not completed" response shapes (drainCopyset/cancelDrain) and
+//! regression-guards the reactivateMember GET-vs-POST generator bug (a
+//! no-request endpoint with a named responseType on a mutating method was
+//! silently generated as GET in all three SDK languages until fixed
+//! alongside this test).
 
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
 use mountos_admin_sdk::{
-    Client, Config, CopysetState, RegisterStorageMemberRequest, UpdateStorageConfigRequest,
+    AddStorageCopysetMemberRequest, Client, Config, CopysetState, RegisterStorageCopysetRequest,
 };
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
@@ -103,20 +103,6 @@ fn test_client(base_url: String) -> Client {
 }
 
 #[tokio::test]
-async fn get_config_reads_back_k() {
-    // D40: the read-back half of updateConfig - a storage's current target
-    // K plus the placement-config values needed to interpret it.
-    let (base_url, handle) = fixture_server(serde_json::json!({
-        "id": "s1", "k": 3, "algorithmVersion": 1, "epochPolicyVersion": 1,
-    }));
-    let client = test_client(base_url);
-
-    let cfg = client.storages.get_config(7).await.expect("get_config");
-    assert_eq!(cfg.k, 3);
-    assert_eq!(handle.join().unwrap().method, "GET");
-}
-
-#[tokio::test]
 async fn list_copysets_full_state_per_copyset() {
     let (base_url, handle) = fixture_server(serde_json::json!([
         {"id": "p1", "storageId": "s1", "state": "active", "memberA": "bv1", "memberB": "bv2", "tags": []},
@@ -136,7 +122,7 @@ async fn list_copysets_full_state_per_copyset() {
 
 #[tokio::test]
 async fn drain_copyset_idempotent_ack() {
-    // D9: response reads "draining", not "drained" - an accepted-transition
+    // response reads "draining", not "drained" - an accepted-transition
     // ack, never a completion promise.
     let (base_url, handle) = fixture_server(serde_json::json!({"id": "p1", "state": "draining"}));
     let client = test_client(base_url);
@@ -156,30 +142,6 @@ async fn cancel_drain_active_again() {
     assert_eq!(handle.join().unwrap().path, "/api/v1/storages/7/copysets/p1/cancel-drain");
 }
 
-#[tokio::test]
-async fn update_config_partial_surfaces_reason() {
-    let (base_url, handle) = fixture_server(serde_json::json!({
-        "id": "s1", "targetK": 3, "activeCopysetCountBefore": 1, "copysetsNeeded": 2,
-        "copysetsFormed": 1, "activeCopysetCountAfter": 2, "partial": true,
-        "reason": "placement cluster B has no unused members",
-    }));
-    let client = test_client(base_url);
-
-    let res = client
-        .storages
-        .update_config(7, &UpdateStorageConfigRequest { k: 3 })
-        .await
-        .expect("update_config");
-    assert!(res.partial);
-    assert_eq!(res.reason.as_deref(), Some("placement cluster B has no unused members"));
-    assert_eq!(res.target_k, 3);
-    assert_eq!(res.active_copyset_count_before, 1);
-    assert_eq!(res.copysets_needed, 2);
-    assert_eq!(res.copysets_formed, 1);
-    assert_eq!(res.active_copyset_count_after, 2);
-    assert_eq!(handle.join().unwrap().body.unwrap()["k"], 3);
-}
-
 /// Regression guard: reactivateMember is a mutating (POST) action with a
 /// named responseType and no request body - a generator dispatch bug made
 /// this silently emit a GET in all three SDK languages (fixed alongside
@@ -188,7 +150,7 @@ async fn update_config_partial_surfaces_reason() {
 #[tokio::test]
 async fn reactivate_member_sends_post() {
     let (base_url, handle) = fixture_server(serde_json::json!({
-        "id": "bv1", "name": "originator", "regionId": 1, "regionClusterId": 2, "memberState": "active",
+        "id": "bv1", "name": "originator", "regionId": 1, "memberState": "active",
     }));
     let client = test_client(base_url);
 
@@ -198,39 +160,60 @@ async fn reactivate_member_sends_post() {
 }
 
 #[tokio::test]
-async fn register_member_explicit_name() {
+async fn register_copyset_explicit_names() {
     let (base_url, handle) = fixture_server(serde_json::json!({
-        "id": "bv5", "name": "new-member", "regionId": 1, "regionClusterId": 3, "memberState": "active",
+        "id": "p5", "storageId": "s1", "state": "active", "memberA": "bv5", "memberB": "bv6", "tags": [],
     }));
     let client = test_client(base_url);
 
     let res = client
         .storages
-        .register_member(7, &RegisterStorageMemberRequest { region_cluster_id: 3, name: Some("new-member".into()) })
+        .register_copyset(
+            7,
+            &RegisterStorageCopysetRequest { name_a: Some("mos-block-a".into()), name_b: Some("mos-block-b".into()) },
+        )
         .await
-        .expect("register_member");
-    assert_eq!(res.member_state, "active");
-    assert_eq!(handle.join().unwrap().body.unwrap()["name"], "new-member");
+        .expect("register_copyset");
+    assert_eq!(res.member_a.as_deref(), Some("bv5"));
+    assert_eq!(res.member_b.as_deref(), Some("bv6"));
+    assert_eq!(handle.join().unwrap().body.unwrap()["nameA"], "mos-block-a");
 }
 
-// name is optional on the wire: None must be dropped from the request body
-// entirely (never sent as `"name": null`), letting the server auto-fill it.
+// Both names are optional on the wire: None must be dropped from the
+// request body entirely (never sent as `"nameA": null`), letting the server
+// auto-fill that slot.
 #[tokio::test]
-async fn register_member_omitted_name() {
+async fn register_copyset_omitted_names() {
     let (base_url, handle) = fixture_server(serde_json::json!({
-        "id": "bv6", "name": "auto-generated", "regionId": 1, "regionClusterId": 3, "memberState": "active",
+        "id": "p6", "storageId": "s1", "state": "active", "memberA": "bv7", "memberB": "bv8", "tags": [],
     }));
     let client = test_client(base_url);
 
     let res = client
         .storages
-        .register_member(7, &RegisterStorageMemberRequest { region_cluster_id: 3, name: None })
+        .register_copyset(7, &RegisterStorageCopysetRequest { name_a: None, name_b: None })
         .await
-        .expect("register_member");
-    assert_eq!(res.member_state, "active");
-    assert_eq!(res.name, "auto-generated");
+        .expect("register_copyset");
+    assert_eq!(res.state, CopysetState::Active);
     let body = handle.join().unwrap().body.unwrap();
-    assert!(body.get("name").is_none(), "expected no name key in request body when omitted, got {body:?}");
+    assert!(body.get("nameA").is_none(), "expected no nameA key in request body when omitted, got {body:?}");
+    assert!(body.get("nameB").is_none(), "expected no nameB key in request body when omitted, got {body:?}");
+}
+
+#[tokio::test]
+async fn add_copyset_member_replaces_vacant_slot() {
+    let (base_url, handle) = fixture_server(serde_json::json!({
+        "id": "bv9", "name": "replacement", "regionId": 1, "memberState": "active",
+    }));
+    let client = test_client(base_url);
+
+    let res = client
+        .storages
+        .add_copyset_member(7, "p1", &AddStorageCopysetMemberRequest { name: Some("replacement".into()) })
+        .await
+        .expect("add_copyset_member");
+    assert_eq!(res.member_state, "active");
+    assert_eq!(handle.join().unwrap().body.unwrap()["name"], "replacement");
 }
 
 // Regression coverage for the generator emitting crate::http::encode_segment

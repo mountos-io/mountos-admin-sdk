@@ -1,7 +1,7 @@
-// Regression guard for VE-017 (Pair -> Copyset renamed in 1.14.0 with no
-// aliases). Exercises the compat.ts shims: old method names, old-named
-// request fields, and old-named response fields populated from the new
-// wire fields.
+// Regression guard for the Pair -> Copyset rename (1.14.0, shipped with no
+// migration aliases). Exercises the compat.ts shims: old method names,
+// old-named request fields, and old-named response fields populated from
+// the new wire fields.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { createClient, type RequestFn } from '../dist/index.js'
@@ -71,25 +71,11 @@ test('getCopysetConfig/updateCopysetConfig (new names) still carry the deprecate
 test('listBlockVolumes response carries pairId shimmed from copysetId', async () => {
   const { client } = fakeClient({
     'GET /api/v1/storages/7/block-volumes': [
-      { id: 'bv1', shardId: 1, regionClusterId: 10, clusterReady: true, isActive: true, createdAt: '', updatedAt: '', copysetId: 'c1' },
-      { id: 'bv2', shardId: 2, regionClusterId: 10, clusterReady: true, isActive: true, createdAt: '', updatedAt: '' },
+      { id: 'bv1', shardId: 1, isActive: true, createdAt: '', updatedAt: '', copysetId: 'c1' },
+      { id: 'bv2', shardId: 2, isActive: true, createdAt: '', updatedAt: '' },
     ],
   })
   const vols = await client.storages.listBlockVolumes(7)
   assert.equal(vols[0].pairId, 'c1')
   assert.equal(vols[1].pairId, undefined)
-})
-
-test('Storages.updateConfig response carries the deprecated pair-count fields', async () => {
-  const { client } = fakeClient({
-    'PUT /api/v1/storages/7/config': {
-      id: 's1', targetK: 3, activeCopysetCountBefore: 1, copysetsNeeded: 2, copysetsFormed: 2,
-      activeCopysetCountAfter: 3, partial: false,
-    },
-  })
-  const result = await client.storages.updateConfig(7, { k: 3 })
-  assert.equal(result.activePairCountBefore, 1)
-  assert.equal(result.pairsNeeded, 2)
-  assert.equal(result.pairsFormed, 2)
-  assert.equal(result.activePairCountAfter, 3)
 })

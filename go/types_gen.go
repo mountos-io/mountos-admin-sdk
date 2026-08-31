@@ -288,29 +288,14 @@ type Storage struct {
 }
 
 type BlockVolume struct {
-	ID              string  `json:"id"`
-	Name            *string `json:"name,omitempty"`
-	ClusterName     *string `json:"clusterName,omitempty"`
-	ClusterUUID     *string `json:"clusterUuid,omitempty"`
-	ShardID         int64   `json:"shardId"`
-	RegionClusterID int64   `json:"regionClusterId"`
-	ClusterReady    bool    `json:"clusterReady"`
-	IsActive        bool    `json:"isActive"`
-	CreatedAt       string  `json:"createdAt"`
-	UpdatedAt       string  `json:"updatedAt"`
-	MemberState     *string `json:"memberState,omitempty"`
-	CopysetID       *string `json:"copysetId,omitempty"`
-}
-
-type UpdateConfigResult struct {
-	ID                       string  `json:"id"`
-	TargetK                  int32   `json:"targetK"`
-	ActiveCopysetCountBefore int32   `json:"activeCopysetCountBefore"`
-	CopysetsNeeded           int32   `json:"copysetsNeeded"`
-	CopysetsFormed           int32   `json:"copysetsFormed"`
-	ActiveCopysetCountAfter  int32   `json:"activeCopysetCountAfter"`
-	Partial                  bool    `json:"partial"`
-	Reason                   *string `json:"reason,omitempty"`
+	ID          string  `json:"id"`
+	Name        *string `json:"name,omitempty"`
+	ShardID     int64   `json:"shardId"`
+	IsActive    bool    `json:"isActive"`
+	CreatedAt   string  `json:"createdAt"`
+	UpdatedAt   string  `json:"updatedAt"`
+	MemberState *string `json:"memberState,omitempty"`
+	CopysetID   *string `json:"copysetId,omitempty"`
 }
 
 type Copyset struct {
@@ -319,8 +304,6 @@ type Copyset struct {
 	State            CopysetState `json:"state"`
 	MemberA          *string      `json:"memberA,omitempty"`
 	MemberB          *string      `json:"memberB,omitempty"`
-	PlacementGroupA  *int64       `json:"placementGroupA,omitempty"`
-	PlacementGroupB  *int64       `json:"placementGroupB,omitempty"`
 	DrainStartedAt   *string      `json:"drainStartedAt,omitempty"`
 	SyncedAt         *string      `json:"syncedAt,omitempty"`
 	RetiredAt        *string      `json:"retiredAt,omitempty"`
@@ -331,11 +314,10 @@ type Copyset struct {
 }
 
 type PoolMember struct {
-	ID              string `json:"id"`
-	Name            string `json:"name"`
-	RegionID        int64  `json:"regionId"`
-	RegionClusterID int64  `json:"regionClusterId"`
-	MemberState     string `json:"memberState"`
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	RegionID    int64  `json:"regionId"`
+	MemberState string `json:"memberState"`
 }
 
 type Volume struct {
@@ -647,11 +629,6 @@ type BackfillFailure struct {
 	Error   string `json:"error"`
 }
 
-type BlockMember struct {
-	Name            *string `json:"name,omitempty"`
-	RegionClusterID int64   `json:"regionClusterId"`
-}
-
 type CompatibleStorage struct {
 	ID           int64              `json:"id"`
 	UUID         string             `json:"uuid"`
@@ -930,26 +907,20 @@ type MetadataClusterListOptions struct {
 // Storages
 
 type CreateStorageRequest struct {
-	AccountID    int64         `json:"accountId"`
-	RegionID     int64         `json:"regionId"`
-	Name         string        `json:"name"`
-	Description  *string       `json:"description,omitempty"`
-	StorageType  string        `json:"storageType"`
-	ProviderType string        `json:"providerType"`
-	Endpoint     string        `json:"endpoint"`
-	Region       *string       `json:"region,omitempty"`
-	Bucket       *string       `json:"bucket,omitempty"`
-	Base         *string       `json:"base,omitempty"`
-	BlockRegion  *string       `json:"blockRegion,omitempty"`
-	BlockSize    *int32        `json:"blockSize,omitempty"`
-	Members      []BlockMember `json:"members,omitempty"`
-	AccessKey    *string       `json:"accessKey,omitempty"`
-	SecretKey    *string       `json:"secretKey,omitempty"`
-}
-
-type CreateStorageResponse struct {
-	ID             int64    `json:"id"`
-	BlockVolumeIDs []string `json:"blockVolumeIds,omitempty"`
+	AccountID    int64   `json:"accountId"`
+	RegionID     int64   `json:"regionId"`
+	Name         string  `json:"name"`
+	Description  *string `json:"description,omitempty"`
+	StorageType  string  `json:"storageType"`
+	ProviderType string  `json:"providerType"`
+	Endpoint     string  `json:"endpoint"`
+	Region       *string `json:"region,omitempty"`
+	Bucket       *string `json:"bucket,omitempty"`
+	Base         *string `json:"base,omitempty"`
+	BlockRegion  *string `json:"blockRegion,omitempty"`
+	BlockSize    *int32  `json:"blockSize,omitempty"`
+	AccessKey    *string `json:"accessKey,omitempty"`
+	SecretKey    *string `json:"secretKey,omitempty"`
 }
 
 type EditStorageRequest struct {
@@ -1001,17 +972,6 @@ type MoveVolumesStorageResponse struct {
 	Failures []MoveVolumeFailure `json:"failures"`
 }
 
-type UpdateStorageConfigRequest struct {
-	K int32 `json:"k"`
-}
-
-type GetConfigStorageResponse struct {
-	ID                 string `json:"id"`
-	K                  int32  `json:"k"`
-	AlgorithmVersion   int32  `json:"algorithmVersion"`
-	EpochPolicyVersion int32  `json:"epochPolicyVersion"`
-}
-
 type DrainCopysetStorageResponse struct {
 	ID    string `json:"id"`
 	State string `json:"state"`
@@ -1026,9 +986,13 @@ type UpdateStorageTagsRequest struct {
 	Tags []string `json:"tags,omitempty"`
 }
 
-type RegisterStorageMemberRequest struct {
-	RegionClusterID int64   `json:"regionClusterId"`
-	Name            *string `json:"name,omitempty"`
+type RegisterStorageCopysetRequest struct {
+	NameA *string `json:"nameA,omitempty"`
+	NameB *string `json:"nameB,omitempty"`
+}
+
+type AddStorageCopysetMemberRequest struct {
+	Name *string `json:"name,omitempty"`
 }
 
 type RemoveMemberStorageResponse struct {

@@ -289,12 +289,12 @@ func (s *MetadataClustersService) Deactivate(ctx context.Context, regionID int64
 
 type StoragesService struct{ c *Client }
 
-func (s *StoragesService) Create(ctx context.Context, req *CreateStorageRequest) (*CreateStorageResponse, error) {
+func (s *StoragesService) Create(ctx context.Context, req *CreateStorageRequest) (*IDResponse, error) {
 	data, err := s.c.post(ctx, "/api/v1/storages/create", req)
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[CreateStorageResponse](data)
+	return decodeJSON[IDResponse](data)
 }
 
 func (s *StoragesService) List(ctx context.Context, opts StorageListOptions) (*PaginatedResponse[Storage], error) {
@@ -396,22 +396,6 @@ func (s *StoragesService) MoveVolumes(ctx context.Context, storageID int64, req 
 	return decodeJSON[MoveVolumesStorageResponse](data)
 }
 
-func (s *StoragesService) UpdateConfig(ctx context.Context, storageID int64, req *UpdateStorageConfigRequest) (*UpdateConfigResult, error) {
-	data, err := s.c.put(ctx, fmt.Sprintf("/api/v1/storages/%s/config", strconv.FormatInt(storageID, 10)), req)
-	if err != nil {
-		return nil, err
-	}
-	return decodeJSON[UpdateConfigResult](data)
-}
-
-func (s *StoragesService) GetConfig(ctx context.Context, storageID int64) (*GetConfigStorageResponse, error) {
-	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/storages/%s/config", strconv.FormatInt(storageID, 10)))
-	if err != nil {
-		return nil, err
-	}
-	return decodeJSON[GetConfigStorageResponse](data)
-}
-
 func (s *StoragesService) ListCopysets(ctx context.Context, storageID int64, state string, includeRetired bool) ([]Copyset, error) {
 	q := url.Values{}
 	if state != "" {
@@ -467,8 +451,16 @@ func (s *StoragesService) UpdateTags(ctx context.Context, storageID int64, copys
 	return decodeJSON[Copyset](data)
 }
 
-func (s *StoragesService) RegisterMember(ctx context.Context, storageID int64, req *RegisterStorageMemberRequest) (*PoolMember, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/members", strconv.FormatInt(storageID, 10)), req)
+func (s *StoragesService) RegisterCopyset(ctx context.Context, storageID int64, req *RegisterStorageCopysetRequest) (*Copyset, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/copysets", strconv.FormatInt(storageID, 10)), req)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[Copyset](data)
+}
+
+func (s *StoragesService) AddCopysetMember(ctx context.Context, storageID int64, copysetID string, req *AddStorageCopysetMemberRequest) (*PoolMember, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/copysets/%s/members", strconv.FormatInt(storageID, 10), url.PathEscape(copysetID)), req)
 	if err != nil {
 		return nil, err
 	}

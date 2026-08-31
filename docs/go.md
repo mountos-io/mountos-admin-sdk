@@ -206,26 +206,13 @@ type BackfillFailure struct {
 }
 ```
 
-### `BlockMember`
-
-```go
-type BlockMember struct {
-    Name                     *string                  `json:"name,omitempty"`
-    RegionClusterID          int64                    `json:"regionClusterId"`
-}
-```
-
 ### `BlockVolume`
 
 ```go
 type BlockVolume struct {
     ID                       string                   `json:"id"`
     Name                     *string                  `json:"name,omitempty"`
-    ClusterName              *string                  `json:"clusterName,omitempty"`
-    ClusterUUID              *string                  `json:"clusterUuid,omitempty"`
     ShardID                  int64                    `json:"shardId"`
-    RegionClusterID          int64                    `json:"regionClusterId"`
-    ClusterReady             bool                     `json:"clusterReady"`
     IsActive                 bool                     `json:"isActive"`
     CreatedAt                string                   `json:"createdAt"`
     UpdatedAt                string                   `json:"updatedAt"`
@@ -295,8 +282,6 @@ type Copyset struct {
     State                    CopysetState             `json:"state"`
     MemberA                  *string                  `json:"memberA,omitempty"`
     MemberB                  *string                  `json:"memberB,omitempty"`
-    PlacementGroupA          *int64                   `json:"placementGroupA,omitempty"`
-    PlacementGroupB          *int64                   `json:"placementGroupB,omitempty"`
     DrainStartedAt           *string                  `json:"drainStartedAt,omitempty"`
     SyncedAt                 *string                  `json:"syncedAt,omitempty"`
     RetiredAt                *string                  `json:"retiredAt,omitempty"`
@@ -647,7 +632,6 @@ type PoolMember struct {
     ID                       string                   `json:"id"`
     Name                     string                   `json:"name"`
     RegionID                 int64                    `json:"regionId"`
-    RegionClusterID          int64                    `json:"regionClusterId"`
     MemberState              string                   `json:"memberState"`
 }
 ```
@@ -816,21 +800,6 @@ type Storage struct {
     IsActive                 bool                     `json:"isActive"`
     CreatedAt                string                   `json:"createdAt"`
     UpdatedAt                string                   `json:"updatedAt"`
-}
-```
-
-### `UpdateConfigResult`
-
-```go
-type UpdateConfigResult struct {
-    ID                       string                   `json:"id"`
-    TargetK                  int32                    `json:"targetK"`
-    ActiveCopysetCountBefore int32                    `json:"activeCopysetCountBefore"`
-    CopysetsNeeded           int32                    `json:"copysetsNeeded"`
-    CopysetsFormed           int32                    `json:"copysetsFormed"`
-    ActiveCopysetCountAfter  int32                    `json:"activeCopysetCountAfter"`
-    Partial                  bool                     `json:"partial"`
-    Reason                   *string                  `json:"reason,omitempty"`
 }
 ```
 
@@ -1336,7 +1305,7 @@ Accessor: `client.Storages`
 #### `Create` - POST /api/v1/storages/create
 
 ```go
-func (s *StoragesService) Create(ctx context.Context, req *CreateStorageRequest) (*CreateStorageResponse, error)
+func (s *StoragesService) Create(ctx context.Context, req *CreateStorageRequest) (*IDResponse, error)
 ```
 
 Request body:
@@ -1355,18 +1324,8 @@ type CreateStorageRequest struct {
     Base                     *string                  `json:"base,omitempty"`
     BlockRegion              *string                  `json:"blockRegion,omitempty"`
     BlockSize                *int32                   `json:"blockSize,omitempty"`
-    Members                  []BlockMember            `json:"members,omitempty"`
     AccessKey                *string                  `json:"accessKey,omitempty"`
     SecretKey                *string                  `json:"secretKey,omitempty"`
-}
-```
-
-Response body:
-
-```go
-type CreateStorageResponse struct {
-    ID                       int64                    `json:"id"`
-    BlockVolumeIDs           []string                 `json:"blockVolumeIds,omitempty"`
 }
 ```
 
@@ -1517,37 +1476,6 @@ type MoveVolumesStorageResponse struct {
 }
 ```
 
-#### `UpdateConfig` - PUT /api/v1/storages/:storageId/config
-
-```go
-func (s *StoragesService) UpdateConfig(ctx context.Context, storageID int64, req *UpdateStorageConfigRequest) (*UpdateConfigResult, error)
-```
-
-Request body:
-
-```go
-type UpdateStorageConfigRequest struct {
-    K                        int32                    `json:"k"`
-}
-```
-
-#### `GetConfig` - GET /api/v1/storages/:storageId/config
-
-```go
-func (s *StoragesService) GetConfig(ctx context.Context, storageID int64) (*GetConfigStorageResponse, error)
-```
-
-Response body:
-
-```go
-type GetConfigStorageResponse struct {
-    ID                       string                   `json:"id"`
-    K                        int32                    `json:"k"`
-    AlgorithmVersion         int32                    `json:"algorithmVersion"`
-    EpochPolicyVersion       int32                    `json:"epochPolicyVersion"`
-}
-```
-
 #### `ListCopysets` - GET /api/v1/storages/:storageId/copysets
 
 ```go
@@ -1604,17 +1532,31 @@ type UpdateStorageTagsRequest struct {
 }
 ```
 
-#### `RegisterMember` - POST /api/v1/storages/:storageId/members
+#### `RegisterCopyset` - POST /api/v1/storages/:storageId/copysets
 
 ```go
-func (s *StoragesService) RegisterMember(ctx context.Context, storageID int64, req *RegisterStorageMemberRequest) (*PoolMember, error)
+func (s *StoragesService) RegisterCopyset(ctx context.Context, storageID int64, req *RegisterStorageCopysetRequest) (*Copyset, error)
 ```
 
 Request body:
 
 ```go
-type RegisterStorageMemberRequest struct {
-    RegionClusterID          int64                    `json:"regionClusterId"`
+type RegisterStorageCopysetRequest struct {
+    NameA                    *string                  `json:"nameA,omitempty"`
+    NameB                    *string                  `json:"nameB,omitempty"`
+}
+```
+
+#### `AddCopysetMember` - POST /api/v1/storages/:storageId/copysets/:copysetId/members
+
+```go
+func (s *StoragesService) AddCopysetMember(ctx context.Context, storageID int64, copysetID string, req *AddStorageCopysetMemberRequest) (*PoolMember, error)
+```
+
+Request body:
+
+```go
+type AddStorageCopysetMemberRequest struct {
     Name                     *string                  `json:"name,omitempty"`
 }
 ```

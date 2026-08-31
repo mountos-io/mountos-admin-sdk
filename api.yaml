@@ -181,57 +181,44 @@ types:
     - "createdAt: datetime"
     - "updatedAt: datetime"
 
-  # One block-volume member of a block storage on create: a failure-domain
-  # cluster placement (block_volumes.region_cluster_id - blockserv-owned pair
-  # diversity, distinct from the region_clusters/metadata_clusters sharding
-  # table renamed elsewhere in this API) and an optional operator-facing name
-  # tag. 1 originator + up to 2 HA members.
-  BlockMember:
-    - "name: string?"
-    - "regionClusterId: int64"
-
-  # A provisioned block-volume member. id is the BLOCK_VOLUME_ID env value and
-  # clusterUuid the METADATA_CLUSTER_ID env value (or the deprecated
-  # REGION_CLUSTER_ID) an operator gives its blockserv.
+  # A provisioned block-volume member. id is the BLOCK_VOLUME_ID env value an
+  # operator gives its blockserv - the only identity a blockserv instance
+  # needs. There is no cluster/placement field: blockserv has no cluster
+  # concept, and placement (spreading a copyset's two members across racks/
+  # AZs) is operator advice, not a tracked or selectable value.
   BlockVolume:
     - "id: string"
     - "name: string?"
-    - "clusterName: string?"
-    - "clusterUuid: string?"
     - "shardId: int64"
-    - "regionClusterId: int64"
-    - "clusterReady: bool"
     - "isActive: bool"
     - "createdAt: datetime"
     - "updatedAt: datetime"
-    # Pool-membership state for the block copyset placement redesign, mirroring
-    # block_volumes.member_state/copyset_sid (appserv.md §4). copysetId is absent/null
-    # while unpaired (member_state == "detached"). NOTE: listBlockVolumes'
-    # handler does not populate these yet as of this writing (only the new
-    # copysets endpoints below do) - flagged to mos-appserv, needed for
-    # admin-client to find/reactivate a detached member outside a copyset view.
+    # Pool-membership state for block copyset placement, mirroring
+    # block_volumes.member_state and copyset_sid. copysetId is absent/null
+    # while unpaired (member_state == "detached"). listBlockVolumes' handler
+    # does not populate these fields yet; only the new copysets endpoints
+    # below do. mos-appserv still needs to add this, so admin-client can
+    # find or reactivate a detached member outside a copyset view.
     - "memberState: string?" # active | retiring | detached
     - "copysetId: string?"
 
   # A copyset provides High Availability (HA) through two nodes holding
-  # identical copies. One copyset of block-volume members under the
-  # deterministic copyset placement redesign (spec/appserv.md §5b).
-  # id/storageId/memberA/memberB are opaque external ids (string), matching
-  # BlockVolume.id - NOT the int64 shard id used in the :storageId URL path
-  # param. memberA/memberB and the placement groups are absent only in the
-  # defensive 0/1-member edge case; a normally formed copyset always has both.
+  # identical copies. A pairing is decided once, at registerCopyset, and
+  # never reshuffled afterward. id/storageId/memberA/memberB are opaque
+  # external ids (string), matching BlockVolume.id, not the int64 shard id
+  # used in the :storageId URL path param. memberA/memberB are absent only
+  # in the defensive 0/1-member edge case (a vacant slot awaiting
+  # addCopysetMember); a normally formed copyset always has both.
   Copyset:
     - "id: string"
     - "storageId: string"
     - "state: CopysetState"
     - "memberA: string?" # BlockVolume.id
     - "memberB: string?" # BlockVolume.id
-    - "placementGroupA: int64?" # block_volumes.region_cluster_id
-    - "placementGroupB: int64?" # block_volumes.region_cluster_id
     - "drainStartedAt: datetime?"
     - "syncedAt: datetime?"
     - "retiredAt: datetime?"
-    # nullable, drain-only (D5): appserv's reconciler only polls draining
+    # nullable, drain-only: appserv's reconciler only polls draining
     # copysets, so these are its last-observed values, null otherwise.
     - "pendingSyncJobsA: int32?"
     - "pendingSyncJobsB: int32?"
@@ -240,44 +227,25 @@ types:
     # (opaque admin/SDK token).
     - "drainInitiatedBy: int64?"
     # Unindexed/unsearchable operator labels (updateTags), the one
-    # concretely-named use case for the copyset's escape-hatch config -
-    # never a substitute for a real, queryable field. Always present, an
+    # concretely-named use case for the copyset's escape-hatch config.
+    # Never a substitute for a real, queryable field. Always present, an
     # empty array when unset, never null.
     - "tags: string[]"
 
-  # Response shape for registerMember/reactivateMember - deliberately
-  # narrower than the full BlockVolume view (no clusterName/clusterUuid/
-  # shardId/clusterReady/createdAt/updatedAt): both call sites always return
-  # a freshly poolable member with copysetId implicitly 0/unpaired, so there's
-  # no copyset to reference and the extra fields would just be zero-value noise.
+  # Response shape for addCopysetMember/reactivateMember: a single member,
+  # deliberately narrower than the full BlockVolume view (no createdAt/
+  # updatedAt/copysetId) since both call sites already know which copyset
+  # they acted on. registerCopyset returns the full Copyset instead (both
+  # members at once).
   PoolMember:
     - "id: string"
     - "name: string"
     - "regionId: int64"
-    - "regionClusterId: int64"
-    - "memberState: string" # always "active" from these two actions
-
-  # Response shape for updateConfig. Every count a caller could want is
-  # explicit so none has to be inferred from a delta: targetK is the
-  # absolute K requested; activeCopysetCountBefore/After are the storage's
-  # active-or-draining copyset count immediately before/after this call
-  # (After = Before + copysetsFormed); copysetsNeeded is how many additional
-  # copysets this call actually needed (targetK - activeCopysetCountBefore,
-  # floored at 0); copysetsFormed is the delta this call actually created.
-  UpdateConfigResult:
-    - "id: string"
-    - "targetK: int32"
-    - "activeCopysetCountBefore: int32"
-    - "copysetsNeeded: int32"
-    - "copysetsFormed: int32"
-    - "activeCopysetCountAfter: int32"
-    - "partial: bool"
-    - "reason: string?"
+    - "memberState: string" # always "active" from these actions
 
   # Per-volume block-placement copyset-count config: a single volume's own
-  # working-set size within its storage's copyset fleet, distinct from
-  # UpdateConfigResult/getConfig above (the storage's fleet-wide k). id is
-  # the volume's own int64 shard id, matching Volume.id. copysetIds are Copyset.id
+  # working-set size within its storage's copyset fleet. id is the volume's
+  # own int64 shard id, matching Volume.id. copysetIds are Copyset.id
   # strings (the volume's current candidate set).
   VolumeBlockPlacementConfig:
     - "id: int64"
@@ -285,10 +253,8 @@ types:
     - "currentEpoch: int64"
     - "copysetIds: string[]"
 
-  # Response shape for Volumes.updateCopysetConfig - the volume-scoped analog
-  # of UpdateConfigResult. Partial (copysetsAdded < needed, reason set) mirrors
-  # UpdateConfigResult's own partial-fulfillment convention: pool/cluster
-  # exhaustion, never a same-cluster fallback.
+  # Response shape for Volumes.updateCopysetConfig. Partial (copysetsAdded <
+  # needed, reason set) means pool exhaustion, never a partial pair.
   VolumeBlockPlacementResizeResult:
     - "id: int64"
     - "targetCopysetCount: int32"
@@ -1013,6 +979,8 @@ resources:
       copysetId: string
       blockVolumeId: string
     endpoints:
+      # Block storage starts with zero members; populate it afterward via
+      # registerCopyset (each call creates one fully-formed pair).
       - action: create
         method: POST
         path: /create
@@ -1029,12 +997,10 @@ resources:
           - "base: string"
           - "blockRegion: string"
           - "blockSize: int32"
-          - "members: BlockMember[]"
           - "accessKey: string"
           - "secretKey: string"
         response:
           - "id: int64"
-          - "blockVolumeIds: string[]?"
 
       - action: list
         method: GET
@@ -1137,44 +1103,18 @@ resources:
           - "moved: string[]"
           - "failures: MoveVolumeFailure[]"
 
-      # ── Block copyset placement admin surface (spec/appserv.md §7) ──
+      # Block copyset placement admin surface.
       # Nested under /storages/:storageId/..., matching listBlockVolumes'
-      # existing style rather than a first-class top-level "copysets" resource
-      # (decided and documented in spec/admin-sdk.md §4: every action here is
-      # storage-scoped, same as block-volumes already is, and there is no
-      # cross-storage copyset query anywhere in scope).
+      # existing style rather than a first-class top-level "copysets" resource:
+      # every action here is storage-scoped, same as block-volumes already is,
+      # and there is no cross-storage copyset query anywhere in scope.
       #
-      # AuthZ: every action below - mutating (updateConfig, drainCopyset,
-      # cancelDrain, registerMember, reactivateMember) and read (listCopysets,
-      # getCopysetStatus, getConfig) - is gated by the EnforceUserRoleAccountID
-      # account-scope check (routes_appserv.go); mutating actions also
-      # require adminOnly. Matches listBlockVolumes, which enforces the same
-      # account-scope check on its own read.
-
-      # Idempotently re-runs auto-pairing toward k every call (a no-op at the
-      # current k). recomputeCopysets as a separate endpoint was REMOVED (D7) -
-      # redundant with calling this at the current k.
-      - action: updateConfig
-        method: PUT
-        path: /:storageId/config
-        request:
-          - "k: int32!"
-        responseType: UpdateConfigResult
-
-      # The read-back half of updateConfig{k} (D40): a storage's current
-      # target K plus the placement-config values needed to interpret it.
-      # mos-adminclient had no way to reach this without re-deriving K from
-      # listCopysets' copyset count, which is wrong once a drain or auto-pairing
-      # partial has run. 404s if the storage has never been paired (no
-      # config row minted yet) - never a zero-value k.
-      - action: getConfig
-        method: GET
-        path: /:storageId/config
-        response:
-          - "id: string"
-          - "k: int32"
-          - "algorithmVersion: int32"
-          - "epochPolicyVersion: int32"
+      # AuthZ: every action below, both mutating (drainCopyset, cancelDrain,
+      # registerCopyset, addCopysetMember, reactivateMember) and read
+      # (listCopysets, getCopysetStatus), is gated by the
+      # EnforceUserRoleAccountID account-scope check (routes_appserv.go);
+      # mutating actions also require adminOnly. Matches listBlockVolumes,
+      # which enforces the same account-scope check on its own read.
 
       # Defaults to non-retired copysets only - state, given, filters to
       # exactly that CopysetState; includeRetired=true drops the default
@@ -1194,9 +1134,9 @@ resources:
         path: /:storageId/copysets/:copysetId
         responseType: Copyset
 
-      # Accepted-transition ack, NOT completion - poll getCopysetStatus.
-      # IDEMPOTENT (D9): a second call on an already-draining/beyond copyset
-      # returns the CURRENT state as success, not a 409 - draining is an
+      # Accepted-transition ack, NOT completion; poll getCopysetStatus.
+      # IDEMPOTENT: a second call on an already-draining/beyond copyset
+      # returns the CURRENT state as success, not a 409, since draining is an
       # observed state, not a contended resource.
       - action: drainCopyset
         method: POST
@@ -1205,7 +1145,7 @@ resources:
           - "id: string"
           - "state: string"
 
-      # Only valid while draining (D27) - fails (409) once synced_drained;
+      # Only valid while draining; fails (409) once synced_drained, since
       # reads have already stopped and the copyset is committed to retiring by
       # then, un-retiring is a different, riskier operation not offered here.
       - action: cancelDrain
@@ -1225,36 +1165,49 @@ resources:
           - "tags: string[]?"
         responseType: Copyset
 
-      # Moves member provisioning into its own pooling step, out of create's
-      # create-time-only flow (D24). Immediately poolable: the handler
-      # reactivates the freshly created member in the same call. name is
+      # Creates a brand-new copyset and both its members atomically. A
+      # pairing is decided once, here, and never reshuffled afterward -
+      # there is no algorithmic re-pairing step. nameA/nameB are each
       # optional: an omitted/empty value auto-fills server-side (an
       # adjective-noun-hex label), never generated client-side.
-      - action: registerMember
+      - action: registerCopyset
         method: POST
-        path: /:storageId/members
+        path: /:storageId/copysets
         request:
-          - "regionClusterId: int64!"
+          - "nameA: string?"
+          - "nameB: string?"
+        responseType: Copyset
+
+      # Registers a single new member into an existing copyset's vacant slot
+      # - the only case single-member registration is valid for (replacing a
+      # permanently-removed member; reactivating a merely-detached member
+      # uses reactivateMember instead). 409s if the copyset already has two
+      # members. name is optional, same auto-fill rule as registerCopyset.
+      - action: addCopysetMember
+        method: POST
+        path: /:storageId/copysets/:copysetId/members
+        request:
           - "name: string?"
         responseType: PoolMember
 
-      # The ONLY way a 'detached' member becomes poolable again (D24) -
+      # The ONLY way a 'detached' member becomes poolable again;
       # without this, a drained copyset's nodes are permanently stranded.
+      # Keeps the member's existing copyset_sid - a pairing never changes.
       - action: reactivateMember
         method: POST
         path: /:storageId/members/:blockVolumeId/reactivate
         responseType: PoolMember
 
       # Permanently removes a detached pool member from the storage's
-      # inventory - deregisters the server entirely, distinct from draining
+      # inventory, deregistering the server entirely, distinct from draining
       # a copyset it's part of. Only ever allowed on a member with no
       # active/draining copyset assignment: the handler 409s unless the
       # member is currently 'detached', matching reactivateMember's own
       # CAS-guarded safety. A removed member's row is soft-deleted, not
-      # hard-deleted - its (storage_sid, region_cluster_id, name) natural
-      # key becomes reusable by a fresh registerMember call, but any
-      # retired copyset it last belonged to keeps resolving it by id for
-      # historical audit purposes.
+      # hard-deleted. Its (storage_sid, name) natural key becomes reusable
+      # by a fresh registerCopyset/addCopysetMember call, but any retired
+      # copyset it last belonged to keeps resolving it by id for historical
+      # audit purposes.
       - action: removeMember
         method: DELETE
         path: /:storageId/members/:blockVolumeId
@@ -1445,9 +1398,10 @@ resources:
           - "id: int64"
 
       # Per-volume block-placement copyset-count config: a volume's own target
-      # copyset count, current epoch, and current candidate copyset set. Distinct
-      # from Storages.updateConfig/getConfig above (the storage's fleet-wide
-      # k) - this is the volume's own working-set size within that fleet.
+      # copyset count, current epoch, and current candidate copyset set. This
+      # is the volume's own working-set size within the storage's copyset
+      # fleet - a storage has no fleet-wide target of its own; each copyset
+      # is created explicitly, one registerCopyset call at a time.
       # AuthZ: no adminOnly on either action - gated by
       # EnforceUserRoleVolumeAccess (routes_appserv.go), so both an admin
       # and the volume's own owning account may call it, mirroring

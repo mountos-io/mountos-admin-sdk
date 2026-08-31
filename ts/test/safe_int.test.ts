@@ -1,4 +1,4 @@
-// BHA-063: server int64 fields (ids, byte counts, ...) can exceed
+// Server int64 fields (ids, byte counts, ...) can exceed
 // Number.MAX_SAFE_INTEGER; JSON.parse silently rounds such a value to the
 // nearest representable double. assertSafeIntegers must catch that instead
 // of letting a corrupted id/count flow through unnoticed.
@@ -15,8 +15,8 @@ test('assertSafeIntegers passes safe nested values', () => {
 
 test('assertSafeIntegers throws on an out-of-range integer, with a path', () => {
   assert.throws(
-    () => assertSafeIntegers({ copysets: [{ placementGroupA: 9007199254740993 }] }),
-    (err: unknown) => err instanceof UnsafeIntegerError && err.message.includes('$.copysets[0].placementGroupA'),
+    () => assertSafeIntegers({ copysets: [{ pendingSyncJobsA: 9007199254740993 }] }),
+    (err: unknown) => err instanceof UnsafeIntegerError && err.message.includes('$.copysets[0].pendingSyncJobsA'),
   )
 })
 
@@ -35,7 +35,7 @@ test('a real response carrying an unsafe int64 rejects loudly instead of returni
     // so JSON.parse (inside res.json()) is what performs the rounding this
     // test is guarding against, exactly as a real fetch response would.
     const raw = '{"status":"success","message":"ok","data":'
-      + '{"id":"p1","storageId":"s1","state":"active","placementGroupA":9223372036854775807}}'
+      + '{"id":"p1","storageId":"s1","state":"active","pendingSyncJobsA":9223372036854775807}}'
     return new Response(raw, { status: 200, headers: { 'content-type': 'application/json' } })
   }) as typeof fetch
 
@@ -51,14 +51,14 @@ test('a response with only safe integers resolves normally', async () => {
   const originalFetch = globalThis.fetch
   globalThis.fetch = (async () => {
     const raw = '{"status":"success","message":"ok","data":'
-      + '{"id":"p1","storageId":"s1","state":"active","placementGroupA":2}}'
+      + '{"id":"p1","storageId":"s1","state":"active","pendingSyncJobsA":2}}'
     return new Response(raw, { status: 200, headers: { 'content-type': 'application/json' } })
   }) as typeof fetch
 
   try {
     const client = createServerClient({ baseUrl: 'http://example.invalid', privateKey: fakePrivateKey() })
     const copyset = await client.storages.getCopysetStatus(7, 'p1')
-    assert.equal(copyset.placementGroupA, 2)
+    assert.equal(copyset.pendingSyncJobsA, 2)
   } finally {
     globalThis.fetch = originalFetch
   }

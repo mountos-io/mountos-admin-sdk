@@ -279,7 +279,7 @@ pub struct StoragesService {
 }
 
 impl StoragesService {
-    pub async fn create(&self, req: &CreateStorageRequest) -> Result<CreateStorageResponse, Error> {
+    pub async fn create(&self, req: &CreateStorageRequest) -> Result<IdResponse, Error> {
         self.inner.post("/api/v1/storages/create", req).await
     }
 
@@ -345,14 +345,6 @@ impl StoragesService {
         self.inner.post(&format!("/api/v1/storages/{}/move-volumes", storage_id), req).await
     }
 
-    pub async fn update_config(&self, storage_id: i64, req: &UpdateStorageConfigRequest) -> Result<UpdateConfigResult, Error> {
-        self.inner.put(&format!("/api/v1/storages/{}/config", storage_id), req).await
-    }
-
-    pub async fn get_config(&self, storage_id: i64) -> Result<GetConfigStorageResponse, Error> {
-        self.inner.get(&format!("/api/v1/storages/{}/config", storage_id), &[]).await
-    }
-
     pub async fn list_copysets(&self, storage_id: i64, state: Option<&str>, include_retired: Option<bool>) -> Result<Vec<Copyset>, Error> {
         let mut query: Vec<(&str, String)> = Vec::new();
         if let Some(v) = state {
@@ -380,8 +372,12 @@ impl StoragesService {
         self.inner.put(&format!("/api/v1/storages/{}/copysets/{}/tags", storage_id, crate::http::encode_segment(copyset_id)), req).await
     }
 
-    pub async fn register_member(&self, storage_id: i64, req: &RegisterStorageMemberRequest) -> Result<PoolMember, Error> {
-        self.inner.post(&format!("/api/v1/storages/{}/members", storage_id), req).await
+    pub async fn register_copyset(&self, storage_id: i64, req: &RegisterStorageCopysetRequest) -> Result<Copyset, Error> {
+        self.inner.post(&format!("/api/v1/storages/{}/copysets", storage_id), req).await
+    }
+
+    pub async fn add_copyset_member(&self, storage_id: i64, copyset_id: &str, req: &AddStorageCopysetMemberRequest) -> Result<PoolMember, Error> {
+        self.inner.post(&format!("/api/v1/storages/{}/copysets/{}/members", storage_id, crate::http::encode_segment(copyset_id)), req).await
     }
 
     pub async fn reactivate_member(&self, storage_id: i64, block_volume_id: &str) -> Result<PoolMember, Error> {

@@ -9,8 +9,7 @@
 //! so this is a lossless, zero-cost compatibility layer for the type-only
 //! renames below (`Pair`, `PairState`, `DrainPairStorageResponse`). It does
 //! NOT cover field-level renames on structs that were never themselves
-//! renamed (`BlockVolume::copyset_id`, `UpdateConfigResult`'s
-//! `*copyset*`/`active_copyset_count_*` fields,
+//! renamed (`BlockVolume::copyset_id`,
 //! `VolumeBlockPlacementConfig::copyset_ids`,
 //! `VolumeBlockPlacementResizeResult`'s `copyset_count_*`/`copysets_*`
 //! fields): Rust has no field-alias mechanism, so restoring those would

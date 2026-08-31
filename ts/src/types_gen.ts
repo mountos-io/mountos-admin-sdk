@@ -120,27 +120,12 @@ export interface Storage {
 export interface BlockVolume {
   id: string
   name?: string
-  clusterName?: string
-  clusterUuid?: string
   shardId: number
-  regionClusterId: number
-  clusterReady: boolean
   isActive: boolean
   createdAt: string
   updatedAt: string
   memberState?: string
   copysetId?: string
-}
-
-export interface UpdateConfigResult {
-  id: string
-  targetK: number
-  activeCopysetCountBefore: number
-  copysetsNeeded: number
-  copysetsFormed: number
-  activeCopysetCountAfter: number
-  partial: boolean
-  reason?: string
 }
 
 export interface Copyset {
@@ -149,8 +134,6 @@ export interface Copyset {
   state: CopysetState
   memberA?: string
   memberB?: string
-  placementGroupA?: number
-  placementGroupB?: number
   drainStartedAt?: string
   syncedAt?: string
   retiredAt?: string
@@ -164,7 +147,6 @@ export interface PoolMember {
   id: string
   name: string
   regionId: number
-  regionClusterId: number
   memberState: string
 }
 
@@ -477,11 +459,6 @@ export interface BackfillFailure {
   error: string
 }
 
-export interface BlockMember {
-  name?: string
-  regionClusterId: number
-}
-
 export interface CompatibleStorage {
   id: number
   uuid: string
@@ -753,7 +730,6 @@ export interface CreateStorageRequest {
   base?: string
   blockRegion?: string
   blockSize?: number
-  members?: BlockMember[]
   accessKey?: string
   secretKey?: string
 }
@@ -780,16 +756,16 @@ export interface MoveStorageVolumesRequest {
   volumeIds: string[]
 }
 
-export interface UpdateStorageConfigRequest {
-  k: number
-}
-
 export interface UpdateStorageTagsRequest {
   tags?: string[]
 }
 
-export interface RegisterStorageMemberRequest {
-  regionClusterId: number
+export interface RegisterStorageCopysetRequest {
+  nameA?: string
+  nameB?: string
+}
+
+export interface AddStorageCopysetMemberRequest {
   name?: string
 }
 

@@ -188,26 +188,13 @@ pub struct BackfillFailure {
 }
 ```
 
-### `BlockMember`
-
-```rust
-pub struct BlockMember {
-    pub name: Option<String>,
-    pub region_cluster_id: i64,
-}
-```
-
 ### `BlockVolume`
 
 ```rust
 pub struct BlockVolume {
     pub id: String,
     pub name: Option<String>,
-    pub cluster_name: Option<String>,
-    pub cluster_uuid: Option<String>,
     pub shard_id: i64,
-    pub region_cluster_id: i64,
-    pub cluster_ready: bool,
     pub is_active: bool,
     pub created_at: String,
     pub updated_at: String,
@@ -277,8 +264,6 @@ pub struct Copyset {
     pub state: CopysetState,
     pub member_a: Option<String>,
     pub member_b: Option<String>,
-    pub placement_group_a: Option<i64>,
-    pub placement_group_b: Option<i64>,
     pub drain_started_at: Option<String>,
     pub synced_at: Option<String>,
     pub retired_at: Option<String>,
@@ -629,7 +614,6 @@ pub struct PoolMember {
     pub id: String,
     pub name: String,
     pub region_id: i64,
-    pub region_cluster_id: i64,
     pub member_state: String,
 }
 ```
@@ -798,21 +782,6 @@ pub struct Storage {
     pub is_active: bool,
     pub created_at: String,
     pub updated_at: String,
-}
-```
-
-### `UpdateConfigResult`
-
-```rust
-pub struct UpdateConfigResult {
-    pub id: String,
-    pub target_k: i32,
-    pub active_copyset_count_before: i32,
-    pub copysets_needed: i32,
-    pub copysets_formed: i32,
-    pub active_copyset_count_after: i32,
-    pub partial: bool,
-    pub reason: Option<String>,
 }
 ```
 
@@ -1318,7 +1287,7 @@ Accessor: `client.storages`
 #### `create` - POST /api/v1/storages/create
 
 ```rust
-pub async fn create(&self, req: &CreateStorageRequest) -> Result<CreateStorageResponse, Error>
+pub async fn create(&self, req: &CreateStorageRequest) -> Result<IdResponse, Error>
 ```
 
 Request body:
@@ -1337,18 +1306,8 @@ pub struct CreateStorageRequest {
     pub base: Option<String>,
     pub block_region: Option<String>,
     pub block_size: Option<i32>,
-    pub members: Option<Vec<BlockMember>>,
     pub access_key: Option<String>,
     pub secret_key: Option<String>,
-}
-```
-
-Response body:
-
-```rust
-pub struct CreateStorageResponse {
-    pub id: i64,
-    pub block_volume_ids: Option<Vec<String>>,
 }
 ```
 
@@ -1499,37 +1458,6 @@ pub struct MoveVolumesStorageResponse {
 }
 ```
 
-#### `update_config` - PUT /api/v1/storages/:storageId/config
-
-```rust
-pub async fn update_config(&self, storage_id: i64, req: &UpdateStorageConfigRequest) -> Result<UpdateConfigResult, Error>
-```
-
-Request body:
-
-```rust
-pub struct UpdateStorageConfigRequest {
-    pub k: i32,
-}
-```
-
-#### `get_config` - GET /api/v1/storages/:storageId/config
-
-```rust
-pub async fn get_config(&self, storage_id: i64) -> Result<GetConfigStorageResponse, Error>
-```
-
-Response body:
-
-```rust
-pub struct GetConfigStorageResponse {
-    pub id: String,
-    pub k: i32,
-    pub algorithm_version: i32,
-    pub epoch_policy_version: i32,
-}
-```
-
 #### `list_copysets` - GET /api/v1/storages/:storageId/copysets
 
 ```rust
@@ -1586,17 +1514,31 @@ pub struct UpdateStorageTagsRequest {
 }
 ```
 
-#### `register_member` - POST /api/v1/storages/:storageId/members
+#### `register_copyset` - POST /api/v1/storages/:storageId/copysets
 
 ```rust
-pub async fn register_member(&self, storage_id: i64, req: &RegisterStorageMemberRequest) -> Result<PoolMember, Error>
+pub async fn register_copyset(&self, storage_id: i64, req: &RegisterStorageCopysetRequest) -> Result<Copyset, Error>
 ```
 
 Request body:
 
 ```rust
-pub struct RegisterStorageMemberRequest {
-    pub region_cluster_id: i64,
+pub struct RegisterStorageCopysetRequest {
+    pub name_a: Option<String>,
+    pub name_b: Option<String>,
+}
+```
+
+#### `add_copyset_member` - POST /api/v1/storages/:storageId/copysets/:copysetId/members
+
+```rust
+pub async fn add_copyset_member(&self, storage_id: i64, copyset_id: &str, req: &AddStorageCopysetMemberRequest) -> Result<PoolMember, Error>
+```
+
+Request body:
+
+```rust
+pub struct AddStorageCopysetMemberRequest {
     pub name: Option<String>,
 }
 ```

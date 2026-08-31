@@ -13,8 +13,7 @@ import "context"
 // this is a lossless, zero-cost compatibility layer for the type-only
 // renames below (Pair, PairState, DrainPairStorageResponse). It does NOT
 // cover field-level renames on struct types that were never themselves
-// renamed (BlockVolume.PairID -> CopysetID, UpdateConfigResult's
-// Pairs*/ActivePairCount* fields, VolumeBlockPlacementConfig.PairIds,
+// renamed (BlockVolume.PairID -> CopysetID, VolumeBlockPlacementConfig.PairIds,
 // VolumeBlockPlacementResizeResult's PairCount*/Pairs* fields): Go has no
 // field-alias mechanism, so restoring those would require either editing
 // the generated structs (adding the old field back) or a hand-written

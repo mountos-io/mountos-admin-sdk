@@ -342,12 +342,11 @@ Request:
   "base"?: string,
   "blockRegion"?: string,
   "blockSize"?: int32,
-  "members"?: BlockMember[],
   "accessKey"?: string,
   "secretKey"?: string
 }
 ```
-Response data: `{ "id": int64, "blockVolumeIds?": string[] }`
+Response data: `{ "id": int64 }`
 
 ### GET /api/v1/storages/list
 Query: `accountId=int64(required)`, `search=string`, `regionId=int64`, `storageType=string`, `providerType=string`, `isActive=bool`, `directAccess=bool`, `page=int(default 1)`, `limit=int(default 10)`
@@ -412,20 +411,6 @@ Request:
 ```
 Response data: `{ "moved": string[], "failures": MoveVolumeFailure[] }`
 
-### PUT /api/v1/storages/:storageId/config
-Param: `storageId`
-Request:
-```
-{
-  "k": int32(required)
-}
-```
-Response data: `UpdateConfigResult`
-
-### GET /api/v1/storages/:storageId/config
-Param: `storageId`
-Response data: `{ "id": string, "k": int32, "algorithmVersion": int32, "epochPolicyVersion": int32 }`
-
 ### GET /api/v1/storages/:storageId/copysets
 Param: `storageId`
 Query: `state=string`, `includeRetired=bool`
@@ -457,12 +442,23 @@ Request:
 ```
 Response data: `Copyset`
 
-### POST /api/v1/storages/:storageId/members
+### POST /api/v1/storages/:storageId/copysets
 Param: `storageId`
 Request:
 ```
 {
-  "regionClusterId": int64(required),
+  "nameA"?: string,
+  "nameB"?: string
+}
+```
+Response data: `Copyset`
+
+### POST /api/v1/storages/:storageId/copysets/:copysetId/members
+Param: `storageId`
+Param: `copysetId`
+Request:
+```
+{
   "name"?: string
 }
 ```
@@ -1175,24 +1171,12 @@ Response data: `GCWorkerEventGoalsResponse`
 }
 ```
 
-### BlockMember Type
-```
-{
-  "name"?: string,
-  "regionClusterId": int64
-}
-```
-
 ### BlockVolume Type
 ```
 {
   "id": string,
   "name"?: string,
-  "clusterName"?: string,
-  "clusterUuid"?: string,
   "shardId": int64,
-  "regionClusterId": int64,
-  "clusterReady": bool,
   "isActive": bool,
   "createdAt": RFC3339,
   "updatedAt": RFC3339,
@@ -1229,8 +1213,6 @@ Response data: `GCWorkerEventGoalsResponse`
   "state": CopysetState,
   "memberA"?: string,
   "memberB"?: string,
-  "placementGroupA"?: int64,
-  "placementGroupB"?: int64,
   "drainStartedAt"?: RFC3339,
   "syncedAt"?: RFC3339,
   "retiredAt"?: RFC3339,
@@ -1443,7 +1425,6 @@ Response data: `GCWorkerEventGoalsResponse`
   "id": string,
   "name": string,
   "regionId": int64,
-  "regionClusterId": int64,
   "memberState": string
 }
 ```
@@ -1501,20 +1482,6 @@ Response data: `GCWorkerEventGoalsResponse`
   "clientType": string,
   "status": string,
   "count": int64
-}
-```
-
-### UpdateConfigResult Type
-```
-{
-  "id": string,
-  "targetK": int32,
-  "activeCopysetCountBefore": int32,
-  "copysetsNeeded": int32,
-  "copysetsFormed": int32,
-  "activeCopysetCountAfter": int32,
-  "partial": bool,
-  "reason"?: string
 }
 ```
 

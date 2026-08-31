@@ -144,26 +144,13 @@ interface BackfillFailure {
 }
 ```
 
-### `BlockMember`
-
-```typescript
-interface BlockMember {
-  name?: string;
-  regionClusterId: number;
-}
-```
-
 ### `BlockVolume`
 
 ```typescript
 interface BlockVolume {
   id: string;
   name?: string;
-  clusterName?: string;
-  clusterUuid?: string;
   shardId: number;
-  regionClusterId: number;
-  clusterReady: boolean;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -233,8 +220,6 @@ interface Copyset {
   state: CopysetState;
   memberA?: string;
   memberB?: string;
-  placementGroupA?: number;
-  placementGroupB?: number;
   drainStartedAt?: string;
   syncedAt?: string;
   retiredAt?: string;
@@ -585,7 +570,6 @@ interface PoolMember {
   id: string;
   name: string;
   regionId: number;
-  regionClusterId: number;
   memberState: string;
 }
 ```
@@ -754,21 +738,6 @@ interface Storage {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
-}
-```
-
-### `UpdateConfigResult`
-
-```typescript
-interface UpdateConfigResult {
-  id: string;
-  targetK: number;
-  activeCopysetCountBefore: number;
-  copysetsNeeded: number;
-  copysetsFormed: number;
-  activeCopysetCountAfter: number;
-  partial: boolean;
-  reason?: string;
 }
 ```
 
@@ -1257,7 +1226,7 @@ Accessor: `client.storages`
 #### `create` - POST /api/v1/storages/create
 
 ```typescript
-client.storages.create(req: CreateStorageRequest, signal?: AbortSignal): Promise<{ id: number; blockVolumeIds?: string[] }>;
+client.storages.create(req: CreateStorageRequest, signal?: AbortSignal): Promise<{ id: number }>;
 ```
 
 Request body:
@@ -1276,7 +1245,6 @@ Request body:
   base?: string;
   blockRegion?: string;
   blockSize?: number;
-  members?: BlockMember[];
   accessKey?: string;
   secretKey?: string;
 }
@@ -1386,26 +1354,6 @@ Request body:
 }
 ```
 
-#### `updateConfig` - PUT /api/v1/storages/:storageId/config
-
-```typescript
-client.storages.updateConfig(storageId: number, req: UpdateStorageConfigRequest, signal?: AbortSignal): Promise<UpdateConfigResult>;
-```
-
-Request body:
-
-```typescript
-{
-  k: number;
-}
-```
-
-#### `getConfig` - GET /api/v1/storages/:storageId/config
-
-```typescript
-client.storages.getConfig(storageId: number, signal?: AbortSignal): Promise<{ id: string; k: number; algorithmVersion: number; epochPolicyVersion: number }>;
-```
-
 #### `listCopysets` - GET /api/v1/storages/:storageId/copysets
 
 ```typescript
@@ -1453,17 +1401,31 @@ Request body:
 }
 ```
 
-#### `registerMember` - POST /api/v1/storages/:storageId/members
+#### `registerCopyset` - POST /api/v1/storages/:storageId/copysets
 
 ```typescript
-client.storages.registerMember(storageId: number, req: RegisterStorageMemberRequest, signal?: AbortSignal): Promise<PoolMember>;
+client.storages.registerCopyset(storageId: number, req: RegisterStorageCopysetRequest, signal?: AbortSignal): Promise<Copyset>;
 ```
 
 Request body:
 
 ```typescript
 {
-  regionClusterId: number;
+  nameA?: string;
+  nameB?: string;
+}
+```
+
+#### `addCopysetMember` - POST /api/v1/storages/:storageId/copysets/:copysetId/members
+
+```typescript
+client.storages.addCopysetMember(storageId: number, copysetId: string, req: AddStorageCopysetMemberRequest, signal?: AbortSignal): Promise<PoolMember>;
+```
+
+Request body:
+
+```typescript
+{
   name?: string;
 }
 ```

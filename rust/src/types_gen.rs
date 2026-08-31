@@ -455,16 +455,8 @@ pub struct BlockVolume {
     pub id: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
-    #[serde(rename = "clusterName", skip_serializing_if = "Option::is_none")]
-    pub cluster_name: Option<String>,
-    #[serde(rename = "clusterUuid", skip_serializing_if = "Option::is_none")]
-    pub cluster_uuid: Option<String>,
     #[serde(rename = "shardId")]
     pub shard_id: i64,
-    #[serde(rename = "regionClusterId")]
-    pub region_cluster_id: i64,
-    #[serde(rename = "clusterReady")]
-    pub cluster_ready: bool,
     #[serde(rename = "isActive")]
     pub is_active: bool,
     #[serde(rename = "createdAt")]
@@ -478,24 +470,6 @@ pub struct BlockVolume {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct UpdateConfigResult {
-    pub id: String,
-    #[serde(rename = "targetK")]
-    pub target_k: i32,
-    #[serde(rename = "activeCopysetCountBefore")]
-    pub active_copyset_count_before: i32,
-    #[serde(rename = "copysetsNeeded")]
-    pub copysets_needed: i32,
-    #[serde(rename = "copysetsFormed")]
-    pub copysets_formed: i32,
-    #[serde(rename = "activeCopysetCountAfter")]
-    pub active_copyset_count_after: i32,
-    pub partial: bool,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub reason: Option<String>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Copyset {
     pub id: String,
     #[serde(rename = "storageId")]
@@ -505,10 +479,6 @@ pub struct Copyset {
     pub member_a: Option<String>,
     #[serde(rename = "memberB", skip_serializing_if = "Option::is_none")]
     pub member_b: Option<String>,
-    #[serde(rename = "placementGroupA", skip_serializing_if = "Option::is_none")]
-    pub placement_group_a: Option<i64>,
-    #[serde(rename = "placementGroupB", skip_serializing_if = "Option::is_none")]
-    pub placement_group_b: Option<i64>,
     #[serde(rename = "drainStartedAt", skip_serializing_if = "Option::is_none")]
     pub drain_started_at: Option<String>,
     #[serde(rename = "syncedAt", skip_serializing_if = "Option::is_none")]
@@ -530,8 +500,6 @@ pub struct PoolMember {
     pub name: String,
     #[serde(rename = "regionId")]
     pub region_id: i64,
-    #[serde(rename = "regionClusterId")]
-    pub region_cluster_id: i64,
     #[serde(rename = "memberState")]
     pub member_state: String,
 }
@@ -1020,14 +988,6 @@ pub struct BackfillFailure {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct BlockMember {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub name: Option<String>,
-    #[serde(rename = "regionClusterId")]
-    pub region_cluster_id: i64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CompatibleStorage {
     pub id: i64,
     pub uuid: String,
@@ -1452,19 +1412,10 @@ pub struct CreateStorageRequest {
     pub block_region: Option<String>,
     #[serde(rename = "blockSize", skip_serializing_if = "Option::is_none")]
     pub block_size: Option<i32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub members: Option<Vec<BlockMember>>,
     #[serde(rename = "accessKey", skip_serializing_if = "Option::is_none")]
     pub access_key: Option<String>,
     #[serde(rename = "secretKey", skip_serializing_if = "Option::is_none")]
     pub secret_key: Option<String>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CreateStorageResponse {
-    pub id: i64,
-    #[serde(rename = "blockVolumeIds", skip_serializing_if = "Option::is_none")]
-    pub block_volume_ids: Option<Vec<String>>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -1535,21 +1486,6 @@ pub struct MoveVolumesStorageResponse {
     pub failures: Vec<MoveVolumeFailure>,
 }
 
-#[derive(Debug, Clone, Serialize)]
-pub struct UpdateStorageConfigRequest {
-    pub k: i32,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct GetConfigStorageResponse {
-    pub id: String,
-    pub k: i32,
-    #[serde(rename = "algorithmVersion")]
-    pub algorithm_version: i32,
-    #[serde(rename = "epochPolicyVersion")]
-    pub epoch_policy_version: i32,
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DrainCopysetStorageResponse {
     pub id: String,
@@ -1569,9 +1505,15 @@ pub struct UpdateStorageTagsRequest {
 }
 
 #[derive(Debug, Clone, Serialize)]
-pub struct RegisterStorageMemberRequest {
-    #[serde(rename = "regionClusterId")]
-    pub region_cluster_id: i64,
+pub struct RegisterStorageCopysetRequest {
+    #[serde(rename = "nameA", skip_serializing_if = "Option::is_none")]
+    pub name_a: Option<String>,
+    #[serde(rename = "nameB", skip_serializing_if = "Option::is_none")]
+    pub name_b: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct AddStorageCopysetMemberRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
 }
