@@ -69,7 +69,7 @@ func TestGetPairConfigAndUpdatePairConfigAreAliases(t *testing.T) {
 	if err != nil {
 		t.Fatalf("GetPairConfig: %v", err)
 	}
-	if cfg.TargetCopysetCount != 3 || len(cfg.CopysetIds) != 2 {
+	if cfg.TargetCopysetCount != 3 || len(cfg.CopysetIDs) != 2 {
 		t.Fatalf("unexpected config: %+v", cfg)
 	}
 
