@@ -617,6 +617,8 @@ pub struct NodeStatsSample {
     pub db_ping_min_us: Option<f64>,
     pub db_ping_max_us: Option<f64>,
     pub db_ping_std_dev_us: Option<f64>,
+    pub db_dispatch_outstanding: Option<i64>,
+    pub db_dispatch_lane_cap: Option<i64>,
 }
 ```
 

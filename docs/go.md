@@ -635,6 +635,8 @@ type NodeStatsSample struct {
     DbPingMinUs              float64                  `json:"dbPingMinUs,omitempty"`
     DbPingMaxUs              float64                  `json:"dbPingMaxUs,omitempty"`
     DbPingStdDevUs           float64                  `json:"dbPingStdDevUs,omitempty"`
+    DbDispatchOutstanding    int64                    `json:"dbDispatchOutstanding,omitempty"`
+    DbDispatchLaneCap        int                      `json:"dbDispatchLaneCap,omitempty"`
 }
 ```
 

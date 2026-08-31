@@ -572,6 +572,8 @@ export interface NodeStatsSample {
   dbPingMinUs?: number
   dbPingMaxUs?: number
   dbPingStdDevUs?: number
+  dbDispatchOutstanding?: number
+  dbDispatchLaneCap?: number
 }
 
 export interface Ref {

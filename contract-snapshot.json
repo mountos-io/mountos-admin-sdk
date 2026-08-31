@@ -1315,6 +1315,16 @@
           "required": false,
           "optional": true
         },
+        "dbDispatchLaneCap": {
+          "type": "int",
+          "required": false,
+          "optional": true
+        },
+        "dbDispatchOutstanding": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
         "dbLatency15mUs": {
           "type": "float",
           "required": false,

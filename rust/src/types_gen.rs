@@ -1172,6 +1172,10 @@ pub struct NodeStatsSample {
     pub db_ping_max_us: Option<f64>,
     #[serde(rename = "dbPingStdDevUs", skip_serializing_if = "Option::is_none")]
     pub db_ping_std_dev_us: Option<f64>,
+    #[serde(rename = "dbDispatchOutstanding", skip_serializing_if = "Option::is_none")]
+    pub db_dispatch_outstanding: Option<i64>,
+    #[serde(rename = "dbDispatchLaneCap", skip_serializing_if = "Option::is_none")]
+    pub db_dispatch_lane_cap: Option<i64>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

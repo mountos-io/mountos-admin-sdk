@@ -590,6 +590,11 @@ types:
     - "dbPingMinUs: float?"
     - "dbPingMaxUs: float?"
     - "dbPingStdDevUs: float?"
+    # DB dispatcher pressure, present when the process uses the bounded DB
+    # dispatch lane. Outstanding is the current queued/running request count;
+    # laneCap is its configured concurrency ceiling.
+    - "dbDispatchOutstanding: int64?"
+    - "dbDispatchLaneCap: int?"
 
   ClientSession:
     - "id: int64"

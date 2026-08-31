@@ -1426,7 +1426,9 @@ Response data: `GCWorkerEventGoalsResponse`
   "dbPingAvgUs"?: float,
   "dbPingMinUs"?: float,
   "dbPingMaxUs"?: float,
-  "dbPingStdDevUs"?: float
+  "dbPingStdDevUs"?: float,
+  "dbDispatchOutstanding"?: int64,
+  "dbDispatchLaneCap"?: int
 }
 ```
 
