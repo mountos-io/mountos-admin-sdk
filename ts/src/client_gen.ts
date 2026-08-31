@@ -324,6 +324,10 @@ export class StoragesResource {
     return this.client.request('POST', `/api/v1/storages/${storageId}/members/${encodeURIComponent(blockVolumeId)}/reactivate`, undefined, signal)
   }
 
+  removeMember(storageId: number, blockVolumeId: string, signal?: AbortSignal): Promise<{ id: string }> {
+    return this.client.request('DELETE', `/api/v1/storages/${storageId}/members/${encodeURIComponent(blockVolumeId)}`, undefined, signal)
+  }
+
   backfillFingerprints(signal?: AbortSignal): Promise<{ scanned: number; updated: number; failures: BackfillFailure[]; hasMore: boolean }> {
     return this.client.request('POST', '/api/v1/storages/backfill-fingerprints', undefined, signal)
   }

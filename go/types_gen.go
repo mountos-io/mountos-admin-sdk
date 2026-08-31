@@ -1031,6 +1031,10 @@ type RegisterStorageMemberRequest struct {
 	Name            string `json:"name,omitempty"`
 }
 
+type RemoveMemberStorageResponse struct {
+	ID string `json:"id"`
+}
+
 type BackfillFingerprintsStorageResponse struct {
 	Scanned  int32             `json:"scanned"`
 	Updated  int32             `json:"updated"`

@@ -1607,6 +1607,20 @@ pub struct RegisterStorageMemberRequest {
 pub async fn reactivate_member(&self, storage_id: i64, block_volume_id: &str) -> Result<PoolMember, Error>
 ```
 
+#### `remove_member` - DELETE /api/v1/storages/:storageId/members/:blockVolumeId
+
+```rust
+pub async fn remove_member(&self, storage_id: i64, block_volume_id: &str) -> Result<RemoveMemberStorageResponse, Error>
+```
+
+Response body:
+
+```rust
+pub struct RemoveMemberStorageResponse {
+    pub id: String,
+}
+```
+
 #### `backfill_fingerprints` - POST /api/v1/storages/backfill-fingerprints
 
 ```rust

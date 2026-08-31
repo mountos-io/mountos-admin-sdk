@@ -1625,6 +1625,20 @@ type RegisterStorageMemberRequest struct {
 func (s *StoragesService) ReactivateMember(ctx context.Context, storageID int64, blockVolumeID string) (*PoolMember, error)
 ```
 
+#### `RemoveMember` - DELETE /api/v1/storages/:storageId/members/:blockVolumeId
+
+```go
+func (s *StoragesService) RemoveMember(ctx context.Context, storageID int64, blockVolumeID string) (*RemoveMemberStorageResponse, error)
+```
+
+Response body:
+
+```go
+type RemoveMemberStorageResponse struct {
+    ID                       string                   `json:"id"`
+}
+```
+
 #### `BackfillFingerprints` - POST /api/v1/storages/backfill-fingerprints
 
 ```go

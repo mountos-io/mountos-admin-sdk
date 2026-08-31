@@ -388,6 +388,10 @@ impl StoragesService {
         self.inner.post_empty(&format!("/api/v1/storages/{}/members/{}/reactivate", storage_id, crate::http::encode_segment(block_volume_id))).await
     }
 
+    pub async fn remove_member(&self, storage_id: i64, block_volume_id: &str) -> Result<RemoveMemberStorageResponse, Error> {
+        self.inner.delete(&format!("/api/v1/storages/{}/members/{}", storage_id, crate::http::encode_segment(block_volume_id))).await
+    }
+
     pub async fn backfill_fingerprints(&self) -> Result<BackfillFingerprintsStorageResponse, Error> {
         self.inner.post_empty("/api/v1/storages/backfill-fingerprints").await
     }

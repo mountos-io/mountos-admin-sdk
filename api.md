@@ -473,6 +473,11 @@ Param: `storageId`
 Param: `blockVolumeId`
 Response data: `PoolMember`
 
+### DELETE /api/v1/storages/:storageId/members/:blockVolumeId
+Param: `storageId`
+Param: `blockVolumeId`
+Response data: `{ "id": string }`
+
 ### POST /api/v1/storages/backfill-fingerprints
 Response data: `{ "scanned": int32, "updated": int32, "failures": BackfillFailure[], "hasMore": bool }`
 

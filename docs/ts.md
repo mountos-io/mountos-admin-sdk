@@ -1474,6 +1474,12 @@ Request body:
 client.storages.reactivateMember(storageId: number, blockVolumeId: string, signal?: AbortSignal): Promise<PoolMember>;
 ```
 
+#### `removeMember` - DELETE /api/v1/storages/:storageId/members/:blockVolumeId
+
+```typescript
+client.storages.removeMember(storageId: number, blockVolumeId: string, signal?: AbortSignal): Promise<{ id: string }>;
+```
+
 #### `backfillFingerprints` - POST /api/v1/storages/backfill-fingerprints
 
 ```typescript

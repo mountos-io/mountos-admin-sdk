@@ -1577,6 +1577,11 @@ pub struct RegisterStorageMemberRequest {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RemoveMemberStorageResponse {
+    pub id: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BackfillFingerprintsStorageResponse {
     pub scanned: i32,
     pub updated: i32,

@@ -1245,6 +1245,22 @@ resources:
         path: /:storageId/members/:blockVolumeId/reactivate
         responseType: PoolMember
 
+      # Permanently removes a detached pool member from the storage's
+      # inventory - deregisters the server entirely, distinct from draining
+      # a copyset it's part of. Only ever allowed on a member with no
+      # active/draining copyset assignment: the handler 409s unless the
+      # member is currently 'detached', matching reactivateMember's own
+      # CAS-guarded safety. A removed member's row is soft-deleted, not
+      # hard-deleted - its (storage_sid, region_cluster_id, name) natural
+      # key becomes reusable by a fresh registerMember call, but any
+      # retired copyset it last belonged to keeps resolving it by id for
+      # historical audit purposes.
+      - action: removeMember
+        method: DELETE
+        path: /:storageId/members/:blockVolumeId
+        response:
+          - "id: string"
+
       # One-time migration helper: computes physicalFingerprint for storages
       # created before the column existed. Platform-admin only, not per-account.
       - action: backfillFingerprints
