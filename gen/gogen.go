@@ -399,17 +399,20 @@ func writeGoStruct(w *strings.Builder, name string, fields []string, isRequest b
 		gt := goType(f.Type)
 		// Request body fields that aren't required (both the explicit "?"
 		// tier and bare/unmarked fields), and model/response fields marked
-		// "?", get a pointer on bool/int types so callers can distinguish
+		// "?", get a pointer on scalar types so callers can distinguish
 		// "not set"/"not observed" from a genuine zero value - mirrors
 		// goOptionalQueryType for query params, and matches TS
 		// (writeTSInterface) and Rust (writeRustStruct), which both gate
 		// their own optional-wrapping on f.Optional regardless of isRequest.
+		// string/datetime need the same pointer as bool/int: their Go zero
+		// value ("") is a real, distinct value a server can send, so an
+		// unwrapped string can't tell "absent" from "explicitly empty".
 		// A slice/map is left unwrapped: a nil slice/map already signals
 		// "absent" in Go idiom, so a pointer on top would be redundant.
 		wantsPointer := (isRequest && !f.Required) || (!isRequest && f.Optional)
 		if wantsPointer {
 			switch f.Type {
-			case "bool", "int", "int32", "int64":
+			case "bool", "int", "int32", "int64", "string", "datetime":
 				gt = "*" + gt
 			}
 		}

@@ -24,6 +24,23 @@ var abbreviations = map[string]string{
 	"gc":   "GC",
 }
 
+// abbreviationFor returns the canonical form for a lowercased word,
+// recognizing both the exact abbreviation ("id" -> "ID") and its simple
+// plural ("ids" -> "IDs"). Without the plural form, a field like
+// copysetIds falls through to ordinary title-casing and comes out as
+// CopysetIds instead of CopysetIDs.
+func abbreviationFor(lower string) (string, bool) {
+	if abbr, ok := abbreviations[lower]; ok {
+		return abbr, true
+	}
+	if base, ok := strings.CutSuffix(lower, "s"); ok {
+		if abbr, ok := abbreviations[base]; ok {
+			return abbr + "s", true
+		}
+	}
+	return "", false
+}
+
 // splitWords splits on camelCase boundaries, hyphens, underscores.
 func splitWords(s string) []string {
 	var words []string
@@ -64,7 +81,7 @@ func pascalCase(s string) string {
 	var b strings.Builder
 	for _, w := range words {
 		lower := strings.ToLower(w)
-		if abbr, ok := abbreviations[lower]; ok {
+		if abbr, ok := abbreviationFor(lower); ok {
 			b.WriteString(abbr)
 		} else {
 			b.WriteString(strings.ToUpper(w[:1]) + w[1:])
@@ -83,13 +100,13 @@ func camelCase(s string) string {
 		lower := strings.ToLower(w)
 		if i == 0 {
 			// first word: if it's an abbreviation, lowercase it
-			if _, ok := abbreviations[lower]; ok {
+			if _, ok := abbreviationFor(lower); ok {
 				b.WriteString(lower)
 			} else {
 				b.WriteString(strings.ToLower(w[:1]) + w[1:])
 			}
 		} else {
-			if abbr, ok := abbreviations[lower]; ok {
+			if abbr, ok := abbreviationFor(lower); ok {
 				b.WriteString(abbr)
 			} else {
 				b.WriteString(strings.ToUpper(w[:1]) + w[1:])

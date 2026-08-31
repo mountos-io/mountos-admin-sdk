@@ -104,10 +104,11 @@ func generateDocGo(spec *Spec, outDir string) {
 				}
 				// spec.Types are general model structs, never request bodies
 				// (gogen.go's writeGoStruct always renders them with
-				// isRequest=false) -- never pointer-wrap here, regardless of
-				// optionality, to match what's actually emitted.
+				// isRequest=false), so writeGoStruct's own condition for that
+				// case reduces to f.Optional -- matches what's actually
+				// emitted for every qualifying type, not just bool/int.
 				fmt.Fprintf(&w, "    %-24s %-24s `json:%q`\n",
-					goFieldName(f.Name), goDocType(f.Type, false), tag)
+					goFieldName(f.Name), goDocType(f.Type, f.Optional), tag)
 			}
 			w.WriteString("}\n```\n\n")
 		}
@@ -291,8 +292,10 @@ func generateDocGo(spec *Spec, outDir string) {
 					if f.Optional {
 						tag += ",omitempty"
 					}
+					// Matches writeGoStruct(..., isRequest=false): the same
+					// condition as the Types section above.
 					fmt.Fprintf(&w, "    %-24s %-24s `json:%q`\n",
-						goFieldName(f.Name), goDocType(f.Type, false), tag)
+						goFieldName(f.Name), goDocType(f.Type, f.Optional), tag)
 				}
 				w.WriteString("}\n```\n\n")
 			}
@@ -303,14 +306,15 @@ func generateDocGo(spec *Spec, outDir string) {
 }
 
 // goDocType maps a spec type through the real generator's goType. When ptr is
-// set (request-body fields with !f.Required), it pointer-wraps under
-// writeGoStruct's exact condition (only bool/int spec types) so the documented
+// set (the caller's own optionality condition, matching whichever of
+// writeGoStruct's isRequest branches produced the struct being documented),
+// it pointer-wraps under writeGoStruct's exact type list so the documented
 // field type can't diverge from the emitted one.
 func goDocType(t string, ptr bool) string {
 	base := goType(t)
 	if ptr {
 		switch t {
-		case "bool", "int", "int32", "int64":
+		case "bool", "int", "int32", "int64", "string", "datetime":
 			return "*" + base
 		}
 	}

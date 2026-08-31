@@ -219,7 +219,7 @@ type Account struct {
 	ID             int64           `json:"id"`
 	Name           string          `json:"name"`
 	Description    string          `json:"description"`
-	IconURL        string          `json:"iconUrl,omitempty"`
+	IconURL        *string         `json:"iconUrl,omitempty"`
 	ProviderInfo   map[string]any  `json:"providerInfo,omitempty"`
 	LiveVolume     int64           `json:"liveVolume"`
 	TotalVolume    int64           `json:"totalVolume"`
@@ -266,64 +266,64 @@ type MetadataCluster struct {
 }
 
 type Storage struct {
-	ID                  int64  `json:"id"`
-	UUID                string `json:"uuid"`
-	Account             Ref    `json:"account"`
-	RegionInfo          Ref    `json:"regionInfo"`
-	Name                string `json:"name"`
-	Description         string `json:"description,omitempty"`
-	StorageType         string `json:"storageType"`
-	ProviderType        string `json:"providerType"`
-	Endpoint            string `json:"endpoint"`
-	Region              string `json:"region,omitempty"`
-	Bucket              string `json:"bucket,omitempty"`
-	Base                string `json:"base,omitempty"`
-	PhysicalFingerprint string `json:"physicalFingerprint,omitempty"`
-	BlockRegion         string `json:"blockRegion,omitempty"`
-	BlockSize           *int32 `json:"blockSize,omitempty"`
-	DirectAccess        *bool  `json:"directAccess,omitempty"`
-	IsActive            bool   `json:"isActive"`
-	CreatedAt           string `json:"createdAt"`
-	UpdatedAt           string `json:"updatedAt"`
+	ID                  int64   `json:"id"`
+	UUID                string  `json:"uuid"`
+	Account             Ref     `json:"account"`
+	RegionInfo          Ref     `json:"regionInfo"`
+	Name                string  `json:"name"`
+	Description         *string `json:"description,omitempty"`
+	StorageType         string  `json:"storageType"`
+	ProviderType        string  `json:"providerType"`
+	Endpoint            string  `json:"endpoint"`
+	Region              *string `json:"region,omitempty"`
+	Bucket              *string `json:"bucket,omitempty"`
+	Base                *string `json:"base,omitempty"`
+	PhysicalFingerprint *string `json:"physicalFingerprint,omitempty"`
+	BlockRegion         *string `json:"blockRegion,omitempty"`
+	BlockSize           *int32  `json:"blockSize,omitempty"`
+	DirectAccess        *bool   `json:"directAccess,omitempty"`
+	IsActive            bool    `json:"isActive"`
+	CreatedAt           string  `json:"createdAt"`
+	UpdatedAt           string  `json:"updatedAt"`
 }
 
 type BlockVolume struct {
-	ID              string `json:"id"`
-	Name            string `json:"name,omitempty"`
-	ClusterName     string `json:"clusterName,omitempty"`
-	ClusterUUID     string `json:"clusterUuid,omitempty"`
-	ShardID         int64  `json:"shardId"`
-	RegionClusterID int64  `json:"regionClusterId"`
-	ClusterReady    bool   `json:"clusterReady"`
-	IsActive        bool   `json:"isActive"`
-	CreatedAt       string `json:"createdAt"`
-	UpdatedAt       string `json:"updatedAt"`
-	MemberState     string `json:"memberState,omitempty"`
-	CopysetID       string `json:"copysetId,omitempty"`
+	ID              string  `json:"id"`
+	Name            *string `json:"name,omitempty"`
+	ClusterName     *string `json:"clusterName,omitempty"`
+	ClusterUUID     *string `json:"clusterUuid,omitempty"`
+	ShardID         int64   `json:"shardId"`
+	RegionClusterID int64   `json:"regionClusterId"`
+	ClusterReady    bool    `json:"clusterReady"`
+	IsActive        bool    `json:"isActive"`
+	CreatedAt       string  `json:"createdAt"`
+	UpdatedAt       string  `json:"updatedAt"`
+	MemberState     *string `json:"memberState,omitempty"`
+	CopysetID       *string `json:"copysetId,omitempty"`
 }
 
 type UpdateConfigResult struct {
-	ID                       string `json:"id"`
-	TargetK                  int32  `json:"targetK"`
-	ActiveCopysetCountBefore int32  `json:"activeCopysetCountBefore"`
-	CopysetsNeeded           int32  `json:"copysetsNeeded"`
-	CopysetsFormed           int32  `json:"copysetsFormed"`
-	ActiveCopysetCountAfter  int32  `json:"activeCopysetCountAfter"`
-	Partial                  bool   `json:"partial"`
-	Reason                   string `json:"reason,omitempty"`
+	ID                       string  `json:"id"`
+	TargetK                  int32   `json:"targetK"`
+	ActiveCopysetCountBefore int32   `json:"activeCopysetCountBefore"`
+	CopysetsNeeded           int32   `json:"copysetsNeeded"`
+	CopysetsFormed           int32   `json:"copysetsFormed"`
+	ActiveCopysetCountAfter  int32   `json:"activeCopysetCountAfter"`
+	Partial                  bool    `json:"partial"`
+	Reason                   *string `json:"reason,omitempty"`
 }
 
 type Copyset struct {
 	ID               string       `json:"id"`
 	StorageID        string       `json:"storageId"`
 	State            CopysetState `json:"state"`
-	MemberA          string       `json:"memberA,omitempty"`
-	MemberB          string       `json:"memberB,omitempty"`
+	MemberA          *string      `json:"memberA,omitempty"`
+	MemberB          *string      `json:"memberB,omitempty"`
 	PlacementGroupA  *int64       `json:"placementGroupA,omitempty"`
 	PlacementGroupB  *int64       `json:"placementGroupB,omitempty"`
-	DrainStartedAt   string       `json:"drainStartedAt,omitempty"`
-	SyncedAt         string       `json:"syncedAt,omitempty"`
-	RetiredAt        string       `json:"retiredAt,omitempty"`
+	DrainStartedAt   *string      `json:"drainStartedAt,omitempty"`
+	SyncedAt         *string      `json:"syncedAt,omitempty"`
+	RetiredAt        *string      `json:"retiredAt,omitempty"`
 	PendingSyncJobsA *int32       `json:"pendingSyncJobsA,omitempty"`
 	PendingSyncJobsB *int32       `json:"pendingSyncJobsB,omitempty"`
 	DrainInitiatedBy *int64       `json:"drainInitiatedBy,omitempty"`
@@ -345,9 +345,9 @@ type Volume struct {
 	Region                  Ref                    `json:"region"`
 	MetadataCluster         Ref                    `json:"metadataCluster,omitempty"`
 	Name                    string                 `json:"name"`
-	Description             string                 `json:"description,omitempty"`
+	Description             *string                `json:"description,omitempty"`
 	VolumeType              string                 `json:"volumeType"`
-	StorageType             string                 `json:"storageType,omitempty"`
+	StorageType             *string                `json:"storageType,omitempty"`
 	Encryption              bool                   `json:"encryption"`
 	QuotaLimit              int64                  `json:"quotaLimit"`
 	LiveVolume              int64                  `json:"liveVolume"`
@@ -370,19 +370,19 @@ type VolumeBlockPlacementConfig struct {
 	ID                 int64    `json:"id"`
 	TargetCopysetCount int32    `json:"targetCopysetCount"`
 	CurrentEpoch       int64    `json:"currentEpoch"`
-	CopysetIds         []string `json:"copysetIds"`
+	CopysetIDs         []string `json:"copysetIds"`
 }
 
 type VolumeBlockPlacementResizeResult struct {
-	ID                 int64  `json:"id"`
-	TargetCopysetCount int32  `json:"targetCopysetCount"`
-	CopysetCountBefore int32  `json:"copysetCountBefore"`
-	CopysetsAdded      int32  `json:"copysetsAdded"`
-	CopysetsRemoved    int32  `json:"copysetsRemoved"`
-	CopysetCountAfter  int32  `json:"copysetCountAfter"`
-	Epoch              int64  `json:"epoch"`
-	Partial            bool   `json:"partial"`
-	Reason             string `json:"reason,omitempty"`
+	ID                 int64   `json:"id"`
+	TargetCopysetCount int32   `json:"targetCopysetCount"`
+	CopysetCountBefore int32   `json:"copysetCountBefore"`
+	CopysetsAdded      int32   `json:"copysetsAdded"`
+	CopysetsRemoved    int32   `json:"copysetsRemoved"`
+	CopysetCountAfter  int32   `json:"copysetCountAfter"`
+	Epoch              int64   `json:"epoch"`
+	Partial            bool    `json:"partial"`
+	Reason             *string `json:"reason,omitempty"`
 }
 
 type Fork struct {
@@ -420,7 +420,7 @@ type ForkEntryDetail struct {
 	Mtime      int64          `json:"mtime"`
 	Ctime      int64          `json:"ctime"`
 	Generation int64          `json:"generation"`
-	Owner      string         `json:"owner,omitempty"`
+	Owner      *string        `json:"owner,omitempty"`
 	Mode       *int32         `json:"mode,omitempty"`
 	Xattrs     map[string]any `json:"xattrs,omitempty"`
 	CreatorID  *int64         `json:"creatorId,omitempty"`
@@ -428,11 +428,11 @@ type ForkEntryDetail struct {
 }
 
 type ForkEntryVersion struct {
-	Generation  int64  `json:"generation"`
-	Size        int64  `json:"size"`
-	Mtime       int64  `json:"mtime"`
-	UpdaterID   *int64 `json:"updaterId,omitempty"`
-	ContentHash string `json:"contentHash,omitempty"`
+	Generation  int64   `json:"generation"`
+	Size        int64   `json:"size"`
+	Mtime       int64   `json:"mtime"`
+	UpdaterID   *int64  `json:"updaterId,omitempty"`
+	ContentHash *string `json:"contentHash,omitempty"`
 }
 
 type ForkTreeMatch struct {
@@ -446,17 +446,17 @@ type ForkTreeMatch struct {
 type AuditLog struct {
 	ID                int64           `json:"id"`
 	Title             string          `json:"title"`
-	Description       string          `json:"description,omitempty"`
-	Subject           string          `json:"subject,omitempty"`
+	Description       *string         `json:"description,omitempty"`
+	Subject           *string         `json:"subject,omitempty"`
 	Success           bool            `json:"success"`
 	Data              json.RawMessage `json:"data,omitempty"`
-	CreatedBy         string          `json:"createdBy,omitempty"`
-	Node              string          `json:"node,omitempty"`
+	CreatedBy         *string         `json:"createdBy,omitempty"`
+	Node              *string         `json:"node,omitempty"`
 	AccountID         *int64          `json:"accountId,omitempty"`
 	RegionID          *int64          `json:"regionId,omitempty"`
 	MetadataClusterID *int64          `json:"metadataClusterId,omitempty"`
-	CreatedAt         string          `json:"createdAt,omitempty"`
-	UpdatedAt         string          `json:"updatedAt,omitempty"`
+	CreatedAt         *string         `json:"createdAt,omitempty"`
+	UpdatedAt         *string         `json:"updatedAt,omitempty"`
 }
 
 type ServiceNode struct {
@@ -466,10 +466,10 @@ type ServiceNode struct {
 	ServiceType       string         `json:"serviceType"`
 	NodeID            string         `json:"nodeId"`
 	AdvertiseAddr     string         `json:"advertiseAddr"`
-	RpcAddr           string         `json:"rpcAddr,omitempty"`
+	RpcAddr           *string        `json:"rpcAddr,omitempty"`
 	Metadata          map[string]any `json:"metadata,omitempty"`
-	MetricsEndpoint   string         `json:"metricsEndpoint,omitempty"`
-	InstanceID        string         `json:"instanceId,omitempty"`
+	MetricsEndpoint   *string        `json:"metricsEndpoint,omitempty"`
+	InstanceID        *string        `json:"instanceId,omitempty"`
 	InstanceInfo      map[string]any `json:"instanceInfo,omitempty"`
 	Status            string         `json:"status"`
 	LastHeartbeat     *int64         `json:"lastHeartbeat,omitempty"`
@@ -488,13 +488,13 @@ type ClientSession struct {
 	User            Ref                 `json:"user,omitempty"`
 	ClientType      string              `json:"clientType"`
 	OsName          string              `json:"osName"`
-	OsVersion       string              `json:"osVersion,omitempty"`
-	AppVersion      string              `json:"appVersion,omitempty"`
-	Hostname        string              `json:"hostname,omitempty"`
+	OsVersion       *string             `json:"osVersion,omitempty"`
+	AppVersion      *string             `json:"appVersion,omitempty"`
+	Hostname        *string             `json:"hostname,omitempty"`
 	IPAddr          string              `json:"ipAddr"`
-	MountMode       string              `json:"mountMode,omitempty"`
-	MountPath       string              `json:"mountPath,omitempty"`
-	ForkName        string              `json:"forkName,omitempty"`
+	MountMode       *string             `json:"mountMode,omitempty"`
+	MountPath       *string             `json:"mountPath,omitempty"`
+	ForkName        *string             `json:"forkName,omitempty"`
 	IsTemporaryFork bool                `json:"isTemporaryFork"`
 	Metadata        json.RawMessage     `json:"metadata,omitempty"`
 	Metrics         json.RawMessage     `json:"metrics,omitempty"`
@@ -563,7 +563,7 @@ type LicenseDetails struct {
 	ExpiredAccessEndsAt   string        `json:"expiredAccessEndsAt"`
 	ExpiredAccessDaysLeft int           `json:"expiredAccessDaysLeft"`
 	Quota                 LicenseQuota  `json:"quota"`
-	Distribution          string        `json:"distribution,omitempty"`
+	Distribution          *string       `json:"distribution,omitempty"`
 	DistributionRef       []string      `json:"distributionRef,omitempty"`
 	UnlimitedStorage      *bool         `json:"unlimitedStorage,omitempty"`
 }
@@ -582,19 +582,19 @@ type LicenseList struct {
 }
 
 type ServiceAlert struct {
-	ID          int64  `json:"id"`
-	AlertID     string `json:"alertId"`
-	Source      string `json:"source"`
-	NodeID      string `json:"nodeId"`
-	Severity    int    `json:"severity"`
-	Category    string `json:"category"`
-	Title       string `json:"title"`
-	Description string `json:"description,omitempty"`
-	Region      Ref    `json:"region,omitempty"`
-	Account     Ref    `json:"account,omitempty"`
-	EventTime   string `json:"eventTime"`
-	ResolvedAt  string `json:"resolvedAt,omitempty"`
-	CreatedAt   string `json:"createdAt,omitempty"`
+	ID          int64   `json:"id"`
+	AlertID     string  `json:"alertId"`
+	Source      string  `json:"source"`
+	NodeID      string  `json:"nodeId"`
+	Severity    int     `json:"severity"`
+	Category    string  `json:"category"`
+	Title       string  `json:"title"`
+	Description *string `json:"description,omitempty"`
+	Region      Ref     `json:"region,omitempty"`
+	Account     Ref     `json:"account,omitempty"`
+	EventTime   string  `json:"eventTime"`
+	ResolvedAt  *string `json:"resolvedAt,omitempty"`
+	CreatedAt   *string `json:"createdAt,omitempty"`
 }
 
 type AlertCountResponse struct {
@@ -607,18 +607,18 @@ type AlertCountResponse struct {
 }
 
 type RegionAlert struct {
-	ID                int64  `json:"id"`
-	AlertID           string `json:"alertId"`
-	Source            string `json:"source"`
-	NodeID            string `json:"nodeId"`
-	MetadataClusterID *int64 `json:"metadataClusterId,omitempty"`
-	Severity          int    `json:"severity"`
-	Category          string `json:"category"`
-	Title             string `json:"title"`
-	Description       string `json:"description,omitempty"`
-	EventTime         string `json:"eventTime"`
-	ResolvedAt        string `json:"resolvedAt,omitempty"`
-	CreatedAt         string `json:"createdAt,omitempty"`
+	ID                int64   `json:"id"`
+	AlertID           string  `json:"alertId"`
+	Source            string  `json:"source"`
+	NodeID            string  `json:"nodeId"`
+	MetadataClusterID *int64  `json:"metadataClusterId,omitempty"`
+	Severity          int     `json:"severity"`
+	Category          string  `json:"category"`
+	Title             string  `json:"title"`
+	Description       *string `json:"description,omitempty"`
+	EventTime         string  `json:"eventTime"`
+	ResolvedAt        *string `json:"resolvedAt,omitempty"`
+	CreatedAt         *string `json:"createdAt,omitempty"`
 }
 
 type GCWorkerEvent struct {
@@ -627,11 +627,11 @@ type GCWorkerEvent struct {
 	MetadataClusterID *int64         `json:"metadataClusterId,omitempty"`
 	Goal              string         `json:"goal"`
 	Sid               *int64         `json:"sid,omitempty"`
-	Subject           string         `json:"subject,omitempty"`
+	Subject           *string        `json:"subject,omitempty"`
 	Ops               map[string]any `json:"ops"`
 	DurationMs        int64          `json:"durationMs"`
 	EventTime         string         `json:"eventTime"`
-	CreatedAt         string         `json:"createdAt,omitempty"`
+	CreatedAt         *string        `json:"createdAt,omitempty"`
 }
 
 type GCWorkerEventHistogramResponse struct {
@@ -648,8 +648,8 @@ type BackfillFailure struct {
 }
 
 type BlockMember struct {
-	Name            string `json:"name,omitempty"`
-	RegionClusterID int64  `json:"regionClusterId"`
+	Name            *string `json:"name,omitempty"`
+	RegionClusterID int64   `json:"regionClusterId"`
 }
 
 type CompatibleStorage struct {
@@ -667,15 +667,15 @@ type CompatibleVolume struct {
 }
 
 type DashboardUser struct {
-	ID        string `json:"id"`
-	Name      string `json:"name"`
-	Email     string `json:"email,omitempty"`
-	Role      string `json:"role"`
-	Username  string `json:"username,omitempty"`
-	AccountID *int64 `json:"accountId,omitempty"`
-	UserID    *int64 `json:"userId,omitempty"`
-	VolumeID  *int64 `json:"volumeId,omitempty"`
-	Exp       *int64 `json:"exp,omitempty"`
+	ID        string  `json:"id"`
+	Name      string  `json:"name"`
+	Email     *string `json:"email,omitempty"`
+	Role      string  `json:"role"`
+	Username  *string `json:"username,omitempty"`
+	AccountID *int64  `json:"accountId,omitempty"`
+	UserID    *int64  `json:"userId,omitempty"`
+	VolumeID  *int64  `json:"volumeId,omitempty"`
+	Exp       *int64  `json:"exp,omitempty"`
 }
 
 type DiscoverEndpoint struct {
@@ -781,16 +781,16 @@ type UserLite struct {
 }
 
 type VolumeApiKey struct {
-	APIKey     string `json:"apiKey"`
-	Name       string `json:"name,omitempty"`
-	CreatedAt  string `json:"createdAt,omitempty"`
-	LastUsedAt string `json:"lastUsedAt,omitempty"`
+	APIKey     string  `json:"apiKey"`
+	Name       *string `json:"name,omitempty"`
+	CreatedAt  *string `json:"createdAt,omitempty"`
+	LastUsedAt *string `json:"lastUsedAt,omitempty"`
 }
 
 type VolumeRef struct {
-	ID   int64  `json:"id"`
-	Name string `json:"name"`
-	Type string `json:"type,omitempty"`
+	ID   int64   `json:"id"`
+	Name string  `json:"name"`
+	Type *string `json:"type,omitempty"`
 }
 
 type VolumeRetentionPolicy struct {
@@ -816,15 +816,15 @@ type VolumeVersioningPolicy struct {
 
 type CreateAccountRequest struct {
 	Name         string         `json:"name"`
-	Description  string         `json:"description,omitempty"`
-	IconURL      string         `json:"iconUrl,omitempty"`
+	Description  *string        `json:"description,omitempty"`
+	IconURL      *string        `json:"iconUrl,omitempty"`
 	ProviderInfo map[string]any `json:"providerInfo,omitempty"`
 }
 
 type EditAccountRequest struct {
 	Name         string          `json:"name"`
-	Description  string          `json:"description,omitempty"`
-	IconURL      string          `json:"iconUrl,omitempty"`
+	Description  *string         `json:"description,omitempty"`
+	IconURL      *string         `json:"iconUrl,omitempty"`
 	ProviderInfo map[string]any  `json:"providerInfo,omitempty"`
 	Retention    RetentionPolicy `json:"retention,omitempty"`
 }
@@ -846,12 +846,12 @@ type AddUserRequest struct {
 	AccountID    int64          `json:"accountId"`
 	Username     string         `json:"username"`
 	Email        string         `json:"email"`
-	Name         string         `json:"name,omitempty"`
+	Name         *string        `json:"name,omitempty"`
 	ProviderInfo map[string]any `json:"providerInfo,omitempty"`
 }
 
 type BulkUserRequest struct {
-	Ids []int64 `json:"ids"`
+	IDs []int64 `json:"ids"`
 }
 
 type BulkUserResponse struct {
@@ -861,7 +861,7 @@ type BulkUserResponse struct {
 type EditUserRequest struct {
 	Username     string         `json:"username"`
 	Email        string         `json:"email"`
-	Name         string         `json:"name,omitempty"`
+	Name         *string        `json:"name,omitempty"`
 	ProviderInfo map[string]any `json:"providerInfo,omitempty"`
 }
 
@@ -933,41 +933,41 @@ type CreateStorageRequest struct {
 	AccountID    int64         `json:"accountId"`
 	RegionID     int64         `json:"regionId"`
 	Name         string        `json:"name"`
-	Description  string        `json:"description,omitempty"`
+	Description  *string       `json:"description,omitempty"`
 	StorageType  string        `json:"storageType"`
 	ProviderType string        `json:"providerType"`
 	Endpoint     string        `json:"endpoint"`
-	Region       string        `json:"region,omitempty"`
-	Bucket       string        `json:"bucket,omitempty"`
-	Base         string        `json:"base,omitempty"`
-	BlockRegion  string        `json:"blockRegion,omitempty"`
+	Region       *string       `json:"region,omitempty"`
+	Bucket       *string       `json:"bucket,omitempty"`
+	Base         *string       `json:"base,omitempty"`
+	BlockRegion  *string       `json:"blockRegion,omitempty"`
 	BlockSize    *int32        `json:"blockSize,omitempty"`
 	Members      []BlockMember `json:"members,omitempty"`
-	AccessKey    string        `json:"accessKey,omitempty"`
-	SecretKey    string        `json:"secretKey,omitempty"`
+	AccessKey    *string       `json:"accessKey,omitempty"`
+	SecretKey    *string       `json:"secretKey,omitempty"`
 }
 
 type CreateStorageResponse struct {
 	ID             int64    `json:"id"`
-	BlockVolumeIds []string `json:"blockVolumeIds,omitempty"`
+	BlockVolumeIDs []string `json:"blockVolumeIds,omitempty"`
 }
 
 type EditStorageRequest struct {
-	Name         string `json:"name"`
-	Description  string `json:"description,omitempty"`
-	Endpoint     string `json:"endpoint,omitempty"`
-	AccessKey    string `json:"accessKey,omitempty"`
-	SecretKey    string `json:"secretKey,omitempty"`
-	DirectAccess *bool  `json:"directAccess,omitempty"`
+	Name         string  `json:"name"`
+	Description  *string `json:"description,omitempty"`
+	Endpoint     *string `json:"endpoint,omitempty"`
+	AccessKey    *string `json:"accessKey,omitempty"`
+	SecretKey    *string `json:"secretKey,omitempty"`
+	DirectAccess *bool   `json:"directAccess,omitempty"`
 }
 
 type TestStorageNewBucketRequest struct {
-	Endpoint     string `json:"endpoint"`
-	Region       string `json:"region,omitempty"`
-	Bucket       string `json:"bucket"`
-	AccessKey    string `json:"accessKey"`
-	SecretKey    string `json:"secretKey"`
-	ProviderType string `json:"providerType,omitempty"`
+	Endpoint     string  `json:"endpoint"`
+	Region       *string `json:"region,omitempty"`
+	Bucket       string  `json:"bucket"`
+	AccessKey    string  `json:"accessKey"`
+	SecretKey    string  `json:"secretKey"`
+	ProviderType *string `json:"providerType,omitempty"`
 }
 
 type TestNewBucketStorageResponse struct {
@@ -993,7 +993,7 @@ type ListCompatibleStorageResponse struct {
 }
 
 type MoveStorageVolumesRequest struct {
-	VolumeIds []string `json:"volumeIds"`
+	VolumeIDs []string `json:"volumeIds"`
 }
 
 type MoveVolumesStorageResponse struct {
@@ -1027,8 +1027,8 @@ type UpdateStorageTagsRequest struct {
 }
 
 type RegisterStorageMemberRequest struct {
-	RegionClusterID int64  `json:"regionClusterId"`
-	Name            string `json:"name,omitempty"`
+	RegionClusterID int64   `json:"regionClusterId"`
+	Name            *string `json:"name,omitempty"`
 }
 
 type RemoveMemberStorageResponse struct {
@@ -1060,33 +1060,33 @@ type CreateVolumeRequest struct {
 	AccountID           int64                  `json:"accountId"`
 	StorageID           int64                  `json:"storageId"`
 	Name                string                 `json:"name"`
-	Description         string                 `json:"description,omitempty"`
+	Description         *string                `json:"description,omitempty"`
 	VolumeType          string                 `json:"volumeType"`
 	Encryption          *bool                  `json:"encryption,omitempty"`
-	EncryptionKey       string                 `json:"encryptionKey,omitempty"`
+	EncryptionKey       *string                `json:"encryptionKey,omitempty"`
 	Retention           VolumeRetentionPolicy  `json:"retention,omitempty"`
 	Versioning          VolumeVersioningPolicy `json:"versioning,omitempty"`
-	Compaction          string                 `json:"compaction,omitempty"`
+	Compaction          *string                `json:"compaction,omitempty"`
 	QuotaLimit          *int64                 `json:"quotaLimit,omitempty"`
 	MetadataClusterID   *int64                 `json:"metadataClusterId,omitempty"`
-	MetadataClusterUUID string                 `json:"metadataClusterUuid,omitempty"`
+	MetadataClusterUUID *string                `json:"metadataClusterUuid,omitempty"`
 }
 
 type CreateVolumeResponse struct {
-	ID            int64  `json:"id"`
-	EncryptionKey string `json:"encryptionKey,omitempty"`
+	ID            int64   `json:"id"`
+	EncryptionKey *string `json:"encryptionKey,omitempty"`
 }
 
 type EditVolumeRequest struct {
-	Description string                 `json:"description,omitempty"`
+	Description *string                `json:"description,omitempty"`
 	Retention   VolumeRetentionPolicy  `json:"retention,omitempty"`
 	Versioning  VolumeVersioningPolicy `json:"versioning,omitempty"`
-	Compaction  string                 `json:"compaction,omitempty"`
+	Compaction  *string                `json:"compaction,omitempty"`
 }
 
 type MoveVolumeClusterRequest struct {
-	TargetClusterID   *int64 `json:"targetClusterId,omitempty"`
-	TargetClusterUUID string `json:"targetClusterUuid,omitempty"`
+	TargetClusterID   *int64  `json:"targetClusterId,omitempty"`
+	TargetClusterUUID *string `json:"targetClusterUuid,omitempty"`
 }
 
 type MoveClusterVolumeResponse struct {
@@ -1103,8 +1103,8 @@ type DeactivateVolumeRequest struct {
 }
 
 type GenerateVolumeAPIKeysRequest struct {
-	UserID int64  `json:"userId"`
-	Name   string `json:"name,omitempty"`
+	UserID int64   `json:"userId"`
+	Name   *string `json:"name,omitempty"`
 }
 
 type GenerateAPIKeysVolumeResponse struct {
@@ -1157,15 +1157,15 @@ type SizeHistoryVolumeResponse struct {
 }
 
 type CreateVolumeForkRequest struct {
-	Name       string `json:"name"`
-	ParentName string `json:"parentName,omitempty"`
-	AsOf       *int64 `json:"asOf,omitempty"`
-	VolumeType string `json:"volumeType,omitempty"`
+	Name       string  `json:"name"`
+	ParentName *string `json:"parentName,omitempty"`
+	AsOf       *int64  `json:"asOf,omitempty"`
+	VolumeType *string `json:"volumeType,omitempty"`
 }
 
 type DeleteVolumeForkRequest struct {
-	Force      *bool  `json:"force,omitempty"`
-	VolumeType string `json:"volumeType,omitempty"`
+	Force      *bool   `json:"force,omitempty"`
+	VolumeType *string `json:"volumeType,omitempty"`
 }
 
 type DeleteForkVolumeResponse struct {
@@ -1173,7 +1173,7 @@ type DeleteForkVolumeResponse struct {
 }
 
 type RestoreVolumeForkRequest struct {
-	VolumeType string `json:"volumeType,omitempty"`
+	VolumeType *string `json:"volumeType,omitempty"`
 }
 
 type VolumeListOptions struct {
