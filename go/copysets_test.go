@@ -179,34 +179,34 @@ func TestReactivateMemberSendsPost(t *testing.T) {
 	}
 }
 
-func TestRegisterCopysetExplicitNames(t *testing.T) {
+func TestRegisterCopysetExplicitName(t *testing.T) {
 	fs, srv := newFixtureServer(t, map[string]any{
 		"POST /api/v1/storages/7/copysets": map[string]any{
-			"id": "p5", "storageId": "s1", "state": "active", "memberA": "bv5", "memberB": "bv6",
+			"id": "p5", "storageId": "s1", "name": "mos-block-a", "state": "active", "memberA": "bv5", "memberB": "bv6",
 		},
 	})
 	defer srv.Close()
 	c := newTestClient(t, srv.URL)
 
-	res, err := c.Storages.RegisterCopyset(context.Background(), 7, &sdk.RegisterStorageCopysetRequest{NameA: strPtr("mos-block-a"), NameB: strPtr("mos-block-b")})
+	res, err := c.Storages.RegisterCopyset(context.Background(), 7, &sdk.RegisterStorageCopysetRequest{Name: strPtr("mos-block-a")})
 	if err != nil {
 		t.Fatalf("RegisterCopyset: %v", err)
 	}
-	if res.MemberA == nil || *res.MemberA != "bv5" || res.MemberB == nil || *res.MemberB != "bv6" {
+	if res.Name != "mos-block-a" || res.MemberA == nil || *res.MemberA != "bv5" || res.MemberB == nil || *res.MemberB != "bv6" {
 		t.Fatalf("unexpected copyset: %+v", res)
 	}
-	if got := fs.calls[0].body["nameA"]; got != "mos-block-a" {
-		t.Fatalf("expected nameA in request body, got %+v", fs.calls[0].body)
+	if got := fs.calls[0].body["name"]; got != "mos-block-a" {
+		t.Fatalf("expected name in request body, got %+v", fs.calls[0].body)
 	}
 }
 
-// TestRegisterCopysetOmittedNames confirms both names are optional on the
-// wire: an omitted Name never sends its key at all (omitempty), letting the
-// server auto-fill it for that slot.
-func TestRegisterCopysetOmittedNames(t *testing.T) {
+// TestRegisterCopysetOmittedName confirms name is optional on the wire: an
+// omitted Name never sends its key at all (omitempty), letting the server
+// auto-fill it - and both members derive from whatever it picks.
+func TestRegisterCopysetOmittedName(t *testing.T) {
 	fs, srv := newFixtureServer(t, map[string]any{
 		"POST /api/v1/storages/7/copysets": map[string]any{
-			"id": "p6", "storageId": "s1", "state": "active", "memberA": "bv7", "memberB": "bv8",
+			"id": "p6", "storageId": "s1", "name": "riveted-truss-4f2a", "state": "active", "memberA": "bv7", "memberB": "bv8",
 		},
 	})
 	defer srv.Close()
@@ -216,33 +216,58 @@ func TestRegisterCopysetOmittedNames(t *testing.T) {
 	if err != nil {
 		t.Fatalf("RegisterCopyset: %v", err)
 	}
-	if _, ok := fs.calls[0].body["nameA"]; ok {
-		t.Fatalf("expected no nameA key in request body when omitted, got %+v", fs.calls[0].body)
-	}
-	if _, ok := fs.calls[0].body["nameB"]; ok {
-		t.Fatalf("expected no nameB key in request body when omitted, got %+v", fs.calls[0].body)
+	if _, ok := fs.calls[0].body["name"]; ok {
+		t.Fatalf("expected no name key in request body when omitted, got %+v", fs.calls[0].body)
 	}
 }
 
-// TestAddCopysetMember covers the narrow vacant-slot replacement path,
-// distinct from registerCopyset's atomic two-member creation.
-func TestAddCopysetMember(t *testing.T) {
+// TestRegisterCopysetsBulk covers the count-only bulk path: no explicit
+// names, every copyset in the batch auto-generated server-side.
+func TestRegisterCopysetsBulk(t *testing.T) {
 	fs, srv := newFixtureServer(t, map[string]any{
-		"POST /api/v1/storages/7/copysets/p1/members": map[string]any{
-			"id": "bv9", "name": "replacement", "regionId": 1, "memberState": "active",
+		"POST /api/v1/storages/7/copysets/bulk": map[string]any{
+			"copysets": []map[string]any{
+				{"id": "p10", "storageId": "s1", "name": "riveted-truss-1a2b", "state": "active", "memberA": "bv10", "memberB": "bv11"},
+				{"id": "p11", "storageId": "s1", "name": "coupled-beam-3c4d", "state": "active", "memberA": "bv12", "memberB": "bv13"},
+			},
 		},
 	})
 	defer srv.Close()
 	c := newTestClient(t, srv.URL)
 
-	res, err := c.Storages.AddCopysetMember(context.Background(), 7, "p1", &sdk.AddStorageCopysetMemberRequest{Name: strPtr("replacement")})
+	res, err := c.Storages.RegisterCopysetsBulk(context.Background(), 7, &sdk.RegisterStorageCopysetsBulkRequest{Count: 2})
+	if err != nil {
+		t.Fatalf("RegisterCopysetsBulk: %v", err)
+	}
+	if len(res.Copysets) != 2 || res.Copysets[0].Name != "riveted-truss-1a2b" || res.Copysets[1].Name != "coupled-beam-3c4d" {
+		t.Fatalf("unexpected bulk result: %+v", res)
+	}
+	if got := fs.calls[0].body["count"]; got != float64(2) {
+		t.Fatalf("expected count=2 in request body, got %+v", fs.calls[0].body)
+	}
+}
+
+// TestAddCopysetMember covers the narrow vacant-slot replacement path,
+// distinct from registerCopyset's atomic two-member creation. Takes no
+// request body - the new member's name is always derived server-side from
+// the copyset's own name.
+func TestAddCopysetMember(t *testing.T) {
+	fs, srv := newFixtureServer(t, map[string]any{
+		"POST /api/v1/storages/7/copysets/p1/members": map[string]any{
+			"id": "bv9", "name": "mos-block-a-b", "regionId": 1, "memberState": "active",
+		},
+	})
+	defer srv.Close()
+	c := newTestClient(t, srv.URL)
+
+	res, err := c.Storages.AddCopysetMember(context.Background(), 7, "p1")
 	if err != nil {
 		t.Fatalf("AddCopysetMember: %v", err)
 	}
-	if res.Name != "replacement" {
+	if res.Name != "mos-block-a-b" {
 		t.Fatalf("unexpected member: %+v", res)
 	}
-	if got := fs.calls[0].body["name"]; got != "replacement" {
-		t.Fatalf("expected name in request body, got %+v", fs.calls[0].body)
+	if fs.calls[0].body != nil {
+		t.Fatalf("expected no request body, got %+v", fs.calls[0].body)
 	}
 }

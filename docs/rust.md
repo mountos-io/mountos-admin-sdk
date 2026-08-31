@@ -261,6 +261,7 @@ pub struct CompatibleVolume {
 pub struct Copyset {
     pub id: String,
     pub storage_id: String,
+    pub name: String,
     pub state: CopysetState,
     pub member_a: Option<String>,
     pub member_b: Option<String>,
@@ -1524,23 +1525,36 @@ Request body:
 
 ```rust
 pub struct RegisterStorageCopysetRequest {
-    pub name_a: Option<String>,
-    pub name_b: Option<String>,
+    pub name: Option<String>,
+}
+```
+
+#### `register_copysets_bulk` - POST /api/v1/storages/:storageId/copysets/bulk
+
+```rust
+pub async fn register_copysets_bulk(&self, storage_id: i64, req: &RegisterStorageCopysetsBulkRequest) -> Result<RegisterCopysetsBulkStorageResponse, Error>
+```
+
+Request body:
+
+```rust
+pub struct RegisterStorageCopysetsBulkRequest {
+    pub count: i32,
+}
+```
+
+Response body:
+
+```rust
+pub struct RegisterCopysetsBulkStorageResponse {
+    pub copysets: Vec<Copyset>,
 }
 ```
 
 #### `add_copyset_member` - POST /api/v1/storages/:storageId/copysets/:copysetId/members
 
 ```rust
-pub async fn add_copyset_member(&self, storage_id: i64, copyset_id: &str, req: &AddStorageCopysetMemberRequest) -> Result<PoolMember, Error>
-```
-
-Request body:
-
-```rust
-pub struct AddStorageCopysetMemberRequest {
-    pub name: Option<String>,
-}
+pub async fn add_copyset_member(&self, storage_id: i64, copyset_id: &str) -> Result<PoolMember, Error>
 ```
 
 #### `reactivate_member` - POST /api/v1/storages/:storageId/members/:blockVolumeId/reactivate

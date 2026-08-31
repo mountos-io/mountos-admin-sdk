@@ -474,6 +474,7 @@ pub struct Copyset {
     pub id: String,
     #[serde(rename = "storageId")]
     pub storage_id: String,
+    pub name: String,
     pub state: CopysetState,
     #[serde(rename = "memberA", skip_serializing_if = "Option::is_none")]
     pub member_a: Option<String>,
@@ -1506,16 +1507,18 @@ pub struct UpdateStorageTagsRequest {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct RegisterStorageCopysetRequest {
-    #[serde(rename = "nameA", skip_serializing_if = "Option::is_none")]
-    pub name_a: Option<String>,
-    #[serde(rename = "nameB", skip_serializing_if = "Option::is_none")]
-    pub name_b: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize)]
-pub struct AddStorageCopysetMemberRequest {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub name: Option<String>,
+pub struct RegisterStorageCopysetsBulkRequest {
+    pub count: i32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RegisterCopysetsBulkStorageResponse {
+    pub copysets: Vec<Copyset>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

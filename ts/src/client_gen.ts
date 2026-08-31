@@ -10,7 +10,7 @@ import type {
   CreateStorageRequest, Storage, StorageListOptions, BlockVolume, EditStorageRequest, 
   TestStorageNewBucketRequest, CompatibleStorage, MoveStorageVolumesRequest, 
   MoveVolumeFailure, Copyset, UpdateStorageTagsRequest, RegisterStorageCopysetRequest, 
-  AddStorageCopysetMemberRequest, PoolMember, BackfillFailure, CreateVolumeRequest, 
+  RegisterStorageCopysetsBulkRequest, PoolMember, BackfillFailure, CreateVolumeRequest, 
   VolumeRetentionPolicy, VolumeVersioningPolicy, Volume, VolumeListOptions, 
   EditVolumeRequest, MoveVolumeClusterRequest, DeactivateVolumeRequest, 
   GenerateVolumeAPIKeysRequest, VolumeApiKey, RevokeVolumeAPIKeyRequest, 
@@ -311,8 +311,12 @@ export class StoragesResource {
     return this.client.request('POST', `/api/v1/storages/${storageId}/copysets`, req, signal)
   }
 
-  addCopysetMember(storageId: number, copysetId: string, req: AddStorageCopysetMemberRequest, signal?: AbortSignal): Promise<PoolMember> {
-    return this.client.request('POST', `/api/v1/storages/${storageId}/copysets/${encodeURIComponent(copysetId)}/members`, req, signal)
+  registerCopysetsBulk(storageId: number, req: RegisterStorageCopysetsBulkRequest, signal?: AbortSignal): Promise<{ copysets: Copyset[] }> {
+    return this.client.request('POST', `/api/v1/storages/${storageId}/copysets/bulk`, req, signal)
+  }
+
+  addCopysetMember(storageId: number, copysetId: string, signal?: AbortSignal): Promise<PoolMember> {
+    return this.client.request('POST', `/api/v1/storages/${storageId}/copysets/${encodeURIComponent(copysetId)}/members`, undefined, signal)
   }
 
   reactivateMember(storageId: number, blockVolumeId: string, signal?: AbortSignal): Promise<PoolMember> {

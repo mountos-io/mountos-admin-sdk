@@ -131,6 +131,7 @@ export interface BlockVolume {
 export interface Copyset {
   id: string
   storageId: string
+  name: string
   state: CopysetState
   memberA?: string
   memberB?: string
@@ -761,12 +762,11 @@ export interface UpdateStorageTagsRequest {
 }
 
 export interface RegisterStorageCopysetRequest {
-  nameA?: string
-  nameB?: string
+  name?: string
 }
 
-export interface AddStorageCopysetMemberRequest {
-  name?: string
+export interface RegisterStorageCopysetsBulkRequest {
+  count: number
 }
 
 export interface StorageListOptions extends ListOptions {

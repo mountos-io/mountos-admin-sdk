@@ -217,6 +217,7 @@ interface CompatibleVolume {
 interface Copyset {
   id: string;
   storageId: string;
+  name: string;
   state: CopysetState;
   memberA?: string;
   memberB?: string;
@@ -1411,23 +1412,28 @@ Request body:
 
 ```typescript
 {
-  nameA?: string;
-  nameB?: string;
+  name?: string;
 }
 ```
 
-#### `addCopysetMember` - POST /api/v1/storages/:storageId/copysets/:copysetId/members
+#### `registerCopysetsBulk` - POST /api/v1/storages/:storageId/copysets/bulk
 
 ```typescript
-client.storages.addCopysetMember(storageId: number, copysetId: string, req: AddStorageCopysetMemberRequest, signal?: AbortSignal): Promise<PoolMember>;
+client.storages.registerCopysetsBulk(storageId: number, req: RegisterStorageCopysetsBulkRequest, signal?: AbortSignal): Promise<{ copysets: Copyset[] }>;
 ```
 
 Request body:
 
 ```typescript
 {
-  name?: string;
+  count: number;
 }
+```
+
+#### `addCopysetMember` - POST /api/v1/storages/:storageId/copysets/:copysetId/members
+
+```typescript
+client.storages.addCopysetMember(storageId: number, copysetId: string, signal?: AbortSignal): Promise<PoolMember>;
 ```
 
 #### `reactivateMember` - POST /api/v1/storages/:storageId/members/:blockVolumeId/reactivate

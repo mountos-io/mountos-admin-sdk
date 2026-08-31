@@ -279,6 +279,7 @@ type CompatibleVolume struct {
 type Copyset struct {
     ID                       string                   `json:"id"`
     StorageID                string                   `json:"storageId"`
+    Name                     string                   `json:"name"`
     State                    CopysetState             `json:"state"`
     MemberA                  *string                  `json:"memberA,omitempty"`
     MemberB                  *string                  `json:"memberB,omitempty"`
@@ -1542,23 +1543,36 @@ Request body:
 
 ```go
 type RegisterStorageCopysetRequest struct {
-    NameA                    *string                  `json:"nameA,omitempty"`
-    NameB                    *string                  `json:"nameB,omitempty"`
+    Name                     *string                  `json:"name,omitempty"`
+}
+```
+
+#### `RegisterCopysetsBulk` - POST /api/v1/storages/:storageId/copysets/bulk
+
+```go
+func (s *StoragesService) RegisterCopysetsBulk(ctx context.Context, storageID int64, req *RegisterStorageCopysetsBulkRequest) (*RegisterCopysetsBulkStorageResponse, error)
+```
+
+Request body:
+
+```go
+type RegisterStorageCopysetsBulkRequest struct {
+    Count                    int32                    `json:"count"`
+}
+```
+
+Response body:
+
+```go
+type RegisterCopysetsBulkStorageResponse struct {
+    Copysets                 []Copyset                `json:"copysets"`
 }
 ```
 
 #### `AddCopysetMember` - POST /api/v1/storages/:storageId/copysets/:copysetId/members
 
 ```go
-func (s *StoragesService) AddCopysetMember(ctx context.Context, storageID int64, copysetID string, req *AddStorageCopysetMemberRequest) (*PoolMember, error)
-```
-
-Request body:
-
-```go
-type AddStorageCopysetMemberRequest struct {
-    Name                     *string                  `json:"name,omitempty"`
-}
+func (s *StoragesService) AddCopysetMember(ctx context.Context, storageID int64, copysetID string) (*PoolMember, error)
 ```
 
 #### `ReactivateMember` - POST /api/v1/storages/:storageId/members/:blockVolumeId/reactivate

@@ -459,8 +459,16 @@ func (s *StoragesService) RegisterCopyset(ctx context.Context, storageID int64, 
 	return decodeJSON[Copyset](data)
 }
 
-func (s *StoragesService) AddCopysetMember(ctx context.Context, storageID int64, copysetID string, req *AddStorageCopysetMemberRequest) (*PoolMember, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/copysets/%s/members", strconv.FormatInt(storageID, 10), url.PathEscape(copysetID)), req)
+func (s *StoragesService) RegisterCopysetsBulk(ctx context.Context, storageID int64, req *RegisterStorageCopysetsBulkRequest) (*RegisterCopysetsBulkStorageResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/copysets/bulk", strconv.FormatInt(storageID, 10)), req)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[RegisterCopysetsBulkStorageResponse](data)
+}
+
+func (s *StoragesService) AddCopysetMember(ctx context.Context, storageID int64, copysetID string) (*PoolMember, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/copysets/%s/members", strconv.FormatInt(storageID, 10), url.PathEscape(copysetID)), nil)
 	if err != nil {
 		return nil, err
 	}

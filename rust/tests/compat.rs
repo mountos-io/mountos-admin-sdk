@@ -87,7 +87,7 @@ fn test_client(base_url: String) -> Client {
 #[tokio::test]
 async fn list_pairs_is_an_alias_for_list_copysets() {
     let (base_url, handle) = fixture_server(serde_json::json!([
-        {"id": "p1", "storageId": "s1", "state": "active", "tags": []},
+        {"id": "p1", "storageId": "s1", "name": "mos-block-a", "state": "active", "tags": []},
     ]));
     let client = test_client(base_url);
 

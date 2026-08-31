@@ -301,6 +301,7 @@ type BlockVolume struct {
 type Copyset struct {
 	ID               string       `json:"id"`
 	StorageID        string       `json:"storageId"`
+	Name             string       `json:"name"`
 	State            CopysetState `json:"state"`
 	MemberA          *string      `json:"memberA,omitempty"`
 	MemberB          *string      `json:"memberB,omitempty"`
@@ -987,12 +988,15 @@ type UpdateStorageTagsRequest struct {
 }
 
 type RegisterStorageCopysetRequest struct {
-	NameA *string `json:"nameA,omitempty"`
-	NameB *string `json:"nameB,omitempty"`
+	Name *string `json:"name,omitempty"`
 }
 
-type AddStorageCopysetMemberRequest struct {
-	Name *string `json:"name,omitempty"`
+type RegisterStorageCopysetsBulkRequest struct {
+	Count int32 `json:"count"`
+}
+
+type RegisterCopysetsBulkStorageResponse struct {
+	Copysets []Copyset `json:"copysets"`
 }
 
 type RemoveMemberStorageResponse struct {

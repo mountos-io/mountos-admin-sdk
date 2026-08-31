@@ -11,7 +11,7 @@
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
 use mountos_admin_sdk::{
-    AddStorageCopysetMemberRequest, Client, Config, CopysetState, RegisterStorageCopysetRequest,
+    Client, Config, CopysetState, RegisterStorageCopysetRequest, RegisterStorageCopysetsBulkRequest,
 };
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
@@ -105,8 +105,8 @@ fn test_client(base_url: String) -> Client {
 #[tokio::test]
 async fn list_copysets_full_state_per_copyset() {
     let (base_url, handle) = fixture_server(serde_json::json!([
-        {"id": "p1", "storageId": "s1", "state": "active", "memberA": "bv1", "memberB": "bv2", "tags": []},
-        {"id": "p2", "storageId": "s1", "state": "draining", "memberA": "bv3", "memberB": "bv4", "pendingSyncJobsA": 3, "pendingSyncJobsB": 0, "tags": ["east"]},
+        {"id": "p1", "storageId": "s1", "name": "mos-block-a", "state": "active", "memberA": "bv1", "memberB": "bv2", "tags": []},
+        {"id": "p2", "storageId": "s1", "name": "mos-block-b", "state": "draining", "memberA": "bv3", "memberB": "bv4", "pendingSyncJobsA": 3, "pendingSyncJobsB": 0, "tags": ["east"]},
     ]));
     let client = test_client(base_url);
 
@@ -160,60 +160,78 @@ async fn reactivate_member_sends_post() {
 }
 
 #[tokio::test]
-async fn register_copyset_explicit_names() {
+async fn register_copyset_explicit_name() {
     let (base_url, handle) = fixture_server(serde_json::json!({
-        "id": "p5", "storageId": "s1", "state": "active", "memberA": "bv5", "memberB": "bv6", "tags": [],
+        "id": "p5", "storageId": "s1", "name": "mos-block-a", "state": "active", "memberA": "bv5", "memberB": "bv6", "tags": [],
     }));
     let client = test_client(base_url);
 
     let res = client
         .storages
-        .register_copyset(
-            7,
-            &RegisterStorageCopysetRequest { name_a: Some("mos-block-a".into()), name_b: Some("mos-block-b".into()) },
-        )
+        .register_copyset(7, &RegisterStorageCopysetRequest { name: Some("mos-block-a".into()) })
         .await
         .expect("register_copyset");
+    assert_eq!(res.name, "mos-block-a");
     assert_eq!(res.member_a.as_deref(), Some("bv5"));
     assert_eq!(res.member_b.as_deref(), Some("bv6"));
-    assert_eq!(handle.join().unwrap().body.unwrap()["nameA"], "mos-block-a");
+    assert_eq!(handle.join().unwrap().body.unwrap()["name"], "mos-block-a");
 }
 
-// Both names are optional on the wire: None must be dropped from the
-// request body entirely (never sent as `"nameA": null`), letting the server
-// auto-fill that slot.
+// name is optional on the wire: None must be dropped from the request body
+// entirely (never sent as `"name": null`), letting the server auto-fill it -
+// both members then derive from whatever it picks.
 #[tokio::test]
-async fn register_copyset_omitted_names() {
+async fn register_copyset_omitted_name() {
     let (base_url, handle) = fixture_server(serde_json::json!({
-        "id": "p6", "storageId": "s1", "state": "active", "memberA": "bv7", "memberB": "bv8", "tags": [],
+        "id": "p6", "storageId": "s1", "name": "riveted-truss-4f2a", "state": "active", "memberA": "bv7", "memberB": "bv8", "tags": [],
     }));
     let client = test_client(base_url);
 
     let res = client
         .storages
-        .register_copyset(7, &RegisterStorageCopysetRequest { name_a: None, name_b: None })
+        .register_copyset(7, &RegisterStorageCopysetRequest { name: None })
         .await
         .expect("register_copyset");
     assert_eq!(res.state, CopysetState::Active);
+    assert_eq!(res.name, "riveted-truss-4f2a");
     let body = handle.join().unwrap().body.unwrap();
-    assert!(body.get("nameA").is_none(), "expected no nameA key in request body when omitted, got {body:?}");
-    assert!(body.get("nameB").is_none(), "expected no nameB key in request body when omitted, got {body:?}");
+    assert!(body.get("name").is_none(), "expected no name key in request body when omitted, got {body:?}");
 }
 
 #[tokio::test]
-async fn add_copyset_member_replaces_vacant_slot() {
+async fn register_copysets_bulk_count_only() {
     let (base_url, handle) = fixture_server(serde_json::json!({
-        "id": "bv9", "name": "replacement", "regionId": 1, "memberState": "active",
+        "copysets": [
+            {"id": "p10", "storageId": "s1", "name": "riveted-truss-1a2b", "state": "active", "memberA": "bv10", "memberB": "bv11", "tags": []},
+            {"id": "p11", "storageId": "s1", "name": "coupled-beam-3c4d", "state": "active", "memberA": "bv12", "memberB": "bv13", "tags": []},
+        ],
     }));
     let client = test_client(base_url);
 
     let res = client
         .storages
-        .add_copyset_member(7, "p1", &AddStorageCopysetMemberRequest { name: Some("replacement".into()) })
+        .register_copysets_bulk(7, &RegisterStorageCopysetsBulkRequest { count: 2 })
         .await
-        .expect("add_copyset_member");
+        .expect("register_copysets_bulk");
+    assert_eq!(res.copysets.len(), 2);
+    assert_eq!(res.copysets[0].name, "riveted-truss-1a2b");
+    assert_eq!(res.copysets[1].name, "coupled-beam-3c4d");
+    assert_eq!(handle.join().unwrap().body.unwrap()["count"], 2);
+}
+
+// The new member's name is always derived server-side from the copyset's
+// own name, never operator-supplied: no request body to send.
+#[tokio::test]
+async fn add_copyset_member_replaces_vacant_slot() {
+    let (base_url, handle) = fixture_server(serde_json::json!({
+        "id": "bv9", "name": "mos-block-a-b", "regionId": 1, "memberState": "active",
+    }));
+    let client = test_client(base_url);
+
+    let res = client.storages.add_copyset_member(7, "p1").await.expect("add_copyset_member");
     assert_eq!(res.member_state, "active");
-    assert_eq!(handle.join().unwrap().body.unwrap()["name"], "replacement");
+    assert_eq!(res.name, "mos-block-a-b");
+    assert!(handle.join().unwrap().body.is_none(), "expected no request body");
 }
 
 // Regression coverage for the generator emitting crate::http::encode_segment
@@ -227,7 +245,7 @@ async fn add_copyset_member_replaces_vacant_slot() {
 async fn string_path_params_are_url_encoded() {
     let raw_copyset_id = "copyset/id with spaces/café";
     let (base_url, handle) = fixture_server(serde_json::json!({
-        "id": raw_copyset_id, "storageId": "s1", "state": "active", "tags": [],
+        "id": raw_copyset_id, "storageId": "s1", "name": "mos-block-a", "state": "active", "tags": [],
     }));
     let client = test_client(base_url);
 

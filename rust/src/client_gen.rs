@@ -376,8 +376,12 @@ impl StoragesService {
         self.inner.post(&format!("/api/v1/storages/{}/copysets", storage_id), req).await
     }
 
-    pub async fn add_copyset_member(&self, storage_id: i64, copyset_id: &str, req: &AddStorageCopysetMemberRequest) -> Result<PoolMember, Error> {
-        self.inner.post(&format!("/api/v1/storages/{}/copysets/{}/members", storage_id, crate::http::encode_segment(copyset_id)), req).await
+    pub async fn register_copysets_bulk(&self, storage_id: i64, req: &RegisterStorageCopysetsBulkRequest) -> Result<RegisterCopysetsBulkStorageResponse, Error> {
+        self.inner.post(&format!("/api/v1/storages/{}/copysets/bulk", storage_id), req).await
+    }
+
+    pub async fn add_copyset_member(&self, storage_id: i64, copyset_id: &str) -> Result<PoolMember, Error> {
+        self.inner.post_empty(&format!("/api/v1/storages/{}/copysets/{}/members", storage_id, crate::http::encode_segment(copyset_id))).await
     }
 
     pub async fn reactivate_member(&self, storage_id: i64, block_volume_id: &str) -> Result<PoolMember, Error> {

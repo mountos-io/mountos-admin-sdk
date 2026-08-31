@@ -80,36 +80,55 @@ test('reactivateMember: sends POST (regression guard for the responseType/no-req
   assert.equal(calls[0].method, 'POST')
 })
 
-test('registerCopyset: explicit names, both members immediately poolable', async () => {
+test('registerCopyset: explicit name, both members immediately poolable', async () => {
   const { client, calls } = fakeClient({
     'POST /api/v1/storages/7/copysets': {
-      id: 'p5', storageId: 's1', state: 'active', memberA: 'bv5', memberB: 'bv6',
+      id: 'p5', storageId: 's1', name: 'mos-block-a', state: 'active', memberA: 'bv5', memberB: 'bv6',
     },
   })
-  const res = await client.storages.registerCopyset(7, { nameA: 'mos-block-a', nameB: 'mos-block-b' })
+  const res = await client.storages.registerCopyset(7, { name: 'mos-block-a' })
+  assert.equal(res.name, 'mos-block-a')
   assert.equal(res.memberA, 'bv5')
   assert.equal(res.memberB, 'bv6')
-  assert.deepEqual(calls[0].body, { nameA: 'mos-block-a', nameB: 'mos-block-b' })
+  assert.deepEqual(calls[0].body, { name: 'mos-block-a' })
 })
 
-test('registerCopyset: omitted names auto-fill server-side for both slots', async () => {
+test('registerCopyset: omitted name auto-fills server-side, both members derive from it', async () => {
   const { client, calls } = fakeClient({
     'POST /api/v1/storages/7/copysets': {
-      id: 'p6', storageId: 's1', state: 'active', memberA: 'bv7', memberB: 'bv8',
+      id: 'p6', storageId: 's1', name: 'riveted-truss-4f2a', state: 'active', memberA: 'bv7', memberB: 'bv8',
     },
   })
   const res = await client.storages.registerCopyset(7, {})
   assert.equal(res.state, 'active')
+  assert.equal(res.name, 'riveted-truss-4f2a')
   assert.deepEqual(calls[0].body, {})
 })
 
-test('addCopysetMember: replaces a vacant slot on an existing copyset', async () => {
+test('registerCopysetsBulk: count-only, every copyset auto-named', async () => {
   const { client, calls } = fakeClient({
-    'POST /api/v1/storages/7/copysets/p1/members': {
-      id: 'bv9', name: 'replacement', regionId: 1, memberState: 'active',
+    'POST /api/v1/storages/7/copysets/bulk': {
+      copysets: [
+        { id: 'p10', storageId: 's1', name: 'riveted-truss-1a2b', state: 'active', memberA: 'bv10', memberB: 'bv11' },
+        { id: 'p11', storageId: 's1', name: 'coupled-beam-3c4d', state: 'active', memberA: 'bv12', memberB: 'bv13' },
+      ],
     },
   })
-  const res = await client.storages.addCopysetMember(7, 'p1', { name: 'replacement' })
+  const res = await client.storages.registerCopysetsBulk(7, { count: 2 })
+  assert.equal(res.copysets.length, 2)
+  assert.equal(res.copysets[0].name, 'riveted-truss-1a2b')
+  assert.equal(res.copysets[1].name, 'coupled-beam-3c4d')
+  assert.deepEqual(calls[0].body, { count: 2 })
+})
+
+test('addCopysetMember: replaces a vacant slot on an existing copyset, no request body', async () => {
+  const { client, calls } = fakeClient({
+    'POST /api/v1/storages/7/copysets/p1/members': {
+      id: 'bv9', name: 'mos-block-a-b', regionId: 1, memberState: 'active',
+    },
+  })
+  const res = await client.storages.addCopysetMember(7, 'p1')
   assert.equal(res.memberState, 'active')
-  assert.deepEqual(calls[0].body, { name: 'replacement' })
+  assert.equal(res.name, 'mos-block-a-b')
+  assert.equal(calls[0].body, undefined)
 })

@@ -430,6 +430,11 @@
           "required": false,
           "optional": true
         },
+        "name": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
         "pendingSyncJobsA": {
           "type": "int32",
           "required": false,

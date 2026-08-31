@@ -212,6 +212,10 @@ types:
   Copyset:
     - "id: string"
     - "storageId: string"
+    # Operator-facing label, set once at registration (explicit or auto-
+    # generated), never renamed. Both members' names are always derived
+    # from it (<name>-a / <name>-b).
+    - "name: string"
     - "state: CopysetState"
     - "memberA: string?" # BlockVolume.id
     - "memberB: string?" # BlockVolume.id
@@ -980,7 +984,8 @@ resources:
       blockVolumeId: string
     endpoints:
       # Block storage starts with zero members; populate it afterward via
-      # registerCopyset (each call creates one fully-formed pair).
+      # registerCopyset (one fully-formed pair) or registerCopysetsBulk
+      # (many pairs in one call, every name auto-generated).
       - action: create
         method: POST
         path: /create
@@ -1167,27 +1172,39 @@ resources:
 
       # Creates a brand-new copyset and both its members atomically. A
       # pairing is decided once, here, and never reshuffled afterward -
-      # there is no algorithmic re-pairing step. nameA/nameB are each
-      # optional: an omitted/empty value auto-fills server-side (an
-      # adjective-noun-hex label), never generated client-side.
+      # there is no algorithmic re-pairing step. name is optional: an
+      # omitted/empty value auto-fills server-side (an adjective-noun-hex
+      # label), never generated client-side. Both members' names are always
+      # derived from the copyset's own name (<name>-a / <name>-b), never set
+      # independently.
       - action: registerCopyset
         method: POST
         path: /:storageId/copysets
         request:
-          - "nameA: string?"
-          - "nameB: string?"
+          - "name: string?"
         responseType: Copyset
+
+      # Creates count brand-new copysets in one call, every name auto-
+      # generated - bulk registration takes no explicit names, unlike
+      # registerCopyset. count must be between 1 and 100; appserv is the
+      # authority on the bound.
+      - action: registerCopysetsBulk
+        method: POST
+        path: /:storageId/copysets/bulk
+        request:
+          - "count: int32!"
+        response:
+          - "copysets: Copyset[]"
 
       # Registers a single new member into an existing copyset's vacant slot
       # - the only case single-member registration is valid for (replacing a
       # permanently-removed member; reactivating a merely-detached member
       # uses reactivateMember instead). 409s if the copyset already has two
-      # members. name is optional, same auto-fill rule as registerCopyset.
+      # members. The new member's name is always derived from the copyset's
+      # own name, never operator-supplied - takes no request body.
       - action: addCopysetMember
         method: POST
         path: /:storageId/copysets/:copysetId/members
-        request:
-          - "name: string?"
         responseType: PoolMember
 
       # The ONLY way a 'detached' member becomes poolable again;
@@ -1400,8 +1417,9 @@ resources:
       # Per-volume block-placement copyset-count config: a volume's own target
       # copyset count, current epoch, and current candidate copyset set. This
       # is the volume's own working-set size within the storage's copyset
-      # fleet - a storage has no fleet-wide target of its own; each copyset
-      # is created explicitly, one registerCopyset call at a time.
+      # fleet - a storage has no fleet-wide target of its own; every copyset
+      # is created explicitly, via registerCopyset or registerCopysetsBulk,
+      # never algorithmically formed.
       # AuthZ: no adminOnly on either action - gated by
       # EnforceUserRoleVolumeAccess (routes_appserv.go), so both an admin
       # and the volume's own owning account may call it, mirroring

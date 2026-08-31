@@ -447,21 +447,24 @@ Param: `storageId`
 Request:
 ```
 {
-  "nameA"?: string,
-  "nameB"?: string
+  "name"?: string
 }
 ```
 Response data: `Copyset`
 
-### POST /api/v1/storages/:storageId/copysets/:copysetId/members
+### POST /api/v1/storages/:storageId/copysets/bulk
 Param: `storageId`
-Param: `copysetId`
 Request:
 ```
 {
-  "name"?: string
+  "count": int32(required)
 }
 ```
+Response data: `{ "copysets": Copyset[] }`
+
+### POST /api/v1/storages/:storageId/copysets/:copysetId/members
+Param: `storageId`
+Param: `copysetId`
 Response data: `PoolMember`
 
 ### POST /api/v1/storages/:storageId/members/:blockVolumeId/reactivate
@@ -1210,6 +1213,7 @@ Response data: `GCWorkerEventGoalsResponse`
 {
   "id": string,
   "storageId": string,
+  "name": string,
   "state": CopysetState,
   "memberA"?: string,
   "memberB"?: string,
