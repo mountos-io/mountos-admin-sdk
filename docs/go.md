@@ -907,7 +907,7 @@ type VolumeBlockPlacementConfig struct {
     ID                       int64                    `json:"id"`
     TargetCopysetCount       int32                    `json:"targetCopysetCount"`
     CurrentEpoch             int64                    `json:"currentEpoch"`
-    CopysetIds               []string                 `json:"copysetIds"`
+    CopysetIDs               []string                 `json:"copysetIds"`
 }
 ```
 
@@ -1120,7 +1120,7 @@ Request body:
 
 ```go
 type BulkUserRequest struct {
-    Ids                      []int64                  `json:"ids"`
+    IDs                      []int64                  `json:"ids"`
 }
 ```
 
@@ -1366,7 +1366,7 @@ Response body:
 ```go
 type CreateStorageResponse struct {
     ID                       int64                    `json:"id"`
-    BlockVolumeIds           []string                 `json:"blockVolumeIds,omitempty"`
+    BlockVolumeIDs           []string                 `json:"blockVolumeIds,omitempty"`
 }
 ```
 
@@ -1504,7 +1504,7 @@ Request body:
 
 ```go
 type MoveStorageVolumesRequest struct {
-    VolumeIds                []string                 `json:"volumeIds"`
+    VolumeIDs                []string                 `json:"volumeIds"`
 }
 ```
 
