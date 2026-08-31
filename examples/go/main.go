@@ -78,7 +78,6 @@ func main() {
   regionResp, err := client.Regions.Create(ctx, &sdk.CreateRegionRequest{
     AccountID: acct.ID,
     Name:      fmt.Sprintf("us-east-%d", acct.ID),
-    DNS:       fmt.Sprintf("us-east-%d.example.com", acct.ID),
   })
   if err != nil {
     log.Fatal("create region:", err)
