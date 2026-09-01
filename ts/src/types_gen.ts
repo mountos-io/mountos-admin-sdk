@@ -140,6 +140,8 @@ export interface Copyset {
   retiredAt?: string
   pendingSyncJobsA?: number
   pendingSyncJobsB?: number
+  pendingSyncJobsObservedAt?: string
+  volumeCount: number
   drainInitiatedBy?: number
   tags: string[]
 }

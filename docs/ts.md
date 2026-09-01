@@ -226,6 +226,8 @@ interface Copyset {
   retiredAt?: string;
   pendingSyncJobsA?: number;
   pendingSyncJobsB?: number;
+  pendingSyncJobsObservedAt?: string;
+  volumeCount: number;
   drainInitiatedBy?: number;
   tags: string[];
 }
@@ -1434,12 +1436,6 @@ Request body:
 
 ```typescript
 client.storages.addCopysetMember(storageId: number, copysetId: string, signal?: AbortSignal): Promise<PoolMember>;
-```
-
-#### `reactivateMember` - POST /api/v1/storages/:storageId/members/:blockVolumeId/reactivate
-
-```typescript
-client.storages.reactivateMember(storageId: number, blockVolumeId: string, signal?: AbortSignal): Promise<PoolMember>;
 ```
 
 #### `removeMember` - DELETE /api/v1/storages/:storageId/members/:blockVolumeId

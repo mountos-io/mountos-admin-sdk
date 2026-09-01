@@ -3,10 +3,11 @@
 //! single-request TCP fixture, no live appserv and no new dev-dependency
 //! (no mock-server crate available under `cargo --locked`). Covers the
 //! "accepted, not completed" response shapes (drainCopyset/cancelDrain) and
-//! regression-guards the reactivateMember GET-vs-POST generator bug (a
-//! no-request endpoint with a named responseType on a mutating method was
-//! silently generated as GET in all three SDK languages until fixed
-//! alongside this test).
+//! regression-guards the GET-vs-POST generator bug (a no-request endpoint
+//! with a named responseType on a mutating method was silently generated as
+//! GET in all three SDK languages until fixed) via
+//! add_copyset_member_replaces_vacant_slot, the surviving action with that
+//! same shape.
 
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
@@ -105,8 +106,8 @@ fn test_client(base_url: String) -> Client {
 #[tokio::test]
 async fn list_copysets_full_state_per_copyset() {
     let (base_url, handle) = fixture_server(serde_json::json!([
-        {"id": "p1", "storageId": "s1", "name": "mos-block-a", "state": "active", "memberA": "bv1", "memberB": "bv2", "tags": []},
-        {"id": "p2", "storageId": "s1", "name": "mos-block-b", "state": "draining", "memberA": "bv3", "memberB": "bv4", "pendingSyncJobsA": 3, "pendingSyncJobsB": 0, "tags": ["east"]},
+        {"id": "p1", "storageId": "s1", "name": "mos-block-a", "state": "active", "memberA": "bv1", "memberB": "bv2", "volumeCount": 0, "tags": []},
+        {"id": "p2", "storageId": "s1", "name": "mos-block-b", "state": "draining", "memberA": "bv3", "memberB": "bv4", "pendingSyncJobsA": 3, "pendingSyncJobsB": 0, "volumeCount": 2, "tags": ["east"]},
     ]));
     let client = test_client(base_url);
 
@@ -142,27 +143,10 @@ async fn cancel_drain_active_again() {
     assert_eq!(handle.join().unwrap().path, "/api/v1/storages/7/copysets/p1/cancel-drain");
 }
 
-/// Regression guard: reactivateMember is a mutating (POST) action with a
-/// named responseType and no request body - a generator dispatch bug made
-/// this silently emit a GET in all three SDK languages (fixed alongside
-/// this test). Asserting the recorded method here, not just that the call
-/// succeeds, is the point.
-#[tokio::test]
-async fn reactivate_member_sends_post() {
-    let (base_url, handle) = fixture_server(serde_json::json!({
-        "id": "bv1", "name": "originator", "regionId": 1, "memberState": "active",
-    }));
-    let client = test_client(base_url);
-
-    let res = client.storages.reactivate_member(7, "bv1").await.expect("reactivate_member");
-    assert_eq!(res.member_state, "active");
-    assert_eq!(handle.join().unwrap().method, "POST");
-}
-
 #[tokio::test]
 async fn register_copyset_explicit_name() {
     let (base_url, handle) = fixture_server(serde_json::json!({
-        "id": "p5", "storageId": "s1", "name": "mos-block-a", "state": "active", "memberA": "bv5", "memberB": "bv6", "tags": [],
+        "id": "p5", "storageId": "s1", "name": "mos-block-a", "state": "active", "memberA": "bv5", "memberB": "bv6", "volumeCount": 0, "tags": [],
     }));
     let client = test_client(base_url);
 
@@ -183,7 +167,7 @@ async fn register_copyset_explicit_name() {
 #[tokio::test]
 async fn register_copyset_omitted_name() {
     let (base_url, handle) = fixture_server(serde_json::json!({
-        "id": "p6", "storageId": "s1", "name": "riveted-truss-4f2a", "state": "active", "memberA": "bv7", "memberB": "bv8", "tags": [],
+        "id": "p6", "storageId": "s1", "name": "riveted-truss-4f2a", "state": "active", "memberA": "bv7", "memberB": "bv8", "volumeCount": 0, "tags": [],
     }));
     let client = test_client(base_url);
 
@@ -202,8 +186,8 @@ async fn register_copyset_omitted_name() {
 async fn register_copysets_bulk_count_only() {
     let (base_url, handle) = fixture_server(serde_json::json!({
         "copysets": [
-            {"id": "p10", "storageId": "s1", "name": "riveted-truss-1a2b", "state": "active", "memberA": "bv10", "memberB": "bv11", "tags": []},
-            {"id": "p11", "storageId": "s1", "name": "coupled-beam-3c4d", "state": "active", "memberA": "bv12", "memberB": "bv13", "tags": []},
+            {"id": "p10", "storageId": "s1", "name": "riveted-truss-1a2b", "state": "active", "memberA": "bv10", "memberB": "bv11", "volumeCount": 0, "tags": []},
+            {"id": "p11", "storageId": "s1", "name": "coupled-beam-3c4d", "state": "active", "memberA": "bv12", "memberB": "bv13", "volumeCount": 0, "tags": []},
         ],
     }));
     let client = test_client(base_url);
@@ -220,7 +204,10 @@ async fn register_copysets_bulk_count_only() {
 }
 
 // The new member's name is always derived server-side from the copyset's
-// own name, never operator-supplied: no request body to send.
+// own name, never operator-supplied: no request body to send. Also the
+// regression guard for the GET-vs-POST generator bug this file's own doc
+// comment describes: asserting the recorded method, not just that the call
+// succeeds, is the point.
 #[tokio::test]
 async fn add_copyset_member_replaces_vacant_slot() {
     let (base_url, handle) = fixture_server(serde_json::json!({
@@ -231,7 +218,9 @@ async fn add_copyset_member_replaces_vacant_slot() {
     let res = client.storages.add_copyset_member(7, "p1").await.expect("add_copyset_member");
     assert_eq!(res.member_state, "active");
     assert_eq!(res.name, "mos-block-a-b");
-    assert!(handle.join().unwrap().body.is_none(), "expected no request body");
+    let recorded = handle.join().unwrap();
+    assert_eq!(recorded.method, "POST");
+    assert!(recorded.body.is_none(), "expected no request body");
 }
 
 // Regression coverage for the generator emitting crate::http::encode_segment
@@ -245,7 +234,7 @@ async fn add_copyset_member_replaces_vacant_slot() {
 async fn string_path_params_are_url_encoded() {
     let raw_copyset_id = "copyset/id with spaces/café";
     let (base_url, handle) = fixture_server(serde_json::json!({
-        "id": raw_copyset_id, "storageId": "s1", "name": "mos-block-a", "state": "active", "tags": [],
+        "id": raw_copyset_id, "storageId": "s1", "name": "mos-block-a", "state": "active", "volumeCount": 0, "tags": [],
     }));
     let client = test_client(base_url);
 

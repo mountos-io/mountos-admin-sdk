@@ -467,11 +467,6 @@ Param: `storageId`
 Param: `copysetId`
 Response data: `PoolMember`
 
-### POST /api/v1/storages/:storageId/members/:blockVolumeId/reactivate
-Param: `storageId`
-Param: `blockVolumeId`
-Response data: `PoolMember`
-
 ### DELETE /api/v1/storages/:storageId/members/:blockVolumeId
 Param: `storageId`
 Param: `blockVolumeId`
@@ -1222,6 +1217,8 @@ Response data: `GCWorkerEventGoalsResponse`
   "retiredAt"?: RFC3339,
   "pendingSyncJobsA"?: int32,
   "pendingSyncJobsB"?: int32,
+  "pendingSyncJobsObservedAt"?: RFC3339,
+  "volumeCount": int64,
   "drainInitiatedBy"?: int64,
   "tags": string[]
 }

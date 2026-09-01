@@ -299,19 +299,21 @@ type BlockVolume struct {
 }
 
 type Copyset struct {
-	ID               string       `json:"id"`
-	StorageID        string       `json:"storageId"`
-	Name             string       `json:"name"`
-	State            CopysetState `json:"state"`
-	MemberA          *string      `json:"memberA,omitempty"`
-	MemberB          *string      `json:"memberB,omitempty"`
-	DrainStartedAt   *string      `json:"drainStartedAt,omitempty"`
-	SyncedAt         *string      `json:"syncedAt,omitempty"`
-	RetiredAt        *string      `json:"retiredAt,omitempty"`
-	PendingSyncJobsA *int32       `json:"pendingSyncJobsA,omitempty"`
-	PendingSyncJobsB *int32       `json:"pendingSyncJobsB,omitempty"`
-	DrainInitiatedBy *int64       `json:"drainInitiatedBy,omitempty"`
-	Tags             []string     `json:"tags"`
+	ID                        string       `json:"id"`
+	StorageID                 string       `json:"storageId"`
+	Name                      string       `json:"name"`
+	State                     CopysetState `json:"state"`
+	MemberA                   *string      `json:"memberA,omitempty"`
+	MemberB                   *string      `json:"memberB,omitempty"`
+	DrainStartedAt            *string      `json:"drainStartedAt,omitempty"`
+	SyncedAt                  *string      `json:"syncedAt,omitempty"`
+	RetiredAt                 *string      `json:"retiredAt,omitempty"`
+	PendingSyncJobsA          *int32       `json:"pendingSyncJobsA,omitempty"`
+	PendingSyncJobsB          *int32       `json:"pendingSyncJobsB,omitempty"`
+	PendingSyncJobsObservedAt *string      `json:"pendingSyncJobsObservedAt,omitempty"`
+	VolumeCount               int64        `json:"volumeCount"`
+	DrainInitiatedBy          *int64       `json:"drainInitiatedBy,omitempty"`
+	Tags                      []string     `json:"tags"`
 }
 
 type PoolMember struct {

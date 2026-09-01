@@ -490,6 +490,10 @@ pub struct Copyset {
     pub pending_sync_jobs_a: Option<i32>,
     #[serde(rename = "pendingSyncJobsB", skip_serializing_if = "Option::is_none")]
     pub pending_sync_jobs_b: Option<i32>,
+    #[serde(rename = "pendingSyncJobsObservedAt", skip_serializing_if = "Option::is_none")]
+    pub pending_sync_jobs_observed_at: Option<String>,
+    #[serde(rename = "volumeCount")]
+    pub volume_count: i64,
     #[serde(rename = "drainInitiatedBy", skip_serializing_if = "Option::is_none")]
     pub drain_initiated_by: Option<i64>,
     pub tags: Vec<String>,

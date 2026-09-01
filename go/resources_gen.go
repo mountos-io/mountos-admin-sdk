@@ -475,14 +475,6 @@ func (s *StoragesService) AddCopysetMember(ctx context.Context, storageID int64,
 	return decodeJSON[PoolMember](data)
 }
 
-func (s *StoragesService) ReactivateMember(ctx context.Context, storageID int64, blockVolumeID string) (*PoolMember, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/members/%s/reactivate", strconv.FormatInt(storageID, 10), url.PathEscape(blockVolumeID)), nil)
-	if err != nil {
-		return nil, err
-	}
-	return decodeJSON[PoolMember](data)
-}
-
 func (s *StoragesService) RemoveMember(ctx context.Context, storageID int64, blockVolumeID string) (*RemoveMemberStorageResponse, error) {
 	data, err := s.c.delete(ctx, fmt.Sprintf("/api/v1/storages/%s/members/%s", strconv.FormatInt(storageID, 10), url.PathEscape(blockVolumeID)))
 	if err != nil {

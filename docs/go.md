@@ -288,6 +288,8 @@ type Copyset struct {
     RetiredAt                *string                  `json:"retiredAt,omitempty"`
     PendingSyncJobsA         *int32                   `json:"pendingSyncJobsA,omitempty"`
     PendingSyncJobsB         *int32                   `json:"pendingSyncJobsB,omitempty"`
+    PendingSyncJobsObservedAt *string                  `json:"pendingSyncJobsObservedAt,omitempty"`
+    VolumeCount              int64                    `json:"volumeCount"`
     DrainInitiatedBy         *int64                   `json:"drainInitiatedBy,omitempty"`
     Tags                     []string                 `json:"tags"`
 }
@@ -1573,12 +1575,6 @@ type RegisterCopysetsBulkStorageResponse struct {
 
 ```go
 func (s *StoragesService) AddCopysetMember(ctx context.Context, storageID int64, copysetID string) (*PoolMember, error)
-```
-
-#### `ReactivateMember` - POST /api/v1/storages/:storageId/members/:blockVolumeId/reactivate
-
-```go
-func (s *StoragesService) ReactivateMember(ctx context.Context, storageID int64, blockVolumeID string) (*PoolMember, error)
 ```
 
 #### `RemoveMember` - DELETE /api/v1/storages/:storageId/members/:blockVolumeId

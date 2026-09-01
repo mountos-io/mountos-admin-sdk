@@ -319,10 +319,6 @@ export class StoragesResource {
     return this.client.request('POST', `/api/v1/storages/${storageId}/copysets/${encodeURIComponent(copysetId)}/members`, undefined, signal)
   }
 
-  reactivateMember(storageId: number, blockVolumeId: string, signal?: AbortSignal): Promise<PoolMember> {
-    return this.client.request('POST', `/api/v1/storages/${storageId}/members/${encodeURIComponent(blockVolumeId)}/reactivate`, undefined, signal)
-  }
-
   removeMember(storageId: number, blockVolumeId: string, signal?: AbortSignal): Promise<{ id: string }> {
     return this.client.request('DELETE', `/api/v1/storages/${storageId}/members/${encodeURIComponent(blockVolumeId)}`, undefined, signal)
   }

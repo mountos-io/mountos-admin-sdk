@@ -270,6 +270,8 @@ pub struct Copyset {
     pub retired_at: Option<String>,
     pub pending_sync_jobs_a: Option<i32>,
     pub pending_sync_jobs_b: Option<i32>,
+    pub pending_sync_jobs_observed_at: Option<String>,
+    pub volume_count: i64,
     pub drain_initiated_by: Option<i64>,
     pub tags: Vec<String>,
 }
@@ -1555,12 +1557,6 @@ pub struct RegisterCopysetsBulkStorageResponse {
 
 ```rust
 pub async fn add_copyset_member(&self, storage_id: i64, copyset_id: &str) -> Result<PoolMember, Error>
-```
-
-#### `reactivate_member` - POST /api/v1/storages/:storageId/members/:blockVolumeId/reactivate
-
-```rust
-pub async fn reactivate_member(&self, storage_id: i64, block_volume_id: &str) -> Result<PoolMember, Error>
 ```
 
 #### `remove_member` - DELETE /api/v1/storages/:storageId/members/:blockVolumeId

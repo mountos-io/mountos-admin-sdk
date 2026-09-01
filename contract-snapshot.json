@@ -445,6 +445,11 @@
           "required": false,
           "optional": true
         },
+        "pendingSyncJobsObservedAt": {
+          "type": "datetime",
+          "required": false,
+          "optional": true
+        },
         "retiredAt": {
           "type": "datetime",
           "required": false,
@@ -467,6 +472,11 @@
         },
         "tags": {
           "type": "string[]",
+          "required": false,
+          "optional": false
+        },
+        "volumeCount": {
+          "type": "int64",
           "required": false,
           "optional": false
         }

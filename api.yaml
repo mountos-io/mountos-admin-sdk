@@ -198,7 +198,8 @@ types:
     # while unpaired (member_state == "detached"). listBlockVolumes' handler
     # does not populate these fields yet; only the new copysets endpoints
     # below do. mos-appserv still needs to add this, so admin-client can
-    # find or reactivate a detached member outside a copyset view.
+    # find a detached member outside a copyset view (to remove it, or pair
+    # it into a different copyset's vacant slot).
     - "memberState: string?" # active | retiring | detached
     - "copysetId: string?"
 
@@ -226,6 +227,12 @@ types:
     # copysets, so these are its last-observed values, null otherwise.
     - "pendingSyncJobsA: int32?"
     - "pendingSyncJobsB: int32?"
+    # When the reconciler last refreshed pendingSyncJobsA/B. Null under the
+    # same condition those two fields are null.
+    - "pendingSyncJobsObservedAt: datetime?"
+    # How many volumes currently include this copyset in their working set.
+    # Maintained by the placement path, not computed per request.
+    - "volumeCount: int64"
     # Audit-surface actor id: the dashboard user who called drainCopyset. Null
     # when the copyset has never drained or the caller had no DB-backed actor id
     # (opaque admin/SDK token).
@@ -236,16 +243,15 @@ types:
     # empty array when unset, never null.
     - "tags: string[]"
 
-  # Response shape for addCopysetMember/reactivateMember: a single member,
-  # deliberately narrower than the full BlockVolume view (no createdAt/
-  # updatedAt/copysetId) since both call sites already know which copyset
-  # they acted on. registerCopyset returns the full Copyset instead (both
-  # members at once).
+  # Response shape for addCopysetMember: a single member, deliberately
+  # narrower than the full BlockVolume view (no createdAt/updatedAt/
+  # copysetId) since the call site already knows which copyset it acted on.
+  # registerCopyset returns the full Copyset instead (both members at once).
   PoolMember:
     - "id: string"
     - "name: string"
     - "regionId: int64"
-    - "memberState: string" # always "active" from these actions
+    - "memberState: string" # always "active" from this action
 
   # Per-volume block-placement copyset-count config: a single volume's own
   # working-set size within its storage's copyset fleet. id is the volume's
@@ -1115,7 +1121,7 @@ resources:
       # and there is no cross-storage copyset query anywhere in scope.
       #
       # AuthZ: every action below, both mutating (drainCopyset, cancelDrain,
-      # registerCopyset, addCopysetMember, reactivateMember) and read
+      # registerCopyset, addCopysetMember) and read
       # (listCopysets, getCopysetStatus), is gated by the
       # EnforceUserRoleAccountID account-scope check (routes_appserv.go);
       # mutating actions also require adminOnly. Matches listBlockVolumes,
@@ -1198,33 +1204,25 @@ resources:
 
       # Registers a single new member into an existing copyset's vacant slot
       # - the only case single-member registration is valid for (replacing a
-      # permanently-removed member; reactivating a merely-detached member
-      # uses reactivateMember instead). 409s if the copyset already has two
-      # members. The new member's name is always derived from the copyset's
-      # own name, never operator-supplied - takes no request body.
+      # permanently-removed member). A detached member is never brought back
+      # to a copyset on its own; removeMember then a fresh addCopysetMember
+      # is the only path. 409s if the copyset already has two members. The
+      # new member's name is always derived from the copyset's own name,
+      # never operator-supplied - takes no request body.
       - action: addCopysetMember
         method: POST
         path: /:storageId/copysets/:copysetId/members
-        responseType: PoolMember
-
-      # The ONLY way a 'detached' member becomes poolable again;
-      # without this, a drained copyset's nodes are permanently stranded.
-      # Keeps the member's existing copyset_sid - a pairing never changes.
-      - action: reactivateMember
-        method: POST
-        path: /:storageId/members/:blockVolumeId/reactivate
         responseType: PoolMember
 
       # Permanently removes a detached pool member from the storage's
       # inventory, deregistering the server entirely, distinct from draining
       # a copyset it's part of. Only ever allowed on a member with no
       # active/draining copyset assignment: the handler 409s unless the
-      # member is currently 'detached', matching reactivateMember's own
-      # CAS-guarded safety. A removed member's row is soft-deleted, not
-      # hard-deleted. Its (storage_sid, name) natural key becomes reusable
-      # by a fresh registerCopyset/addCopysetMember call, but any retired
-      # copyset it last belonged to keeps resolving it by id for historical
-      # audit purposes.
+      # member is currently 'detached'. A removed member's row is
+      # soft-deleted, not hard-deleted. Its (storage_sid, name) natural key
+      # becomes reusable by a fresh registerCopyset/addCopysetMember call,
+      # but any retired copyset it last belonged to keeps resolving it by id
+      # for historical audit purposes.
       - action: removeMember
         method: DELETE
         path: /:storageId/members/:blockVolumeId

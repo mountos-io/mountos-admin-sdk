@@ -1,10 +1,11 @@
 // Fixture/mock-server contract test for the block copyset placement admin
 // surface: exercises the generated client against a hand-written fake
 // RequestFn, no live appserv. Covers the "accepted, not completed" response
-// shapes (drainCopyset/cancelDrain) and regression-guards the
-// reactivateMember GET-vs-POST generator bug (a no-request endpoint with a
-// named responseType on a mutating method was silently generated as GET in
-// all three SDK languages until fixed alongside this test).
+// shapes (drainCopyset/cancelDrain) and regression-guards the GET-vs-POST
+// generator bug (a no-request endpoint with a named responseType on a
+// mutating method was silently generated as GET in all three SDK languages
+// until fixed) via addCopysetMember, the surviving action with that same
+// shape.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 // Imports the tsc-compiled output (dist/), not src/ directly: this repo's
@@ -69,17 +70,6 @@ test('cancelDrain: active-again ack', async () => {
   assert.equal(res.state, 'active')
 })
 
-test('reactivateMember: sends POST (regression guard for the responseType/no-request generator bug)', async () => {
-  const { client, calls } = fakeClient({
-    'POST /api/v1/storages/7/members/bv1/reactivate': {
-      id: 'bv1', name: 'originator', regionId: 1, memberState: 'active',
-    },
-  })
-  const res = await client.storages.reactivateMember(7, 'bv1')
-  assert.equal(res.memberState, 'active')
-  assert.equal(calls[0].method, 'POST')
-})
-
 test('registerCopyset: explicit name, both members immediately poolable', async () => {
   const { client, calls } = fakeClient({
     'POST /api/v1/storages/7/copysets': {
@@ -121,7 +111,7 @@ test('registerCopysetsBulk: count-only, every copyset auto-named', async () => {
   assert.deepEqual(calls[0].body, { count: 2 })
 })
 
-test('addCopysetMember: replaces a vacant slot on an existing copyset, no request body', async () => {
+test('addCopysetMember: replaces a vacant slot on an existing copyset, no request body, sends POST (regression guard for the responseType/no-request generator bug)', async () => {
   const { client, calls } = fakeClient({
     'POST /api/v1/storages/7/copysets/p1/members': {
       id: 'bv9', name: 'mos-block-a-b', regionId: 1, memberState: 'active',
@@ -130,5 +120,6 @@ test('addCopysetMember: replaces a vacant slot on an existing copyset, no reques
   const res = await client.storages.addCopysetMember(7, 'p1')
   assert.equal(res.memberState, 'active')
   assert.equal(res.name, 'mos-block-a-b')
+  assert.equal(calls[0].method, 'POST')
   assert.equal(calls[0].body, undefined)
 })

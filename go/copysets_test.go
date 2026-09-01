@@ -1,10 +1,11 @@
 // Fixture/mock-server contract test for the block copyset placement admin
 // surface: exercises the generated client against an httptest.Server, no
 // live appserv. Covers the "accepted, not completed" response shapes
-// (drainCopyset/cancelDrain) and regression-guards the reactivateMember
-// GET-vs-POST generator bug (a no-request endpoint with a named responseType
-// on a mutating method was silently generated as GET in all three SDK
-// languages until fixed alongside this test).
+// (drainCopyset/cancelDrain) and regression-guards the GET-vs-POST
+// generator bug (a no-request endpoint with a named responseType on a
+// mutating method was silently generated as GET in all three SDK languages
+// until fixed) via TestAddCopysetMember, the surviving action with that
+// same shape.
 package sdk_test
 
 import (
@@ -153,32 +154,6 @@ func TestCancelDrain(t *testing.T) {
 	}
 }
 
-// Regression guard: reactivateMember is a mutating (POST) action with a
-// named responseType and no request body - a generator dispatch bug made
-// this silently emit a GET in all three SDK languages (fixed alongside
-// this test). Asserting the recorded method here, not just that the call
-// succeeds, is the point.
-func TestReactivateMemberSendsPost(t *testing.T) {
-	fs, srv := newFixtureServer(t, map[string]any{
-		"POST /api/v1/storages/7/members/bv1/reactivate": map[string]any{
-			"id": "bv1", "name": "originator", "regionId": 1, "memberState": "active",
-		},
-	})
-	defer srv.Close()
-	c := newTestClient(t, srv.URL)
-
-	res, err := c.Storages.ReactivateMember(context.Background(), 7, "bv1")
-	if err != nil {
-		t.Fatalf("ReactivateMember: %v", err)
-	}
-	if res.MemberState != "active" {
-		t.Fatalf("unexpected member: %+v", res)
-	}
-	if len(fs.calls) != 1 || fs.calls[0].method != http.MethodPost {
-		t.Fatalf("expected exactly one POST, got calls: %+v", fs.calls)
-	}
-}
-
 func TestRegisterCopysetExplicitName(t *testing.T) {
 	fs, srv := newFixtureServer(t, map[string]any{
 		"POST /api/v1/storages/7/copysets": map[string]any{
@@ -250,7 +225,9 @@ func TestRegisterCopysetsBulk(t *testing.T) {
 // TestAddCopysetMember covers the narrow vacant-slot replacement path,
 // distinct from registerCopyset's atomic two-member creation. Takes no
 // request body - the new member's name is always derived server-side from
-// the copyset's own name.
+// the copyset's own name. Also the regression guard for the GET-vs-POST
+// generator bug this file's own doc comment describes: asserting the
+// recorded method, not just that the call succeeds, is the point.
 func TestAddCopysetMember(t *testing.T) {
 	fs, srv := newFixtureServer(t, map[string]any{
 		"POST /api/v1/storages/7/copysets/p1/members": map[string]any{
@@ -266,6 +243,9 @@ func TestAddCopysetMember(t *testing.T) {
 	}
 	if res.Name != "mos-block-a-b" {
 		t.Fatalf("unexpected member: %+v", res)
+	}
+	if len(fs.calls) != 1 || fs.calls[0].method != http.MethodPost {
+		t.Fatalf("expected exactly one POST, got calls: %+v", fs.calls)
 	}
 	if fs.calls[0].body != nil {
 		t.Fatalf("expected no request body, got %+v", fs.calls[0].body)
