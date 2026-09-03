@@ -1405,6 +1405,11 @@
     },
     "PoolMember": {
       "fields": {
+        "failureDomain": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
         "id": {
           "type": "string",
           "required": false,

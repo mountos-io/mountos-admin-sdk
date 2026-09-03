@@ -243,15 +243,19 @@ types:
     # empty array when unset, never null.
     - "tags: string[]"
 
-  # Response shape for addCopysetMember: a single member, deliberately
-  # narrower than the full BlockVolume view (no createdAt/updatedAt/
-  # copysetId) since the call site already knows which copyset it acted on.
-  # registerCopyset returns the full Copyset instead (both members at once).
+  # Response shape for addCopysetMember/markMemberLost: a single member,
+  # deliberately narrower than the full BlockVolume view (no createdAt/
+  # updatedAt/copysetId) since the call site already knows which copyset it
+  # acted on. registerCopyset returns the full Copyset instead (both
+  # members at once).
   PoolMember:
     - "id: string"
     - "name: string"
     - "regionId: int64"
-    - "memberState: string" # always "active" from this action
+    - "memberState: string" # active | lost, depending on the action that returned this
+    # Rack/host/availability-zone label the caller supplied at creation, if
+    # any. Absent when never set - every existing member keeps this absent.
+    - "failureDomain: string?"
 
   # Per-volume block-placement copyset-count config: a single volume's own
   # working-set size within its storage's copyset fleet. id is the volume's
@@ -1148,10 +1152,14 @@ resources:
       # Accepted-transition ack, NOT completion; poll getCopysetStatus.
       # IDEMPOTENT: a second call on an already-draining/beyond copyset
       # returns the CURRENT state as success, not a 409, since draining is an
-      # observed state, not a contended resource.
+      # observed state, not a contended resource. force, given true,
+      # overrides the guard against draining a copyset that would leave one
+      # of its volumes with zero write-eligible copysets (a 409 otherwise).
       - action: drainCopyset
         method: POST
         path: /:storageId/copysets/:copysetId/drain
+        request:
+          - "force: bool?"
         response:
           - "id: string"
           - "state: string"
@@ -1159,9 +1167,13 @@ resources:
       # Only valid while draining; fails (409) once synced_drained, since
       # reads have already stopped and the copyset is committed to retiring by
       # then, un-retiring is a different, riskier operation not offered here.
+      # force, given true, overrides the guard against readmitting a copyset
+      # with a member whose service node is deactivated (a 409 otherwise).
       - action: cancelDrain
         method: POST
         path: /:storageId/copysets/:copysetId/cancel-drain
+        request:
+          - "force: bool?"
         response:
           - "id: string"
           - "state: string"
@@ -1182,36 +1194,66 @@ resources:
       # omitted/empty value auto-fills server-side (an adjective-noun-hex
       # label), never generated client-side. Both members' names are always
       # derived from the copyset's own name (<name>-a / <name>-b), never set
-      # independently.
+      # independently. failureDomainA/failureDomainB are optional, one per
+      # member; when both are given, they must differ (a 409 otherwise),
+      # unless either side is empty - the same rule addCopysetMember applies
+      # to a later replacement, now enforced at creation time too.
       - action: registerCopyset
         method: POST
         path: /:storageId/copysets
         request:
           - "name: string?"
+          - "failureDomainA: string?"
+          - "failureDomainB: string?"
         responseType: Copyset
 
       # Creates count brand-new copysets in one call, every name auto-
       # generated - bulk registration takes no explicit names, unlike
       # registerCopyset. count must be between 1 and 100; appserv is the
-      # authority on the bound.
+      # authority on the bound. failureDomainA/failureDomainB behave exactly
+      # like registerCopyset's own fields, applied identically to every
+      # copyset this call creates.
       - action: registerCopysetsBulk
         method: POST
         path: /:storageId/copysets/bulk
         request:
           - "count: int32!"
+          - "failureDomainA: string?"
+          - "failureDomainB: string?"
         response:
           - "copysets: Copyset[]"
 
       # Registers a single new member into an existing copyset's vacant slot
       # - the only case single-member registration is valid for (replacing a
-      # permanently-removed member). A detached member is never brought back
-      # to a copyset on its own; removeMember then a fresh addCopysetMember
-      # is the only path. 409s if the copyset already has two members. The
-      # new member's name is always derived from the copyset's own name,
-      # never operator-supplied - takes no request body.
+      # permanently-removed or lost member). A detached member is never
+      # brought back to a copyset on its own; removeMember then a fresh
+      # addCopysetMember is the only path. 409s if the copyset already has
+      # two members. The new member's name is always derived from the
+      # copyset's own name, never operator-supplied. failureDomain is
+      # optional; when given, it must differ from the surviving member's own
+      # failure-domain label (a 409 otherwise), unless either side is empty.
       - action: addCopysetMember
         method: POST
         path: /:storageId/copysets/:copysetId/members
+        request:
+          - "failureDomain: string?"
+        responseType: PoolMember
+
+      # Declares a copyset member permanently lost, freeing its slot for
+      # addCopysetMember right away rather than waiting for the copyset to
+      # drain all the way to synced_drained - the exit for a member whose
+      # node will never answer a live poll again. The surviving member keeps
+      # serving throughout. Unless force is true, 409s unless the member's
+      # own service node is confirmed deactivated; this action can never be
+      # used to silently discard a healthy member. 409s if blockVolumeId is
+      # not currently an active member of this copyset, or if the copyset
+      # itself is not active.
+      - action: markMemberLost
+        method: POST
+        path: /:storageId/copysets/:copysetId/members/mark-lost
+        request:
+          - "blockVolumeId: string!"
+          - "force: bool?"
         responseType: PoolMember
 
       # Permanently removes a detached pool member from the storage's

@@ -75,7 +75,7 @@ func (s *StoragesService) GetPairStatus(ctx context.Context, storageID int64, pa
 
 // Deprecated: use StoragesService.DrainCopyset instead.
 func (s *StoragesService) DrainPair(ctx context.Context, storageID int64, pairID string) (*DrainPairStorageResponse, error) {
-	return s.DrainCopyset(ctx, storageID, pairID)
+	return s.DrainCopyset(ctx, storageID, pairID, nil)
 }
 
 // Deprecated: use VolumesService.GetCopysetConfig instead.

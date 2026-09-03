@@ -121,7 +121,7 @@ StoragesResource.prototype.getPairStatus = function (
 StoragesResource.prototype.drainPair = function (
   this: StoragesResource, storageId: number, pairId: string, signal?: AbortSignal,
 ): Promise<{ id: string; state: string }> {
-  return this.drainCopyset(storageId, pairId, signal)
+  return this.drainCopyset(storageId, pairId, {}, signal)
 }
 
 VolumesResource.prototype.getPairConfig = function (

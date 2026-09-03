@@ -9,8 +9,10 @@ import type {
   MetadataClusterListOptions, EditMetadataClusterRequest, SetMetadataClusterReadyRequest, 
   CreateStorageRequest, Storage, StorageListOptions, BlockVolume, EditStorageRequest, 
   TestStorageNewBucketRequest, CompatibleStorage, MoveStorageVolumesRequest, 
-  MoveVolumeFailure, Copyset, UpdateStorageTagsRequest, RegisterStorageCopysetRequest, 
-  RegisterStorageCopysetsBulkRequest, PoolMember, BackfillFailure, CreateVolumeRequest, 
+  MoveVolumeFailure, Copyset, DrainStorageCopysetRequest, CancelStorageDrainRequest, 
+  UpdateStorageTagsRequest, RegisterStorageCopysetRequest, 
+  RegisterStorageCopysetsBulkRequest, AddStorageCopysetMemberRequest, PoolMember, 
+  MarkStorageMemberLostRequest, BackfillFailure, CreateVolumeRequest, 
   VolumeRetentionPolicy, VolumeVersioningPolicy, Volume, VolumeListOptions, 
   EditVolumeRequest, MoveVolumeClusterRequest, DeactivateVolumeRequest, 
   GenerateVolumeAPIKeysRequest, VolumeApiKey, RevokeVolumeAPIKeyRequest, 
@@ -295,12 +297,12 @@ export class StoragesResource {
     return this.client.request('GET', `/api/v1/storages/${storageId}/copysets/${encodeURIComponent(copysetId)}`, undefined, signal)
   }
 
-  drainCopyset(storageId: number, copysetId: string, signal?: AbortSignal): Promise<{ id: string; state: string }> {
-    return this.client.request('POST', `/api/v1/storages/${storageId}/copysets/${encodeURIComponent(copysetId)}/drain`, undefined, signal)
+  drainCopyset(storageId: number, copysetId: string, req: DrainStorageCopysetRequest, signal?: AbortSignal): Promise<{ id: string; state: string }> {
+    return this.client.request('POST', `/api/v1/storages/${storageId}/copysets/${encodeURIComponent(copysetId)}/drain`, req, signal)
   }
 
-  cancelDrain(storageId: number, copysetId: string, signal?: AbortSignal): Promise<{ id: string; state: string }> {
-    return this.client.request('POST', `/api/v1/storages/${storageId}/copysets/${encodeURIComponent(copysetId)}/cancel-drain`, undefined, signal)
+  cancelDrain(storageId: number, copysetId: string, req: CancelStorageDrainRequest, signal?: AbortSignal): Promise<{ id: string; state: string }> {
+    return this.client.request('POST', `/api/v1/storages/${storageId}/copysets/${encodeURIComponent(copysetId)}/cancel-drain`, req, signal)
   }
 
   updateTags(storageId: number, copysetId: string, req: UpdateStorageTagsRequest, signal?: AbortSignal): Promise<Copyset> {
@@ -315,8 +317,12 @@ export class StoragesResource {
     return this.client.request('POST', `/api/v1/storages/${storageId}/copysets/bulk`, req, signal)
   }
 
-  addCopysetMember(storageId: number, copysetId: string, signal?: AbortSignal): Promise<PoolMember> {
-    return this.client.request('POST', `/api/v1/storages/${storageId}/copysets/${encodeURIComponent(copysetId)}/members`, undefined, signal)
+  addCopysetMember(storageId: number, copysetId: string, req: AddStorageCopysetMemberRequest, signal?: AbortSignal): Promise<PoolMember> {
+    return this.client.request('POST', `/api/v1/storages/${storageId}/copysets/${encodeURIComponent(copysetId)}/members`, req, signal)
+  }
+
+  markMemberLost(storageId: number, copysetId: string, req: MarkStorageMemberLostRequest, signal?: AbortSignal): Promise<PoolMember> {
+    return this.client.request('POST', `/api/v1/storages/${storageId}/copysets/${encodeURIComponent(copysetId)}/members/mark-lost`, req, signal)
   }
 
   removeMember(storageId: number, blockVolumeId: string, signal?: AbortSignal): Promise<{ id: string }> {

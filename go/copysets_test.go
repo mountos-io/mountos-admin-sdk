@@ -129,7 +129,7 @@ func TestDrainCopysetIdempotentAck(t *testing.T) {
 	defer srv.Close()
 	c := newTestClient(t, srv.URL)
 
-	res, err := c.Storages.DrainCopyset(context.Background(), 7, "p1")
+	res, err := c.Storages.DrainCopyset(context.Background(), 7, "p1", nil)
 	if err != nil {
 		t.Fatalf("DrainCopyset: %v", err)
 	}
@@ -145,7 +145,7 @@ func TestCancelDrain(t *testing.T) {
 	defer srv.Close()
 	c := newTestClient(t, srv.URL)
 
-	res, err := c.Storages.CancelDrain(context.Background(), 7, "p1")
+	res, err := c.Storages.CancelDrain(context.Background(), 7, "p1", nil)
 	if err != nil {
 		t.Fatalf("CancelDrain: %v", err)
 	}
@@ -222,6 +222,31 @@ func TestRegisterCopysetsBulk(t *testing.T) {
 	}
 }
 
+// TestRegisterCopysetFailureDomains confirms failureDomainA/failureDomainB
+// reach the wire under their own field names when given.
+func TestRegisterCopysetFailureDomains(t *testing.T) {
+	fs, srv := newFixtureServer(t, map[string]any{
+		"POST /api/v1/storages/7/copysets": map[string]any{
+			"id": "p12", "storageId": "s1", "name": "mos-block-fd", "state": "active", "memberA": "bv14", "memberB": "bv15",
+		},
+	})
+	defer srv.Close()
+	c := newTestClient(t, srv.URL)
+
+	_, err := c.Storages.RegisterCopyset(context.Background(), 7, &sdk.RegisterStorageCopysetRequest{
+		Name: strPtr("mos-block-fd"), FailureDomainA: strPtr("rack-1"), FailureDomainB: strPtr("rack-2"),
+	})
+	if err != nil {
+		t.Fatalf("RegisterCopyset: %v", err)
+	}
+	if got := fs.calls[0].body["failureDomainA"]; got != "rack-1" {
+		t.Fatalf("expected failureDomainA=rack-1 in request body, got %+v", fs.calls[0].body)
+	}
+	if got := fs.calls[0].body["failureDomainB"]; got != "rack-2" {
+		t.Fatalf("expected failureDomainB=rack-2 in request body, got %+v", fs.calls[0].body)
+	}
+}
+
 // TestAddCopysetMember covers the narrow vacant-slot replacement path,
 // distinct from registerCopyset's atomic two-member creation. Takes no
 // request body - the new member's name is always derived server-side from
@@ -237,7 +262,7 @@ func TestAddCopysetMember(t *testing.T) {
 	defer srv.Close()
 	c := newTestClient(t, srv.URL)
 
-	res, err := c.Storages.AddCopysetMember(context.Background(), 7, "p1")
+	res, err := c.Storages.AddCopysetMember(context.Background(), 7, "p1", nil)
 	if err != nil {
 		t.Fatalf("AddCopysetMember: %v", err)
 	}
@@ -249,5 +274,30 @@ func TestAddCopysetMember(t *testing.T) {
 	}
 	if fs.calls[0].body != nil {
 		t.Fatalf("expected no request body, got %+v", fs.calls[0].body)
+	}
+}
+
+// TestMarkMemberLost proves the new mark-lost action posts to the members
+// collection's own sub-path (never the plain addCopysetMember path) and
+// carries the target blockVolumeId plus an optional force flag.
+func TestMarkMemberLost(t *testing.T) {
+	fs, srv := newFixtureServer(t, map[string]any{
+		"POST /api/v1/storages/7/copysets/p1/members/mark-lost": map[string]any{
+			"id": "bv9", "name": "mos-block-a-a", "regionId": 1, "memberState": "lost",
+		},
+	})
+	defer srv.Close()
+	c := newTestClient(t, srv.URL)
+
+	force := true
+	res, err := c.Storages.MarkMemberLost(context.Background(), 7, "p1", &sdk.MarkStorageMemberLostRequest{BlockVolumeID: "bv9", Force: &force})
+	if err != nil {
+		t.Fatalf("MarkMemberLost: %v", err)
+	}
+	if res.MemberState != "lost" {
+		t.Fatalf("expected memberState=lost, got %+v", res)
+	}
+	if len(fs.calls) != 1 || fs.calls[0].method != http.MethodPost {
+		t.Fatalf("expected exactly one POST, got calls: %+v", fs.calls)
 	}
 }

@@ -317,10 +317,11 @@ type Copyset struct {
 }
 
 type PoolMember struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	RegionID    int64  `json:"regionId"`
-	MemberState string `json:"memberState"`
+	ID            string  `json:"id"`
+	Name          string  `json:"name"`
+	RegionID      int64   `json:"regionId"`
+	MemberState   string  `json:"memberState"`
+	FailureDomain *string `json:"failureDomain,omitempty"`
 }
 
 type Volume struct {
@@ -975,9 +976,17 @@ type MoveVolumesStorageResponse struct {
 	Failures []MoveVolumeFailure `json:"failures"`
 }
 
+type DrainStorageCopysetRequest struct {
+	Force *bool `json:"force,omitempty"`
+}
+
 type DrainCopysetStorageResponse struct {
 	ID    string `json:"id"`
 	State string `json:"state"`
+}
+
+type CancelStorageDrainRequest struct {
+	Force *bool `json:"force,omitempty"`
 }
 
 type CancelDrainStorageResponse struct {
@@ -990,15 +999,28 @@ type UpdateStorageTagsRequest struct {
 }
 
 type RegisterStorageCopysetRequest struct {
-	Name *string `json:"name,omitempty"`
+	Name           *string `json:"name,omitempty"`
+	FailureDomainA *string `json:"failureDomainA,omitempty"`
+	FailureDomainB *string `json:"failureDomainB,omitempty"`
 }
 
 type RegisterStorageCopysetsBulkRequest struct {
-	Count int32 `json:"count"`
+	Count          int32   `json:"count"`
+	FailureDomainA *string `json:"failureDomainA,omitempty"`
+	FailureDomainB *string `json:"failureDomainB,omitempty"`
 }
 
 type RegisterCopysetsBulkStorageResponse struct {
 	Copysets []Copyset `json:"copysets"`
+}
+
+type AddStorageCopysetMemberRequest struct {
+	FailureDomain *string `json:"failureDomain,omitempty"`
+}
+
+type MarkStorageMemberLostRequest struct {
+	BlockVolumeID string `json:"blockVolumeId"`
+	Force         *bool  `json:"force,omitempty"`
 }
 
 type RemoveMemberStorageResponse struct {

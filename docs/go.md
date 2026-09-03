@@ -636,6 +636,7 @@ type PoolMember struct {
     Name                     string                   `json:"name"`
     RegionID                 int64                    `json:"regionId"`
     MemberState              string                   `json:"memberState"`
+    FailureDomain            *string                  `json:"failureDomain,omitempty"`
 }
 ```
 
@@ -1494,7 +1495,15 @@ func (s *StoragesService) GetCopysetStatus(ctx context.Context, storageID int64,
 #### `DrainCopyset` - POST /api/v1/storages/:storageId/copysets/:copysetId/drain
 
 ```go
-func (s *StoragesService) DrainCopyset(ctx context.Context, storageID int64, copysetID string) (*DrainCopysetStorageResponse, error)
+func (s *StoragesService) DrainCopyset(ctx context.Context, storageID int64, copysetID string, req *DrainStorageCopysetRequest) (*DrainCopysetStorageResponse, error)
+```
+
+Request body:
+
+```go
+type DrainStorageCopysetRequest struct {
+    Force                    *bool                    `json:"force,omitempty"`
+}
 ```
 
 Response body:
@@ -1509,7 +1518,15 @@ type DrainCopysetStorageResponse struct {
 #### `CancelDrain` - POST /api/v1/storages/:storageId/copysets/:copysetId/cancel-drain
 
 ```go
-func (s *StoragesService) CancelDrain(ctx context.Context, storageID int64, copysetID string) (*CancelDrainStorageResponse, error)
+func (s *StoragesService) CancelDrain(ctx context.Context, storageID int64, copysetID string, req *CancelStorageDrainRequest) (*CancelDrainStorageResponse, error)
+```
+
+Request body:
+
+```go
+type CancelStorageDrainRequest struct {
+    Force                    *bool                    `json:"force,omitempty"`
+}
 ```
 
 Response body:
@@ -1546,6 +1563,8 @@ Request body:
 ```go
 type RegisterStorageCopysetRequest struct {
     Name                     *string                  `json:"name,omitempty"`
+    FailureDomainA           *string                  `json:"failureDomainA,omitempty"`
+    FailureDomainB           *string                  `json:"failureDomainB,omitempty"`
 }
 ```
 
@@ -1560,6 +1579,8 @@ Request body:
 ```go
 type RegisterStorageCopysetsBulkRequest struct {
     Count                    int32                    `json:"count"`
+    FailureDomainA           *string                  `json:"failureDomainA,omitempty"`
+    FailureDomainB           *string                  `json:"failureDomainB,omitempty"`
 }
 ```
 
@@ -1574,7 +1595,30 @@ type RegisterCopysetsBulkStorageResponse struct {
 #### `AddCopysetMember` - POST /api/v1/storages/:storageId/copysets/:copysetId/members
 
 ```go
-func (s *StoragesService) AddCopysetMember(ctx context.Context, storageID int64, copysetID string) (*PoolMember, error)
+func (s *StoragesService) AddCopysetMember(ctx context.Context, storageID int64, copysetID string, req *AddStorageCopysetMemberRequest) (*PoolMember, error)
+```
+
+Request body:
+
+```go
+type AddStorageCopysetMemberRequest struct {
+    FailureDomain            *string                  `json:"failureDomain,omitempty"`
+}
+```
+
+#### `MarkMemberLost` - POST /api/v1/storages/:storageId/copysets/:copysetId/members/mark-lost
+
+```go
+func (s *StoragesService) MarkMemberLost(ctx context.Context, storageID int64, copysetID string, req *MarkStorageMemberLostRequest) (*PoolMember, error)
+```
+
+Request body:
+
+```go
+type MarkStorageMemberLostRequest struct {
+    BlockVolumeID            string                   `json:"blockVolumeId"`
+    Force                    *bool                    `json:"force,omitempty"`
+}
 ```
 
 #### `RemoveMember` - DELETE /api/v1/storages/:storageId/members/:blockVolumeId

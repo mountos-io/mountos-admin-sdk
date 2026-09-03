@@ -22,9 +22,9 @@
 //! Hand-written, not touched by `make gen`.
 
 use crate::{
-    Copyset, CopysetState, DrainCopysetStorageResponse, Error, StoragesService,
-    UpdateVolumeCopysetConfigRequest, VolumeBlockPlacementConfig, VolumeBlockPlacementResizeResult,
-    VolumesService,
+    Copyset, CopysetState, DrainCopysetStorageResponse, DrainStorageCopysetRequest, Error,
+    StoragesService, UpdateVolumeCopysetConfigRequest, VolumeBlockPlacementConfig,
+    VolumeBlockPlacementResizeResult, VolumesService,
 };
 
 /// Deprecated: use [`CopysetState`] instead.
@@ -66,7 +66,7 @@ impl StoragesService {
 
     /// Deprecated: use [`StoragesService::drain_copyset`] instead.
     pub async fn drain_pair(&self, storage_id: i64, pair_id: &str) -> Result<DrainPairStorageResponse, Error> {
-        self.drain_copyset(storage_id, pair_id).await
+        self.drain_copyset(storage_id, pair_id, &DrainStorageCopysetRequest { force: None }).await
     }
 }
 

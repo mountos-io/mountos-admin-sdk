@@ -57,7 +57,7 @@ test('drainCopyset: idempotent-ack shape - state reads "draining", not "drained"
   const { client, calls } = fakeClient({
     'POST /api/v1/storages/7/copysets/p1/drain': { id: 'p1', state: 'draining' },
   })
-  const res = await client.storages.drainCopyset(7, 'p1')
+  const res = await client.storages.drainCopyset(7, 'p1', {})
   assert.equal(res.state, 'draining')
   assert.equal(calls[0].method, 'POST')
 })
@@ -66,7 +66,7 @@ test('cancelDrain: active-again ack', async () => {
   const { client } = fakeClient({
     'POST /api/v1/storages/7/copysets/p1/cancel-drain': { id: 'p1', state: 'active' },
   })
-  const res = await client.storages.cancelDrain(7, 'p1')
+  const res = await client.storages.cancelDrain(7, 'p1', {})
   assert.equal(res.state, 'active')
 })
 
@@ -109,6 +109,19 @@ test('registerCopysetsBulk: count-only, every copyset auto-named', async () => {
   assert.equal(res.copysets[0].name, 'riveted-truss-1a2b')
   assert.equal(res.copysets[1].name, 'coupled-beam-3c4d')
   assert.deepEqual(calls[0].body, { count: 2 })
+})
+
+// failureDomainA/failureDomainB are optional, one per member: omitted
+// entirely, they must never reach the wire, and a given pair must reach it
+// under their exact field names.
+test('registerCopyset: failureDomainA/failureDomainB reach the wire under their own names', async () => {
+  const { client, calls } = fakeClient({
+    'POST /api/v1/storages/7/copysets': {
+      id: 'p12', storageId: 's1', name: 'mos-block-fd', state: 'active', memberA: 'bv14', memberB: 'bv15',
+    },
+  })
+  await client.storages.registerCopyset(7, { name: 'mos-block-fd', failureDomainA: 'rack-1', failureDomainB: 'rack-2' })
+  assert.deepEqual(calls[0].body, { name: 'mos-block-fd', failureDomainA: 'rack-1', failureDomainB: 'rack-2' })
 })
 
 test('addCopysetMember: replaces a vacant slot on an existing copyset, no request body, sends POST (regression guard for the responseType/no-request generator bug)', async () => {

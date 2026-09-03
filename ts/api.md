@@ -424,11 +424,23 @@ Response data: `Copyset`
 ### POST /api/v1/storages/:storageId/copysets/:copysetId/drain
 Param: `storageId`
 Param: `copysetId`
+Request:
+```
+{
+  "force"?: bool
+}
+```
 Response data: `{ "id": string, "state": string }`
 
 ### POST /api/v1/storages/:storageId/copysets/:copysetId/cancel-drain
 Param: `storageId`
 Param: `copysetId`
+Request:
+```
+{
+  "force"?: bool
+}
+```
 Response data: `{ "id": string, "state": string }`
 
 ### PUT /api/v1/storages/:storageId/copysets/:copysetId/tags
@@ -447,7 +459,9 @@ Param: `storageId`
 Request:
 ```
 {
-  "name"?: string
+  "name"?: string,
+  "failureDomainA"?: string,
+  "failureDomainB"?: string
 }
 ```
 Response data: `Copyset`
@@ -457,7 +471,9 @@ Param: `storageId`
 Request:
 ```
 {
-  "count": int32(required)
+  "count": int32(required),
+  "failureDomainA"?: string,
+  "failureDomainB"?: string
 }
 ```
 Response data: `{ "copysets": Copyset[] }`
@@ -465,6 +481,24 @@ Response data: `{ "copysets": Copyset[] }`
 ### POST /api/v1/storages/:storageId/copysets/:copysetId/members
 Param: `storageId`
 Param: `copysetId`
+Request:
+```
+{
+  "failureDomain"?: string
+}
+```
+Response data: `PoolMember`
+
+### POST /api/v1/storages/:storageId/copysets/:copysetId/members/mark-lost
+Param: `storageId`
+Param: `copysetId`
+Request:
+```
+{
+  "blockVolumeId": string(required),
+  "force"?: bool
+}
+```
 Response data: `PoolMember`
 
 ### DELETE /api/v1/storages/:storageId/members/:blockVolumeId
@@ -1426,7 +1460,8 @@ Response data: `GCWorkerEventGoalsResponse`
   "id": string,
   "name": string,
   "regionId": int64,
-  "memberState": string
+  "memberState": string,
+  "failureDomain"?: string
 }
 ```
 

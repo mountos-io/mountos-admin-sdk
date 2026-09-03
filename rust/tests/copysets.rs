@@ -12,7 +12,9 @@
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
 use mountos_admin_sdk::{
-    Client, Config, CopysetState, RegisterStorageCopysetRequest, RegisterStorageCopysetsBulkRequest,
+    AddStorageCopysetMemberRequest, CancelStorageDrainRequest, Client, Config, CopysetState,
+    DrainStorageCopysetRequest, MarkStorageMemberLostRequest, RegisterStorageCopysetRequest,
+    RegisterStorageCopysetsBulkRequest,
 };
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
@@ -128,7 +130,11 @@ async fn drain_copyset_idempotent_ack() {
     let (base_url, handle) = fixture_server(serde_json::json!({"id": "p1", "state": "draining"}));
     let client = test_client(base_url);
 
-    let res = client.storages.drain_copyset(7, "p1").await.expect("drain_copyset");
+    let res = client
+        .storages
+        .drain_copyset(7, "p1", &DrainStorageCopysetRequest { force: None })
+        .await
+        .expect("drain_copyset");
     assert_eq!(res.state, "draining");
     assert_eq!(handle.join().unwrap().method, "POST");
 }
@@ -138,7 +144,11 @@ async fn cancel_drain_active_again() {
     let (base_url, handle) = fixture_server(serde_json::json!({"id": "p1", "state": "active"}));
     let client = test_client(base_url);
 
-    let res = client.storages.cancel_drain(7, "p1").await.expect("cancel_drain");
+    let res = client
+        .storages
+        .cancel_drain(7, "p1", &CancelStorageDrainRequest { force: None })
+        .await
+        .expect("cancel_drain");
     assert_eq!(res.state, "active");
     assert_eq!(handle.join().unwrap().path, "/api/v1/storages/7/copysets/p1/cancel-drain");
 }
@@ -152,7 +162,7 @@ async fn register_copyset_explicit_name() {
 
     let res = client
         .storages
-        .register_copyset(7, &RegisterStorageCopysetRequest { name: Some("mos-block-a".into()) })
+        .register_copyset(7, &RegisterStorageCopysetRequest { name: Some("mos-block-a".into()), failure_domain_a: None, failure_domain_b: None })
         .await
         .expect("register_copyset");
     assert_eq!(res.name, "mos-block-a");
@@ -173,7 +183,7 @@ async fn register_copyset_omitted_name() {
 
     let res = client
         .storages
-        .register_copyset(7, &RegisterStorageCopysetRequest { name: None })
+        .register_copyset(7, &RegisterStorageCopysetRequest { name: None, failure_domain_a: None, failure_domain_b: None })
         .await
         .expect("register_copyset");
     assert_eq!(res.state, CopysetState::Active);
@@ -194,7 +204,7 @@ async fn register_copysets_bulk_count_only() {
 
     let res = client
         .storages
-        .register_copysets_bulk(7, &RegisterStorageCopysetsBulkRequest { count: 2 })
+        .register_copysets_bulk(7, &RegisterStorageCopysetsBulkRequest { count: 2, failure_domain_a: None, failure_domain_b: None })
         .await
         .expect("register_copysets_bulk");
     assert_eq!(res.copysets.len(), 2);
@@ -203,11 +213,36 @@ async fn register_copysets_bulk_count_only() {
     assert_eq!(handle.join().unwrap().body.unwrap()["count"], 2);
 }
 
+// failureDomainA/failureDomainB are optional, one per member: both None must
+// be dropped from the request body entirely, and a given pair must reach the
+// wire under their exact field names.
+#[tokio::test]
+async fn register_copyset_with_failure_domains() {
+    let (base_url, handle) = fixture_server(serde_json::json!({
+        "id": "p12", "storageId": "s1", "name": "mos-block-fd", "state": "active", "memberA": "bv14", "memberB": "bv15", "volumeCount": 0, "tags": [],
+    }));
+    let client = test_client(base_url);
+
+    client
+        .storages
+        .register_copyset(7, &RegisterStorageCopysetRequest {
+            name: Some("mos-block-fd".into()),
+            failure_domain_a: Some("rack-1".into()),
+            failure_domain_b: Some("rack-2".into()),
+        })
+        .await
+        .expect("register_copyset");
+    let body = handle.join().unwrap().body.unwrap();
+    assert_eq!(body["failureDomainA"], "rack-1");
+    assert_eq!(body["failureDomainB"], "rack-2");
+}
+
 // The new member's name is always derived server-side from the copyset's
-// own name, never operator-supplied: no request body to send. Also the
-// regression guard for the GET-vs-POST generator bug this file's own doc
-// comment describes: asserting the recorded method, not just that the call
-// succeeds, is the point.
+// own name, never operator-supplied - failureDomain is the only field this
+// request ever carries, and it is optional. Also the regression guard for
+// the GET-vs-POST generator bug this file's own doc comment describes:
+// asserting the recorded method, not just that the call succeeds, is the
+// point.
 #[tokio::test]
 async fn add_copyset_member_replaces_vacant_slot() {
     let (base_url, handle) = fixture_server(serde_json::json!({
@@ -215,12 +250,35 @@ async fn add_copyset_member_replaces_vacant_slot() {
     }));
     let client = test_client(base_url);
 
-    let res = client.storages.add_copyset_member(7, "p1").await.expect("add_copyset_member");
+    let res = client
+        .storages
+        .add_copyset_member(7, "p1", &AddStorageCopysetMemberRequest { failure_domain: None })
+        .await
+        .expect("add_copyset_member");
     assert_eq!(res.member_state, "active");
     assert_eq!(res.name, "mos-block-a-b");
+    assert_eq!(handle.join().unwrap().method, "POST");
+}
+
+// markMemberLost declares a member permanently lost so its slot can be
+// filled without waiting for the drain lifecycle; blockVolumeId is
+// required, force is optional.
+#[tokio::test]
+async fn mark_member_lost() {
+    let (base_url, handle) = fixture_server(serde_json::json!({
+        "id": "bv9", "name": "mos-block-a-a", "regionId": 1, "memberState": "lost",
+    }));
+    let client = test_client(base_url);
+
+    let res = client
+        .storages
+        .mark_member_lost(7, "p1", &MarkStorageMemberLostRequest { block_volume_id: "bv9".to_string(), force: Some(true) })
+        .await
+        .expect("mark_member_lost");
+    assert_eq!(res.member_state, "lost");
     let recorded = handle.join().unwrap();
     assert_eq!(recorded.method, "POST");
-    assert!(recorded.body.is_none(), "expected no request body");
+    assert_eq!(recorded.path, "/api/v1/storages/7/copysets/p1/members/mark-lost");
 }
 
 // Regression coverage for the generator emitting crate::http::encode_segment

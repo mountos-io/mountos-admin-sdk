@@ -427,16 +427,16 @@ func (s *StoragesService) GetCopysetStatus(ctx context.Context, storageID int64,
 	return decodeJSON[Copyset](data)
 }
 
-func (s *StoragesService) DrainCopyset(ctx context.Context, storageID int64, copysetID string) (*DrainCopysetStorageResponse, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/copysets/%s/drain", strconv.FormatInt(storageID, 10), url.PathEscape(copysetID)), nil)
+func (s *StoragesService) DrainCopyset(ctx context.Context, storageID int64, copysetID string, req *DrainStorageCopysetRequest) (*DrainCopysetStorageResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/copysets/%s/drain", strconv.FormatInt(storageID, 10), url.PathEscape(copysetID)), req)
 	if err != nil {
 		return nil, err
 	}
 	return decodeJSON[DrainCopysetStorageResponse](data)
 }
 
-func (s *StoragesService) CancelDrain(ctx context.Context, storageID int64, copysetID string) (*CancelDrainStorageResponse, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/copysets/%s/cancel-drain", strconv.FormatInt(storageID, 10), url.PathEscape(copysetID)), nil)
+func (s *StoragesService) CancelDrain(ctx context.Context, storageID int64, copysetID string, req *CancelStorageDrainRequest) (*CancelDrainStorageResponse, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/copysets/%s/cancel-drain", strconv.FormatInt(storageID, 10), url.PathEscape(copysetID)), req)
 	if err != nil {
 		return nil, err
 	}
@@ -467,8 +467,16 @@ func (s *StoragesService) RegisterCopysetsBulk(ctx context.Context, storageID in
 	return decodeJSON[RegisterCopysetsBulkStorageResponse](data)
 }
 
-func (s *StoragesService) AddCopysetMember(ctx context.Context, storageID int64, copysetID string) (*PoolMember, error) {
-	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/copysets/%s/members", strconv.FormatInt(storageID, 10), url.PathEscape(copysetID)), nil)
+func (s *StoragesService) AddCopysetMember(ctx context.Context, storageID int64, copysetID string, req *AddStorageCopysetMemberRequest) (*PoolMember, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/copysets/%s/members", strconv.FormatInt(storageID, 10), url.PathEscape(copysetID)), req)
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[PoolMember](data)
+}
+
+func (s *StoragesService) MarkMemberLost(ctx context.Context, storageID int64, copysetID string, req *MarkStorageMemberLostRequest) (*PoolMember, error) {
+	data, err := s.c.post(ctx, fmt.Sprintf("/api/v1/storages/%s/copysets/%s/members/mark-lost", strconv.FormatInt(storageID, 10), url.PathEscape(copysetID)), req)
 	if err != nil {
 		return nil, err
 	}

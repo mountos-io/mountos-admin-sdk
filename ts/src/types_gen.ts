@@ -151,6 +151,7 @@ export interface PoolMember {
   name: string
   regionId: number
   memberState: string
+  failureDomain?: string
 }
 
 export interface Volume {
@@ -759,16 +760,37 @@ export interface MoveStorageVolumesRequest {
   volumeIds: string[]
 }
 
+export interface DrainStorageCopysetRequest {
+  force?: boolean
+}
+
+export interface CancelStorageDrainRequest {
+  force?: boolean
+}
+
 export interface UpdateStorageTagsRequest {
   tags?: string[]
 }
 
 export interface RegisterStorageCopysetRequest {
   name?: string
+  failureDomainA?: string
+  failureDomainB?: string
 }
 
 export interface RegisterStorageCopysetsBulkRequest {
   count: number
+  failureDomainA?: string
+  failureDomainB?: string
+}
+
+export interface AddStorageCopysetMemberRequest {
+  failureDomain?: string
+}
+
+export interface MarkStorageMemberLostRequest {
+  blockVolumeId: string
+  force?: boolean
 }
 
 export interface StorageListOptions extends ListOptions {

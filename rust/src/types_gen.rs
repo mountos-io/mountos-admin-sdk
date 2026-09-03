@@ -507,6 +507,8 @@ pub struct PoolMember {
     pub region_id: i64,
     #[serde(rename = "memberState")]
     pub member_state: String,
+    #[serde(rename = "failureDomain", skip_serializing_if = "Option::is_none")]
+    pub failure_domain: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -1491,10 +1493,22 @@ pub struct MoveVolumesStorageResponse {
     pub failures: Vec<MoveVolumeFailure>,
 }
 
+#[derive(Debug, Clone, Serialize)]
+pub struct DrainStorageCopysetRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub force: Option<bool>,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DrainCopysetStorageResponse {
     pub id: String,
     pub state: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct CancelStorageDrainRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub force: Option<bool>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -1513,16 +1527,38 @@ pub struct UpdateStorageTagsRequest {
 pub struct RegisterStorageCopysetRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
+    #[serde(rename = "failureDomainA", skip_serializing_if = "Option::is_none")]
+    pub failure_domain_a: Option<String>,
+    #[serde(rename = "failureDomainB", skip_serializing_if = "Option::is_none")]
+    pub failure_domain_b: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize)]
 pub struct RegisterStorageCopysetsBulkRequest {
     pub count: i32,
+    #[serde(rename = "failureDomainA", skip_serializing_if = "Option::is_none")]
+    pub failure_domain_a: Option<String>,
+    #[serde(rename = "failureDomainB", skip_serializing_if = "Option::is_none")]
+    pub failure_domain_b: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RegisterCopysetsBulkStorageResponse {
     pub copysets: Vec<Copyset>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct AddStorageCopysetMemberRequest {
+    #[serde(rename = "failureDomain", skip_serializing_if = "Option::is_none")]
+    pub failure_domain: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct MarkStorageMemberLostRequest {
+    #[serde(rename = "blockVolumeId")]
+    pub block_volume_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub force: Option<bool>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -618,6 +618,7 @@ pub struct PoolMember {
     pub name: String,
     pub region_id: i64,
     pub member_state: String,
+    pub failure_domain: Option<String>,
 }
 ```
 
@@ -1476,7 +1477,15 @@ pub async fn get_copyset_status(&self, storage_id: i64, copyset_id: &str) -> Res
 #### `drain_copyset` - POST /api/v1/storages/:storageId/copysets/:copysetId/drain
 
 ```rust
-pub async fn drain_copyset(&self, storage_id: i64, copyset_id: &str) -> Result<DrainCopysetStorageResponse, Error>
+pub async fn drain_copyset(&self, storage_id: i64, copyset_id: &str, req: &DrainStorageCopysetRequest) -> Result<DrainCopysetStorageResponse, Error>
+```
+
+Request body:
+
+```rust
+pub struct DrainStorageCopysetRequest {
+    pub force: Option<bool>,
+}
 ```
 
 Response body:
@@ -1491,7 +1500,15 @@ pub struct DrainCopysetStorageResponse {
 #### `cancel_drain` - POST /api/v1/storages/:storageId/copysets/:copysetId/cancel-drain
 
 ```rust
-pub async fn cancel_drain(&self, storage_id: i64, copyset_id: &str) -> Result<CancelDrainStorageResponse, Error>
+pub async fn cancel_drain(&self, storage_id: i64, copyset_id: &str, req: &CancelStorageDrainRequest) -> Result<CancelDrainStorageResponse, Error>
+```
+
+Request body:
+
+```rust
+pub struct CancelStorageDrainRequest {
+    pub force: Option<bool>,
+}
 ```
 
 Response body:
@@ -1528,6 +1545,8 @@ Request body:
 ```rust
 pub struct RegisterStorageCopysetRequest {
     pub name: Option<String>,
+    pub failure_domain_a: Option<String>,
+    pub failure_domain_b: Option<String>,
 }
 ```
 
@@ -1542,6 +1561,8 @@ Request body:
 ```rust
 pub struct RegisterStorageCopysetsBulkRequest {
     pub count: i32,
+    pub failure_domain_a: Option<String>,
+    pub failure_domain_b: Option<String>,
 }
 ```
 
@@ -1556,7 +1577,30 @@ pub struct RegisterCopysetsBulkStorageResponse {
 #### `add_copyset_member` - POST /api/v1/storages/:storageId/copysets/:copysetId/members
 
 ```rust
-pub async fn add_copyset_member(&self, storage_id: i64, copyset_id: &str) -> Result<PoolMember, Error>
+pub async fn add_copyset_member(&self, storage_id: i64, copyset_id: &str, req: &AddStorageCopysetMemberRequest) -> Result<PoolMember, Error>
+```
+
+Request body:
+
+```rust
+pub struct AddStorageCopysetMemberRequest {
+    pub failure_domain: Option<String>,
+}
+```
+
+#### `mark_member_lost` - POST /api/v1/storages/:storageId/copysets/:copysetId/members/mark-lost
+
+```rust
+pub async fn mark_member_lost(&self, storage_id: i64, copyset_id: &str, req: &MarkStorageMemberLostRequest) -> Result<PoolMember, Error>
+```
+
+Request body:
+
+```rust
+pub struct MarkStorageMemberLostRequest {
+    pub block_volume_id: String,
+    pub force: Option<bool>,
+}
 ```
 
 #### `remove_member` - DELETE /api/v1/storages/:storageId/members/:blockVolumeId

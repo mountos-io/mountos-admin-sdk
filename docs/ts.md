@@ -574,6 +574,7 @@ interface PoolMember {
   name: string;
   regionId: number;
   memberState: string;
+  failureDomain?: string;
 }
 ```
 
@@ -1381,13 +1382,29 @@ client.storages.getCopysetStatus(storageId: number, copysetId: string, signal?: 
 #### `drainCopyset` - POST /api/v1/storages/:storageId/copysets/:copysetId/drain
 
 ```typescript
-client.storages.drainCopyset(storageId: number, copysetId: string, signal?: AbortSignal): Promise<{ id: string; state: string }>;
+client.storages.drainCopyset(storageId: number, copysetId: string, req: DrainStorageCopysetRequest, signal?: AbortSignal): Promise<{ id: string; state: string }>;
+```
+
+Request body:
+
+```typescript
+{
+  force?: boolean;
+}
 ```
 
 #### `cancelDrain` - POST /api/v1/storages/:storageId/copysets/:copysetId/cancel-drain
 
 ```typescript
-client.storages.cancelDrain(storageId: number, copysetId: string, signal?: AbortSignal): Promise<{ id: string; state: string }>;
+client.storages.cancelDrain(storageId: number, copysetId: string, req: CancelStorageDrainRequest, signal?: AbortSignal): Promise<{ id: string; state: string }>;
+```
+
+Request body:
+
+```typescript
+{
+  force?: boolean;
+}
 ```
 
 #### `updateTags` - PUT /api/v1/storages/:storageId/copysets/:copysetId/tags
@@ -1415,6 +1432,8 @@ Request body:
 ```typescript
 {
   name?: string;
+  failureDomainA?: string;
+  failureDomainB?: string;
 }
 ```
 
@@ -1429,13 +1448,38 @@ Request body:
 ```typescript
 {
   count: number;
+  failureDomainA?: string;
+  failureDomainB?: string;
 }
 ```
 
 #### `addCopysetMember` - POST /api/v1/storages/:storageId/copysets/:copysetId/members
 
 ```typescript
-client.storages.addCopysetMember(storageId: number, copysetId: string, signal?: AbortSignal): Promise<PoolMember>;
+client.storages.addCopysetMember(storageId: number, copysetId: string, req: AddStorageCopysetMemberRequest, signal?: AbortSignal): Promise<PoolMember>;
+```
+
+Request body:
+
+```typescript
+{
+  failureDomain?: string;
+}
+```
+
+#### `markMemberLost` - POST /api/v1/storages/:storageId/copysets/:copysetId/members/mark-lost
+
+```typescript
+client.storages.markMemberLost(storageId: number, copysetId: string, req: MarkStorageMemberLostRequest, signal?: AbortSignal): Promise<PoolMember>;
+```
+
+Request body:
+
+```typescript
+{
+  blockVolumeId: string;
+  force?: boolean;
+}
 ```
 
 #### `removeMember` - DELETE /api/v1/storages/:storageId/members/:blockVolumeId
