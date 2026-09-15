@@ -1,11 +1,10 @@
 // Fixture/mock-server contract test for the block copyset placement admin
 // surface: exercises the generated client against an httptest.Server, no
 // live appserv. Covers the "accepted, not completed" response shapes
-// (drainCopyset/cancelDrain) and regression-guards the GET-vs-POST
-// generator bug (a no-request endpoint with a named responseType on a
-// mutating method was silently generated as GET in all three SDK languages
-// until fixed) via TestAddCopysetMember, the surviving action with that
-// same shape.
+// (drainCopyset/cancelDrain) and guards the GET-vs-POST generator rule: a
+// no-request endpoint with a named responseType on a mutating method must
+// generate as that method, not GET, in all three SDK languages. Verified
+// via TestAddCopysetMember, the surviving action with that same shape.
 package sdk_test
 
 import (
@@ -92,10 +91,10 @@ func TestListCopysets(t *testing.T) {
 	}
 }
 
-// TestCopysetPendingSyncJobsNullVsZero proves R3-010's fix: PendingSyncJobsA/B
-// is a *int32, so a wire "null" (not yet observed) and a wire "0" (confirmed
-// zero backlog) decode to distinct Go values, a nil pointer versus a pointer
-// to zero, instead of collapsing onto the same int32 zero value.
+// TestCopysetPendingSyncJobsNullVsZero proves PendingSyncJobsA/B is a
+// *int32, so a wire "null" (not yet observed) and a wire "0" (confirmed
+// zero backlog) decode to distinct Go values, a nil pointer versus a
+// pointer to zero, instead of collapsing onto the same int32 zero value.
 func TestCopysetPendingSyncJobsNullVsZero(t *testing.T) {
 	_, srv := newFixtureServer(t, map[string]any{
 		"GET /api/v1/storages/7/copysets": []map[string]any{
@@ -121,8 +120,8 @@ func TestCopysetPendingSyncJobsNullVsZero(t *testing.T) {
 }
 
 func TestDrainCopysetIdempotentAck(t *testing.T) {
-	// D9: response reads "draining", not "drained" - an accepted-transition
-	// ack, never a completion promise.
+	// Response reads "draining", not "drained": an accepted-transition ack,
+	// never a completion promise.
 	_, srv := newFixtureServer(t, map[string]any{
 		"POST /api/v1/storages/7/copysets/p1/drain": map[string]any{"id": "p1", "state": "draining"},
 	})

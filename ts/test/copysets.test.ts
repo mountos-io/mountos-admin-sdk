@@ -1,11 +1,11 @@
 // Fixture/mock-server contract test for the block copyset placement admin
 // surface: exercises the generated client against a hand-written fake
 // RequestFn, no live appserv. Covers the "accepted, not completed" response
-// shapes (drainCopyset/cancelDrain) and regression-guards the GET-vs-POST
-// generator bug (a no-request endpoint with a named responseType on a
-// mutating method was silently generated as GET in all three SDK languages
-// until fixed) via addCopysetMember, the surviving action with that same
-// shape.
+// shapes (drainCopyset/cancelDrain) and guards the GET-vs-POST generator
+// rule: a no-request endpoint with a named responseType on a mutating
+// method must generate as that method, not GET, in all three SDK
+// languages. Verified via addCopysetMember, the surviving action with
+// that same shape.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 // Imports the tsc-compiled output (dist/), not src/ directly: this repo's

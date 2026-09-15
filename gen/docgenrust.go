@@ -123,7 +123,7 @@ func generateDocRust(spec *Spec, outDir string) {
 			}
 			// Query params: only when the real signature takes a
 			// resource-specific *ListOptions (not the shared ListOptions),
-			// mirroring rustDocArgs's own hasExtraQueryParam gate -- the
+			// mirroring rustDocArgs's own hasExtraQueryParam gate. The
 			// method signature already names this type, so its shape
 			// belongs here rather than nowhere.
 			switch {

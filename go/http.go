@@ -13,7 +13,7 @@ import (
 
 // MethodQuery is the HTTP QUERY method (RFC 10008): a safe, idempotent
 // method like GET, but its parameters travel in the request body instead of
-// the URL. Not in net/http's method constants. See docs/design/query-verb.md.
+// the URL. Not in net/http's method constants.
 const MethodQuery = "QUERY"
 
 type envelope struct {

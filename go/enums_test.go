@@ -97,17 +97,17 @@ func TestLicenseQuotaState_IsValid(t *testing.T) {
 }
 
 // TestCopysetState_String proves the enum's String method returns the wire
-// value, matching the pre-existing print/format expectations a plain string
-// alias used to satisfy implicitly.
+// value, matching the print/format expectations a plain string alias
+// satisfies implicitly.
 func TestCopysetState_String(t *testing.T) {
 	if got := sdk.CopysetStateDraining.String(); got != "draining" {
 		t.Errorf("CopysetStateDraining.String() = %q, want %q", got, "draining")
 	}
 }
 
-// TestCopysetState_JSONRoundTrip proves the defined type still marshals and
-// unmarshals as a plain JSON string, unaffected by the switch away from a
-// bare string alias.
+// TestCopysetState_JSONRoundTrip proves the defined type marshals and
+// unmarshals as a plain JSON string, independent of its underlying
+// representation as a named type rather than a bare string alias.
 func TestCopysetState_JSONRoundTrip(t *testing.T) {
 	type wrapper struct {
 		State sdk.CopysetState `json:"state"`

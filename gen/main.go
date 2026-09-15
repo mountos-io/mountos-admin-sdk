@@ -47,12 +47,12 @@ func loadSpec(path string) *Spec {
 }
 
 // validateSpec catches endpoint shapes the generators don't fully cover.
-// method: QUERY carries its parameters in a JSON request body instead of the
-// URL (see docs/design/query-verb.md) -- that only makes sense when the
-// endpoint actually declares fields to put there. A QUERY endpoint with
-// neither request nor query fields is a plain GET; the Rust and Go toggle/
-// void writers don't plumb a body for that shape (Rust would silently mis-map
-// to POST, Go would fail to compile), so reject it here instead.
+// method: QUERY (RFC 10008) carries its parameters in a JSON request body
+// instead of the URL. That only makes sense when the endpoint actually
+// declares fields to put there. A QUERY endpoint with neither request nor
+// query fields is a plain GET; the Rust and Go toggle/void writers don't
+// plumb a body for that shape (Rust would silently mis-map to POST, Go
+// would fail to compile), so reject it here instead.
 func validateSpec(spec *Spec) {
 	for _, res := range spec.Resources {
 		for _, ep := range res.Endpoints {

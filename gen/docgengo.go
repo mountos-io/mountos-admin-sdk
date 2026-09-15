@@ -105,7 +105,7 @@ func generateDocGo(spec *Spec, outDir string) {
 				// spec.Types are general model structs, never request bodies
 				// (gogen.go's writeGoStruct always renders them with
 				// isRequest=false), so writeGoStruct's own condition for that
-				// case reduces to f.Optional -- matches what's actually
+				// case reduces to f.Optional. This matches what's actually
 				// emitted for every qualifying type, not just bool/int.
 				fmt.Fprintf(&w, "    %-24s %-24s `json:%q`\n",
 					goFieldName(f.Name), goDocType(f.Type, f.Optional), tag)
@@ -200,7 +200,7 @@ func generateDocGo(spec *Spec, outDir string) {
 					isVoid = true
 				}
 
-			// ResponseType before the ad-hoc Response field list -- mirrors
+			// ResponseType before the ad-hoc Response field list. This mirrors
 			// writeGoMethod's real precedence (gogen.go), which itself
 			// matches TS/Rust, so all three languages and this doc agree on
 			// which shape wins for a hypothetical endpoint spec'ing both.
@@ -269,9 +269,9 @@ func generateDocGo(spec *Spec, outDir string) {
 					// Reuses the real goOptionalQueryType (not goDocType):
 					// query params pointer-wrap on !Required (bare fields
 					// included), a different condition from request bodies
-					// (which gate on Optional only) -- a second, divergent
-					// reimplementation here is exactly what caused earlier
-					// bugs in this file.
+					// (which gate on Optional only). A second, divergent
+					// reimplementation here risks drifting out of sync with
+					// that logic.
 					fmt.Fprintf(&w, "    %-20s %-12s `url:%q`%s\n",
 						goFieldName(f.Name), goOptionalQueryType(f), f.Name, comment)
 				}

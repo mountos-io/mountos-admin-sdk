@@ -121,7 +121,7 @@ func generateDoc(spec *Spec, outDir string) {
 					// Response fields are model fields, not request bodies: only
 					// the Optional ("?") tier is ever absent from the payload
 					// (matches Go's omitempty, TS's "?", Rust's Option<T> for
-					// response structs) -- a bare or Required field is always
+					// response structs). A bare or Required field is always
 					// present, so it gets no "?" here.
 					name := f.Name
 					if f.Optional {

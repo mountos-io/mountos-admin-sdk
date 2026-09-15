@@ -659,22 +659,21 @@ func writeGoMethod(w *strings.Builder, spec *Spec, res Resource, ep Endpoint, sv
 	// ResponseType is checked before the ad-hoc Response field list (matches
 	// TS's tsReturnType and Rust's writeRustBodyMethod, and this switch's own
 	// no-request branches below) so all three languages agree on which shape
-	// wins for a hypothetical endpoint spec'ing both -- no live endpoint does
+	// wins for a hypothetical endpoint spec'ing both. No live endpoint does
 	// today, but silently differing precedence per language is exactly the
-	// kind of drift this generator has otherwise been hardened against.
+	// kind of drift this generator guards against.
 	case len(ep.Request) > 0 && ep.ResponseType != "":
 		writeGoBodyResponseTypeMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name, pt)
 	case len(ep.Request) > 0 && len(ep.Response) > 0:
 		writeGoBodyResponseMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name, pt)
 	case len(ep.Request) > 0:
 		writeGoBodyVoidMethod(w, svcType, methodName, ep, fullPath, allPathParams, res.Name, pt)
-	// A no-request endpoint with a named responseType is a GET (list/get)
-	// in every case that predates this comment, so writeGoGetMethod (which
-	// always issues a GET, ignoring ep.Method) was never wrong until an
-	// endpoint like reactivateMember combined a mutating method with a
-	// named responseType and no request body - route those through the
-	// method-aware toggle writer instead, matching the response-fields
-	// branch below.
+	// A no-request endpoint with a named responseType defaults to GET
+	// (list/get) via writeGoGetMethod, which always issues a GET regardless
+	// of ep.Method. That default is wrong for a mutating method with no
+	// request body (e.g. reactivateMember), so ep.Method == "GET" is checked
+	// explicitly here; anything else routes through the method-aware toggle
+	// writer instead, matching the response-fields branch below.
 	case ep.ResponseType != "" && ep.Method == "GET":
 		writeGoGetMethod(w, svcType, methodName, ep, fullPath, allPathParams, pt)
 	case ep.ResponseType != "":
@@ -752,9 +751,8 @@ func goHTTPMethod(method string) string {
 }
 
 // goBodyCarryingMethod reports whether httpMethod (as returned by
-// goHTTPMethod) sends req as a JSON request body. QUERY is a safe/read
-// method like GET but, unlike GET, is defined to carry a body -- see
-// docs/design/query-verb.md.
+// goHTTPMethod) sends req as a JSON request body. QUERY (RFC 10008) is a
+// safe/read method like GET, but unlike GET, it is defined to carry a body.
 func goBodyCarryingMethod(httpMethod string) bool {
 	return httpMethod == "put" || httpMethod == "post" || httpMethod == "query"
 }

@@ -6,10 +6,10 @@ import (
 )
 
 // TestWriteGoStructOptionalWrapping protects goTag/writeGoStruct's
-// pointer-wrapping decision (R3-010): a model/response field marked "?"
-// must pointer-wrap the same scalar Go types the request-field branch
-// already wraps, while a required or plain field, and a slice/map/enum/
-// named type, must not.
+// pointer-wrapping decision: a model/response field marked "?" must
+// pointer-wrap the same scalar Go types the request-field branch already
+// wraps, while a required or plain field, and a slice/map/enum/named type,
+// must not.
 func TestWriteGoStructOptionalWrapping(t *testing.T) {
 	fields := []string{
 		"count: int32?",     // optional scalar model field -> pointer + omitempty

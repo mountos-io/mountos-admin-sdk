@@ -219,7 +219,7 @@ func generateDocTS(spec *Spec, outDir string) {
 					params += ", "
 				}
 				sig = params + "signal?: AbortSignal"
-				// Inline, matching writeTSToggleMethod/tsInlineResponseType --
+				// Inline, matching writeTSToggleMethod/tsInlineResponseType.
 				// TS's return type already shows the shape, unlike Go/Rust
 				// which reference a named type and need a separate section.
 				retType = tsInlineResponseType(ep.Response)

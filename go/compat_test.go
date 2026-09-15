@@ -1,6 +1,6 @@
-// Regression guard for VE-017 (Pair -> Copyset renamed in 1.14.0 with no
-// aliases). Exercises compat.go: the old method/type names still resolve
-// and hit the renamed Copyset routes.
+// Regression guard for the Pair -> Copyset compatibility aliases: exercises
+// compat.go, confirming the old method/type names still resolve and hit
+// the renamed Copyset routes.
 package sdk_test
 
 import (
