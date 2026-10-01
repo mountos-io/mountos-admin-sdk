@@ -542,7 +542,7 @@ pub struct VolumeForkTreesService {
 }
 
 impl VolumeForkTreesService {
-    pub async fn list(&self, volume_id: i64, fork_name: &str, opts: Option<&VolumeForkTreeListOptions>) -> Result<CursorPaginatedResponse<ForkTreeEntry>, Error> {
+    pub async fn list(&self, volume_id: i64, fork_name: &str, opts: Option<&VolumeForkTreeListOptions>) -> Result<StringCursorPaginatedResponse<ForkTreeEntry>, Error> {
         let mut query: Vec<(&str, String)> = Vec::new();
         if let Some(opts) = opts {
             if let Some(v) = &opts.path {

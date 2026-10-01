@@ -23,7 +23,7 @@ let account = client.accounts.get(account_id).await?;
 
 ## Response Model
 
-Each method returns the unwrapped `data` payload as a typed value, or an [`Error`] on `status="failure"` or transport failure. List endpoints return `PaginatedResponse<T>` or `CursorPaginatedResponse<T>`; create/edit/toggle endpoints return `IdResponse`.
+Each method returns the unwrapped `data` payload as a typed value, or an [`Error`] on `status="failure"` or transport failure. List endpoints return `PaginatedResponse<T>`, `CursorPaginatedResponse<T>` or `StringCursorPaginatedResponse<T>`; create/edit/toggle endpoints return `IdResponse`. A string cursor is opaque: pass `next_cursor` back unchanged as `cursor` and never parse or build one.
 
 ```rust
 pub enum Error {
@@ -48,6 +48,11 @@ pub struct PaginationMeta {
 pub struct CursorPaginatedResponse<T> {
     pub items: Vec<T>,
     pub next_cursor: Option<i64>,
+}
+
+pub struct StringCursorPaginatedResponse<T> {
+    pub items: Vec<T>,
+    pub next_cursor: Option<String>,
 }
 
 pub struct IdResponse {
@@ -2003,7 +2008,7 @@ Accessor: `client.volume_fork_trees`
 #### `list` - GET /api/v1/volumes/:volumeId/forks/:forkName/tree
 
 ```rust
-pub async fn list(&self, volume_id: i64, fork_name: &str, opts: Option<&VolumeForkTreeListOptions>) -> Result<CursorPaginatedResponse<ForkTreeEntry>, Error>
+pub async fn list(&self, volume_id: i64, fork_name: &str, opts: Option<&VolumeForkTreeListOptions>) -> Result<StringCursorPaginatedResponse<ForkTreeEntry>, Error>
 ```
 
 Query params:
@@ -2012,7 +2017,7 @@ Query params:
 pub struct VolumeForkTreeListOptions {
     pub path: Option<String>,
     pub as_of: Option<i64>,
-    pub cursor: Option<i64>,
+    pub cursor: Option<String>,
     pub limit: Option<i64>,
     pub sort: Option<String>,
     pub kind: Option<String>,

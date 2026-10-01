@@ -46,6 +46,18 @@ type Endpoint struct {
 	ResponseArray bool     `yaml:"responseArray,omitempty"`
 }
 
+// cursorResponseType names the wrapper type of a cursor-paginated endpoint.
+// A "cursor" query field typed string selects the opaque string cursor
+// wrapper. Any other cursor type selects the int64 wrapper.
+func cursorResponseType(ep Endpoint) string {
+	for _, qs := range ep.Query {
+		if f := parseField(qs); f.Name == "cursor" && f.Type == "string" {
+			return "StringCursorPaginatedResponse"
+		}
+	}
+	return "CursorPaginatedResponse"
+}
+
 type Field struct {
 	Name     string
 	Type     string

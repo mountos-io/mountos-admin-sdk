@@ -726,7 +726,7 @@ func (s *VolumesService) RestoreFork(ctx context.Context, volumeID int64, forkNa
 
 type VolumeForkTreesService struct{ c *Client }
 
-func (s *VolumeForkTreesService) List(ctx context.Context, volumeID int64, forkName string, opts *VolumeForkTreeListOptions) (*CursorPaginatedResponse[ForkTreeEntry], error) {
+func (s *VolumeForkTreesService) List(ctx context.Context, volumeID int64, forkName string, opts *VolumeForkTreeListOptions) (*StringCursorPaginatedResponse[ForkTreeEntry], error) {
 	q := url.Values{}
 	if opts != nil {
 		if opts.Path != "" {
@@ -735,8 +735,8 @@ func (s *VolumeForkTreesService) List(ctx context.Context, volumeID int64, forkN
 		if opts.AsOf != nil {
 			q.Set("asOf", strconv.FormatInt(*opts.AsOf, 10))
 		}
-		if opts.Cursor > 0 {
-			q.Set("cursor", strconv.FormatInt(opts.Cursor, 10))
+		if opts.Cursor != "" {
+			q.Set("cursor", opts.Cursor)
 		}
 		if opts.Limit > 0 {
 			q.Set("limit", strconv.Itoa(opts.Limit))
@@ -756,7 +756,7 @@ func (s *VolumeForkTreesService) List(ctx context.Context, volumeID int64, forkN
 	if err != nil {
 		return nil, err
 	}
-	return decodeJSON[CursorPaginatedResponse[ForkTreeEntry]](data)
+	return decodeJSON[StringCursorPaginatedResponse[ForkTreeEntry]](data)
 }
 
 type VolumeForkEntriesService struct{ c *Client }

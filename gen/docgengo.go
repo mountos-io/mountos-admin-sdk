@@ -48,6 +48,10 @@ func generateDocGo(spec *Spec, outDir string) {
 	w.WriteString("    Items      []T    `json:\"items\"`\n")
 	w.WriteString("    NextCursor *int64 `json:\"nextCursor\"`\n")
 	w.WriteString("}\n\n")
+	w.WriteString("type StringCursorPaginatedResponse[T any] struct {\n")
+	w.WriteString("    Items      []T     `json:\"items\"`\n")
+	w.WriteString("    NextCursor *string `json:\"nextCursor\"`\n")
+	w.WriteString("}\n\n")
 	w.WriteString("type IDResponse struct {\n")
 	w.WriteString("    ID int64 `json:\"id\"`\n")
 	w.WriteString("}\n")
@@ -183,7 +187,7 @@ func generateDocGo(spec *Spec, outDir string) {
 				} else {
 					args = append(args, "opts *"+optsType)
 				}
-				retType = "*CursorPaginatedResponse[" + ep.ResponseType + "]"
+				retType = "*" + cursorResponseType(ep) + "[" + ep.ResponseType + "]"
 
 			case len(ep.Query) > 0 && ep.Pagination == "":
 				for _, qs := range ep.Query {

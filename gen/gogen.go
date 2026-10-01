@@ -256,6 +256,13 @@ func generateGoTypes(spec *Spec, outDir string) {
 	w.WriteString("\tNextCursor *int64 `json:\"nextCursor\"`\n")
 	w.WriteString("}\n\n")
 
+	// StringCursorPaginatedResponse
+	w.WriteString("// StringCursorPaginatedResponse wraps cursor-based results whose cursor is an opaque string.\n")
+	w.WriteString("type StringCursorPaginatedResponse[T any] struct {\n")
+	w.WriteString("\tItems      []T     `json:\"items\"`\n")
+	w.WriteString("\tNextCursor *string `json:\"nextCursor\"`\n")
+	w.WriteString("}\n\n")
+
 	// IDResponse
 	w.WriteString("// IDResponse returned by create/edit/toggle endpoints.\n")
 	w.WriteString("type IDResponse struct {\n")
@@ -1069,7 +1076,8 @@ func writeGoCursorListMethod(w *strings.Builder, spec *Spec, svcType, methodName
 		sig += ", opts *" + optsType
 	}
 
-	fmt.Fprintf(w, "func (s *%s) %s(%s) (*CursorPaginatedResponse[%s], error) {\n", svcType, methodName, sig, ep.ResponseType)
+	respType := cursorResponseType(ep)
+	fmt.Fprintf(w, "func (s *%s) %s(%s) (*%s[%s], error) {\n", svcType, methodName, sig, respType, ep.ResponseType)
 	w.WriteString("\tq := url.Values{}\n")
 	if optsRequired {
 		w.WriteString("\t{\n")
@@ -1091,6 +1099,10 @@ func writeGoCursorListMethod(w *strings.Builder, spec *Spec, svcType, methodName
 			case "int", "int32":
 				fmt.Fprintf(w, "\t\tif opts.%s > 0 {\n", goName)
 				fmt.Fprintf(w, "\t\t\tq.Set(%q, strconv.Itoa(opts.%s))\n", f.Name, goName)
+				w.WriteString("\t\t}\n")
+			case "string":
+				fmt.Fprintf(w, "\t\tif opts.%s != \"\" {\n", goName)
+				fmt.Fprintf(w, "\t\t\tq.Set(%q, opts.%s)\n", f.Name, goName)
 				w.WriteString("\t\t}\n")
 			}
 		case f.Required:
@@ -1121,7 +1133,7 @@ func writeGoCursorListMethod(w *strings.Builder, spec *Spec, svcType, methodName
 	w.WriteString("\t}\n")
 	w.WriteString("\tdata, err := s.c.get(ctx, path)\n")
 	w.WriteString("\tif err != nil {\n\t\treturn nil, err\n\t}\n")
-	fmt.Fprintf(w, "\treturn decodeJSON[CursorPaginatedResponse[%s]](data)\n", ep.ResponseType)
+	fmt.Fprintf(w, "\treturn decodeJSON[%s[%s]](data)\n", respType, ep.ResponseType)
 	w.WriteString("}\n")
 }
 

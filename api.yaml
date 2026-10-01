@@ -1548,6 +1548,9 @@ resources:
       # cursor pagination; asOf=0 means live. Sort accepts
       # "<field>:<dir>" where field is name|size|mtime|kind and
       # dir is asc|desc. kind narrows to file|dir|symlink.
+      # The cursor is an opaque string. Pass nextCursor back unchanged as
+      # cursor. A cursor that the server does not recognize is rejected with
+      # an invalid cursor error, and the listing restarts from the first page.
       - action: list
         method: GET
         path: /
@@ -1555,7 +1558,7 @@ resources:
         query:
           - "path: string"
           - "asOf: int64"
-          - "cursor: int64"
+          - "cursor: string"
           - "limit: int=20"
           - "sort: string"
           - "kind: string"

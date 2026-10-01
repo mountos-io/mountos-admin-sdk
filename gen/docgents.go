@@ -38,6 +38,7 @@ func generateDocTS(spec *Spec, outDir string) {
 	w.WriteString("};\n\n")
 	w.WriteString("type PaginatedResponse<T>       = { items: T[]; pagination: PaginationMeta };\n")
 	w.WriteString("type CursorPaginatedResponse<T> = { items: T[]; nextCursor: number | null };\n")
+	w.WriteString("type StringCursorPaginatedResponse<T> = { items: T[]; nextCursor: string | null };\n")
 	w.WriteString("type PaginationMeta             = { page: number; limit: number; total: number; totalPages: number };\n")
 	w.WriteString("```\n\n")
 
@@ -171,7 +172,7 @@ func generateDocTS(spec *Spec, outDir string) {
 					params += ", "
 				}
 				sig = params + "opts" + optsOptional + ": " + optsType + ", signal?: AbortSignal"
-				retType = "CursorPaginatedResponse<" + ep.ResponseType + ">"
+				retType = cursorResponseType(ep) + "<" + ep.ResponseType + ">"
 				querySection = tsBlockObject(ep.Query)
 
 			case len(ep.Query) > 0 && ep.Pagination == "":

@@ -91,6 +91,12 @@ func generateTSTypes(spec *Spec, outDir string) {
 	w.WriteString("  nextCursor: number | null\n")
 	w.WriteString("}\n\n")
 
+	// StringCursorPaginatedResponse
+	w.WriteString("export interface StringCursorPaginatedResponse<T> {\n")
+	w.WriteString("  items: T[]\n")
+	w.WriteString("  nextCursor: string | null\n")
+	w.WriteString("}\n\n")
+
 	// ListOptions
 	w.WriteString("export interface ListOptions {\n")
 	w.WriteString("  page?: number\n")
@@ -201,7 +207,7 @@ func generateTSClient(spec *Spec, outDir string) {
 
 	// Imports
 	w.WriteString("import type {\n")
-	w.WriteString("  ListOptions, PaginatedResponse, CursorPaginatedResponse,\n")
+	w.WriteString("  ListOptions, PaginatedResponse, CursorPaginatedResponse, StringCursorPaginatedResponse,\n")
 
 	// Collect all type imports
 	var typeImports []string
@@ -372,7 +378,7 @@ func tsReturnType(ep Endpoint) string {
 		return "PaginatedResponse<" + ep.ResponseType + ">"
 	}
 	if ep.ResponseType != "" && ep.Pagination == "cursor" {
-		return "CursorPaginatedResponse<" + ep.ResponseType + ">"
+		return cursorResponseType(ep) + "<" + ep.ResponseType + ">"
 	}
 	if ep.ResponseType != "" {
 		return ep.ResponseType
@@ -615,7 +621,7 @@ func writeTSPageListMethod(w *strings.Builder, methodName string, ep Endpoint, f
 // GET with cursor pagination
 func writeTSCursorListMethod(w *strings.Builder, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string, pt map[string]string) {
 	optsType := listOptionsTypeName(resName)
-	retType := "CursorPaginatedResponse<" + ep.ResponseType + ">"
+	retType := cursorResponseType(ep) + "<" + ep.ResponseType + ">"
 
 	params := tsParams(allPathParams, pt)
 	optsOptional := "?"

@@ -41,6 +41,12 @@ type CursorPaginatedResponse[T any] struct {
 	NextCursor *int64 `json:"nextCursor"`
 }
 
+// StringCursorPaginatedResponse wraps cursor-based results whose cursor is an opaque string.
+type StringCursorPaginatedResponse[T any] struct {
+	Items      []T     `json:"items"`
+	NextCursor *string `json:"nextCursor"`
+}
+
 // IDResponse returned by create/edit/toggle endpoints.
 type IDResponse struct {
 	ID int64 `json:"id"`
@@ -1185,7 +1191,7 @@ type VolumeListOptions struct {
 type VolumeForkTreeListOptions struct {
 	Path   string
 	AsOf   *int64
-	Cursor int64
+	Cursor string
 	Limit  int
 	Sort   string
 	Kind   string

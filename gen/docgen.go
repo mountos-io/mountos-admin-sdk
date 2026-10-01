@@ -28,6 +28,8 @@ func generateDoc(spec *Spec, outDir string) {
 	w.WriteString("```\n")
 	w.WriteString("{ \"items\": T[], \"nextCursor\": int64|null }\n")
 	w.WriteString("```\n\n")
+	w.WriteString("An endpoint whose `cursor` query param is a `string` returns `\"nextCursor\": string|null` instead. ")
+	w.WriteString("That cursor is opaque: pass `nextCursor` back unchanged as `cursor` and never parse or build one.\n\n")
 
 	// Error Codes
 	w.WriteString("## Error Codes (AppServ 1XXXX)\n\n")
@@ -136,7 +138,11 @@ func generateDoc(spec *Spec, outDir string) {
 				} else if ep.Pagination == "page" {
 					fmt.Fprintf(&w, "Response data: `{ \"items\": %s[], \"pagination\": PaginationMeta }`\n", ep.ResponseType)
 				} else if ep.Pagination == "cursor" {
-					fmt.Fprintf(&w, "Response data: `{ \"items\": %s[], \"nextCursor\": int64|null }`\n", ep.ResponseType)
+					cursorType := "int64"
+					if cursorResponseType(ep) == "StringCursorPaginatedResponse" {
+						cursorType = "string"
+					}
+					fmt.Fprintf(&w, "Response data: `{ \"items\": %s[], \"nextCursor\": %s|null }`\n", ep.ResponseType, cursorType)
 				} else {
 					fmt.Fprintf(&w, "Response data: `%s`\n", ep.ResponseType)
 				}

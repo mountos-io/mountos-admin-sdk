@@ -29,8 +29,9 @@ func generateDocRust(spec *Spec, outDir string) {
 
 	w.WriteString("## Response Model\n\n")
 	w.WriteString("Each method returns the unwrapped `data` payload as a typed value, or an [`Error`] ")
-	w.WriteString("on `status=\"failure\"` or transport failure. List endpoints return `PaginatedResponse<T>` ")
-	w.WriteString("or `CursorPaginatedResponse<T>`; create/edit/toggle endpoints return `IdResponse`.\n\n")
+	w.WriteString("on `status=\"failure\"` or transport failure. List endpoints return `PaginatedResponse<T>`, ")
+	w.WriteString("`CursorPaginatedResponse<T>` or `StringCursorPaginatedResponse<T>`; create/edit/toggle endpoints return `IdResponse`. ")
+	w.WriteString("A string cursor is opaque: pass `next_cursor` back unchanged as `cursor` and never parse or build one.\n\n")
 	w.WriteString("```rust\n")
 	w.WriteString("pub enum Error {\n")
 	w.WriteString("    Api { message: String, status: u16, error_code: i64 },\n")
@@ -51,6 +52,10 @@ func generateDocRust(spec *Spec, outDir string) {
 	w.WriteString("pub struct CursorPaginatedResponse<T> {\n")
 	w.WriteString("    pub items: Vec<T>,\n")
 	w.WriteString("    pub next_cursor: Option<i64>,\n")
+	w.WriteString("}\n\n")
+	w.WriteString("pub struct StringCursorPaginatedResponse<T> {\n")
+	w.WriteString("    pub items: Vec<T>,\n")
+	w.WriteString("    pub next_cursor: Option<String>,\n")
 	w.WriteString("}\n\n")
 	w.WriteString("pub struct IdResponse {\n")
 	w.WriteString("    pub id: i64,\n")
@@ -209,7 +214,7 @@ func rustDocReturn(ep Endpoint, resName string) string {
 	case ep.Pagination == "page":
 		return "PaginatedResponse<" + rustType(ep.ResponseType) + ">"
 	case ep.Pagination == "cursor":
-		return "CursorPaginatedResponse<" + rustType(ep.ResponseType) + ">"
+		return cursorResponseType(ep) + "<" + rustType(ep.ResponseType) + ">"
 	case ep.ResponseType != "":
 		return rustType(ep.ResponseType)
 	case len(ep.Response) > 0:

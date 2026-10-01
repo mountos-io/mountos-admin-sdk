@@ -32,6 +32,11 @@ export interface CursorPaginatedResponse<T> {
   nextCursor: number | null
 }
 
+export interface StringCursorPaginatedResponse<T> {
+  items: T[]
+  nextCursor: string | null
+}
+
 export interface ListOptions {
   page?: number
   limit?: number
@@ -896,7 +901,7 @@ export interface VolumeListOptions extends ListOptions {
 export interface VolumeForkTreeListOptions {
   path?: string
   asOf?: number
-  cursor?: number
+  cursor?: string
   limit?: number
   sort?: string
   kind?: string

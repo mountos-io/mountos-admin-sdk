@@ -35,6 +35,7 @@ type StandardResponse<T> = {
 
 type PaginatedResponse<T>       = { items: T[]; pagination: PaginationMeta };
 type CursorPaginatedResponse<T> = { items: T[]; nextCursor: number | null };
+type StringCursorPaginatedResponse<T> = { items: T[]; nextCursor: string | null };
 type PaginationMeta             = { page: number; limit: number; total: number; totalPages: number };
 ```
 
@@ -1805,7 +1806,7 @@ Accessor: `client.volumeForkTrees`
 #### `list` - GET /api/v1/volumes/:volumeId/forks/:forkName/tree
 
 ```typescript
-client.volumeForkTrees.list(volumeId: number, forkName: string, opts?: VolumeForkTreeListOptions, signal?: AbortSignal): Promise<CursorPaginatedResponse<ForkTreeEntry>>;
+client.volumeForkTrees.list(volumeId: number, forkName: string, opts?: VolumeForkTreeListOptions, signal?: AbortSignal): Promise<StringCursorPaginatedResponse<ForkTreeEntry>>;
 ```
 
 Query params:
@@ -1814,7 +1815,7 @@ Query params:
 {
   path?: string;
   asOf?: number;
-  cursor?: number;
+  cursor?: string;
   limit?: number;  // default: 20
   sort?: string;
   kind?: string;

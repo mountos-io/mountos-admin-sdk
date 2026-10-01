@@ -48,6 +48,11 @@ type CursorPaginatedResponse[T any] struct {
     NextCursor *int64 `json:"nextCursor"`
 }
 
+type StringCursorPaginatedResponse[T any] struct {
+    Items      []T     `json:"items"`
+    NextCursor *string `json:"nextCursor"`
+}
+
 type IDResponse struct {
     ID int64 `json:"id"`
 }
@@ -2021,7 +2026,7 @@ Accessor: `client.VolumeForkTrees`
 #### `List` - GET /api/v1/volumes/:volumeId/forks/:forkName/tree
 
 ```go
-func (s *VolumeForkTreesService) List(ctx context.Context, volumeID int64, forkName string, opts *VolumeForkTreeListOptions) (*CursorPaginatedResponse[ForkTreeEntry], error)
+func (s *VolumeForkTreesService) List(ctx context.Context, volumeID int64, forkName string, opts *VolumeForkTreeListOptions) (*StringCursorPaginatedResponse[ForkTreeEntry], error)
 ```
 
 Query params:
@@ -2030,7 +2035,7 @@ Query params:
 type VolumeForkTreeListOptions struct {
     Path                 string       `url:"path"`
     AsOf                 *int64       `url:"asOf"`
-    Cursor               int64        `url:"cursor"`
+    Cursor               string       `url:"cursor"`
     Limit                int          `url:"limit"` // default: 20
     Sort                 string       `url:"sort"`
     Kind                 string       `url:"kind"`

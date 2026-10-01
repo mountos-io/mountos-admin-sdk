@@ -170,6 +170,15 @@ func generateRustTypes(spec *Spec, outDir string) {
 	w.WriteString("    pub next_cursor: Option<i64>,\n")
 	w.WriteString("}\n\n")
 
+	// StringCursorPaginatedResponse
+	w.WriteString("/// Cursor-based list response whose cursor is an opaque string.\n")
+	w.WriteString("#[derive(Debug, Clone, Deserialize)]\n")
+	w.WriteString("pub struct StringCursorPaginatedResponse<T> {\n")
+	w.WriteString("    pub items: Vec<T>,\n")
+	w.WriteString("    #[serde(rename = \"nextCursor\")]\n")
+	w.WriteString("    pub next_cursor: Option<String>,\n")
+	w.WriteString("}\n\n")
+
 	// IdResponse
 	w.WriteString("/// Identifier returned by create/edit/toggle endpoints.\n")
 	w.WriteString("#[derive(Debug, Clone, Deserialize)]\n")
@@ -537,7 +546,7 @@ func writeRustPageListMethod(w *strings.Builder, methodName string, ep Endpoint,
 
 func writeRustCursorListMethod(w *strings.Builder, methodName string, ep Endpoint, fullPath string, allPathParams []string, resName string, pt map[string]string) {
 	pathExpr := rustPathExpr(fullPath, allPathParams, pt)
-	retType := "CursorPaginatedResponse<" + rustType(ep.ResponseType) + ">"
+	retType := cursorResponseType(ep) + "<" + rustType(ep.ResponseType) + ">"
 
 	optsParam, optsRequired := rustOptsParam(listOptionsTypeName(resName), ep.Query)
 	parts := append(rustPathParamParts(allPathParams, pt), optsParam)

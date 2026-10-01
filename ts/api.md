@@ -20,6 +20,8 @@ Cursor-paginated responses nest in `data`:
 { "items": T[], "nextCursor": int64|null }
 ```
 
+An endpoint whose `cursor` query param is a `string` returns `"nextCursor": string|null` instead. That cursor is opaque: pass `nextCursor` back unchanged as `cursor` and never parse or build one.
+
 ## Error Codes (AppServ 1XXXX)
 
 | Code  | Name                   |
@@ -771,8 +773,8 @@ Response data: `Fork`
 ### GET /api/v1/volumes/:volumeId/forks/:forkName/tree
 Param: `volumeId`
 Param: `forkName`
-Query: `path=string`, `asOf=int64`, `cursor=int64`, `limit=int(default 20)`, `sort=string`, `kind=string`
-Response data: `{ "items": ForkTreeEntry[], "nextCursor": int64|null }`
+Query: `path=string`, `asOf=int64`, `cursor=string`, `limit=int(default 20)`, `sort=string`, `kind=string`
+Response data: `{ "items": ForkTreeEntry[], "nextCursor": string|null }`
 
 ### ForkTreeEntry Type
 ```

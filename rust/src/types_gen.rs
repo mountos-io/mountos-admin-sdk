@@ -48,6 +48,14 @@ pub struct CursorPaginatedResponse<T> {
     pub next_cursor: Option<i64>,
 }
 
+/// Cursor-based list response whose cursor is an opaque string.
+#[derive(Debug, Clone, Deserialize)]
+pub struct StringCursorPaginatedResponse<T> {
+    pub items: Vec<T>,
+    #[serde(rename = "nextCursor")]
+    pub next_cursor: Option<String>,
+}
+
 /// Identifier returned by create/edit/toggle endpoints.
 #[derive(Debug, Clone, Deserialize)]
 pub struct IdResponse {
@@ -1801,7 +1809,7 @@ pub struct VolumeListOptions {
 pub struct VolumeForkTreeListOptions {
     pub path: Option<String>,
     pub as_of: Option<i64>,
-    pub cursor: Option<i64>,
+    pub cursor: Option<String>,
     pub limit: Option<i64>,
     pub sort: Option<String>,
     pub kind: Option<String>,
