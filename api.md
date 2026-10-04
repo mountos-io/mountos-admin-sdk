@@ -911,6 +911,7 @@ Response data: `{ "intervalMs": int64, "samples": NodeStatsSample[] }`
   "nodeId": string,
   "advertiseAddr": string,
   "rpcAddr"?: string,
+  "addrs"?: NodeAddress[],
   "metadata"?: object,
   "metricsEndpoint"?: string,
   "instanceId"?: string,
@@ -1417,6 +1418,16 @@ Response data: `GCWorkerEventGoalsResponse`
 {
   "volumeId": string,
   "error": string
+}
+```
+
+### NodeAddress Type
+```
+{
+  "family": int,
+  "scope": string,
+  "advertise": string,
+  "rpc"?: string
 }
 ```
 

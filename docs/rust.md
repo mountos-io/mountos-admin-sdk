@@ -578,6 +578,17 @@ pub struct MoveVolumeFailure {
 }
 ```
 
+### `NodeAddress`
+
+```rust
+pub struct NodeAddress {
+    pub family: i64,
+    pub scope: String,
+    pub advertise: String,
+    pub rpc: Option<String>,
+}
+```
+
 ### `NodeStatsSample`
 
 ```rust
@@ -722,6 +733,7 @@ pub struct ServiceNode {
     pub node_id: String,
     pub advertise_addr: String,
     pub rpc_addr: Option<String>,
+    pub addrs: Option<Vec<NodeAddress>>,
     pub metadata: Option<serde_json::Value>,
     pub metrics_endpoint: Option<String>,
     pub instance_id: Option<String>,

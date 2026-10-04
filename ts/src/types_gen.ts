@@ -288,6 +288,7 @@ export interface ServiceNode {
   nodeId: string
   advertiseAddr: string
   rpcAddr?: string
+  addrs?: NodeAddress[]
   metadata?: Record<string, unknown>
   metricsEndpoint?: string
   instanceId?: string
@@ -527,6 +528,13 @@ export interface LicenseRecord {
 export interface MoveVolumeFailure {
   volumeId: string
   error: string
+}
+
+export interface NodeAddress {
+  family: number
+  scope: string
+  advertise: string
+  rpc?: string
 }
 
 export interface NodeStatsSample {

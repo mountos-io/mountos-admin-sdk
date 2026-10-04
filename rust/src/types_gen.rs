@@ -716,6 +716,8 @@ pub struct ServiceNode {
     #[serde(rename = "rpcAddr", skip_serializing_if = "Option::is_none")]
     pub rpc_addr: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub addrs: Option<Vec<NodeAddress>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<serde_json::Value>,
     #[serde(rename = "metricsEndpoint", skip_serializing_if = "Option::is_none")]
     pub metrics_endpoint: Option<String>,
@@ -1087,6 +1089,15 @@ pub struct MoveVolumeFailure {
     #[serde(rename = "volumeId")]
     pub volume_id: String,
     pub error: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct NodeAddress {
+    pub family: i64,
+    pub scope: String,
+    pub advertise: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rpc: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

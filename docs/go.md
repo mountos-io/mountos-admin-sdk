@@ -596,6 +596,17 @@ type MoveVolumeFailure struct {
 }
 ```
 
+### `NodeAddress`
+
+```go
+type NodeAddress struct {
+    Family                   int                      `json:"family"`
+    Scope                    string                   `json:"scope"`
+    Advertise                string                   `json:"advertise"`
+    Rpc                      *string                  `json:"rpc,omitempty"`
+}
+```
+
 ### `NodeStatsSample`
 
 ```go
@@ -740,6 +751,7 @@ type ServiceNode struct {
     NodeID                   string                   `json:"nodeId"`
     AdvertiseAddr            string                   `json:"advertiseAddr"`
     RpcAddr                  *string                  `json:"rpcAddr,omitempty"`
+    Addrs                    []NodeAddress            `json:"addrs,omitempty"`
     Metadata                 map[string]any           `json:"metadata,omitempty"`
     MetricsEndpoint          *string                  `json:"metricsEndpoint,omitempty"`
     InstanceID               *string                  `json:"instanceId,omitempty"`

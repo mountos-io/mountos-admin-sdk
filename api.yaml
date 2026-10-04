@@ -516,8 +516,12 @@ types:
     - "metadataClusterId: int64?"
     - "serviceType: string"
     - "nodeId: string"
+    # advertiseAddr and rpcAddr are the primary addresses (public, IPv4 when
+    # the node has one). addrs lists every registered address of both
+    # families and scopes.
     - "advertiseAddr: string"
     - "rpcAddr: string?"
+    - "addrs: NodeAddress[]?"
     - "metadata: object?"
     - "metricsEndpoint: string?"
     - "instanceId: string?"
@@ -528,6 +532,15 @@ types:
     - "memUsage: float?"
     - "sysLoad: int?"
     - "binaryVersion: int32?"
+
+  # One registered address of a node: the advertise and RPC address of one
+  # family (4 or 6) and scope ("public" or "private"). rpc is absent when the
+  # node registered no RPC address.
+  NodeAddress:
+    - "family: int"
+    - "scope: string"
+    - "advertise: string"
+    - "rpc: string?"
 
   NodeStatsSample:
     - "timestampMs: int64"

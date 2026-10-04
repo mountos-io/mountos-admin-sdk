@@ -530,6 +530,17 @@ interface MoveVolumeFailure {
 }
 ```
 
+### `NodeAddress`
+
+```typescript
+interface NodeAddress {
+  family: number;
+  scope: string;
+  advertise: string;
+  rpc?: string;
+}
+```
+
 ### `NodeStatsSample`
 
 ```typescript
@@ -674,6 +685,7 @@ interface ServiceNode {
   nodeId: string;
   advertiseAddr: string;
   rpcAddr?: string;
+  addrs?: NodeAddress[];
   metadata?: Record<string, unknown>;
   metricsEndpoint?: string;
   instanceId?: string;

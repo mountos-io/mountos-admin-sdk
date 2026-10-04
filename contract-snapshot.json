@@ -1249,6 +1249,30 @@
         }
       }
     },
+    "NodeAddress": {
+      "fields": {
+        "advertise": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "family": {
+          "type": "int",
+          "required": false,
+          "optional": false
+        },
+        "rpc": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "scope": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
     "NodeStatsSample": {
       "fields": {
         "dbConnsFree": {
@@ -1668,6 +1692,11 @@
     },
     "ServiceNode": {
       "fields": {
+        "addrs": {
+          "type": "NodeAddress[]",
+          "required": false,
+          "optional": true
+        },
         "advertiseAddr": {
           "type": "string",
           "required": false,
