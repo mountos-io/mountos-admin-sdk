@@ -667,9 +667,16 @@ type DashboardUser struct {
 }
 
 type DiscoverEndpoint struct {
-	NodeID string `json:"nodeId"`
-	Addr   string `json:"addr"`
-	Status string `json:"status"`
+	NodeID  string                 `json:"nodeId"`
+	Status  string                 `json:"status"`
+	Public  []DiscoverEndpointAddr `json:"public,omitempty"`
+	Private []DiscoverEndpointAddr `json:"private,omitempty"`
+}
+
+type DiscoverEndpointAddr struct {
+	TCP    string  `json:"tcp"`
+	UDP    *string `json:"udp,omitempty"`
+	Family int     `json:"family"`
 }
 
 type GCWorkerEventBucket struct {

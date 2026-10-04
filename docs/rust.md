@@ -318,8 +318,19 @@ pub struct DashboardUser {
 ```rust
 pub struct DiscoverEndpoint {
     pub node_id: String,
-    pub addr: String,
     pub status: String,
+    pub public: Option<Vec<DiscoverEndpointAddr>>,
+    pub private: Option<Vec<DiscoverEndpointAddr>>,
+}
+```
+
+### `DiscoverEndpointAddr`
+
+```rust
+pub struct DiscoverEndpointAddr {
+    pub tcp: String,
+    pub udp: Option<String>,
+    pub family: i64,
 }
 ```
 

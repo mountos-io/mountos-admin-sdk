@@ -577,20 +577,44 @@
     },
     "DiscoverEndpoint": {
       "fields": {
-        "addr": {
-          "type": "string",
-          "required": false,
-          "optional": false
-        },
         "nodeId": {
           "type": "string",
           "required": false,
           "optional": false
         },
+        "private": {
+          "type": "DiscoverEndpointAddr[]",
+          "required": false,
+          "optional": true
+        },
+        "public": {
+          "type": "DiscoverEndpointAddr[]",
+          "required": false,
+          "optional": true
+        },
         "status": {
           "type": "string",
           "required": false,
           "optional": false
+        }
+      }
+    },
+    "DiscoverEndpointAddr": {
+      "fields": {
+        "family": {
+          "type": "int",
+          "required": false,
+          "optional": false
+        },
+        "tcp": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "udp": {
+          "type": "string",
+          "required": false,
+          "optional": true
         }
       }
     },

@@ -497,8 +497,15 @@ export interface DashboardUser {
 
 export interface DiscoverEndpoint {
   nodeId: string
-  addr: string
   status: string
+  public?: DiscoverEndpointAddr[]
+  private?: DiscoverEndpointAddr[]
+}
+
+export interface DiscoverEndpointAddr {
+  tcp: string
+  udp?: string
+  family: number
 }
 
 export interface GCWorkerEventBucket {

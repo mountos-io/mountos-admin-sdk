@@ -270,8 +270,19 @@ interface DashboardUser {
 ```typescript
 interface DiscoverEndpoint {
   nodeId: string;
-  addr: string;
   status: string;
+  public?: DiscoverEndpointAddr[];
+  private?: DiscoverEndpointAddr[];
+}
+```
+
+### `DiscoverEndpointAddr`
+
+```typescript
+interface DiscoverEndpointAddr {
+  tcp: string;
+  udp?: string;
+  family: number;
 }
 ```
 

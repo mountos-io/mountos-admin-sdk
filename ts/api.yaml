@@ -637,10 +637,20 @@ types:
     - "region: string"
     - "endpoints: DiscoverEndpoint[]"
 
+  # One node of a discover response. public and private list one entry per
+  # address family (IPv4 first); private omits entries equal to a public one.
   DiscoverEndpoint:
     - "nodeId: string"
-    - "addr: string"
     - "status: string"
+    - "public: DiscoverEndpointAddr[]?"
+    - "private: DiscoverEndpointAddr[]?"
+
+  # The TCP and UDP address of one family of a node. udp is absent when the
+  # node runs no UDP listener.
+  DiscoverEndpointAddr:
+    - "tcp: string"
+    - "udp: string?"
+    - "family: int"
 
   # Prometheus/VictoriaMetrics http_sd_configs target shape.
   MetricsTarget:

@@ -1294,8 +1294,18 @@ Response data: `GCWorkerEventGoalsResponse`
 ```
 {
   "nodeId": string,
-  "addr": string,
-  "status": string
+  "status": string,
+  "public"?: DiscoverEndpointAddr[],
+  "private"?: DiscoverEndpointAddr[]
+}
+```
+
+### DiscoverEndpointAddr Type
+```
+{
+  "tcp": string,
+  "udp"?: string,
+  "family": int
 }
 ```
 

@@ -1045,8 +1045,19 @@ pub struct DashboardUser {
 pub struct DiscoverEndpoint {
     #[serde(rename = "nodeId")]
     pub node_id: String,
-    pub addr: String,
     pub status: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub public: Option<Vec<DiscoverEndpointAddr>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub private: Option<Vec<DiscoverEndpointAddr>>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DiscoverEndpointAddr {
+    pub tcp: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub udp: Option<String>,
+    pub family: i64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
