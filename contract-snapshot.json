@@ -975,12 +975,22 @@
           "required": false,
           "optional": false
         },
+        "deployment": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
         "distribution": {
           "type": "string",
           "required": false,
           "optional": true
         },
         "distributionRef": {
+          "type": "string[]",
+          "required": false,
+          "optional": true
+        },
+        "domains": {
           "type": "string[]",
           "required": false,
           "optional": true

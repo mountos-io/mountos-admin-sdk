@@ -492,6 +492,8 @@ pub struct LicenseDetails {
     pub quota: LicenseQuota,
     pub distribution: Option<String>,
     pub distribution_ref: Option<Vec<String>>,
+    pub deployment: Option<String>,
+    pub domains: Option<Vec<String>>,
     pub unlimited_storage: Option<bool>,
 }
 ```

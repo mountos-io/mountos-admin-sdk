@@ -884,6 +884,10 @@ pub struct LicenseDetails {
     pub distribution: Option<String>,
     #[serde(rename = "distributionRef", skip_serializing_if = "Option::is_none")]
     pub distribution_ref: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub deployment: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub domains: Option<Vec<String>>,
     #[serde(rename = "unlimitedStorage", skip_serializing_if = "Option::is_none")]
     pub unlimited_storage: Option<bool>,
 }

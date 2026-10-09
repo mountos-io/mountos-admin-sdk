@@ -444,6 +444,8 @@ interface LicenseDetails {
   quota: LicenseQuota;
   distribution?: string;
   distributionRef?: string[];
+  deployment?: string;
+  domains?: string[];
   unlimitedStorage?: boolean;
 }
 ```

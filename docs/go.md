@@ -510,6 +510,8 @@ type LicenseDetails struct {
     Quota                    LicenseQuota             `json:"quota"`
     Distribution             *string                  `json:"distribution,omitempty"`
     DistributionRef          []string                 `json:"distributionRef,omitempty"`
+    Deployment               *string                  `json:"deployment,omitempty"`
+    Domains                  []string                 `json:"domains,omitempty"`
     UnlimitedStorage         *bool                    `json:"unlimitedStorage,omitempty"`
 }
 ```

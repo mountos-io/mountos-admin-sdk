@@ -1066,6 +1066,8 @@ Response data: `LicenseList`
   "quota": LicenseQuota,
   "distribution"?: string,
   "distributionRef"?: string[],
+  "deployment"?: string,
+  "domains"?: string[],
   "unlimitedStorage"?: bool
 }
 ```
