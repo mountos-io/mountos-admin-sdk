@@ -621,7 +621,6 @@ pub struct Fork {
 pub struct ExclusiveGrantsResponse {
     #[serde(rename = "volumeId")]
     pub volume_id: i64,
-    pub fork: String,
     pub grants: Vec<ExclusiveGrant>,
     #[serde(rename = "ownerReachable")]
     pub owner_reachable: bool,

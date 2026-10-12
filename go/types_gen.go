@@ -394,7 +394,6 @@ type Fork struct {
 
 type ExclusiveGrantsResponse struct {
 	VolumeID       int64            `json:"volumeId"`
-	Fork           string           `json:"fork"`
 	Grants         []ExclusiveGrant `json:"grants"`
 	OwnerReachable bool             `json:"ownerReachable"`
 	Truncated      bool             `json:"truncated"`

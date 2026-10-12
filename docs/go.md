@@ -394,7 +394,6 @@ type ExclusiveGrant struct {
 ```go
 type ExclusiveGrantsResponse struct {
     VolumeID                 int64                    `json:"volumeId"`
-    Fork                     string                   `json:"fork"`
     Grants                   []ExclusiveGrant         `json:"grants"`
     OwnerReachable           bool                     `json:"ownerReachable"`
     Truncated                bool                     `json:"truncated"`
@@ -2086,7 +2085,7 @@ type CreateVolumeForkRequest struct {
 #### `ExclusiveGrants` - GET /api/v1/volumes/:volumeId/exclusive-grants
 
 ```go
-func (s *VolumesService) ExclusiveGrants(ctx context.Context, volumeID int64, fork string, limit int) (*ExclusiveGrantsResponse, error)
+func (s *VolumesService) ExclusiveGrants(ctx context.Context, volumeID int64, limit int) (*ExclusiveGrantsResponse, error)
 ```
 
 #### `ListForks` - GET /api/v1/volumes/:volumeId/forks

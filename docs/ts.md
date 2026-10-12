@@ -328,7 +328,6 @@ interface ExclusiveGrant {
 ```typescript
 interface ExclusiveGrantsResponse {
   volumeId: number;
-  fork: string;
   grants: ExclusiveGrant[];
   ownerReachable: boolean;
   truncated: boolean;
@@ -1865,14 +1864,13 @@ Request body:
 #### `exclusiveGrants` - GET /api/v1/volumes/:volumeId/exclusive-grants
 
 ```typescript
-client.volumes.exclusiveGrants(volumeId: number, fork?: string, limit?: number, signal?: AbortSignal): Promise<ExclusiveGrantsResponse>;
+client.volumes.exclusiveGrants(volumeId: number, limit?: number, signal?: AbortSignal): Promise<ExclusiveGrantsResponse>;
 ```
 
 Query params:
 
 ```typescript
 {
-  fork?: string;
   limit?: number;  // default: 200
 }
 ```

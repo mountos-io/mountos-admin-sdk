@@ -516,11 +516,8 @@ impl VolumesService {
         self.inner.post(&format!("/api/v1/volumes/{}/forks/create", volume_id), req).await
     }
 
-    pub async fn exclusive_grants(&self, volume_id: i64, fork: Option<&str>, limit: Option<i64>) -> Result<ExclusiveGrantsResponse, Error> {
+    pub async fn exclusive_grants(&self, volume_id: i64, limit: Option<i64>) -> Result<ExclusiveGrantsResponse, Error> {
         let mut query: Vec<(&str, String)> = Vec::new();
-        if let Some(v) = fork {
-            query.push(("fork", v.to_string()));
-        }
         if let Some(v) = limit {
             query.push(("limit", v.to_string()));
         }

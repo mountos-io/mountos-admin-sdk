@@ -685,11 +685,8 @@ func (s *VolumesService) CreateFork(ctx context.Context, volumeID int64, req *Cr
 	return decodeJSON[Fork](data)
 }
 
-func (s *VolumesService) ExclusiveGrants(ctx context.Context, volumeID int64, fork string, limit int) (*ExclusiveGrantsResponse, error) {
+func (s *VolumesService) ExclusiveGrants(ctx context.Context, volumeID int64, limit int) (*ExclusiveGrantsResponse, error) {
 	q := url.Values{}
-	if fork != "" {
-		q.Set("fork", fork)
-	}
 	q.Set("limit", strconv.Itoa(limit))
 	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/volumes/%s/exclusive-grants", strconv.FormatInt(volumeID, 10))+"?"+q.Encode())
 	if err != nil {

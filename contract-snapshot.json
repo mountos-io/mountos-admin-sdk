@@ -743,11 +743,6 @@
     },
     "ExclusiveGrantsResponse": {
       "fields": {
-        "fork": {
-          "type": "string",
-          "required": false,
-          "optional": false
-        },
         "grants": {
           "type": "ExclusiveGrant[]",
           "required": false,

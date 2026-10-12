@@ -223,7 +223,6 @@ export interface Fork {
 
 export interface ExclusiveGrantsResponse {
   volumeId: number
-  fork: string
   grants: ExclusiveGrant[]
   ownerReachable: boolean
   truncated: boolean

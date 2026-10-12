@@ -709,7 +709,7 @@ Response data: `Fork`
 
 ### GET /api/v1/volumes/:volumeId/exclusive-grants
 Param: `volumeId`
-Query: `fork=string`, `limit=int(default 200)`
+Query: `limit=int(default 200)`
 Response data: `ExclusiveGrantsResponse`
 
 ### GET /api/v1/volumes/:volumeId/forks
@@ -1363,7 +1363,6 @@ Response data: `GCWorkerEventGoalsResponse`
 ```
 {
   "volumeId": int64,
-  "fork": string,
   "grants": ExclusiveGrant[],
   "ownerReachable": bool,
   "truncated": bool

@@ -376,7 +376,6 @@ pub struct ExclusiveGrant {
 ```rust
 pub struct ExclusiveGrantsResponse {
     pub volume_id: i64,
-    pub fork: String,
     pub grants: Vec<ExclusiveGrant>,
     pub owner_reachable: bool,
     pub truncated: bool,
@@ -2068,7 +2067,7 @@ pub struct CreateVolumeForkRequest {
 #### `exclusive_grants` - GET /api/v1/volumes/:volumeId/exclusive-grants
 
 ```rust
-pub async fn exclusive_grants(&self, volume_id: i64, fork: Option<&str>, limit: Option<i64>) -> Result<ExclusiveGrantsResponse, Error>
+pub async fn exclusive_grants(&self, volume_id: i64, limit: Option<i64>) -> Result<ExclusiveGrantsResponse, Error>
 ```
 
 #### `list_forks` - GET /api/v1/volumes/:volumeId/forks

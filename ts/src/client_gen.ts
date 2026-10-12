@@ -418,8 +418,8 @@ export class VolumesResource {
     return this.client.request('POST', `/api/v1/volumes/${volumeId}/forks/create`, req, signal)
   }
 
-  exclusiveGrants(volumeId: number, fork?: string, limit?: number, signal?: AbortSignal): Promise<ExclusiveGrantsResponse> {
-    return this.client.request('GET', `/api/v1/volumes/${volumeId}/exclusive-grants${queryString({ fork: fork, limit: limit })}`, undefined, signal)
+  exclusiveGrants(volumeId: number, limit?: number, signal?: AbortSignal): Promise<ExclusiveGrantsResponse> {
+    return this.client.request('GET', `/api/v1/volumes/${volumeId}/exclusive-grants${queryString({ limit: limit })}`, undefined, signal)
   }
 
   listForks(volumeId: number, volumeType?: string, includeInactive?: boolean, signal?: AbortSignal): Promise<Fork[]> {
