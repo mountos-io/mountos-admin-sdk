@@ -1118,7 +1118,7 @@ pub struct ExclusiveGrant {
     #[serde(rename = "windowSeconds")]
     pub window_seconds: i32,
     #[serde(rename = "standbyPosition")]
-    pub standby_position: i64,
+    pub standby_position: i32,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub live: Option<bool>,
     #[serde(rename = "lastRenewAgeMs", skip_serializing_if = "Option::is_none")]

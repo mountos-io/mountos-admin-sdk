@@ -715,7 +715,7 @@
           "optional": false
         },
         "standbyPosition": {
-          "type": "int",
+          "type": "int32",
           "required": false,
           "optional": false
         },

@@ -1349,7 +1349,7 @@ Response data: `GCWorkerEventGoalsResponse`
   "sinceUnixMs": int64,
   "holderEpoch": uint64,
   "windowSeconds": int32,
-  "standbyPosition": int,
+  "standbyPosition": int32,
   "live"?: bool,
   "lastRenewAgeMs"?: int64,
   "lastSeenAgeMs"?: int64,

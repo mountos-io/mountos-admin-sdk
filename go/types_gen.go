@@ -715,7 +715,7 @@ type ExclusiveGrant struct {
 	SinceUnixMs       int64  `json:"sinceUnixMs"`
 	HolderEpoch       uint64 `json:"holderEpoch"`
 	WindowSeconds     int32  `json:"windowSeconds"`
-	StandbyPosition   int    `json:"standbyPosition"`
+	StandbyPosition   int32  `json:"standbyPosition"`
 	Live              *bool  `json:"live,omitempty"`
 	LastRenewAgeMs    *int64 `json:"lastRenewAgeMs,omitempty"`
 	LastSeenAgeMs     *int64 `json:"lastSeenAgeMs,omitempty"`

@@ -361,7 +361,7 @@ pub struct ExclusiveGrant {
     pub since_unix_ms: i64,
     pub holder_epoch: u64,
     pub window_seconds: i32,
-    pub standby_position: i64,
+    pub standby_position: i32,
     pub live: Option<bool>,
     pub last_renew_age_ms: Option<i64>,
     pub last_seen_age_ms: Option<i64>,
