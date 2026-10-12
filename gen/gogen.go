@@ -39,6 +39,8 @@ func goType(specType string) string {
 		return "string"
 	case "int64":
 		return "int64"
+	case "uint64":
+		return "uint64"
 	case "int32":
 		return "int32"
 	case "int":

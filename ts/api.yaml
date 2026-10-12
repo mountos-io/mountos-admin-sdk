@@ -614,6 +614,57 @@ types:
     - "disconnectedAt: int64?"
     - "isActive: bool"
 
+  ExclusiveGrant:
+    - "sessionId: string"
+    - "sessionName: string"
+    - "holderIp: string"
+    - "path: string"
+    - "scopeInode: string"
+    - "kind: string"
+    - "state: string"
+    - "role: string"
+    - "durability: string"
+    - "takeOverText: string"
+    - "sinceUnixMs: int64"
+    - "holderEpoch: uint64"
+    - "windowSeconds: int32"
+    - "standbyPosition: int"
+    - "live: bool?"
+    - "lastRenewAgeMs: int64?"
+    - "lastSeenAgeMs: int64?"
+    - "fencedSinceUnixMs: int64?"
+    - "failoverGraceMs: int64?"
+
+  ExclusiveGrantsResponse:
+    - "volumeId: int64"
+    - "fork: string"
+    - "grants: ExclusiveGrant[]"
+    - "ownerReachable: bool"
+    - "truncated: bool"
+
+  MountFlag:
+    - "name: string"
+    - "value: string"
+    - "source: string?"
+
+  MountDetails:
+    - "command: string?"
+    - "mountPoint: string?"
+    - "args: string[]?"
+    - "truncated: bool?"
+    - "mountOptions: string[]?"
+    - "flags: MountFlag[]?"
+
+  MountReportResponse:
+    - "mount: MountDetails?"
+    - "lastHeartbeat: int64?"
+    - "ageSeconds: int64?"
+
+  SupportBundle:
+    - "session: ClientSession"
+    - "mountReport: MountReportResponse"
+    - "serverTime: int64"
+
   SessionSummaryStatusEntry:
     - "clientType: string"
     - "status: string"
@@ -1535,6 +1586,14 @@ resources:
           - "volumeType: string?"
         responseType: Fork
 
+      - action: exclusiveGrants
+        method: GET
+        path: /:volumeId/exclusive-grants
+        query:
+          - "fork: string?"
+          - "limit: int=200"
+        responseType: ExclusiveGrantsResponse
+
       - action: listForks
         method: GET
         path: /:volumeId/forks
@@ -1752,6 +1811,16 @@ resources:
           - "volumeId: int64"
           - "userId: int64"
         responseType: SessionSummary
+
+      - action: mountReport
+        method: GET
+        path: /:sessionId/mount-report
+        responseType: MountReportResponse
+
+      - action: supportBundle
+        method: GET
+        path: /:sessionId/support-bundle
+        responseType: SupportBundle
 
   - name: Discover
     path: /discover

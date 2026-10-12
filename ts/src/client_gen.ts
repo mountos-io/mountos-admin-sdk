@@ -19,15 +19,16 @@ import type {
   RevokeVolumeAPIKeysByUserRequest, GenerateVolumeSttKeyRequest, UpdateVolumeQuotaRequest, 
   VolumeBlockPlacementConfig, UpdateVolumeCopysetConfigRequest, 
   VolumeBlockPlacementResizeResult, VolumeSizePoint, CreateVolumeForkRequest, Fork, 
-  DeleteVolumeForkRequest, RestoreVolumeForkRequest, ForkTreeEntry, 
-  VolumeForkTreeListOptions, ForkEntryDetail, ForkEntryVersion, VolumeForkEntryListOptions, 
-  ForkTreeMatch, VolumeForkSearchListOptions, AuditLog, AuditLogListOptions, 
-  RegionAuditLogListOptions, ServiceNode, NodeStatsSample, ClientSession, 
-  ClientSessionListOptions, SessionSummary, DiscoverMetaResponse, MetricsTarget, 
-  GenerateMetricTokenRequest, MetricsTokenResponse, DashboardStats, LicenseDetails, 
-  LicenseTerms, LoadLicenseRequest, LicenseLoadResult, LicenseList, ServiceAlert, 
-  AlertListOptions, AlertCountResponse, RegionAlert, RegionAlertListOptions, GCWorkerEvent, 
-  GCWorkerEventListOptions, GCWorkerEventHistogramResponse, GCWorkerEventGoalsResponse,
+  ExclusiveGrantsResponse, DeleteVolumeForkRequest, RestoreVolumeForkRequest, 
+  ForkTreeEntry, VolumeForkTreeListOptions, ForkEntryDetail, ForkEntryVersion, 
+  VolumeForkEntryListOptions, ForkTreeMatch, VolumeForkSearchListOptions, AuditLog, 
+  AuditLogListOptions, RegionAuditLogListOptions, ServiceNode, NodeStatsSample, 
+  ClientSession, ClientSessionListOptions, SessionSummary, MountReportResponse, 
+  SupportBundle, DiscoverMetaResponse, MetricsTarget, GenerateMetricTokenRequest, 
+  MetricsTokenResponse, DashboardStats, LicenseDetails, LicenseTerms, LoadLicenseRequest, 
+  LicenseLoadResult, LicenseList, ServiceAlert, AlertListOptions, AlertCountResponse, 
+  RegionAlert, RegionAlertListOptions, GCWorkerEvent, GCWorkerEventListOptions, 
+  GCWorkerEventHistogramResponse, GCWorkerEventGoalsResponse,
 } from './types_gen.js'
 
 export type RequestFn = <T>(method: string, path: string, body?: unknown, signal?: AbortSignal) => Promise<T>
@@ -417,6 +418,10 @@ export class VolumesResource {
     return this.client.request('POST', `/api/v1/volumes/${volumeId}/forks/create`, req, signal)
   }
 
+  exclusiveGrants(volumeId: number, fork?: string, limit?: number, signal?: AbortSignal): Promise<ExclusiveGrantsResponse> {
+    return this.client.request('GET', `/api/v1/volumes/${volumeId}/exclusive-grants${queryString({ fork: fork, limit: limit })}`, undefined, signal)
+  }
+
   listForks(volumeId: number, volumeType?: string, includeInactive?: boolean, signal?: AbortSignal): Promise<Fork[]> {
     return this.client.request('GET', `/api/v1/volumes/${volumeId}/forks${queryString({ volumeType: volumeType, includeInactive: includeInactive })}`, undefined, signal)
   }
@@ -544,6 +549,14 @@ export class ClientSessionsResource {
 
   summary(accountId: number, regionId?: number, metadataClusterId?: number, volumeId?: number, userId?: number, signal?: AbortSignal): Promise<SessionSummary> {
     return this.client.request('GET', `/api/v1/client-sessions/summary${queryString({ accountId: accountId, regionId: regionId, metadataClusterId: metadataClusterId, volumeId: volumeId, userId: userId })}`, undefined, signal)
+  }
+
+  mountReport(sessionId: number, signal?: AbortSignal): Promise<MountReportResponse> {
+    return this.client.request('GET', `/api/v1/client-sessions/${sessionId}/mount-report`, undefined, signal)
+  }
+
+  supportBundle(sessionId: number, signal?: AbortSignal): Promise<SupportBundle> {
+    return this.client.request('GET', `/api/v1/client-sessions/${sessionId}/support-bundle`, undefined, signal)
   }
 }
 

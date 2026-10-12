@@ -22,6 +22,8 @@ func rustType(specType string) string {
 		return "String"
 	case "int64":
 		return "i64"
+	case "uint64":
+		return "u64"
 	case "int32":
 		return "i32"
 	case "int":

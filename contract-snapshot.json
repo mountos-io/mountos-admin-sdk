@@ -637,6 +637,134 @@
         }
       }
     },
+    "ExclusiveGrant": {
+      "fields": {
+        "durability": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "failoverGraceMs": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "fencedSinceUnixMs": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "holderEpoch": {
+          "type": "uint64",
+          "required": false,
+          "optional": false
+        },
+        "holderIp": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "kind": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "lastRenewAgeMs": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "lastSeenAgeMs": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "live": {
+          "type": "bool",
+          "required": false,
+          "optional": true
+        },
+        "path": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "role": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "scopeInode": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "sessionId": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "sessionName": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "sinceUnixMs": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "standbyPosition": {
+          "type": "int",
+          "required": false,
+          "optional": false
+        },
+        "state": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "takeOverText": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "windowSeconds": {
+          "type": "int32",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "ExclusiveGrantsResponse": {
+      "fields": {
+        "fork": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "grants": {
+          "type": "ExclusiveGrant[]",
+          "required": false,
+          "optional": false
+        },
+        "ownerReachable": {
+          "type": "bool",
+          "required": false,
+          "optional": false
+        },
+        "truncated": {
+          "type": "bool",
+          "required": false,
+          "optional": false
+        },
+        "volumeId": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
     "Fork": {
       "fields": {
         "childrenCount": {
@@ -1266,6 +1394,78 @@
           "type": "string",
           "required": false,
           "optional": false
+        }
+      }
+    },
+    "MountDetails": {
+      "fields": {
+        "args": {
+          "type": "string[]",
+          "required": false,
+          "optional": true
+        },
+        "command": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "flags": {
+          "type": "MountFlag[]",
+          "required": false,
+          "optional": true
+        },
+        "mountOptions": {
+          "type": "string[]",
+          "required": false,
+          "optional": true
+        },
+        "mountPoint": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "truncated": {
+          "type": "bool",
+          "required": false,
+          "optional": true
+        }
+      }
+    },
+    "MountFlag": {
+      "fields": {
+        "name": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
+        "source": {
+          "type": "string",
+          "required": false,
+          "optional": true
+        },
+        "value": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "MountReportResponse": {
+      "fields": {
+        "ageSeconds": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "lastHeartbeat": {
+          "type": "int64",
+          "required": false,
+          "optional": true
+        },
+        "mount": {
+          "type": "MountDetails",
+          "required": false,
+          "optional": true
         }
       }
     },
@@ -1984,6 +2184,25 @@
         },
         "uuid": {
           "type": "string",
+          "required": false,
+          "optional": false
+        }
+      }
+    },
+    "SupportBundle": {
+      "fields": {
+        "mountReport": {
+          "type": "MountReportResponse",
+          "required": false,
+          "optional": false
+        },
+        "serverTime": {
+          "type": "int64",
+          "required": false,
+          "optional": false
+        },
+        "session": {
+          "type": "ClientSession",
           "required": false,
           "optional": false
         }

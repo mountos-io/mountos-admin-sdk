@@ -296,6 +296,44 @@ interface DiscoverMetaResponse {
 }
 ```
 
+### `ExclusiveGrant`
+
+```typescript
+interface ExclusiveGrant {
+  sessionId: string;
+  sessionName: string;
+  holderIp: string;
+  path: string;
+  scopeInode: string;
+  kind: string;
+  state: string;
+  role: string;
+  durability: string;
+  takeOverText: string;
+  sinceUnixMs: number;
+  holderEpoch: number;
+  windowSeconds: number;
+  standbyPosition: number;
+  live?: boolean;
+  lastRenewAgeMs?: number;
+  lastSeenAgeMs?: number;
+  fencedSinceUnixMs?: number;
+  failoverGraceMs?: number;
+}
+```
+
+### `ExclusiveGrantsResponse`
+
+```typescript
+interface ExclusiveGrantsResponse {
+  volumeId: number;
+  fork: string;
+  grants: ExclusiveGrant[];
+  ownerReachable: boolean;
+  truncated: boolean;
+}
+```
+
 ### `Fork`
 
 ```typescript
@@ -534,6 +572,39 @@ interface MetricsTokenResponse {
 }
 ```
 
+### `MountDetails`
+
+```typescript
+interface MountDetails {
+  command?: string;
+  mountPoint?: string;
+  args?: string[];
+  truncated?: boolean;
+  mountOptions?: string[];
+  flags?: MountFlag[];
+}
+```
+
+### `MountFlag`
+
+```typescript
+interface MountFlag {
+  name: string;
+  value: string;
+  source?: string;
+}
+```
+
+### `MountReportResponse`
+
+```typescript
+interface MountReportResponse {
+  mount?: MountDetails;
+  lastHeartbeat?: number;
+  ageSeconds?: number;
+}
+```
+
 ### `MoveVolumeFailure`
 
 ```typescript
@@ -768,6 +839,16 @@ interface Storage {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+}
+```
+
+### `SupportBundle`
+
+```typescript
+interface SupportBundle {
+  session: ClientSession;
+  mountReport: MountReportResponse;
+  serverTime: number;
 }
 ```
 
@@ -1780,6 +1861,21 @@ Request body:
 }
 ```
 
+#### `exclusiveGrants` - GET /api/v1/volumes/:volumeId/exclusive-grants
+
+```typescript
+client.volumes.exclusiveGrants(volumeId: number, fork?: string, limit?: number, signal?: AbortSignal): Promise<ExclusiveGrantsResponse>;
+```
+
+Query params:
+
+```typescript
+{
+  fork?: string;
+  limit?: number;  // default: 200
+}
+```
+
 #### `listForks` - GET /api/v1/volumes/:volumeId/forks
 
 ```typescript
@@ -2059,6 +2155,18 @@ Query params:
   volumeId?: number;
   userId?: number;
 }
+```
+
+#### `mountReport` - GET /api/v1/client-sessions/:sessionId/mount-report
+
+```typescript
+client.clientSessions.mountReport(sessionId: number, signal?: AbortSignal): Promise<MountReportResponse>;
+```
+
+#### `supportBundle` - GET /api/v1/client-sessions/:sessionId/support-bundle
+
+```typescript
+client.clientSessions.supportBundle(sessionId: number, signal?: AbortSignal): Promise<SupportBundle>;
 ```
 
 ### Discover

@@ -707,6 +707,11 @@ Request:
 ```
 Response data: `Fork`
 
+### GET /api/v1/volumes/:volumeId/exclusive-grants
+Param: `volumeId`
+Query: `fork=string`, `limit=int(default 200)`
+Response data: `ExclusiveGrantsResponse`
+
 ### GET /api/v1/volumes/:volumeId/forks
 Param: `volumeId`
 Query: `volumeType=string`, `includeInactive=bool(default false)`
@@ -948,6 +953,14 @@ Response data: `ClientSession`
 ### GET /api/v1/client-sessions/summary
 Query: `accountId=int64(required)`, `regionId=int64`, `metadataClusterId=int64`, `volumeId=int64`, `userId=int64`
 Response data: `SessionSummary`
+
+### GET /api/v1/client-sessions/:sessionId/mount-report
+Param: `sessionId`
+Response data: `MountReportResponse`
+
+### GET /api/v1/client-sessions/:sessionId/support-bundle
+Param: `sessionId`
+Response data: `SupportBundle`
 
 ### ClientSession Type
 ```
@@ -1320,6 +1333,42 @@ Response data: `GCWorkerEventGoalsResponse`
 }
 ```
 
+### ExclusiveGrant Type
+```
+{
+  "sessionId": string,
+  "sessionName": string,
+  "holderIp": string,
+  "path": string,
+  "scopeInode": string,
+  "kind": string,
+  "state": string,
+  "role": string,
+  "durability": string,
+  "takeOverText": string,
+  "sinceUnixMs": int64,
+  "holderEpoch": uint64,
+  "windowSeconds": int32,
+  "standbyPosition": int,
+  "live"?: bool,
+  "lastRenewAgeMs"?: int64,
+  "lastSeenAgeMs"?: int64,
+  "fencedSinceUnixMs"?: int64,
+  "failoverGraceMs"?: int64
+}
+```
+
+### ExclusiveGrantsResponse Type
+```
+{
+  "volumeId": int64,
+  "fork": string,
+  "grants": ExclusiveGrant[],
+  "ownerReachable": bool,
+  "truncated": bool
+}
+```
+
 ### Fork Type
 ```
 {
@@ -1422,6 +1471,36 @@ Response data: `GCWorkerEventGoalsResponse`
 ```
 {
   "token": string
+}
+```
+
+### MountDetails Type
+```
+{
+  "command"?: string,
+  "mountPoint"?: string,
+  "args"?: string[],
+  "truncated"?: bool,
+  "mountOptions"?: string[],
+  "flags"?: MountFlag[]
+}
+```
+
+### MountFlag Type
+```
+{
+  "name": string,
+  "value": string,
+  "source"?: string
+}
+```
+
+### MountReportResponse Type
+```
+{
+  "mount"?: MountDetails,
+  "lastHeartbeat"?: int64,
+  "ageSeconds"?: int64
 }
 ```
 
@@ -1543,6 +1622,15 @@ Response data: `GCWorkerEventGoalsResponse`
   "clientType": string,
   "status": string,
   "count": int64
+}
+```
+
+### SupportBundle Type
+```
+{
+  "session": ClientSession,
+  "mountReport": MountReportResponse,
+  "serverTime": int64
 }
 ```
 

@@ -344,6 +344,44 @@ pub struct DiscoverMetaResponse {
 }
 ```
 
+### `ExclusiveGrant`
+
+```rust
+pub struct ExclusiveGrant {
+    pub session_id: String,
+    pub session_name: String,
+    pub holder_ip: String,
+    pub path: String,
+    pub scope_inode: String,
+    pub kind: String,
+    pub state: String,
+    pub role: String,
+    pub durability: String,
+    pub take_over_text: String,
+    pub since_unix_ms: i64,
+    pub holder_epoch: u64,
+    pub window_seconds: i32,
+    pub standby_position: i64,
+    pub live: Option<bool>,
+    pub last_renew_age_ms: Option<i64>,
+    pub last_seen_age_ms: Option<i64>,
+    pub fenced_since_unix_ms: Option<i64>,
+    pub failover_grace_ms: Option<i64>,
+}
+```
+
+### `ExclusiveGrantsResponse`
+
+```rust
+pub struct ExclusiveGrantsResponse {
+    pub volume_id: i64,
+    pub fork: String,
+    pub grants: Vec<ExclusiveGrant>,
+    pub owner_reachable: bool,
+    pub truncated: bool,
+}
+```
+
 ### `Fork`
 
 ```rust
@@ -582,6 +620,39 @@ pub struct MetricsTokenResponse {
 }
 ```
 
+### `MountDetails`
+
+```rust
+pub struct MountDetails {
+    pub command: Option<String>,
+    pub mount_point: Option<String>,
+    pub args: Option<Vec<String>>,
+    pub truncated: Option<bool>,
+    pub mount_options: Option<Vec<String>>,
+    pub flags: Option<Vec<MountFlag>>,
+}
+```
+
+### `MountFlag`
+
+```rust
+pub struct MountFlag {
+    pub name: String,
+    pub value: String,
+    pub source: Option<String>,
+}
+```
+
+### `MountReportResponse`
+
+```rust
+pub struct MountReportResponse {
+    pub mount: Option<MountDetails>,
+    pub last_heartbeat: Option<i64>,
+    pub age_seconds: Option<i64>,
+}
+```
+
 ### `MoveVolumeFailure`
 
 ```rust
@@ -816,6 +887,16 @@ pub struct Storage {
     pub is_active: bool,
     pub created_at: String,
     pub updated_at: String,
+}
+```
+
+### `SupportBundle`
+
+```rust
+pub struct SupportBundle {
+    pub session: ClientSession,
+    pub mount_report: MountReportResponse,
+    pub server_time: i64,
 }
 ```
 
@@ -1983,6 +2064,12 @@ pub struct CreateVolumeForkRequest {
 }
 ```
 
+#### `exclusive_grants` - GET /api/v1/volumes/:volumeId/exclusive-grants
+
+```rust
+pub async fn exclusive_grants(&self, volume_id: i64, fork: Option<&str>, limit: Option<i64>) -> Result<ExclusiveGrantsResponse, Error>
+```
+
 #### `list_forks` - GET /api/v1/volumes/:volumeId/forks
 
 ```rust
@@ -2226,6 +2313,18 @@ pub async fn get(&self, session_id: i64) -> Result<ClientSession, Error>
 
 ```rust
 pub async fn summary(&self, account_id: i64, region_id: Option<i64>, metadata_cluster_id: Option<i64>, volume_id: Option<i64>, user_id: Option<i64>) -> Result<SessionSummary, Error>
+```
+
+#### `mount_report` - GET /api/v1/client-sessions/:sessionId/mount-report
+
+```rust
+pub async fn mount_report(&self, session_id: i64) -> Result<MountReportResponse, Error>
+```
+
+#### `support_bundle` - GET /api/v1/client-sessions/:sessionId/support-bundle
+
+```rust
+pub async fn support_bundle(&self, session_id: i64) -> Result<SupportBundle, Error>
 ```
 
 ### Discover

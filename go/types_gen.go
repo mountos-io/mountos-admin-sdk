@@ -392,6 +392,14 @@ type Fork struct {
 	Size          int64  `json:"size"`
 }
 
+type ExclusiveGrantsResponse struct {
+	VolumeID       int64            `json:"volumeId"`
+	Fork           string           `json:"fork"`
+	Grants         []ExclusiveGrant `json:"grants"`
+	OwnerReachable bool             `json:"ownerReachable"`
+	Truncated      bool             `json:"truncated"`
+}
+
 type ForkTreeEntry struct {
 	Inode     int64  `json:"inode"`
 	Name      string `json:"name"`
@@ -506,6 +514,18 @@ type SessionSummary struct {
 	VolumeCount   int64                       `json:"volumeCount"`
 	HostCount     int64                       `json:"hostCount"`
 	DegradedCount int64                       `json:"degradedCount"`
+}
+
+type MountReportResponse struct {
+	Mount         MountDetails `json:"mount,omitempty"`
+	LastHeartbeat *int64       `json:"lastHeartbeat,omitempty"`
+	AgeSeconds    *int64       `json:"ageSeconds,omitempty"`
+}
+
+type SupportBundle struct {
+	Session     ClientSession       `json:"session"`
+	MountReport MountReportResponse `json:"mountReport"`
+	ServerTime  int64               `json:"serverTime"`
 }
 
 type DiscoverMetaResponse struct {
@@ -681,6 +701,28 @@ type DiscoverEndpointAddr struct {
 	Family int     `json:"family"`
 }
 
+type ExclusiveGrant struct {
+	SessionID         string `json:"sessionId"`
+	SessionName       string `json:"sessionName"`
+	HolderIP          string `json:"holderIp"`
+	Path              string `json:"path"`
+	ScopeInode        string `json:"scopeInode"`
+	Kind              string `json:"kind"`
+	State             string `json:"state"`
+	Role              string `json:"role"`
+	Durability        string `json:"durability"`
+	TakeOverText      string `json:"takeOverText"`
+	SinceUnixMs       int64  `json:"sinceUnixMs"`
+	HolderEpoch       uint64 `json:"holderEpoch"`
+	WindowSeconds     int32  `json:"windowSeconds"`
+	StandbyPosition   int    `json:"standbyPosition"`
+	Live              *bool  `json:"live,omitempty"`
+	LastRenewAgeMs    *int64 `json:"lastRenewAgeMs,omitempty"`
+	LastSeenAgeMs     *int64 `json:"lastSeenAgeMs,omitempty"`
+	FencedSinceUnixMs *int64 `json:"fencedSinceUnixMs,omitempty"`
+	FailoverGraceMs   *int64 `json:"failoverGraceMs,omitempty"`
+}
+
 type GCWorkerEventBucket struct {
 	BucketStart string `json:"bucketStart"`
 	Goal        string `json:"goal"`
@@ -703,6 +745,21 @@ type LicenseRecord struct {
 	ExpiresAt       string        `json:"expiresAt"`
 	MaxStorageBytes int64         `json:"maxStorageBytes"`
 	InsertedAt      string        `json:"insertedAt"`
+}
+
+type MountDetails struct {
+	Command      *string     `json:"command,omitempty"`
+	MountPoint   *string     `json:"mountPoint,omitempty"`
+	Args         []string    `json:"args,omitempty"`
+	Truncated    *bool       `json:"truncated,omitempty"`
+	MountOptions []string    `json:"mountOptions,omitempty"`
+	Flags        []MountFlag `json:"flags,omitempty"`
+}
+
+type MountFlag struct {
+	Name   string  `json:"name"`
+	Value  string  `json:"value"`
+	Source *string `json:"source,omitempty"`
 }
 
 type MoveVolumeFailure struct {

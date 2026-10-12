@@ -618,6 +618,17 @@ pub struct Fork {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ExclusiveGrantsResponse {
+    #[serde(rename = "volumeId")]
+    pub volume_id: i64,
+    pub fork: String,
+    pub grants: Vec<ExclusiveGrant>,
+    #[serde(rename = "ownerReachable")]
+    pub owner_reachable: bool,
+    pub truncated: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ForkTreeEntry {
     pub inode: i64,
     pub name: String,
@@ -799,6 +810,25 @@ pub struct SessionSummary {
     pub host_count: i64,
     #[serde(rename = "degradedCount")]
     pub degraded_count: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MountReportResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub mount: Option<MountDetails>,
+    #[serde(rename = "lastHeartbeat", skip_serializing_if = "Option::is_none")]
+    pub last_heartbeat: Option<i64>,
+    #[serde(rename = "ageSeconds", skip_serializing_if = "Option::is_none")]
+    pub age_seconds: Option<i64>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SupportBundle {
+    pub session: ClientSession,
+    #[serde(rename = "mountReport")]
+    pub mount_report: MountReportResponse,
+    #[serde(rename = "serverTime")]
+    pub server_time: i64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -1065,6 +1095,43 @@ pub struct DiscoverEndpointAddr {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ExclusiveGrant {
+    #[serde(rename = "sessionId")]
+    pub session_id: String,
+    #[serde(rename = "sessionName")]
+    pub session_name: String,
+    #[serde(rename = "holderIp")]
+    pub holder_ip: String,
+    pub path: String,
+    #[serde(rename = "scopeInode")]
+    pub scope_inode: String,
+    pub kind: String,
+    pub state: String,
+    pub role: String,
+    pub durability: String,
+    #[serde(rename = "takeOverText")]
+    pub take_over_text: String,
+    #[serde(rename = "sinceUnixMs")]
+    pub since_unix_ms: i64,
+    #[serde(rename = "holderEpoch")]
+    pub holder_epoch: u64,
+    #[serde(rename = "windowSeconds")]
+    pub window_seconds: i32,
+    #[serde(rename = "standbyPosition")]
+    pub standby_position: i64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub live: Option<bool>,
+    #[serde(rename = "lastRenewAgeMs", skip_serializing_if = "Option::is_none")]
+    pub last_renew_age_ms: Option<i64>,
+    #[serde(rename = "lastSeenAgeMs", skip_serializing_if = "Option::is_none")]
+    pub last_seen_age_ms: Option<i64>,
+    #[serde(rename = "fencedSinceUnixMs", skip_serializing_if = "Option::is_none")]
+    pub fenced_since_unix_ms: Option<i64>,
+    #[serde(rename = "failoverGraceMs", skip_serializing_if = "Option::is_none")]
+    pub failover_grace_ms: Option<i64>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GCWorkerEventBucket {
     #[serde(rename = "bucketStart")]
     pub bucket_start: String,
@@ -1097,6 +1164,30 @@ pub struct LicenseRecord {
     pub max_storage_bytes: i64,
     #[serde(rename = "insertedAt")]
     pub inserted_at: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MountDetails {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub command: Option<String>,
+    #[serde(rename = "mountPoint", skip_serializing_if = "Option::is_none")]
+    pub mount_point: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub args: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub truncated: Option<bool>,
+    #[serde(rename = "mountOptions", skip_serializing_if = "Option::is_none")]
+    pub mount_options: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub flags: Option<Vec<MountFlag>>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MountFlag {
+    pub name: String,
+    pub value: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

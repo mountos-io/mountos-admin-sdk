@@ -362,6 +362,44 @@ type DiscoverMetaResponse struct {
 }
 ```
 
+### `ExclusiveGrant`
+
+```go
+type ExclusiveGrant struct {
+    SessionID                string                   `json:"sessionId"`
+    SessionName              string                   `json:"sessionName"`
+    HolderIP                 string                   `json:"holderIp"`
+    Path                     string                   `json:"path"`
+    ScopeInode               string                   `json:"scopeInode"`
+    Kind                     string                   `json:"kind"`
+    State                    string                   `json:"state"`
+    Role                     string                   `json:"role"`
+    Durability               string                   `json:"durability"`
+    TakeOverText             string                   `json:"takeOverText"`
+    SinceUnixMs              int64                    `json:"sinceUnixMs"`
+    HolderEpoch              uint64                   `json:"holderEpoch"`
+    WindowSeconds            int32                    `json:"windowSeconds"`
+    StandbyPosition          int                      `json:"standbyPosition"`
+    Live                     *bool                    `json:"live,omitempty"`
+    LastRenewAgeMs           *int64                   `json:"lastRenewAgeMs,omitempty"`
+    LastSeenAgeMs            *int64                   `json:"lastSeenAgeMs,omitempty"`
+    FencedSinceUnixMs        *int64                   `json:"fencedSinceUnixMs,omitempty"`
+    FailoverGraceMs          *int64                   `json:"failoverGraceMs,omitempty"`
+}
+```
+
+### `ExclusiveGrantsResponse`
+
+```go
+type ExclusiveGrantsResponse struct {
+    VolumeID                 int64                    `json:"volumeId"`
+    Fork                     string                   `json:"fork"`
+    Grants                   []ExclusiveGrant         `json:"grants"`
+    OwnerReachable           bool                     `json:"ownerReachable"`
+    Truncated                bool                     `json:"truncated"`
+}
+```
+
 ### `Fork`
 
 ```go
@@ -600,6 +638,39 @@ type MetricsTokenResponse struct {
 }
 ```
 
+### `MountDetails`
+
+```go
+type MountDetails struct {
+    Command                  *string                  `json:"command,omitempty"`
+    MountPoint               *string                  `json:"mountPoint,omitempty"`
+    Args                     []string                 `json:"args,omitempty"`
+    Truncated                *bool                    `json:"truncated,omitempty"`
+    MountOptions             []string                 `json:"mountOptions,omitempty"`
+    Flags                    []MountFlag              `json:"flags,omitempty"`
+}
+```
+
+### `MountFlag`
+
+```go
+type MountFlag struct {
+    Name                     string                   `json:"name"`
+    Value                    string                   `json:"value"`
+    Source                   *string                  `json:"source,omitempty"`
+}
+```
+
+### `MountReportResponse`
+
+```go
+type MountReportResponse struct {
+    Mount                    MountDetails             `json:"mount,omitempty"`
+    LastHeartbeat            *int64                   `json:"lastHeartbeat,omitempty"`
+    AgeSeconds               *int64                   `json:"ageSeconds,omitempty"`
+}
+```
+
 ### `MoveVolumeFailure`
 
 ```go
@@ -834,6 +905,16 @@ type Storage struct {
     IsActive                 bool                     `json:"isActive"`
     CreatedAt                string                   `json:"createdAt"`
     UpdatedAt                string                   `json:"updatedAt"`
+}
+```
+
+### `SupportBundle`
+
+```go
+type SupportBundle struct {
+    Session                  ClientSession            `json:"session"`
+    MountReport              MountReportResponse      `json:"mountReport"`
+    ServerTime               int64                    `json:"serverTime"`
 }
 ```
 
@@ -2001,6 +2082,12 @@ type CreateVolumeForkRequest struct {
 }
 ```
 
+#### `ExclusiveGrants` - GET /api/v1/volumes/:volumeId/exclusive-grants
+
+```go
+func (s *VolumesService) ExclusiveGrants(ctx context.Context, volumeID int64, fork string, limit int) (*ExclusiveGrantsResponse, error)
+```
+
 #### `ListForks` - GET /api/v1/volumes/:volumeId/forks
 
 ```go
@@ -2244,6 +2331,18 @@ func (s *ClientSessionsService) Get(ctx context.Context, sessionID int64) (*Clie
 
 ```go
 func (s *ClientSessionsService) Summary(ctx context.Context, accountID int64, regionID *int64, metadataClusterID *int64, volumeID *int64, userID *int64) (*SessionSummary, error)
+```
+
+#### `MountReport` - GET /api/v1/client-sessions/:sessionId/mount-report
+
+```go
+func (s *ClientSessionsService) MountReport(ctx context.Context, sessionID int64) (*MountReportResponse, error)
+```
+
+#### `SupportBundle` - GET /api/v1/client-sessions/:sessionId/support-bundle
+
+```go
+func (s *ClientSessionsService) SupportBundle(ctx context.Context, sessionID int64) (*SupportBundle, error)
 ```
 
 ### Discover

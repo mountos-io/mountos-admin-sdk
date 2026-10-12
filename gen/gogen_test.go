@@ -69,3 +69,20 @@ func TestWriteGoStructRequestOptionalUnchanged(t *testing.T) {
 func collapseSpace(s string) string {
 	return strings.Join(strings.Fields(s), " ")
 }
+
+// TestUint64Mapping checks that an unsigned 64-bit spec type maps to a native
+// unsigned type in Go and Rust, and to a number in TS.
+func TestUint64Mapping(t *testing.T) {
+	if got := goType("uint64"); got != "uint64" {
+		t.Errorf("goType(uint64) = %q", got)
+	}
+	if got := rustType("uint64"); got != "u64" {
+		t.Errorf("rustType(uint64) = %q", got)
+	}
+	if got := tsType("uint64"); got != "number" {
+		t.Errorf("tsType(uint64) = %q", got)
+	}
+	if !isPrimitiveType("uint64") {
+		t.Error("isPrimitiveType(uint64) = false")
+	}
+}

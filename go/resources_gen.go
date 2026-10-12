@@ -685,6 +685,19 @@ func (s *VolumesService) CreateFork(ctx context.Context, volumeID int64, req *Cr
 	return decodeJSON[Fork](data)
 }
 
+func (s *VolumesService) ExclusiveGrants(ctx context.Context, volumeID int64, fork string, limit int) (*ExclusiveGrantsResponse, error) {
+	q := url.Values{}
+	if fork != "" {
+		q.Set("fork", fork)
+	}
+	q.Set("limit", strconv.Itoa(limit))
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/volumes/%s/exclusive-grants", strconv.FormatInt(volumeID, 10))+"?"+q.Encode())
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[ExclusiveGrantsResponse](data)
+}
+
 func (s *VolumesService) ListForks(ctx context.Context, volumeID int64, volumeType string, includeInactive bool) ([]Fork, error) {
 	q := url.Values{}
 	if volumeType != "" {
@@ -1058,6 +1071,22 @@ func (s *ClientSessionsService) Summary(ctx context.Context, accountID int64, re
 		return nil, err
 	}
 	return decodeJSON[SessionSummary](data)
+}
+
+func (s *ClientSessionsService) MountReport(ctx context.Context, sessionID int64) (*MountReportResponse, error) {
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/client-sessions/%s/mount-report", strconv.FormatInt(sessionID, 10)))
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[MountReportResponse](data)
+}
+
+func (s *ClientSessionsService) SupportBundle(ctx context.Context, sessionID int64) (*SupportBundle, error) {
+	data, err := s.c.get(ctx, fmt.Sprintf("/api/v1/client-sessions/%s/support-bundle", strconv.FormatInt(sessionID, 10)))
+	if err != nil {
+		return nil, err
+	}
+	return decodeJSON[SupportBundle](data)
 }
 
 type DiscoverService struct{ c *Client }

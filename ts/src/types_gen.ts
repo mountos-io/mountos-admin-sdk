@@ -221,6 +221,14 @@ export interface Fork {
   size: number
 }
 
+export interface ExclusiveGrantsResponse {
+  volumeId: number
+  fork: string
+  grants: ExclusiveGrant[]
+  ownerReachable: boolean
+  truncated: boolean
+}
+
 export interface ForkTreeEntry {
   inode: number
   name: string
@@ -335,6 +343,18 @@ export interface SessionSummary {
   volumeCount: number
   hostCount: number
   degradedCount: number
+}
+
+export interface MountReportResponse {
+  mount?: MountDetails
+  lastHeartbeat?: number
+  ageSeconds?: number
+}
+
+export interface SupportBundle {
+  session: ClientSession
+  mountReport: MountReportResponse
+  serverTime: number
 }
 
 export interface DiscoverMetaResponse {
@@ -510,6 +530,28 @@ export interface DiscoverEndpointAddr {
   family: number
 }
 
+export interface ExclusiveGrant {
+  sessionId: string
+  sessionName: string
+  holderIp: string
+  path: string
+  scopeInode: string
+  kind: string
+  state: string
+  role: string
+  durability: string
+  takeOverText: string
+  sinceUnixMs: number
+  holderEpoch: number
+  windowSeconds: number
+  standbyPosition: number
+  live?: boolean
+  lastRenewAgeMs?: number
+  lastSeenAgeMs?: number
+  fencedSinceUnixMs?: number
+  failoverGraceMs?: number
+}
+
 export interface GCWorkerEventBucket {
   bucketStart: string
   goal: string
@@ -532,6 +574,21 @@ export interface LicenseRecord {
   expiresAt: string
   maxStorageBytes: number
   insertedAt: string
+}
+
+export interface MountDetails {
+  command?: string
+  mountPoint?: string
+  args?: string[]
+  truncated?: boolean
+  mountOptions?: string[]
+  flags?: MountFlag[]
+}
+
+export interface MountFlag {
+  name: string
+  value: string
+  source?: string
 }
 
 export interface MoveVolumeFailure {

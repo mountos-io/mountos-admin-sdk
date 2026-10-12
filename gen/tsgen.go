@@ -13,7 +13,7 @@ func generateTS(spec *Spec, outDir string) {
 
 func isPrimitiveType(specType string) bool {
 	switch specType {
-	case "string", "datetime", "int64", "int32", "int", "float", "float64", "bool", "object", "json":
+	case "string", "datetime", "int64", "uint64", "int32", "int", "float", "float64", "bool", "object", "json":
 		return true
 	}
 	return false
@@ -37,7 +37,7 @@ func tsType(specType string) string {
 	switch specType {
 	case "string", "datetime":
 		return "string"
-	case "int64", "int32", "int", "float", "float64":
+	case "int64", "uint64", "int32", "int", "float", "float64":
 		return "number"
 	case "bool":
 		return "boolean"

@@ -516,6 +516,17 @@ impl VolumesService {
         self.inner.post(&format!("/api/v1/volumes/{}/forks/create", volume_id), req).await
     }
 
+    pub async fn exclusive_grants(&self, volume_id: i64, fork: Option<&str>, limit: Option<i64>) -> Result<ExclusiveGrantsResponse, Error> {
+        let mut query: Vec<(&str, String)> = Vec::new();
+        if let Some(v) = fork {
+            query.push(("fork", v.to_string()));
+        }
+        if let Some(v) = limit {
+            query.push(("limit", v.to_string()));
+        }
+        self.inner.get(&format!("/api/v1/volumes/{}/exclusive-grants", volume_id), &query).await
+    }
+
     pub async fn list_forks(&self, volume_id: i64, volume_type: Option<&str>, include_inactive: Option<bool>) -> Result<Vec<Fork>, Error> {
         let mut query: Vec<(&str, String)> = Vec::new();
         if let Some(v) = volume_type {
@@ -822,6 +833,14 @@ impl ClientSessionsService {
             query.push(("userId", v.to_string()));
         }
         self.inner.get("/api/v1/client-sessions/summary", &query).await
+    }
+
+    pub async fn mount_report(&self, session_id: i64) -> Result<MountReportResponse, Error> {
+        self.inner.get(&format!("/api/v1/client-sessions/{}/mount-report", session_id), &[]).await
+    }
+
+    pub async fn support_bundle(&self, session_id: i64) -> Result<SupportBundle, Error> {
+        self.inner.get(&format!("/api/v1/client-sessions/{}/support-bundle", session_id), &[]).await
     }
 }
 
