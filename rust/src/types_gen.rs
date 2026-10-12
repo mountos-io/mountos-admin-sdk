@@ -1100,6 +1100,7 @@ pub struct ExclusiveGrant {
     pub session_id: String,
     #[serde(rename = "sessionName")]
     pub session_name: String,
+    pub fork: String,
     #[serde(rename = "holderIp")]
     pub holder_ip: String,
     pub path: String,

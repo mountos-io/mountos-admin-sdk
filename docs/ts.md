@@ -302,6 +302,7 @@ interface DiscoverMetaResponse {
 interface ExclusiveGrant {
   sessionId: string;
   sessionName: string;
+  fork: string;
   holderIp: string;
   path: string;
   scopeInode: string;

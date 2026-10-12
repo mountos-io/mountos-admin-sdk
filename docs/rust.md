@@ -350,6 +350,7 @@ pub struct DiscoverMetaResponse {
 pub struct ExclusiveGrant {
     pub session_id: String,
     pub session_name: String,
+    pub fork: String,
     pub holder_ip: String,
     pub path: String,
     pub scope_inode: String,

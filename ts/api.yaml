@@ -614,9 +614,11 @@ types:
     - "disconnectedAt: int64?"
     - "isActive: bool"
 
+  # fork is the name of the volume fork of the scope.
   ExclusiveGrant:
     - "sessionId: string"
     - "sessionName: string"
+    - "fork: string"
     - "holderIp: string"
     - "path: string"
     - "scopeInode: string"
@@ -1589,6 +1591,9 @@ resources:
       - action: exclusiveGrants
         method: GET
         path: /:volumeId/exclusive-grants
+        # fork absent or empty lists the grants of every fork of the volume in
+        # one answer, and the response fork is then empty. A fork name lists
+        # that fork only. limit covers the rows of all forks together.
         query:
           - "fork: string?"
           - "limit: int=200"

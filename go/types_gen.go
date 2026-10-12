@@ -704,6 +704,7 @@ type DiscoverEndpointAddr struct {
 type ExclusiveGrant struct {
 	SessionID         string `json:"sessionId"`
 	SessionName       string `json:"sessionName"`
+	Fork              string `json:"fork"`
 	HolderIP          string `json:"holderIp"`
 	Path              string `json:"path"`
 	ScopeInode        string `json:"scopeInode"`

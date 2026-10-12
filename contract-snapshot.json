@@ -654,6 +654,11 @@
           "required": false,
           "optional": true
         },
+        "fork": {
+          "type": "string",
+          "required": false,
+          "optional": false
+        },
         "holderEpoch": {
           "type": "uint64",
           "required": false,
