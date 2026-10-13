@@ -1,6 +1,6 @@
 # mountOS Admin SDK
 
-Provider-facing SDK for the mountOS Admin API. Wraps the appserv provider API (`/api/v1/*`) with ED25519 JWT authentication.
+SDKs for [mountOS](https://mountos.io), a cross-platform, forkable, time-traveling distributed filesystem over object storage. Automate accounts, users, volumes, forks, quotas, and audit logs from TypeScript, Go, or Rust. The SDKs wrap the appserv provider API (`/api/v1/*`) with ED25519 JWT authentication.
 
 ## SDKs
 

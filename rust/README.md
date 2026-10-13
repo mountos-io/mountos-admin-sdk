@@ -1,7 +1,8 @@
 # mountOS Admin SDK for Rust
 
-Async Rust SDK for the mountOS provider API, built on `reqwest`/`tokio` with
-ED25519 JWT authentication.
+Async Rust SDK for [mountOS](https://mountos.io), a cross-platform, forkable,
+time-traveling distributed filesystem over object storage. Automate accounts, users, volumes, forks, quotas, and audit
+logs. Built on `reqwest`/`tokio` with ED25519 JWT authentication.
 
 ## Install
 

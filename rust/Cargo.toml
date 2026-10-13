@@ -3,14 +3,14 @@ name = "mountos-admin-sdk"
 version = "1.27.0"
 edition = "2024"
 rust-version = "1.85"
-description = "Rust SDK for the mountOS provider API"
+description = "Rust SDK for mountOS, a cross-platform, forkable, time-traveling distributed filesystem over object storage. Automate accounts, users, volumes, forks, quotas, and audit logs."
 repository = "https://github.com/mountos-io/mountos-admin-sdk"
-homepage = "https://github.com/mountos-io/mountos-admin-sdk"
+homepage = "https://mountos.io"
 documentation = "https://docs.rs/mountos-admin-sdk"
 readme = "README.md"
 license = "Apache-2.0"
-keywords = ["mountos", "sdk", "admin", "api-client"]
-categories = ["api-bindings"]
+keywords = ["mountos", "object-storage", "filesystem", "s3", "sdk"]
+categories = ["api-bindings", "filesystem"]
 
 [dependencies]
 # native-roots uses the OS trust store so self-hosted appserv behind a

@@ -1,6 +1,6 @@
 # @mountos-io/admin-sdk
 
-TypeScript SDK for the mountOS provider API. ESM-only, Node 18+/Bun/Deno.
+TypeScript SDK for [mountOS](https://mountos.io), a cross-platform, forkable, time-traveling distributed filesystem over object storage. Automate accounts, users, volumes, forks, quotas, and audit logs. ESM-only, Node 18+/Bun/Deno.
 
 ## Install
 

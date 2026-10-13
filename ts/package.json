@@ -1,7 +1,23 @@
 {
   "name": "@mountos-io/admin-sdk",
   "version": "1.27.0",
-  "description": "mountOS Admin SDK for provider API",
+  "description": "TypeScript SDK for mountOS, a cross-platform, forkable, time-traveling distributed filesystem over object storage. Automate accounts, users, volumes, forks, quotas, and audit logs.",
+  "keywords": [
+    "mountos",
+    "posix-filesystem",
+    "object-storage",
+    "s3",
+    "volumes",
+    "storage-provisioning",
+    "admin-sdk",
+    "ai-agents"
+  ],
+  "homepage": "https://mountos.io",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mountos-io/mountos-admin-sdk.git",
+    "directory": "ts"
+  },
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

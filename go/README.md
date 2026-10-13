@@ -1,6 +1,6 @@
 # mountOS Admin SDK for Go
 
-Go SDK for the mountOS provider API. Zero external dependencies - pure stdlib.
+Go SDK for [mountOS](https://mountos.io), a cross-platform, forkable, time-traveling distributed filesystem over object storage. Automate accounts, users, volumes, forks, quotas, and audit logs. Zero external dependencies, pure stdlib.
 
 ## Install
 
