@@ -204,6 +204,9 @@ func generateRustTypes(spec *Spec, outDir string) {
 		writeRustEnum(&w, name, spec.Enums[name])
 	}
 
+	inputs := rustInputTypes(spec)
+	defaults := rustDefaultableTypes(spec, inputs)
+
 	// Model types.
 	for _, typeName := range orderTypes(spec) {
 		fields, ok := spec.Types[typeName]
@@ -211,7 +214,7 @@ func generateRustTypes(spec *Spec, outDir string) {
 			continue
 		}
 		w.WriteString("\n")
-		writeRustStruct(&w, typeName, fields, false, rustCallerBuilt[typeName])
+		writeRustStruct(&w, typeName, fields, false, inputs[typeName], defaults[typeName])
 	}
 
 	// Resource request/response/list-option types.
@@ -220,11 +223,11 @@ func generateRustTypes(spec *Spec, outDir string) {
 		for _, ep := range res.Endpoints {
 			if len(ep.Request) > 0 {
 				w.WriteString("\n")
-				writeRustStruct(&w, requestTypeName(res.Name, ep.Action), ep.Request, true, true)
+				writeRustStruct(&w, requestTypeName(res.Name, ep.Action), ep.Request, true, true, true)
 			}
 			if len(ep.Response) > 0 && !responseIsIDOnly(ep.Response) {
 				w.WriteString("\n")
-				writeRustStruct(&w, customResponseTypeName(res.Name, ep.Action), ep.Response, false, false)
+				writeRustStruct(&w, customResponseTypeName(res.Name, ep.Action), ep.Response, false, false, false)
 			}
 		}
 		for _, ep := range res.Endpoints {
@@ -238,23 +241,88 @@ func generateRustTypes(spec *Spec, outDir string) {
 	writeFile(filepath.Join(outDir, "types_gen.rs"), w.String())
 }
 
-// rustCallerBuilt lists model types that callers construct themselves (they
-// are inputs to Config), so they get Default and a constructor like a request
-// struct. Every other model type is built by deserialization only.
-var rustCallerBuilt = map[string]bool{"DashboardUser": true}
+// rustInputTypes returns the model types a caller can build: DashboardUser (an
+// input to Config) and every model type reachable through the fields of a
+// request struct. They get the same constructors as a request struct. Every
+// other model type is built by deserialization only.
+func rustInputTypes(spec *Spec) map[string]bool {
+	inputs := map[string]bool{}
+	var visit func(fieldType string)
+	visit = func(fieldType string) {
+		name := baseTypeName(fieldType)
+		if inputs[name] {
+			return
+		}
+		fields, ok := spec.Types[name]
+		if !ok {
+			return
+		}
+		inputs[name] = true
+		for _, fs := range fields {
+			visit(parseField(fs).Type)
+		}
+	}
+	visit("DashboardUser")
+	for _, res := range spec.Resources {
+		for _, ep := range res.Endpoints {
+			for _, fs := range ep.Request {
+				visit(parseField(fs).Type)
+			}
+		}
+	}
+	return inputs
+}
+
+// rustDefaultableTypes returns the input types that can derive Default: every
+// required field is a scalar, String, Vec, JSON value or another such input
+// struct. A required string-enum field has no Default, so its struct relies on
+// new(required...) alone.
+func rustDefaultableTypes(spec *Spec, inputs map[string]bool) map[string]bool {
+	memo := map[string]bool{}
+	var ok func(name string) bool
+	fieldOK := func(f Field) bool {
+		if f.Optional || strings.HasSuffix(f.Type, "[]") {
+			return true
+		}
+		if isPrimitiveType(f.Type) {
+			return true
+		}
+		return inputs[f.Type] && ok(f.Type)
+	}
+	ok = func(name string) bool {
+		if v, seen := memo[name]; seen {
+			return v
+		}
+		memo[name] = false // a cycle through required fields cannot derive Default
+		result := true
+		for _, fs := range spec.Types[name] {
+			if !fieldOK(parseField(fs)) {
+				result = false
+				break
+			}
+		}
+		memo[name] = result
+		return result
+	}
+	out := map[string]bool{}
+	for name := range inputs {
+		out[name] = ok(name)
+	}
+	return out
+}
 
 // writeRustStruct emits a serde struct. Request structs serialize optional
 // fields with skip_serializing_if; model structs do the same so optional
 // fields are omitted (matching the Go SDK's omitempty). Every struct is
 // non_exhaustive, so a caller cannot use a struct literal and a new field is
-// not a breaking change. A callerBuilt struct derives Default and gets
+// not a breaking change. A callerBuilt struct gets
 // constructors because outside code cannot write a literal.
-func writeRustStruct(w *strings.Builder, name string, fields []string, isRequest, callerBuilt bool) {
+func writeRustStruct(w *strings.Builder, name string, fields []string, isRequest, callerBuilt, hasDefault bool) {
 	derive := "Debug, Clone, Serialize, Deserialize"
 	switch {
 	case isRequest:
 		derive = "Debug, Clone, Default, Serialize"
-	case callerBuilt:
+	case callerBuilt && hasDefault:
 		derive = "Debug, Clone, Default, Serialize, Deserialize"
 	}
 	fmt.Fprintf(w, "#[derive(%s)]\n#[non_exhaustive]\npub struct %s {\n", derive, name)
@@ -293,8 +361,7 @@ func rustParam(ty, arg string) (string, string) {
 
 // writeRustCtor emits new(required...) and one with_<field> setter per
 // optional field. Outside the crate a non_exhaustive struct cannot be built by
-// a literal, so these are the way to build one. Fields not named start at their
-// Default value.
+// a literal, so these are the way to build one. Optional fields start unset.
 func writeRustCtor(w *strings.Builder, name string, fields []rustCtorField) {
 	var params, inits []string
 	for _, f := range fields {
@@ -313,7 +380,12 @@ func writeRustCtor(w *strings.Builder, name string, fields []rustCtorField) {
 	if len(params) > 0 {
 		w.WriteString("    /// Builds the value from its required fields. Optional fields start unset.\n")
 		fmt.Fprintf(w, "    pub fn new(%s) -> Self {\n", strings.Join(params, ", "))
-		fmt.Fprintf(w, "        Self {\n            %s,\n            ..Default::default()\n        }\n    }\n", strings.Join(inits, ",\n            "))
+		for _, f := range fields {
+			if f.Optional {
+				inits = append(inits, f.Name+": None")
+			}
+		}
+		fmt.Fprintf(w, "        Self {\n            %s,\n        }\n    }\n", strings.Join(inits, ",\n            "))
 	}
 	first := len(params) == 0
 	for _, f := range fields {

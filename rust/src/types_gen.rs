@@ -23,7 +23,8 @@ impl Config {
         Self {
             base_url: base_url.into(),
             private_key: private_key.into(),
-            ..Default::default()
+            dashboard_user: None,
+            dashboard_hmac_key: None,
         }
     }
 
@@ -1170,7 +1171,12 @@ impl DashboardUser {
             id: id.into(),
             name: name.into(),
             role: role.into(),
-            ..Default::default()
+            email: None,
+            username: None,
+            account_id: None,
+            user_id: None,
+            volume_id: None,
+            exp: None,
         }
     }
 
@@ -1440,11 +1446,19 @@ pub struct RegionVolumeMetrics {
     pub total_quota_limit: i64,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[non_exhaustive]
 pub struct RetentionPolicy {
     #[serde(rename = "clientSessionDays", skip_serializing_if = "Option::is_none")]
     pub client_session_days: Option<i32>,
+}
+
+impl RetentionPolicy {
+    /// Sets `client_session_days`.
+    pub fn with_client_session_days(mut self, value: i32) -> Self {
+        self.client_session_days = Some(value);
+        self
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -1493,7 +1507,7 @@ pub struct VolumeRef {
     pub r#type: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[non_exhaustive]
 pub struct VolumeRetentionPolicy {
     #[serde(rename = "dataDays", skip_serializing_if = "Option::is_none")]
@@ -1504,6 +1518,32 @@ pub struct VolumeRetentionPolicy {
     pub fork_grace_days: Option<i32>,
     #[serde(rename = "eventLogDays", skip_serializing_if = "Option::is_none")]
     pub event_log_days: Option<i32>,
+}
+
+impl VolumeRetentionPolicy {
+    /// Sets `data_days`.
+    pub fn with_data_days(mut self, value: i32) -> Self {
+        self.data_days = Some(value);
+        self
+    }
+
+    /// Sets `grace_days`.
+    pub fn with_grace_days(mut self, value: i32) -> Self {
+        self.grace_days = Some(value);
+        self
+    }
+
+    /// Sets `fork_grace_days`.
+    pub fn with_fork_grace_days(mut self, value: i32) -> Self {
+        self.fork_grace_days = Some(value);
+        self
+    }
+
+    /// Sets `event_log_days`.
+    pub fn with_event_log_days(mut self, value: i32) -> Self {
+        self.event_log_days = Some(value);
+        self
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -1521,11 +1561,19 @@ pub struct VolumeSizePoint {
     pub live_inactive_volume: i64,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[non_exhaustive]
 pub struct VolumeVersioningPolicy {
     #[serde(rename = "contentWindowSeconds", skip_serializing_if = "Option::is_none")]
     pub content_window_seconds: Option<i32>,
+}
+
+impl VolumeVersioningPolicy {
+    /// Sets `content_window_seconds`.
+    pub fn with_content_window_seconds(mut self, value: i32) -> Self {
+        self.content_window_seconds = Some(value);
+        self
+    }
 }
 
 // Accounts
@@ -1547,7 +1595,9 @@ impl CreateAccountRequest {
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             name: name.into(),
-            ..Default::default()
+            description: None,
+            icon_url: None,
+            provider_info: None,
         }
     }
 
@@ -1589,7 +1639,10 @@ impl EditAccountRequest {
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             name: name.into(),
-            ..Default::default()
+            description: None,
+            icon_url: None,
+            provider_info: None,
+            retention: None,
         }
     }
 
@@ -1632,7 +1685,7 @@ impl UpdateAccountQuotaRequest {
     pub fn new(quota_limit: i64) -> Self {
         Self {
             quota_limit,
-            ..Default::default()
+            quota_excess_pct: None,
         }
     }
 
@@ -1693,7 +1746,8 @@ impl AddUserRequest {
             account_id,
             username: username.into(),
             email: email.into(),
-            ..Default::default()
+            name: None,
+            provider_info: None,
         }
     }
 
@@ -1721,7 +1775,6 @@ impl BulkUserRequest {
     pub fn new(ids: Vec<i64>) -> Self {
         Self {
             ids,
-            ..Default::default()
         }
     }
 }
@@ -1749,7 +1802,8 @@ impl EditUserRequest {
         Self {
             username: username.into(),
             email: email.into(),
-            ..Default::default()
+            name: None,
+            provider_info: None,
         }
     }
 
@@ -1781,7 +1835,10 @@ impl UserListOptions {
     pub fn new(account_id: i64) -> Self {
         Self {
             account_id,
-            ..Default::default()
+            search: None,
+            is_active: None,
+            page: None,
+            limit: None,
         }
     }
 
@@ -1826,7 +1883,6 @@ impl CreateRegionRequest {
         Self {
             account_id,
             name: name.into(),
-            ..Default::default()
         }
     }
 }
@@ -1845,7 +1901,6 @@ impl EditRegionRequest {
         Self {
             account_id,
             name: name.into(),
-            ..Default::default()
         }
     }
 }
@@ -1864,7 +1919,9 @@ impl RegionListOptions {
     pub fn new(account_id: i64) -> Self {
         Self {
             account_id,
-            ..Default::default()
+            is_active: None,
+            page: None,
+            limit: None,
         }
     }
 
@@ -1904,7 +1961,10 @@ impl ClusterListOptions {
     pub fn new(account_id: i64) -> Self {
         Self {
             account_id,
-            ..Default::default()
+            region_id: None,
+            is_active: None,
+            page: None,
+            limit: None,
         }
     }
 
@@ -1946,7 +2006,6 @@ impl CreateMetadataClusterRequest {
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             name: name.into(),
-            ..Default::default()
         }
     }
 }
@@ -1962,7 +2021,6 @@ impl EditMetadataClusterRequest {
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             name: name.into(),
-            ..Default::default()
         }
     }
 }
@@ -1978,7 +2036,6 @@ impl SetMetadataClusterReadyRequest {
     pub fn new(ready: bool) -> Self {
         Self {
             ready,
-            ..Default::default()
         }
     }
 }
@@ -2061,7 +2118,14 @@ impl CreateStorageRequest {
             storage_type: storage_type.into(),
             provider_type: provider_type.into(),
             endpoint: endpoint.into(),
-            ..Default::default()
+            description: None,
+            region: None,
+            bucket: None,
+            base: None,
+            block_region: None,
+            block_size: None,
+            access_key: None,
+            secret_key: None,
         }
     }
 
@@ -2135,7 +2199,11 @@ impl EditStorageRequest {
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             name: name.into(),
-            ..Default::default()
+            description: None,
+            endpoint: None,
+            access_key: None,
+            secret_key: None,
+            direct_access: None,
         }
     }
 
@@ -2193,7 +2261,8 @@ impl TestStorageNewBucketRequest {
             bucket: bucket.into(),
             access_key: access_key.into(),
             secret_key: secret_key.into(),
-            ..Default::default()
+            region: None,
+            provider_type: None,
         }
     }
 
@@ -2252,7 +2321,6 @@ impl MoveStorageVolumesRequest {
     pub fn new(volume_ids: Vec<String>) -> Self {
         Self {
             volume_ids,
-            ..Default::default()
         }
     }
 }
@@ -2369,7 +2437,8 @@ impl RegisterStorageCopysetsBulkRequest {
     pub fn new(count: i32) -> Self {
         Self {
             count,
-            ..Default::default()
+            failure_domain_a: None,
+            failure_domain_b: None,
         }
     }
 
@@ -2421,7 +2490,7 @@ impl MarkStorageMemberLostRequest {
     pub fn new(block_volume_id: impl Into<String>) -> Self {
         Self {
             block_volume_id: block_volume_id.into(),
-            ..Default::default()
+            force: None,
         }
     }
 
@@ -2467,7 +2536,14 @@ impl StorageListOptions {
     pub fn new(account_id: i64) -> Self {
         Self {
             account_id,
-            ..Default::default()
+            search: None,
+            region_id: None,
+            storage_type: None,
+            provider_type: None,
+            is_active: None,
+            direct_access: None,
+            page: None,
+            limit: None,
         }
     }
 
@@ -2560,7 +2636,15 @@ impl CreateVolumeRequest {
             storage_id,
             name: name.into(),
             volume_type: volume_type.into(),
-            ..Default::default()
+            description: None,
+            encryption: None,
+            encryption_key: None,
+            retention: None,
+            versioning: None,
+            compaction: None,
+            quota_limit: None,
+            metadata_cluster_id: None,
+            metadata_cluster_uuid: None,
         }
     }
 
@@ -2746,7 +2830,7 @@ impl GenerateVolumeAPIKeysRequest {
     pub fn new(user_id: i64) -> Self {
         Self {
             user_id,
-            ..Default::default()
+            name: None,
         }
     }
 
@@ -2786,7 +2870,6 @@ impl RevokeVolumeAPIKeyRequest {
     pub fn new(api_key: impl Into<String>) -> Self {
         Self {
             api_key: api_key.into(),
-            ..Default::default()
         }
     }
 }
@@ -2803,7 +2886,6 @@ impl RevokeVolumeAPIKeysByUserRequest {
     pub fn new(user_id: i64) -> Self {
         Self {
             user_id,
-            ..Default::default()
         }
     }
 }
@@ -2822,7 +2904,7 @@ impl GenerateVolumeSttKeyRequest {
     pub fn new(expiry_seconds: i64) -> Self {
         Self {
             expiry_seconds,
-            ..Default::default()
+            user_id: None,
         }
     }
 
@@ -2856,7 +2938,6 @@ impl UpdateVolumeQuotaRequest {
     pub fn new(quota_limit: i64) -> Self {
         Self {
             quota_limit,
-            ..Default::default()
         }
     }
 }
@@ -2873,7 +2954,6 @@ impl UpdateVolumeCopysetConfigRequest {
     pub fn new(target_copyset_count: i32) -> Self {
         Self {
             target_copyset_count,
-            ..Default::default()
         }
     }
 }
@@ -2916,7 +2996,9 @@ impl CreateVolumeForkRequest {
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             name: name.into(),
-            ..Default::default()
+            parent_name: None,
+            as_of: None,
+            volume_type: None,
         }
     }
 
@@ -3003,7 +3085,14 @@ impl VolumeListOptions {
     pub fn new(account_id: i64) -> Self {
         Self {
             account_id,
-            ..Default::default()
+            region_id: None,
+            metadata_cluster_id: None,
+            storage_id: None,
+            volume_type: None,
+            locked: None,
+            is_active: None,
+            page: None,
+            limit: None,
         }
     }
 
@@ -3214,7 +3303,12 @@ impl AuditLogListOptions {
     pub fn new(account_id: i64) -> Self {
         Self {
             account_id,
-            ..Default::default()
+            region_id: None,
+            metadata_cluster_id: None,
+            cursor: None,
+            limit: None,
+            subject: None,
+            created_by: None,
         }
     }
 
@@ -3336,7 +3430,18 @@ impl ClientSessionListOptions {
     pub fn new(account_id: i64) -> Self {
         Self {
             account_id,
-            ..Default::default()
+            region_id: None,
+            metadata_cluster_id: None,
+            volume_id: None,
+            user_id: None,
+            client_type: None,
+            status: None,
+            is_active: None,
+            os_name: None,
+            platform: None,
+            search: None,
+            page: None,
+            limit: None,
         }
     }
 
@@ -3429,7 +3534,6 @@ impl GenerateMetricTokenRequest {
     pub fn new(expiry_seconds: i64) -> Self {
         Self {
             expiry_seconds,
-            ..Default::default()
         }
     }
 }
@@ -3449,7 +3553,6 @@ impl LoadLicenseRequest {
     pub fn new(payloads: Vec<String>) -> Self {
         Self {
             payloads,
-            ..Default::default()
         }
     }
 }
