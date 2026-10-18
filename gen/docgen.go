@@ -133,17 +133,18 @@ func generateDoc(spec *Spec, outDir string) {
 				}
 				fmt.Fprintf(&w, "Response data: `{ %s }`\n", strings.Join(parts, ", "))
 			} else if ep.ResponseType != "" {
-				if ep.ResponseArray {
+				switch {
+				case ep.ResponseArray:
 					fmt.Fprintf(&w, "Response data: `%s[]`\n", ep.ResponseType)
-				} else if ep.Pagination == "page" {
+				case ep.Pagination == "page":
 					fmt.Fprintf(&w, "Response data: `{ \"items\": %s[], \"pagination\": PaginationMeta }`\n", ep.ResponseType)
-				} else if ep.Pagination == "cursor" {
+				case ep.Pagination == "cursor":
 					cursorType := "int64"
 					if cursorResponseType(ep) == "StringCursorPaginatedResponse" {
 						cursorType = "string"
 					}
 					fmt.Fprintf(&w, "Response data: `{ \"items\": %s[], \"nextCursor\": %s|null }`\n", ep.ResponseType, cursorType)
-				} else {
+				default:
 					fmt.Fprintf(&w, "Response data: `%s`\n", ep.ResponseType)
 				}
 			}

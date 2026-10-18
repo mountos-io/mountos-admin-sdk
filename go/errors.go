@@ -4,6 +4,7 @@ import "fmt"
 
 // Error represents an API error response.
 type Error struct {
+	_         struct{} // callers must name fields
 	Message   string
 	Status    int
 	ErrorCode int

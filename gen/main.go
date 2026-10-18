@@ -67,7 +67,7 @@ func validateSpec(spec *Spec) {
 }
 
 func writeFile(path, content string) {
-	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(path), 0o750); err != nil {
 		fatalf("mkdir %s: %v", filepath.Dir(path), err)
 	}
 	if err := os.WriteFile(path, []byte(content), 0644); err != nil {

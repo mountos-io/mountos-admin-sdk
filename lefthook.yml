@@ -1,0 +1,27 @@
+pre-commit:
+  parallel: true
+  commands:
+    format-go:
+      glob: "*.go"
+      run: |
+        files=$(git diff --name-only --cached --diff-filter=ACMR -- '*.go')
+        [ -z "$files" ] && exit 0
+        bad=$(gofmt -l $files)
+        if [ -n "$bad" ]; then
+          echo "gofmt needed on:"
+          echo "$bad"
+          echo "fix: gofmt -w <files>"
+          exit 1
+        fi
+    gen-check:
+      glob: "{api.yaml,gen/**,go/**,ts/src/**,rust/src/**,docs/**,api.md,contract-snapshot.json}"
+      run: make gen-check
+    lint-go:
+      glob: "{go/**/*.go,gen/**/*.go,examples/go/**/*.go,.golangci.yml}"
+      run: make go-check lint
+    lint-ts:
+      glob: "{ts/src/**,ts/test/**,ts/eslint.config.js,ts/package.json,ts/tsconfig*.json,examples/ts/**}"
+      run: make ts-check ts-lint example-ts
+    lint-rust:
+      glob: "{rust/**/*.rs,rust/Cargo.toml,examples/rust/**}"
+      run: make rust-fmt rust-check example-rust

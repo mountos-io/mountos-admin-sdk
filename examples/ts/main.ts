@@ -126,8 +126,7 @@ async function main() {
   const { items: licenses } = await client.license.list()
   console.log(`Stored license payloads: ${licenses.length}`)
   for (const r of licenses) {
-    // active is the newest non-expired payload for its license id; expiry retires it.
-    console.log(`  ${r.key}: ${r.licensee} (${r.status}, active=${r.active})`)
+    console.log(`  ${r.key}: ${r.licensee} (${r.status}, expires ${r.expiresAt})`)
   }
 
   // --- Vault ---

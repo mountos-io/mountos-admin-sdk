@@ -31,7 +31,9 @@ struct RecordedRequest {
 /// then closes. Returns the base URL to hand to `Config` and a join handle
 /// that yields what the server actually received, for the caller to assert
 /// method/path/body against.
-fn fixture_server(response_data: serde_json::Value) -> (String, thread::JoinHandle<RecordedRequest>) {
+fn fixture_server(
+    response_data: serde_json::Value,
+) -> (String, thread::JoinHandle<RecordedRequest>) {
     let listener = TcpListener::bind("127.0.0.1:0").expect("bind ephemeral port");
     let addr = listener.local_addr().expect("local addr");
 
@@ -39,13 +41,16 @@ fn fixture_server(response_data: serde_json::Value) -> (String, thread::JoinHand
         let (mut stream, _) = listener.accept().expect("accept one connection");
         let recorded = read_request(&mut stream);
 
-        let envelope = serde_json::json!({"status": "success", "message": "ok", "data": response_data});
+        let envelope =
+            serde_json::json!({"status": "success", "message": "ok", "data": response_data});
         let body = serde_json::to_vec(&envelope).expect("serialize envelope");
         let response = format!(
             "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n",
             body.len()
         );
-        stream.write_all(response.as_bytes()).expect("write status line/headers");
+        stream
+            .write_all(response.as_bytes())
+            .expect("write status line/headers");
         stream.write_all(&body).expect("write body");
         stream.flush().ok();
 
@@ -79,7 +84,11 @@ fn read_request(stream: &mut TcpStream) -> RecordedRequest {
     let path = parts.next().expect("path").to_string();
 
     let content_length: usize = lines
-        .find_map(|l| l.to_ascii_lowercase().strip_prefix("content-length:").map(|v| v.trim().to_string()))
+        .find_map(|l| {
+            l.to_ascii_lowercase()
+                .strip_prefix("content-length:")
+                .map(|v| v.trim().to_string())
+        })
         .and_then(|v| v.parse().ok())
         .unwrap_or(0);
 
@@ -90,7 +99,11 @@ fn read_request(stream: &mut TcpStream) -> RecordedRequest {
         body_bytes.extend_from_slice(&chunk[..n]);
     }
 
-    let body = if body_bytes.is_empty() { None } else { serde_json::from_slice(&body_bytes).ok() };
+    let body = if body_bytes.is_empty() {
+        None
+    } else {
+        serde_json::from_slice(&body_bytes).ok()
+    };
     RecordedRequest { method, path, body }
 }
 
@@ -102,7 +115,7 @@ fn test_client(base_url: String) -> Client {
     // Fixed 32-byte seed: structurally valid ED25519 key material, no
     // randomness needed for a fixture test.
     let seed = [7u8; 32];
-    Client::new(Config { base_url, private_key: STANDARD.encode(seed), ..Default::default() }).expect("new client")
+    Client::new(Config::new(base_url, STANDARD.encode(seed))).expect("new client")
 }
 
 #[tokio::test]
@@ -113,7 +126,11 @@ async fn list_copysets_full_state_per_copyset() {
     ]));
     let client = test_client(base_url);
 
-    let copysets = client.storages.list_copysets(7, None, None).await.expect("list_copysets");
+    let copysets = client
+        .storages
+        .list_copysets(7, None, None)
+        .await
+        .expect("list_copysets");
     assert_eq!(copysets.len(), 2);
     assert_eq!(copysets[1].state, CopysetState::Draining);
     assert_eq!(copysets[1].pending_sync_jobs_a, Some(3));
@@ -132,7 +149,7 @@ async fn drain_copyset_idempotent_ack() {
 
     let res = client
         .storages
-        .drain_copyset(7, "p1", &DrainStorageCopysetRequest { force: None })
+        .drain_copyset(7, "p1", &DrainStorageCopysetRequest::default())
         .await
         .expect("drain_copyset");
     assert_eq!(res.state, "draining");
@@ -146,11 +163,14 @@ async fn cancel_drain_active_again() {
 
     let res = client
         .storages
-        .cancel_drain(7, "p1", &CancelStorageDrainRequest { force: None })
+        .cancel_drain(7, "p1", &CancelStorageDrainRequest::default())
         .await
         .expect("cancel_drain");
     assert_eq!(res.state, "active");
-    assert_eq!(handle.join().unwrap().path, "/api/v1/storages/7/copysets/p1/cancel-drain");
+    assert_eq!(
+        handle.join().unwrap().path,
+        "/api/v1/storages/7/copysets/p1/cancel-drain"
+    );
 }
 
 #[tokio::test]
@@ -162,7 +182,10 @@ async fn register_copyset_explicit_name() {
 
     let res = client
         .storages
-        .register_copyset(7, &RegisterStorageCopysetRequest { name: Some("mos-block-a".into()), failure_domain_a: None, failure_domain_b: None })
+        .register_copyset(
+            7,
+            &RegisterStorageCopysetRequest::default().with_name("mos-block-a"),
+        )
         .await
         .expect("register_copyset");
     assert_eq!(res.name, "mos-block-a");
@@ -183,13 +206,16 @@ async fn register_copyset_omitted_name() {
 
     let res = client
         .storages
-        .register_copyset(7, &RegisterStorageCopysetRequest { name: None, failure_domain_a: None, failure_domain_b: None })
+        .register_copyset(7, &RegisterStorageCopysetRequest::default())
         .await
         .expect("register_copyset");
     assert_eq!(res.state, CopysetState::Active);
     assert_eq!(res.name, "riveted-truss-4f2a");
     let body = handle.join().unwrap().body.unwrap();
-    assert!(body.get("name").is_none(), "expected no name key in request body when omitted, got {body:?}");
+    assert!(
+        body.get("name").is_none(),
+        "expected no name key in request body when omitted, got {body:?}"
+    );
 }
 
 #[tokio::test]
@@ -204,7 +230,7 @@ async fn register_copysets_bulk_count_only() {
 
     let res = client
         .storages
-        .register_copysets_bulk(7, &RegisterStorageCopysetsBulkRequest { count: 2, failure_domain_a: None, failure_domain_b: None })
+        .register_copysets_bulk(7, &RegisterStorageCopysetsBulkRequest::new(2))
         .await
         .expect("register_copysets_bulk");
     assert_eq!(res.copysets.len(), 2);
@@ -225,11 +251,13 @@ async fn register_copyset_with_failure_domains() {
 
     client
         .storages
-        .register_copyset(7, &RegisterStorageCopysetRequest {
-            name: Some("mos-block-fd".into()),
-            failure_domain_a: Some("rack-1".into()),
-            failure_domain_b: Some("rack-2".into()),
-        })
+        .register_copyset(
+            7,
+            &RegisterStorageCopysetRequest::default()
+                .with_name("mos-block-fd")
+                .with_failure_domain_a("rack-1")
+                .with_failure_domain_b("rack-2"),
+        )
         .await
         .expect("register_copyset");
     let body = handle.join().unwrap().body.unwrap();
@@ -252,7 +280,7 @@ async fn add_copyset_member_replaces_vacant_slot() {
 
     let res = client
         .storages
-        .add_copyset_member(7, "p1", &AddStorageCopysetMemberRequest { failure_domain: None })
+        .add_copyset_member(7, "p1", &AddStorageCopysetMemberRequest::default())
         .await
         .expect("add_copyset_member");
     assert_eq!(res.member_state, "active");
@@ -272,13 +300,20 @@ async fn mark_member_lost() {
 
     let res = client
         .storages
-        .mark_member_lost(7, "p1", &MarkStorageMemberLostRequest { block_volume_id: "bv9".to_string(), force: Some(true) })
+        .mark_member_lost(
+            7,
+            "p1",
+            &MarkStorageMemberLostRequest::new("bv9").with_force(true),
+        )
         .await
         .expect("mark_member_lost");
     assert_eq!(res.member_state, "lost");
     let recorded = handle.join().unwrap();
     assert_eq!(recorded.method, "POST");
-    assert_eq!(recorded.path, "/api/v1/storages/7/copysets/p1/members/mark-lost");
+    assert_eq!(
+        recorded.path,
+        "/api/v1/storages/7/copysets/p1/members/mark-lost"
+    );
 }
 
 // Regression coverage for the generator emitting crate::http::encode_segment
@@ -296,7 +331,11 @@ async fn string_path_params_are_url_encoded() {
     }));
     let client = test_client(base_url);
 
-    let copyset = client.storages.get_copyset_status(7, raw_copyset_id).await.expect("get_copyset_status");
+    let copyset = client
+        .storages
+        .get_copyset_status(7, raw_copyset_id)
+        .await
+        .expect("get_copyset_status");
     assert_eq!(copyset.id, raw_copyset_id);
 
     let path = handle.join().unwrap().path;
@@ -304,5 +343,8 @@ async fn string_path_params_are_url_encoded() {
         path.contains("copyset%2Fid%20with%20spaces%2Fcaf%C3%A9"),
         "request path {path:?} did not contain the escaped segment"
     );
-    assert!(!path.contains("/copysets/copyset/"), "request path {path:?} sent the '/' unescaped, splitting the path");
+    assert!(
+        !path.contains("/copysets/copyset/"),
+        "request path {path:?} sent the '/' unescaped, splitting the path"
+    );
 }

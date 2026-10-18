@@ -13,12 +13,17 @@ Generated from [api.yaml](../api.yaml). Do not edit.
 ```rust
 use mountos_admin_sdk::{Client, Config};
 
-let client = Client::new(Config {
-    base_url: "https://appserv.example.com".into(),
-    private_key: "<base64 ED25519 key>".into(),
-    ..Default::default()
-})?;
+let client = Client::new(Config::new("https://appserv.example.com", "<base64 ED25519 key>"))?;
 let account = client.accounts.get(account_id).await?;
+```
+
+## Building Values
+
+Every public struct and enum is `#[non_exhaustive]`: code outside the crate cannot write a struct literal, and a `match` on an enum needs a wildcard arm. A new field or variant in a minor version never breaks a caller. Request, options and config structs derive `Default`. A struct with required fields has `new(required...)`. Each optional field has a `with_<field>(value)` setter.
+
+```rust
+let req = CreateAccountRequest::new("Acme").with_description("Demo account");
+let opts = AccountListOptions::default().with_page(1).with_limit(10);
 ```
 
 ## Response Model

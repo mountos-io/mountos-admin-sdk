@@ -16,7 +16,9 @@ struct RecordedRequest {
     body: Option<serde_json::Value>,
 }
 
-fn fixture_server(response_data: serde_json::Value) -> (String, thread::JoinHandle<RecordedRequest>) {
+fn fixture_server(
+    response_data: serde_json::Value,
+) -> (String, thread::JoinHandle<RecordedRequest>) {
     let listener = TcpListener::bind("127.0.0.1:0").expect("bind ephemeral port");
     let addr = listener.local_addr().expect("local addr");
 
@@ -24,13 +26,16 @@ fn fixture_server(response_data: serde_json::Value) -> (String, thread::JoinHand
         let (mut stream, _) = listener.accept().expect("accept one connection");
         let recorded = read_request(&mut stream);
 
-        let envelope = serde_json::json!({"status": "success", "message": "ok", "data": response_data});
+        let envelope =
+            serde_json::json!({"status": "success", "message": "ok", "data": response_data});
         let body = serde_json::to_vec(&envelope).expect("serialize envelope");
         let response = format!(
             "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n",
             body.len()
         );
-        stream.write_all(response.as_bytes()).expect("write status line/headers");
+        stream
+            .write_all(response.as_bytes())
+            .expect("write status line/headers");
         stream.write_all(&body).expect("write body");
         stream.flush().ok();
 
@@ -60,7 +65,11 @@ fn read_request(stream: &mut TcpStream) -> RecordedRequest {
     let path = parts.next().expect("path").to_string();
 
     let content_length: usize = lines
-        .find_map(|l| l.to_ascii_lowercase().strip_prefix("content-length:").map(|v| v.trim().to_string()))
+        .find_map(|l| {
+            l.to_ascii_lowercase()
+                .strip_prefix("content-length:")
+                .map(|v| v.trim().to_string())
+        })
         .and_then(|v| v.parse().ok())
         .unwrap_or(0);
 
@@ -71,7 +80,11 @@ fn read_request(stream: &mut TcpStream) -> RecordedRequest {
         body_bytes.extend_from_slice(&chunk[..n]);
     }
 
-    let body = if body_bytes.is_empty() { None } else { serde_json::from_slice(&body_bytes).ok() };
+    let body = if body_bytes.is_empty() {
+        None
+    } else {
+        serde_json::from_slice(&body_bytes).ok()
+    };
     RecordedRequest { method, path, body }
 }
 
@@ -81,7 +94,7 @@ fn find_subslice(haystack: &[u8], needle: &[u8]) -> Option<usize> {
 
 fn test_client(base_url: String) -> Client {
     let seed = [7u8; 32];
-    Client::new(Config { base_url, private_key: STANDARD.encode(seed), ..Default::default() }).expect("new client")
+    Client::new(Config::new(base_url, STANDARD.encode(seed))).expect("new client")
 }
 
 #[tokio::test]
@@ -91,7 +104,11 @@ async fn list_pairs_is_an_alias_for_list_copysets() {
     ]));
     let client = test_client(base_url);
 
-    let pairs = client.storages.list_pairs(7, None, None).await.expect("list_pairs");
+    let pairs = client
+        .storages
+        .list_pairs(7, None, None)
+        .await
+        .expect("list_pairs");
     assert_eq!(pairs.len(), 1);
     assert_eq!(pairs[0].state, PairState::Active);
 
@@ -109,7 +126,7 @@ async fn get_pair_config_and_update_pair_config_alias_copyset_config_and_transla
 
     let resize = client
         .volumes
-        .update_pair_config(5, &UpdateVolumePairConfigRequest { target_pair_count: 4 })
+        .update_pair_config(5, &UpdateVolumePairConfigRequest::new(4))
         .await
         .expect("update_pair_config");
     assert_eq!(resize.target_copyset_count, 4);
@@ -120,5 +137,8 @@ async fn get_pair_config_and_update_pair_config_alias_copyset_config_and_transla
     assert_eq!(recorded.path, "/api/v1/volumes/5/copyset-config");
     let body = recorded.body.expect("request body");
     assert_eq!(body["targetCopysetCount"], serde_json::json!(4));
-    assert!(body.get("targetPairCount").is_none(), "wire body must use the new field name only");
+    assert!(
+        body.get("targetPairCount").is_none(),
+        "wire body must use the new field name only"
+    );
 }

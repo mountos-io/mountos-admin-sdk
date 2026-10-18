@@ -18,11 +18,11 @@ const (
 )
 
 type tokenCache struct {
-	mu     sync.Mutex
 	token  string
-	expiry int64
-	key    ed25519.PrivateKey
 	kfp    string
+	key    ed25519.PrivateKey
+	expiry int64
+	mu     sync.Mutex
 }
 
 func newTokenCache(privateKeyBase64 string) (*tokenCache, error) {

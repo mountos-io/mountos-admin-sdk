@@ -105,18 +105,17 @@ TLS uses `rustls` with the OS trust store (self-hosted appserv behind a private 
 ```rust
 use mountos_admin_sdk::{Client, Config, CreateAccountRequest, UpdateVolumeQuotaRequest};
 
-let client = Client::new(Config {
-    base_url: "https://appserv.example.com".into(),
-    private_key: "base64-ed25519-key".into(), // 32-byte seed or 64-byte seed+pubkey
-    ..Default::default()
-})?;
+// 32-byte seed or 64-byte seed+pubkey, base64 encoded
+let client = Client::new(Config::new("https://appserv.example.com", "base64-ed25519-key"))?;
 
-let created = client.accounts.create(&CreateAccountRequest {
-    name: "Acme".into(), description: None, icon_url: None, provider_info: None,
-}).await?;
+let created = client.accounts.create(&CreateAccountRequest::new("Acme")).await?;
 let page = client.accounts.list(None).await?;                     // Option<&...ListOptions>
-client.volumes.update_quota(created.id, &UpdateVolumeQuotaRequest { quota_limit: 1 << 30 }).await?;
+client.volumes.update_quota(created.id, &UpdateVolumeQuotaRequest::new(1 << 30)).await?;
 ```
+
+Public Rust structs and enums are `#[non_exhaustive]`. Build a struct with `new(required...)`,
+`Default` and the `with_<field>(value)` setters, never with a struct literal. In Go, build every
+struct by field name (a positional literal does not compile).
 
 Methods are `async` on snake_case accessors (`client.volume_fork_trees`, `client.region_audit_logs`).
 Errors are `mountos_admin_sdk::Error`; match `Error::Api { message, status, error_code }` vs

@@ -15,24 +15,16 @@ so self-hosted appserv behind a private/corporate CA works out of the box.
 
 ## Usage
 
-```rust
+```rust,no_run
 use mountos_admin_sdk::{Client, Config, CreateAccountRequest};
 
 #[tokio::main]
 async fn main() -> Result<(), mountos_admin_sdk::Error> {
-    let client = Client::new(Config {
-        base_url: "https://appserv.example.com".into(),
-        private_key: "<base64 ED25519 key>".into(), // 32-byte seed or 64-byte seed+pubkey
-        ..Default::default()
-    })?;
+    // 32-byte seed or 64-byte seed+pubkey, base64 encoded
+    let client = Client::new(Config::new("https://appserv.example.com", "<base64 ED25519 key>"))?;
 
     // Accounts
-    let created = client.accounts.create(&CreateAccountRequest {
-        name: "Acme".into(),
-        description: None,
-        icon_url: None,
-        provider_info: None,
-    }).await?;
+    let created = client.accounts.create(&CreateAccountRequest::new("Acme")).await?;
     let account = client.accounts.get(created.id).await?;
     println!("{} (active={})", account.name, account.is_active);
 
@@ -41,9 +33,10 @@ async fn main() -> Result<(), mountos_admin_sdk::Error> {
     println!("{} accounts", page.pagination.total);
 
     // Volumes
-    client.volumes.update_quota(created.id, &mountos_admin_sdk::UpdateVolumeQuotaRequest {
-        quota_limit: 1 << 30,
-    }).await?;
+    client.volumes.update_quota(
+        created.id,
+        &mountos_admin_sdk::UpdateVolumeQuotaRequest::new(1 << 30),
+    ).await?;
 
     Ok(())
 }
@@ -54,15 +47,22 @@ Resource accessors map to `client.<resource>` in snake_case (`client.volume_fork
 
 ## Error Handling
 
-```rust
-use mountos_admin_sdk::Error;
+```rust,no_run
+use mountos_admin_sdk::{Client, Config, Error};
 
-match client.accounts.get(999).await {
-    Ok(account) => println!("{}", account.name),
-    Err(Error::Api { message, status, error_code }) => {
-        eprintln!("{message} (status={status}, code={error_code})");
+#[tokio::main]
+async fn main() -> Result<(), Error> {
+    let client = Client::new(Config::new("https://appserv.example.com", "<base64 ED25519 key>"))?;
+
+    match client.accounts.get(999).await {
+        Ok(account) => println!("{}", account.name),
+        // Error is non_exhaustive: keep a wildcard arm.
+        Err(Error::Api { message, status, error_code }) => {
+            eprintln!("{message} (status={status}, code={error_code})");
+        }
+        Err(e) => eprintln!("transport error: {e}"),
     }
-    Err(e) => eprintln!("transport error: {e}"),
+    Ok(())
 }
 ```
 

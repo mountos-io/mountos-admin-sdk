@@ -25,7 +25,11 @@ fn fixture_server() -> (String, thread::JoinHandle<Vec<String>>) {
             let text = String::from_utf8_lossy(&buf[..n]).to_string();
             request_lines.push(text.lines().next().expect("request line").to_string());
 
-            let next = if page == 0 { serde_json::json!(OPAQUE) } else { serde_json::Value::Null };
+            let next = if page == 0 {
+                serde_json::json!(OPAQUE)
+            } else {
+                serde_json::Value::Null
+            };
             let envelope = serde_json::json!({
                 "status": "success", "message": "ok",
                 "data": {
@@ -52,17 +56,33 @@ fn fixture_server() -> (String, thread::JoinHandle<Vec<String>>) {
 async fn tree_list_cursor_is_an_opaque_string_round_trip() {
     let (base_url, handle) = fixture_server();
     let seed = [7u8; 32];
-    let client = Client::new(Config { base_url, private_key: STANDARD.encode(seed), ..Default::default() })
-        .expect("new client");
+    let client = Client::new(Config::new(base_url, STANDARD.encode(seed))).expect("new client");
 
-    let first = client.volume_fork_trees.list(7, "main", None).await.expect("page 1");
+    let first = client
+        .volume_fork_trees
+        .list(7, "main", None)
+        .await
+        .expect("page 1");
     assert_eq!(first.next_cursor.as_deref(), Some(OPAQUE));
 
-    let opts = VolumeForkTreeListOptions { cursor: first.next_cursor.clone(), ..Default::default() };
-    let last = client.volume_fork_trees.list(7, "main", Some(&opts)).await.expect("page 2");
+    let opts = VolumeForkTreeListOptions::default()
+        .with_cursor(first.next_cursor.clone().expect("cursor"));
+    let last = client
+        .volume_fork_trees
+        .list(7, "main", Some(&opts))
+        .await
+        .expect("page 2");
     assert!(last.next_cursor.is_none());
 
     let lines = handle.join().expect("server thread");
-    assert!(!lines[0].contains("cursor="), "page 1 must not send a cursor: {}", lines[0]);
-    assert!(lines[1].contains(&format!("cursor={OPAQUE}")), "page 2 must send the cursor unchanged: {}", lines[1]);
+    assert!(
+        !lines[0].contains("cursor="),
+        "page 1 must not send a cursor: {}",
+        lines[0]
+    );
+    assert!(
+        lines[1].contains(&format!("cursor={OPAQUE}")),
+        "page 2 must send the cursor unchanged: {}",
+        lines[1]
+    );
 }

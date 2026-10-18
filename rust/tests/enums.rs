@@ -24,7 +24,8 @@ fn copyset_state_deserializes_known_values() {
 
 #[test]
 fn copyset_state_deserializes_unknown_value_to_fallback() {
-    let got: CopysetState = serde_json::from_str("\"future_state\"").expect("deserialize unknown value");
+    let got: CopysetState =
+        serde_json::from_str("\"future_state\"").expect("deserialize unknown value");
     assert_eq!(got, CopysetState::Unknown("future_state".to_string()));
     assert!(!got.is_known());
     assert_eq!(got.as_str(), "future_state");
@@ -60,6 +61,9 @@ fn client_session_status_unknown_value_is_the_declared_variant_not_the_fallback(
 fn client_session_status_deserializes_unrecognized_value_to_fallback() {
     let got: ClientSessionStatus =
         serde_json::from_str("\"totally_new_status\"").expect("deserialize unrecognized value");
-    assert_eq!(got, ClientSessionStatus::UnknownValue("totally_new_status".to_string()));
+    assert_eq!(
+        got,
+        ClientSessionStatus::UnknownValue("totally_new_status".to_string())
+    );
     assert!(!got.is_known());
 }

@@ -15,6 +15,7 @@ test('assertSafeIntegers passes safe nested values', () => {
 
 test('assertSafeIntegers throws on an out-of-range integer, with a path', () => {
   assert.throws(
+    // eslint-disable-next-line no-loss-of-precision -- the test needs a literal past Number.MAX_SAFE_INTEGER
     () => assertSafeIntegers({ copysets: [{ pendingSyncJobsA: 9007199254740993 }] }),
     (err: unknown) => err instanceof UnsafeIntegerError && err.message.includes('$.copysets[0].pendingSyncJobsA'),
   )
@@ -30,14 +31,14 @@ function fakePrivateKey(): string {
 
 test('a real response carrying an unsafe int64 rejects loudly instead of returning a corrupted value', async () => {
   const originalFetch = globalThis.fetch
-  globalThis.fetch = (async () => {
+  globalThis.fetch = () => {
     // Raw literal, not JSON.stringify'd: preserves the full digit sequence
     // so JSON.parse (inside res.json()) is what performs the rounding this
     // test is guarding against, exactly as a real fetch response would.
     const raw = '{"status":"success","message":"ok","data":'
       + '{"id":"p1","storageId":"s1","state":"active","pendingSyncJobsA":9223372036854775807}}'
-    return new Response(raw, { status: 200, headers: { 'content-type': 'application/json' } })
-  }) as typeof fetch
+    return Promise.resolve(new Response(raw, { status: 200, headers: { 'content-type': 'application/json' } }))
+  }
 
   try {
     const client = createServerClient({ baseUrl: 'http://example.invalid', privateKey: fakePrivateKey() })
@@ -49,11 +50,11 @@ test('a real response carrying an unsafe int64 rejects loudly instead of returni
 
 test('a response with only safe integers resolves normally', async () => {
   const originalFetch = globalThis.fetch
-  globalThis.fetch = (async () => {
+  globalThis.fetch = () => {
     const raw = '{"status":"success","message":"ok","data":'
       + '{"id":"p1","storageId":"s1","state":"active","pendingSyncJobsA":2}}'
-    return new Response(raw, { status: 200, headers: { 'content-type': 'application/json' } })
-  }) as typeof fetch
+    return Promise.resolve(new Response(raw, { status: 200, headers: { 'content-type': 'application/json' } }))
+  }
 
   try {
     const client = createServerClient({ baseUrl: 'http://example.invalid', privateKey: fakePrivateKey() })

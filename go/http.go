@@ -31,9 +31,9 @@ func (c *Client) do(ctx context.Context, method, path string, body any) (json.Ra
 
 	var bodyReader io.Reader
 	if body != nil {
-		b, err := json.Marshal(body)
-		if err != nil {
-			return nil, fmt.Errorf("mountos: marshal request: %w", err)
+		b, mErr := json.Marshal(body)
+		if mErr != nil {
+			return nil, fmt.Errorf("mountos: marshal request: %w", mErr)
 		}
 		bodyReader = bytes.NewReader(b)
 	}
@@ -44,9 +44,9 @@ func (c *Client) do(ctx context.Context, method, path string, body any) (json.Ra
 	}
 	req.Header.Set("Authorization", "Bearer "+token)
 	if c.dashboardUser != nil {
-		h, err := SignDashboardUser(c.dashboardUser, c.dashboardHMACKey)
-		if err != nil {
-			return nil, err
+		h, sErr := SignDashboardUser(c.dashboardUser, c.dashboardHMACKey)
+		if sErr != nil {
+			return nil, sErr
 		}
 		req.Header.Set("X-MountOS-Dashboard-User", h)
 	}
@@ -58,7 +58,7 @@ func (c *Client) do(ctx context.Context, method, path string, body any) (json.Ra
 	if err != nil {
 		return nil, fmt.Errorf("mountos: request failed: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }() // a close error after a full read carries no information
 
 	var env envelope
 	if err := json.NewDecoder(resp.Body).Decode(&env); err != nil {

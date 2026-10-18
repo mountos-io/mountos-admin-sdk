@@ -35,7 +35,7 @@ test('tree list cursor is an opaque string round trip', async () => {
     assert.equal(first.nextCursor, opaque)
     assert.doesNotMatch(urls[0], /cursor=/)
 
-    const last = await client.volumeForkTrees.list(7, 'main', { path: '/', cursor: first.nextCursor as string })
+    const last = await client.volumeForkTrees.list(7, 'main', { path: '/', cursor: first.nextCursor })
     assert.match(urls[1], new RegExp(`cursor=${opaque.replace('.', '\\.')}`))
     assert.equal(last.nextCursor, null)
   } finally {

@@ -59,8 +59,8 @@ func TestGenerateContractSnapshot(t *testing.T) {
 		t.Fatalf("field count = %d, want %d (%v)", len(ty.Fields), len(wantFields), ty.Fields)
 	}
 	for name, want := range wantFields {
-		got, ok := ty.Fields[name]
-		if !ok {
+		got, found := ty.Fields[name]
+		if !found {
 			t.Errorf("missing field %q", name)
 			continue
 		}

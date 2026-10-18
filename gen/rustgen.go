@@ -68,7 +68,7 @@ func writeRustEnum(w *strings.Builder, name string, values []string) {
 	fmt.Fprintf(w, "\n/// `%s` values accepted/returned on the wire. `%s` preserves a\n", name, unknown)
 	fmt.Fprintf(w, "/// value this SDK does not recognize yet, for forward compatibility with\n")
 	fmt.Fprintf(w, "/// a server that has introduced a new %s value.\n", name)
-	fmt.Fprintf(w, "#[derive(Debug, Clone, PartialEq, Eq)]\npub enum %s {\n", name)
+	fmt.Fprintf(w, "#[derive(Debug, Clone, PartialEq, Eq)]\n#[non_exhaustive]\npub enum %s {\n", name)
 	for _, variant := range variants {
 		fmt.Fprintf(w, "    %s,\n", variant)
 	}
@@ -124,6 +124,7 @@ func generateRustTypes(spec *Spec, outDir string) {
 	// Config
 	w.WriteString("/// Client configuration.\n")
 	w.WriteString("#[derive(Debug, Clone, Default)]\n")
+	w.WriteString("#[non_exhaustive]\n")
 	w.WriteString("pub struct Config {\n")
 	w.WriteString("    /// Base URL of the appserv provider API, e.g. `https://appserv.example.com`.\n")
 	w.WriteString("    pub base_url: String,\n")
@@ -134,19 +135,25 @@ func generateRustTypes(spec *Spec, outDir string) {
 	w.WriteString("    /// Dedicated HMAC secret for the `X-MountOS-Dashboard-User` header (appserv\n")
 	w.WriteString("    /// `DASHBOARD_USER_HMAC_KEY`); required when `dashboard_user` is set.\n")
 	w.WriteString("    pub dashboard_hmac_key: Option<String>,\n")
-	w.WriteString("}\n\n")
+	w.WriteString("}\n")
+	writeRustCtor(&w, "Config", []rustCtorField{{"base_url", "String", false}, {"private_key", "String", false}, {"dashboard_user", "DashboardUser", true}, {"dashboard_hmac_key", "String", true}})
+	w.WriteString("\n")
 
 	// ListOptions
 	w.WriteString("/// Page-based pagination options.\n")
 	w.WriteString("#[derive(Debug, Clone, Default)]\n")
+	w.WriteString("#[non_exhaustive]\n")
 	w.WriteString("pub struct ListOptions {\n")
 	w.WriteString("    pub page: Option<i64>,\n")
 	w.WriteString("    pub limit: Option<i64>,\n")
-	w.WriteString("}\n\n")
+	w.WriteString("}\n")
+	writeRustCtor(&w, "ListOptions", []rustCtorField{{"page", "i64", true}, {"limit", "i64", true}})
+	w.WriteString("\n")
 
 	// PaginationMeta
 	w.WriteString("/// Pagination metadata returned by page-based list endpoints.\n")
 	w.WriteString("#[derive(Debug, Clone, Deserialize)]\n")
+	w.WriteString("#[non_exhaustive]\n")
 	w.WriteString("pub struct PaginationMeta {\n")
 	w.WriteString("    pub page: i64,\n")
 	w.WriteString("    pub limit: i64,\n")
@@ -158,6 +165,7 @@ func generateRustTypes(spec *Spec, outDir string) {
 	// PaginatedResponse
 	w.WriteString("/// Page-based list response.\n")
 	w.WriteString("#[derive(Debug, Clone, Deserialize)]\n")
+	w.WriteString("#[non_exhaustive]\n")
 	w.WriteString("pub struct PaginatedResponse<T> {\n")
 	w.WriteString("    pub items: Vec<T>,\n")
 	w.WriteString("    pub pagination: PaginationMeta,\n")
@@ -166,6 +174,7 @@ func generateRustTypes(spec *Spec, outDir string) {
 	// CursorPaginatedResponse
 	w.WriteString("/// Cursor-based list response.\n")
 	w.WriteString("#[derive(Debug, Clone, Deserialize)]\n")
+	w.WriteString("#[non_exhaustive]\n")
 	w.WriteString("pub struct CursorPaginatedResponse<T> {\n")
 	w.WriteString("    pub items: Vec<T>,\n")
 	w.WriteString("    #[serde(rename = \"nextCursor\")]\n")
@@ -175,6 +184,7 @@ func generateRustTypes(spec *Spec, outDir string) {
 	// StringCursorPaginatedResponse
 	w.WriteString("/// Cursor-based list response whose cursor is an opaque string.\n")
 	w.WriteString("#[derive(Debug, Clone, Deserialize)]\n")
+	w.WriteString("#[non_exhaustive]\n")
 	w.WriteString("pub struct StringCursorPaginatedResponse<T> {\n")
 	w.WriteString("    pub items: Vec<T>,\n")
 	w.WriteString("    #[serde(rename = \"nextCursor\")]\n")
@@ -184,6 +194,7 @@ func generateRustTypes(spec *Spec, outDir string) {
 	// IdResponse
 	w.WriteString("/// Identifier returned by create/edit/toggle endpoints.\n")
 	w.WriteString("#[derive(Debug, Clone, Deserialize)]\n")
+	w.WriteString("#[non_exhaustive]\n")
 	w.WriteString("pub struct IdResponse {\n")
 	w.WriteString("    pub id: i64,\n")
 	w.WriteString("}\n")
@@ -200,7 +211,7 @@ func generateRustTypes(spec *Spec, outDir string) {
 			continue
 		}
 		w.WriteString("\n")
-		writeRustStruct(&w, typeName, fields, false)
+		writeRustStruct(&w, typeName, fields, false, rustCallerBuilt[typeName])
 	}
 
 	// Resource request/response/list-option types.
@@ -209,11 +220,11 @@ func generateRustTypes(spec *Spec, outDir string) {
 		for _, ep := range res.Endpoints {
 			if len(ep.Request) > 0 {
 				w.WriteString("\n")
-				writeRustStruct(&w, requestTypeName(res.Name, ep.Action), ep.Request, true)
+				writeRustStruct(&w, requestTypeName(res.Name, ep.Action), ep.Request, true, true)
 			}
 			if len(ep.Response) > 0 && !responseIsIDOnly(ep.Response) {
 				w.WriteString("\n")
-				writeRustStruct(&w, customResponseTypeName(res.Name, ep.Action), ep.Response, false)
+				writeRustStruct(&w, customResponseTypeName(res.Name, ep.Action), ep.Response, false, false)
 			}
 		}
 		for _, ep := range res.Endpoints {
@@ -227,23 +238,95 @@ func generateRustTypes(spec *Spec, outDir string) {
 	writeFile(filepath.Join(outDir, "types_gen.rs"), w.String())
 }
 
+// rustCallerBuilt lists model types that callers construct themselves (they
+// are inputs to Config), so they get Default and a constructor like a request
+// struct. Every other model type is built by deserialization only.
+var rustCallerBuilt = map[string]bool{"DashboardUser": true}
+
 // writeRustStruct emits a serde struct. Request structs serialize optional
 // fields with skip_serializing_if; model structs do the same so optional
-// fields are omitted (matching the Go SDK's omitempty).
-func writeRustStruct(w *strings.Builder, name string, fields []string, isRequest bool) {
-	if isRequest {
-		w.WriteString("#[derive(Debug, Clone, Serialize)]\n")
-	} else {
-		w.WriteString("#[derive(Debug, Clone, Serialize, Deserialize)]\n")
+// fields are omitted (matching the Go SDK's omitempty). Every struct is
+// non_exhaustive, so a caller cannot use a struct literal and a new field is
+// not a breaking change. A callerBuilt struct derives Default and gets
+// constructors because outside code cannot write a literal.
+func writeRustStruct(w *strings.Builder, name string, fields []string, isRequest, callerBuilt bool) {
+	derive := "Debug, Clone, Serialize, Deserialize"
+	switch {
+	case isRequest:
+		derive = "Debug, Clone, Default, Serialize"
+	case callerBuilt:
+		derive = "Debug, Clone, Default, Serialize, Deserialize"
 	}
-	fmt.Fprintf(w, "pub struct %s {\n", name)
+	fmt.Fprintf(w, "#[derive(%s)]\n#[non_exhaustive]\npub struct %s {\n", derive, name)
+	var ctor []rustCtorField
 	for _, s := range fields {
 		f := parseField(s)
 		optional := f.Optional
 		if isRequest {
 			optional = !f.Required
 		}
+		ctor = append(ctor, rustCtorField{rustFieldName(f.Name), rustType(f.Type), optional})
 		writeRustField(w, f, optional)
+	}
+	w.WriteString("}\n")
+	if callerBuilt {
+		writeRustCtor(w, name, ctor)
+	}
+}
+
+// rustCtorField is one field of a caller-built struct. Ty is the type without
+// the Option wrapper.
+type rustCtorField struct {
+	Name     string
+	Ty       string
+	Optional bool
+}
+
+// rustParam returns the parameter type and the conversion expression for a
+// constructor argument. String values accept anything that converts to String.
+func rustParam(ty, arg string) (string, string) {
+	if ty == "String" {
+		return "impl Into<String>", arg + ".into()"
+	}
+	return ty, arg
+}
+
+// writeRustCtor emits new(required...) and one with_<field> setter per
+// optional field. Outside the crate a non_exhaustive struct cannot be built by
+// a literal, so these are the way to build one. Fields not named start at their
+// Default value.
+func writeRustCtor(w *strings.Builder, name string, fields []rustCtorField) {
+	var params, inits []string
+	for _, f := range fields {
+		if f.Optional {
+			continue
+		}
+		pt, conv := rustParam(f.Ty, f.Name)
+		params = append(params, f.Name+": "+pt)
+		if conv == f.Name {
+			inits = append(inits, f.Name)
+		} else {
+			inits = append(inits, f.Name+": "+conv)
+		}
+	}
+	fmt.Fprintf(w, "\nimpl %s {\n", name)
+	if len(params) > 0 {
+		w.WriteString("    /// Builds the value from its required fields. Optional fields start unset.\n")
+		fmt.Fprintf(w, "    pub fn new(%s) -> Self {\n", strings.Join(params, ", "))
+		fmt.Fprintf(w, "        Self {\n            %s,\n            ..Default::default()\n        }\n    }\n", strings.Join(inits, ",\n            "))
+	}
+	first := len(params) == 0
+	for _, f := range fields {
+		if !f.Optional {
+			continue
+		}
+		if !first {
+			w.WriteString("\n")
+		}
+		first = false
+		pt, conv := rustParam(f.Ty, "value")
+		fmt.Fprintf(w, "    /// Sets `%s`.\n", strings.TrimPrefix(f.Name, "r#"))
+		fmt.Fprintf(w, "    pub fn with_%s(mut self, value: %s) -> Self {\n        self.%s = Some(%s);\n        self\n    }\n", strings.TrimPrefix(f.Name, "r#"), pt, f.Name, conv)
 	}
 	w.WriteString("}\n")
 }
@@ -271,17 +354,20 @@ func writeRustField(w *strings.Builder, f Field, optional bool) {
 // writeRustListOptions emits a list-options struct. page/limit/cursor and any
 // optional query params are Option<T>; required params are owned values.
 func writeRustListOptions(w *strings.Builder, name string, query []string) {
-	w.WriteString("#[derive(Debug, Clone, Default)]\n")
+	w.WriteString("#[derive(Debug, Clone, Default)]\n#[non_exhaustive]\n")
 	fmt.Fprintf(w, "pub struct %s {\n", name)
+	var ctor []rustCtorField
 	for _, s := range query {
 		f := parseField(s)
 		ty := rustType(f.Type)
+		ctor = append(ctor, rustCtorField{rustFieldName(f.Name), ty, !f.Required})
 		if !f.Required {
 			ty = "Option<" + ty + ">"
 		}
 		fmt.Fprintf(w, "    pub %s: %s,\n", rustFieldName(f.Name), ty)
 	}
 	w.WriteString("}\n")
+	writeRustCtor(w, name, ctor)
 }
 
 func generateRustClient(spec *Spec, outDir string) {
@@ -300,6 +386,7 @@ func generateRustClient(spec *Spec, outDir string) {
 
 	// Client struct.
 	w.WriteString("/// mountOS Admin API client. Construct with [`Client::new`].\n")
+	w.WriteString("#[non_exhaustive]\n")
 	w.WriteString("pub struct Client {\n")
 	for _, res := range spec.Resources {
 		fmt.Fprintf(&w, "    pub %s: %sService,\n", snakeCase(res.Name), res.Name)
@@ -330,6 +417,7 @@ func generateRustClient(spec *Spec, outDir string) {
 func writeRustResource(w *strings.Builder, spec *Spec, res Resource) {
 	svcType := res.Name + "Service"
 	fmt.Fprintf(w, "/// Operations on the `%s` resource.\n", res.Name)
+	w.WriteString("#[non_exhaustive]\n")
 	fmt.Fprintf(w, "pub struct %s {\n", svcType)
 	w.WriteString("    inner: Arc<ClientInner>,\n")
 	w.WriteString("}\n\n")

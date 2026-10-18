@@ -56,7 +56,8 @@ type DrainPairStorageResponse = DrainCopysetStorageResponse
 //
 // Deprecated: use UpdateVolumeCopysetConfigRequest instead.
 type UpdateVolumePairConfigRequest struct {
-	TargetPairCount int32 `json:"targetPairCount"`
+	_               struct{} // callers must name fields
+	TargetPairCount int32    `json:"targetPairCount"`
 }
 
 func (r *UpdateVolumePairConfigRequest) toCopysetConfigRequest() *UpdateVolumeCopysetConfigRequest {

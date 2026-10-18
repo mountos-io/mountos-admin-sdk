@@ -8,11 +8,10 @@
 //! use mountos_admin_sdk::{Client, Config};
 //!
 //! # async fn run() -> Result<(), mountos_admin_sdk::Error> {
-//! let client = Client::new(Config {
-//!     base_url: "https://appserv.example.com".into(),
-//!     private_key: "<base64 ED25519 key>".into(),
-//!     ..Default::default()
-//! })?;
+//! let client = Client::new(Config::new(
+//!     "https://appserv.example.com",
+//!     "<base64 ED25519 key>",
+//! ))?;
 //!
 //! let account = client.accounts.get(1).await?;
 //! println!("{}", account.name);
@@ -20,19 +19,40 @@
 //! # }
 //! ```
 //!
+//! Public structs and enums are `#[non_exhaustive]`. Build a struct with `new(required...)`,
+//! `Default` and the `with_<field>` setters, not with a struct literal:
+//!
+//! ```
+//! use mountos_admin_sdk::{AccountListOptions, CreateAccountRequest};
+//!
+//! let req = CreateAccountRequest::new("Acme").with_description("Demo account");
+//! let opts = AccountListOptions::default().with_page(1).with_limit(10);
+//! # let _ = (req, opts);
+//! ```
+//!
 //! The `private_key` is a base64-encoded ED25519 key - either a 32-byte seed or
 //! a 64-byte seed+public-key. JWT tokens are signed locally and cached for ~55
 //! minutes (1h TTL with a 5-minute refresh margin).
 
 #![forbid(unsafe_code)]
+// Public structs and enums stay non_exhaustive so a new field or variant is not a breaking change.
+#![warn(clippy::exhaustive_structs, clippy::exhaustive_enums)]
+
+// Compiles and runs the README snippets as doc tests.
+#[cfg(doctest)]
+#[doc = include_str!("../README.md")]
+struct ReadmeDoctests;
 
 mod auth;
+// Generated files are not rustfmt-clean by construction.
+#[rustfmt::skip]
 mod client_gen;
 mod compat;
 mod dashboard_user;
 mod errors;
 mod http;
 mod providers;
+#[rustfmt::skip]
 mod types_gen;
 
 pub use client_gen::*;

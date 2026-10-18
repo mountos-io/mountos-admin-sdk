@@ -37,14 +37,24 @@ pub type Pair = Copyset;
 pub type DrainPairStorageResponse = DrainCopysetStorageResponse;
 
 /// Deprecated: use [`UpdateVolumeCopysetConfigRequest`] instead.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
+#[non_exhaustive]
 pub struct UpdateVolumePairConfigRequest {
     pub target_pair_count: i32,
 }
 
+impl UpdateVolumePairConfigRequest {
+    /// Builds the request from its required field.
+    pub fn new(target_pair_count: i32) -> Self {
+        Self { target_pair_count }
+    }
+}
+
 impl From<&UpdateVolumePairConfigRequest> for UpdateVolumeCopysetConfigRequest {
     fn from(req: &UpdateVolumePairConfigRequest) -> Self {
-        UpdateVolumeCopysetConfigRequest { target_copyset_count: req.target_pair_count }
+        UpdateVolumeCopysetConfigRequest {
+            target_copyset_count: req.target_pair_count,
+        }
     }
 }
 
@@ -65,14 +75,26 @@ impl StoragesService {
     }
 
     /// Deprecated: use [`StoragesService::drain_copyset`] instead.
-    pub async fn drain_pair(&self, storage_id: i64, pair_id: &str) -> Result<DrainPairStorageResponse, Error> {
-        self.drain_copyset(storage_id, pair_id, &DrainStorageCopysetRequest { force: None }).await
+    pub async fn drain_pair(
+        &self,
+        storage_id: i64,
+        pair_id: &str,
+    ) -> Result<DrainPairStorageResponse, Error> {
+        self.drain_copyset(
+            storage_id,
+            pair_id,
+            &DrainStorageCopysetRequest { force: None },
+        )
+        .await
     }
 }
 
 impl VolumesService {
     /// Deprecated: use [`VolumesService::get_copyset_config`] instead.
-    pub async fn get_pair_config(&self, volume_id: i64) -> Result<VolumeBlockPlacementConfig, Error> {
+    pub async fn get_pair_config(
+        &self,
+        volume_id: i64,
+    ) -> Result<VolumeBlockPlacementConfig, Error> {
         self.get_copyset_config(volume_id).await
     }
 
@@ -82,6 +104,7 @@ impl VolumesService {
         volume_id: i64,
         req: &UpdateVolumePairConfigRequest,
     ) -> Result<VolumeBlockPlacementResizeResult, Error> {
-        self.update_copyset_config(volume_id, &UpdateVolumeCopysetConfigRequest::from(req)).await
+        self.update_copyset_config(volume_id, &UpdateVolumeCopysetConfigRequest::from(req))
+            .await
     }
 }

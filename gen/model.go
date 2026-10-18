@@ -13,17 +13,17 @@ type Spec struct {
 }
 
 type JWTSpec struct {
+	Claims    map[string]string `yaml:"claims"`
 	Algorithm string            `yaml:"algorithm"`
 	Subject   string            `yaml:"subject"`
 	Audience  string            `yaml:"audience"`
 	Scope     string            `yaml:"scope"`
 	KeyFormat string            `yaml:"keyFormat"`
-	Claims    map[string]string `yaml:"claims"`
 }
 
 type ErrorCodeDef struct {
-	Code int    `yaml:"code"`
 	Name string `yaml:"name"`
+	Code int    `yaml:"code"`
 }
 
 type Resource struct {
@@ -37,12 +37,12 @@ type Endpoint struct {
 	Action        string   `yaml:"action"`
 	Method        string   `yaml:"method"`
 	Path          string   `yaml:"path"`
-	Stub          bool     `yaml:"stub,omitempty"`
 	Pagination    string   `yaml:"pagination,omitempty"`
+	ResponseType  string   `yaml:"responseType,omitempty"`
 	Query         []string `yaml:"query,omitempty"`
 	Request       []string `yaml:"request,omitempty"`
 	Response      []string `yaml:"response,omitempty"`
-	ResponseType  string   `yaml:"responseType,omitempty"`
+	Stub          bool     `yaml:"stub,omitempty"`
 	ResponseArray bool     `yaml:"responseArray,omitempty"`
 }
 
@@ -61,9 +61,9 @@ func cursorResponseType(ep Endpoint) string {
 type Field struct {
 	Name     string
 	Type     string
+	Default  string
 	Required bool
 	Optional bool
-	Default  string
 }
 
 // splitLiteralQuery separates a literal "?a=b&c=d" suffix baked into a spec

@@ -2,6 +2,7 @@
 
 /// An error from the mountOS Admin API or the transport beneath it.
 #[derive(Debug, thiserror::Error)]
+#[non_exhaustive]
 pub enum Error {
     /// The API returned a non-success envelope (`status != "success"`).
     #[error("mountos: {message} (status={status}, code={error_code})")]

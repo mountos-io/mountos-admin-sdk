@@ -24,6 +24,7 @@ func generateDocGo(spec *Spec, outDir string) {
 	w.WriteString("    PrivateKey: \"<base64 ED25519 key>\",\n")
 	w.WriteString("})\n")
 	w.WriteString("```\n\n")
+	w.WriteString("Build every struct by field name. Each struct starts with a blank `_ struct{}` field, so a positional literal does not compile. A new field in a minor version never breaks a caller.\n\n")
 
 	w.WriteString("## Response Envelope\n\n")
 	w.WriteString("SDK methods return the unwrapped `data` payload as a typed value plus `error` (set on `status=\"failure\"` or transport failure).\n\n")

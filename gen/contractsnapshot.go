@@ -24,7 +24,7 @@ type snapshotType struct {
 // and enum definitions, consumed by mountos-servers' structural drift
 // checker (scripts/tools/admincontract). It carries no request/response/
 // resource shaping - just the raw Types/Enums maps already on Spec.
-type contractSnapshot struct {
+type contractSnapshot struct { //nolint:govet // field order is the key order of the committed snapshot JSON
 	Version string                  `json:"version"`
 	Types   map[string]snapshotType `json:"types"`
 	Enums   map[string][]string     `json:"enums"`
@@ -67,7 +67,7 @@ func generateContractSnapshot(spec *Spec, outPath string) error {
 	}
 	data = append(data, '\n')
 
-	if err := os.MkdirAll(filepath.Dir(outPath), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(outPath), 0o750); err != nil {
 		return fmt.Errorf("mkdir %s: %w", filepath.Dir(outPath), err)
 	}
 	if err := os.WriteFile(outPath, data, 0644); err != nil {

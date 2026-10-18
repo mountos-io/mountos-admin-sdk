@@ -140,6 +140,7 @@ VolumesResource.prototype.updatePairConfig = function (
 // were. Wrap it in place so every caller, old or new, gets both field name
 // sets on the response.
 
+// eslint-disable-next-line @typescript-eslint/unbound-method -- always invoked through .call(this, ...)
 const genListBlockVolumes = StoragesResource.prototype.listBlockVolumes
 StoragesResource.prototype.listBlockVolumes = function (
   this: StoragesResource, storageId: number, signal?: AbortSignal,
@@ -151,6 +152,7 @@ StoragesResource.prototype.listBlockVolumes = function (
 // fields, so a caller who migrated the method name but not every read site
 // still works.
 
+// eslint-disable-next-line @typescript-eslint/unbound-method -- always invoked through .call(this, ...)
 const genGetCopysetConfig = VolumesResource.prototype.getCopysetConfig
 VolumesResource.prototype.getCopysetConfig = function (
   this: VolumesResource, volumeId: number, signal?: AbortSignal,
@@ -158,6 +160,7 @@ VolumesResource.prototype.getCopysetConfig = function (
   return genGetCopysetConfig.call(this, volumeId, signal).then(shimVolumeBlockPlacementConfig)
 }
 
+// eslint-disable-next-line @typescript-eslint/unbound-method -- always invoked through .call(this, ...)
 const genUpdateCopysetConfig = VolumesResource.prototype.updateCopysetConfig
 VolumesResource.prototype.updateCopysetConfig = function (
   this: VolumesResource, volumeId: number, req: UpdateVolumeCopysetConfigRequest, signal?: AbortSignal,

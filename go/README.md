@@ -87,6 +87,8 @@ func main() {
 }
 ```
 
+Build every struct by field name. Each struct starts with a blank `_ struct{}` field, so a positional literal does not compile, and a new field in a minor version never breaks a caller.
+
 ## Error Handling
 
 ```go

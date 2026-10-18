@@ -28,9 +28,9 @@ type fixtureServer struct {
 }
 
 type recordedCall struct {
+	body   map[string]any
 	method string
 	path   string
-	body   map[string]any
 }
 
 func newFixtureServer(t *testing.T, responses map[string]any) (*fixtureServer, *httptest.Server) {

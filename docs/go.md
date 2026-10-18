@@ -19,6 +19,8 @@ client, err := sdk.NewClient(sdk.Config{
 })
 ```
 
+Build every struct by field name. Each struct starts with a blank `_ struct{}` field, so a positional literal does not compile. A new field in a minor version never breaks a caller.
+
 ## Response Envelope
 
 SDK methods return the unwrapped `data` payload as a typed value plus `error` (set on `status="failure"` or transport failure).

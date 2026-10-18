@@ -222,6 +222,7 @@ func generateGoTypes(spec *Spec, outDir string) {
 	// Config
 	w.WriteString("// Config holds client configuration.\n")
 	w.WriteString("type Config struct {\n")
+	w.WriteString(goStructGuard)
 	w.WriteString("\tBaseURL          string\n")
 	w.WriteString("\tPrivateKey       string         // base64-encoded ED25519 key: 32-byte seed or 64-byte seed+pubkey\n")
 	w.WriteString("\tDashboardUser    *DashboardUser // optional dashboard operator context\n")
@@ -231,6 +232,7 @@ func generateGoTypes(spec *Spec, outDir string) {
 	// ListOptions
 	w.WriteString("// ListOptions for page-based pagination.\n")
 	w.WriteString("type ListOptions struct {\n")
+	w.WriteString(goStructGuard)
 	w.WriteString("\tPage  int\n")
 	w.WriteString("\tLimit int\n")
 	w.WriteString("}\n\n")
@@ -238,6 +240,7 @@ func generateGoTypes(spec *Spec, outDir string) {
 	// PaginationMeta
 	w.WriteString("// PaginationMeta from paginated responses.\n")
 	w.WriteString("type PaginationMeta struct {\n")
+	w.WriteString(goStructGuard)
 	w.WriteString("\tPage       int   `json:\"page\"`\n")
 	w.WriteString("\tLimit      int   `json:\"limit\"`\n")
 	w.WriteString("\tTotal      int64 `json:\"total\"`\n")
@@ -247,6 +250,7 @@ func generateGoTypes(spec *Spec, outDir string) {
 	// PaginatedResponse
 	w.WriteString("// PaginatedResponse wraps page-based results.\n")
 	w.WriteString("type PaginatedResponse[T any] struct {\n")
+	w.WriteString(goStructGuard)
 	w.WriteString("\tItems      []T            `json:\"items\"`\n")
 	w.WriteString("\tPagination PaginationMeta `json:\"pagination\"`\n")
 	w.WriteString("}\n\n")
@@ -254,6 +258,7 @@ func generateGoTypes(spec *Spec, outDir string) {
 	// CursorPaginatedResponse
 	w.WriteString("// CursorPaginatedResponse wraps cursor-based results.\n")
 	w.WriteString("type CursorPaginatedResponse[T any] struct {\n")
+	w.WriteString(goStructGuard)
 	w.WriteString("\tItems      []T    `json:\"items\"`\n")
 	w.WriteString("\tNextCursor *int64 `json:\"nextCursor\"`\n")
 	w.WriteString("}\n\n")
@@ -261,6 +266,7 @@ func generateGoTypes(spec *Spec, outDir string) {
 	// StringCursorPaginatedResponse
 	w.WriteString("// StringCursorPaginatedResponse wraps cursor-based results whose cursor is an opaque string.\n")
 	w.WriteString("type StringCursorPaginatedResponse[T any] struct {\n")
+	w.WriteString(goStructGuard)
 	w.WriteString("\tItems      []T     `json:\"items\"`\n")
 	w.WriteString("\tNextCursor *string `json:\"nextCursor\"`\n")
 	w.WriteString("}\n\n")
@@ -268,6 +274,7 @@ func generateGoTypes(spec *Spec, outDir string) {
 	// IDResponse
 	w.WriteString("// IDResponse returned by create/edit/toggle endpoints.\n")
 	w.WriteString("type IDResponse struct {\n")
+	w.WriteString(goStructGuard)
 	w.WriteString("\tID int64 `json:\"id\"`\n")
 	w.WriteString("}\n")
 
@@ -391,8 +398,14 @@ func orderTypes(spec *Spec) []string {
 	return ordered
 }
 
+// goStructGuard is the first field of every generated exported struct. A
+// positional literal then fails to compile, so adding a field later never
+// breaks a caller. encoding/json ignores blank fields.
+const goStructGuard = "\t_ struct{} // callers must name fields\n"
+
 func writeGoStruct(w *strings.Builder, name string, fields []string, isRequest bool) {
 	w.WriteString("type " + name + " struct {\n")
+	w.WriteString(goStructGuard)
 	// Calculate alignment
 	type fieldInfo struct {
 		goName string
@@ -484,6 +497,7 @@ func writeGoOptionalQuerySet(w *strings.Builder, spec *Spec, f Field, goName str
 
 func writeGoListOptions(w *strings.Builder, name string, query []string) {
 	w.WriteString("type " + name + " struct {\n")
+	w.WriteString(goStructGuard)
 	type fieldInfo struct {
 		goName string
 		goType string

@@ -9,6 +9,7 @@ import (
 
 // Config holds client configuration.
 type Config struct {
+	_                struct{} // callers must name fields
 	BaseURL          string
 	PrivateKey       string         // base64-encoded ED25519 key: 32-byte seed or 64-byte seed+pubkey
 	DashboardUser    *DashboardUser // optional dashboard operator context
@@ -17,39 +18,45 @@ type Config struct {
 
 // ListOptions for page-based pagination.
 type ListOptions struct {
+	_     struct{} // callers must name fields
 	Page  int
 	Limit int
 }
 
 // PaginationMeta from paginated responses.
 type PaginationMeta struct {
-	Page       int   `json:"page"`
-	Limit      int   `json:"limit"`
-	Total      int64 `json:"total"`
-	TotalPages int64 `json:"totalPages"`
+	_          struct{} // callers must name fields
+	Page       int      `json:"page"`
+	Limit      int      `json:"limit"`
+	Total      int64    `json:"total"`
+	TotalPages int64    `json:"totalPages"`
 }
 
 // PaginatedResponse wraps page-based results.
 type PaginatedResponse[T any] struct {
+	_          struct{}       // callers must name fields
 	Items      []T            `json:"items"`
 	Pagination PaginationMeta `json:"pagination"`
 }
 
 // CursorPaginatedResponse wraps cursor-based results.
 type CursorPaginatedResponse[T any] struct {
-	Items      []T    `json:"items"`
-	NextCursor *int64 `json:"nextCursor"`
+	_          struct{} // callers must name fields
+	Items      []T      `json:"items"`
+	NextCursor *int64   `json:"nextCursor"`
 }
 
 // StringCursorPaginatedResponse wraps cursor-based results whose cursor is an opaque string.
 type StringCursorPaginatedResponse[T any] struct {
-	Items      []T     `json:"items"`
-	NextCursor *string `json:"nextCursor"`
+	_          struct{} // callers must name fields
+	Items      []T      `json:"items"`
+	NextCursor *string  `json:"nextCursor"`
 }
 
 // IDResponse returned by create/edit/toggle endpoints.
 type IDResponse struct {
-	ID int64 `json:"id"`
+	_  struct{} // callers must name fields
+	ID int64    `json:"id"`
 }
 
 // ClientSessionStatus is a closed set of wire values (see ParseClientSessionStatus/IsValid).
@@ -222,6 +229,7 @@ func ParseLicenseStatus(s string) (LicenseStatus, error) {
 }
 
 type Account struct {
+	_              struct{}        // callers must name fields
 	ID             int64           `json:"id"`
 	Name           string          `json:"name"`
 	Description    string          `json:"description"`
@@ -239,72 +247,78 @@ type Account struct {
 }
 
 type User struct {
-	ID        int64  `json:"id"`
-	AccountID int64  `json:"accountId"`
-	Username  string `json:"username"`
-	Email     string `json:"email"`
-	Name      string `json:"name"`
-	IsActive  bool   `json:"isActive"`
+	_         struct{} // callers must name fields
+	ID        int64    `json:"id"`
+	AccountID int64    `json:"accountId"`
+	Username  string   `json:"username"`
+	Email     string   `json:"email"`
+	Name      string   `json:"name"`
+	IsActive  bool     `json:"isActive"`
 }
 
 type Region struct {
-	ID          int64  `json:"id"`
-	ExportID    string `json:"exportId"`
-	AccountID   int64  `json:"accountId"`
-	Name        string `json:"name"`
-	LiveVolume  int64  `json:"liveVolume"`
-	TotalVolume int64  `json:"totalVolume"`
-	IsActive    bool   `json:"isActive"`
-	CreatedAt   string `json:"createdAt"`
-	UpdatedAt   string `json:"updatedAt"`
+	_           struct{} // callers must name fields
+	ID          int64    `json:"id"`
+	ExportID    string   `json:"exportId"`
+	AccountID   int64    `json:"accountId"`
+	Name        string   `json:"name"`
+	LiveVolume  int64    `json:"liveVolume"`
+	TotalVolume int64    `json:"totalVolume"`
+	IsActive    bool     `json:"isActive"`
+	CreatedAt   string   `json:"createdAt"`
+	UpdatedAt   string   `json:"updatedAt"`
 }
 
 type MetadataCluster struct {
-	ID             int64  `json:"id"`
-	ExportID       string `json:"exportId"`
-	RegionID       int64  `json:"regionId"`
-	Name           string `json:"name"`
-	DefaultCluster bool   `json:"defaultCluster"`
-	IsReady        bool   `json:"isReady"`
-	IsActive       bool   `json:"isActive"`
-	CreatedAt      string `json:"createdAt"`
-	UpdatedAt      string `json:"updatedAt"`
+	_              struct{} // callers must name fields
+	ID             int64    `json:"id"`
+	ExportID       string   `json:"exportId"`
+	RegionID       int64    `json:"regionId"`
+	Name           string   `json:"name"`
+	DefaultCluster bool     `json:"defaultCluster"`
+	IsReady        bool     `json:"isReady"`
+	IsActive       bool     `json:"isActive"`
+	CreatedAt      string   `json:"createdAt"`
+	UpdatedAt      string   `json:"updatedAt"`
 }
 
 type Storage struct {
-	ID                  int64   `json:"id"`
-	UUID                string  `json:"uuid"`
-	Account             Ref     `json:"account"`
-	RegionInfo          Ref     `json:"regionInfo"`
-	Name                string  `json:"name"`
-	Description         *string `json:"description,omitempty"`
-	StorageType         string  `json:"storageType"`
-	ProviderType        string  `json:"providerType"`
-	Endpoint            string  `json:"endpoint"`
-	Region              *string `json:"region,omitempty"`
-	Bucket              *string `json:"bucket,omitempty"`
-	Base                *string `json:"base,omitempty"`
-	PhysicalFingerprint *string `json:"physicalFingerprint,omitempty"`
-	BlockRegion         *string `json:"blockRegion,omitempty"`
-	BlockSize           *int32  `json:"blockSize,omitempty"`
-	DirectAccess        *bool   `json:"directAccess,omitempty"`
-	IsActive            bool    `json:"isActive"`
-	CreatedAt           string  `json:"createdAt"`
-	UpdatedAt           string  `json:"updatedAt"`
+	_                   struct{} // callers must name fields
+	ID                  int64    `json:"id"`
+	UUID                string   `json:"uuid"`
+	Account             Ref      `json:"account"`
+	RegionInfo          Ref      `json:"regionInfo"`
+	Name                string   `json:"name"`
+	Description         *string  `json:"description,omitempty"`
+	StorageType         string   `json:"storageType"`
+	ProviderType        string   `json:"providerType"`
+	Endpoint            string   `json:"endpoint"`
+	Region              *string  `json:"region,omitempty"`
+	Bucket              *string  `json:"bucket,omitempty"`
+	Base                *string  `json:"base,omitempty"`
+	PhysicalFingerprint *string  `json:"physicalFingerprint,omitempty"`
+	BlockRegion         *string  `json:"blockRegion,omitempty"`
+	BlockSize           *int32   `json:"blockSize,omitempty"`
+	DirectAccess        *bool    `json:"directAccess,omitempty"`
+	IsActive            bool     `json:"isActive"`
+	CreatedAt           string   `json:"createdAt"`
+	UpdatedAt           string   `json:"updatedAt"`
 }
 
 type BlockVolume struct {
-	ID          string  `json:"id"`
-	Name        *string `json:"name,omitempty"`
-	ShardID     int64   `json:"shardId"`
-	IsActive    bool    `json:"isActive"`
-	CreatedAt   string  `json:"createdAt"`
-	UpdatedAt   string  `json:"updatedAt"`
-	MemberState *string `json:"memberState,omitempty"`
-	CopysetID   *string `json:"copysetId,omitempty"`
+	_           struct{} // callers must name fields
+	ID          string   `json:"id"`
+	Name        *string  `json:"name,omitempty"`
+	ShardID     int64    `json:"shardId"`
+	IsActive    bool     `json:"isActive"`
+	CreatedAt   string   `json:"createdAt"`
+	UpdatedAt   string   `json:"updatedAt"`
+	MemberState *string  `json:"memberState,omitempty"`
+	CopysetID   *string  `json:"copysetId,omitempty"`
 }
 
 type Copyset struct {
+	_                         struct{}     // callers must name fields
 	ID                        string       `json:"id"`
 	StorageID                 string       `json:"storageId"`
 	Name                      string       `json:"name"`
@@ -323,14 +337,16 @@ type Copyset struct {
 }
 
 type PoolMember struct {
-	ID            string  `json:"id"`
-	Name          string  `json:"name"`
-	RegionID      int64   `json:"regionId"`
-	MemberState   string  `json:"memberState"`
-	FailureDomain *string `json:"failureDomain,omitempty"`
+	_             struct{} // callers must name fields
+	ID            string   `json:"id"`
+	Name          string   `json:"name"`
+	RegionID      int64    `json:"regionId"`
+	MemberState   string   `json:"memberState"`
+	FailureDomain *string  `json:"failureDomain,omitempty"`
 }
 
 type Volume struct {
+	_                       struct{}               // callers must name fields
 	ID                      int64                  `json:"id"`
 	Account                 Ref                    `json:"account"`
 	Storage                 Ref                    `json:"storage"`
@@ -359,6 +375,7 @@ type Volume struct {
 }
 
 type VolumeBlockPlacementConfig struct {
+	_                  struct{} // callers must name fields
 	ID                 int64    `json:"id"`
 	TargetCopysetCount int32    `json:"targetCopysetCount"`
 	CurrentEpoch       int64    `json:"currentEpoch"`
@@ -366,33 +383,36 @@ type VolumeBlockPlacementConfig struct {
 }
 
 type VolumeBlockPlacementResizeResult struct {
-	ID                 int64   `json:"id"`
-	TargetCopysetCount int32   `json:"targetCopysetCount"`
-	CopysetCountBefore int32   `json:"copysetCountBefore"`
-	CopysetsAdded      int32   `json:"copysetsAdded"`
-	CopysetsRemoved    int32   `json:"copysetsRemoved"`
-	CopysetCountAfter  int32   `json:"copysetCountAfter"`
-	Epoch              int64   `json:"epoch"`
-	Partial            bool    `json:"partial"`
-	Reason             *string `json:"reason,omitempty"`
+	_                  struct{} // callers must name fields
+	ID                 int64    `json:"id"`
+	TargetCopysetCount int32    `json:"targetCopysetCount"`
+	CopysetCountBefore int32    `json:"copysetCountBefore"`
+	CopysetsAdded      int32    `json:"copysetsAdded"`
+	CopysetsRemoved    int32    `json:"copysetsRemoved"`
+	CopysetCountAfter  int32    `json:"copysetCountAfter"`
+	Epoch              int64    `json:"epoch"`
+	Partial            bool     `json:"partial"`
+	Reason             *string  `json:"reason,omitempty"`
 }
 
 type Fork struct {
-	Fid           int32  `json:"fid"`
-	Name          string `json:"name"`
-	ParentFid     int32  `json:"parentFid"`
-	ParentName    string `json:"parentName"`
-	SnapshotTs    int64  `json:"snapshotTs"`
-	CreatedBy     *int64 `json:"createdBy,omitempty"`
-	CreatedAt     int64  `json:"createdAt"`
-	ChildrenCount int32  `json:"childrenCount"`
-	Inactive      *bool  `json:"inactive,omitempty"`
-	InactiveAt    *int64 `json:"inactiveAt,omitempty"`
-	Status        string `json:"status"`
-	Size          int64  `json:"size"`
+	_             struct{} // callers must name fields
+	Fid           int32    `json:"fid"`
+	Name          string   `json:"name"`
+	ParentFid     int32    `json:"parentFid"`
+	ParentName    string   `json:"parentName"`
+	SnapshotTs    int64    `json:"snapshotTs"`
+	CreatedBy     *int64   `json:"createdBy,omitempty"`
+	CreatedAt     int64    `json:"createdAt"`
+	ChildrenCount int32    `json:"childrenCount"`
+	Inactive      *bool    `json:"inactive,omitempty"`
+	InactiveAt    *int64   `json:"inactiveAt,omitempty"`
+	Status        string   `json:"status"`
+	Size          int64    `json:"size"`
 }
 
 type ExclusiveGrantsResponse struct {
+	_              struct{}         // callers must name fields
 	VolumeID       int64            `json:"volumeId"`
 	Grants         []ExclusiveGrant `json:"grants"`
 	OwnerReachable bool             `json:"ownerReachable"`
@@ -400,17 +420,19 @@ type ExclusiveGrantsResponse struct {
 }
 
 type ForkTreeEntry struct {
-	Inode     int64  `json:"inode"`
-	Name      string `json:"name"`
-	Kind      string `json:"kind"`
-	Size      int64  `json:"size"`
-	Mtime     int64  `json:"mtime"`
-	Ctime     int64  `json:"ctime"`
-	CreatorID *int64 `json:"creatorId,omitempty"`
-	UpdaterID *int64 `json:"updaterId,omitempty"`
+	_         struct{} // callers must name fields
+	Inode     int64    `json:"inode"`
+	Name      string   `json:"name"`
+	Kind      string   `json:"kind"`
+	Size      int64    `json:"size"`
+	Mtime     int64    `json:"mtime"`
+	Ctime     int64    `json:"ctime"`
+	CreatorID *int64   `json:"creatorId,omitempty"`
+	UpdaterID *int64   `json:"updaterId,omitempty"`
 }
 
 type ForkEntryDetail struct {
+	_          struct{}       // callers must name fields
 	Inode      int64          `json:"inode"`
 	Path       string         `json:"path"`
 	Name       string         `json:"name"`
@@ -427,22 +449,25 @@ type ForkEntryDetail struct {
 }
 
 type ForkEntryVersion struct {
-	Generation  int64   `json:"generation"`
-	Size        int64   `json:"size"`
-	Mtime       int64   `json:"mtime"`
-	UpdaterID   *int64  `json:"updaterId,omitempty"`
-	ContentHash *string `json:"contentHash,omitempty"`
+	_           struct{} // callers must name fields
+	Generation  int64    `json:"generation"`
+	Size        int64    `json:"size"`
+	Mtime       int64    `json:"mtime"`
+	UpdaterID   *int64   `json:"updaterId,omitempty"`
+	ContentHash *string  `json:"contentHash,omitempty"`
 }
 
 type ForkTreeMatch struct {
-	Path  string `json:"path"`
-	Inode int64  `json:"inode"`
-	Kind  string `json:"kind"`
-	Size  int64  `json:"size"`
-	Mtime int64  `json:"mtime"`
+	_     struct{} // callers must name fields
+	Path  string   `json:"path"`
+	Inode int64    `json:"inode"`
+	Kind  string   `json:"kind"`
+	Size  int64    `json:"size"`
+	Mtime int64    `json:"mtime"`
 }
 
 type AuditLog struct {
+	_                 struct{}        // callers must name fields
 	ID                int64           `json:"id"`
 	Title             string          `json:"title"`
 	Description       *string         `json:"description,omitempty"`
@@ -459,6 +484,7 @@ type AuditLog struct {
 }
 
 type ServiceNode struct {
+	_                 struct{}       // callers must name fields
 	ID                int64          `json:"id"`
 	RegionID          int64          `json:"regionId"`
 	MetadataClusterID *int64         `json:"metadataClusterId,omitempty"`
@@ -480,6 +506,7 @@ type ServiceNode struct {
 }
 
 type ClientSession struct {
+	_               struct{}            // callers must name fields
 	ID              int64               `json:"id"`
 	Account         Ref                 `json:"account"`
 	Region          Ref                 `json:"region"`
@@ -506,6 +533,7 @@ type ClientSession struct {
 }
 
 type SessionSummary struct {
+	_             struct{}                    // callers must name fields
 	ByStatus      []SessionSummaryStatusEntry `json:"byStatus"`
 	ByPlatform    []SessionSummaryFacet       `json:"byPlatform"`
 	ByOsName      []SessionSummaryFacet       `json:"byOsName"`
@@ -516,33 +544,39 @@ type SessionSummary struct {
 }
 
 type MountReportResponse struct {
+	_             struct{}     // callers must name fields
 	Mount         MountDetails `json:"mount,omitempty"`
 	LastHeartbeat *int64       `json:"lastHeartbeat,omitempty"`
 	AgeSeconds    *int64       `json:"ageSeconds,omitempty"`
 }
 
 type SupportBundle struct {
+	_           struct{}            // callers must name fields
 	Session     ClientSession       `json:"session"`
 	MountReport MountReportResponse `json:"mountReport"`
 	ServerTime  int64               `json:"serverTime"`
 }
 
 type DiscoverMetaResponse struct {
+	_         struct{}           // callers must name fields
 	RegionID  int64              `json:"regionId"`
 	Region    string             `json:"region"`
 	Endpoints []DiscoverEndpoint `json:"endpoints"`
 }
 
 type MetricsTarget struct {
+	_       struct{}       // callers must name fields
 	Targets []string       `json:"targets"`
 	Labels  map[string]any `json:"labels"`
 }
 
 type MetricsTokenResponse struct {
-	Token string `json:"token"`
+	_     struct{} // callers must name fields
+	Token string   `json:"token"`
 }
 
 type DashboardStats struct {
+	_                  struct{}              // callers must name fields
 	UserCount          int64                 `json:"userCount"`
 	VolumeCount        int64                 `json:"volumeCount"`
 	RegionCount        int64                 `json:"regionCount"`
@@ -554,6 +588,7 @@ type DashboardStats struct {
 }
 
 type LicenseDetails struct {
+	_                     struct{}      // callers must name fields
 	LicenseID             string        `json:"licenseId"`
 	Licensee              string        `json:"licensee"`
 	Contact               string        `json:"contact"`
@@ -583,59 +618,66 @@ type LicenseDetails struct {
 }
 
 type LicenseTerms struct {
-	Terms string `json:"terms"`
+	_     struct{} // callers must name fields
+	Terms string   `json:"terms"`
 }
 
 type LicenseLoadResult struct {
-	Loaded  int `json:"loaded"`
-	Ignored int `json:"ignored"`
+	_       struct{} // callers must name fields
+	Loaded  int      `json:"loaded"`
+	Ignored int      `json:"ignored"`
 }
 
 type LicenseList struct {
+	_     struct{}        // callers must name fields
 	Items []LicenseRecord `json:"items"`
 }
 
 type ServiceAlert struct {
-	ID          int64   `json:"id"`
-	AlertID     string  `json:"alertId"`
-	Source      string  `json:"source"`
-	NodeID      string  `json:"nodeId"`
-	Severity    int     `json:"severity"`
-	Category    string  `json:"category"`
-	Title       string  `json:"title"`
-	Description *string `json:"description,omitempty"`
-	Region      Ref     `json:"region,omitempty"`
-	Account     Ref     `json:"account,omitempty"`
-	EventTime   string  `json:"eventTime"`
-	ResolvedAt  *string `json:"resolvedAt,omitempty"`
-	CreatedAt   *string `json:"createdAt,omitempty"`
+	_           struct{} // callers must name fields
+	ID          int64    `json:"id"`
+	AlertID     string   `json:"alertId"`
+	Source      string   `json:"source"`
+	NodeID      string   `json:"nodeId"`
+	Severity    int      `json:"severity"`
+	Category    string   `json:"category"`
+	Title       string   `json:"title"`
+	Description *string  `json:"description,omitempty"`
+	Region      Ref      `json:"region,omitempty"`
+	Account     Ref      `json:"account,omitempty"`
+	EventTime   string   `json:"eventTime"`
+	ResolvedAt  *string  `json:"resolvedAt,omitempty"`
+	CreatedAt   *string  `json:"createdAt,omitempty"`
 }
 
 type AlertCountResponse struct {
-	Active        int64  `json:"active"`
-	Recent        int64  `json:"recent"`
-	InfoCount     int64  `json:"infoCount"`
-	WarningCount  int64  `json:"warningCount"`
-	CriticalCount int64  `json:"criticalCount"`
-	AsOf          string `json:"asOf"`
+	_             struct{} // callers must name fields
+	Active        int64    `json:"active"`
+	Recent        int64    `json:"recent"`
+	InfoCount     int64    `json:"infoCount"`
+	WarningCount  int64    `json:"warningCount"`
+	CriticalCount int64    `json:"criticalCount"`
+	AsOf          string   `json:"asOf"`
 }
 
 type RegionAlert struct {
-	ID                int64   `json:"id"`
-	AlertID           string  `json:"alertId"`
-	Source            string  `json:"source"`
-	NodeID            string  `json:"nodeId"`
-	MetadataClusterID *int64  `json:"metadataClusterId,omitempty"`
-	Severity          int     `json:"severity"`
-	Category          string  `json:"category"`
-	Title             string  `json:"title"`
-	Description       *string `json:"description,omitempty"`
-	EventTime         string  `json:"eventTime"`
-	ResolvedAt        *string `json:"resolvedAt,omitempty"`
-	CreatedAt         *string `json:"createdAt,omitempty"`
+	_                 struct{} // callers must name fields
+	ID                int64    `json:"id"`
+	AlertID           string   `json:"alertId"`
+	Source            string   `json:"source"`
+	NodeID            string   `json:"nodeId"`
+	MetadataClusterID *int64   `json:"metadataClusterId,omitempty"`
+	Severity          int      `json:"severity"`
+	Category          string   `json:"category"`
+	Title             string   `json:"title"`
+	Description       *string  `json:"description,omitempty"`
+	EventTime         string   `json:"eventTime"`
+	ResolvedAt        *string  `json:"resolvedAt,omitempty"`
+	CreatedAt         *string  `json:"createdAt,omitempty"`
 }
 
 type GCWorkerEvent struct {
+	_                 struct{}       // callers must name fields
 	ID                int64          `json:"id"`
 	NodeID            string         `json:"nodeId"`
 	MetadataClusterID *int64         `json:"metadataClusterId,omitempty"`
@@ -649,19 +691,23 @@ type GCWorkerEvent struct {
 }
 
 type GCWorkerEventHistogramResponse struct {
+	_       struct{}              // callers must name fields
 	Buckets []GCWorkerEventBucket `json:"buckets"`
 }
 
 type GCWorkerEventGoalsResponse struct {
+	_     struct{} // callers must name fields
 	Goals []string `json:"goals"`
 }
 
 type BackfillFailure struct {
-	ShardID int64  `json:"shardId"`
-	Error   string `json:"error"`
+	_       struct{} // callers must name fields
+	ShardID int64    `json:"shardId"`
+	Error   string   `json:"error"`
 }
 
 type CompatibleStorage struct {
+	_            struct{}           // callers must name fields
 	ID           int64              `json:"id"`
 	UUID         string             `json:"uuid"`
 	Name         string             `json:"name"`
@@ -671,23 +717,26 @@ type CompatibleStorage struct {
 }
 
 type CompatibleVolume struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	_    struct{} // callers must name fields
+	ID   string   `json:"id"`
+	Name string   `json:"name"`
 }
 
 type DashboardUser struct {
-	ID        string  `json:"id"`
-	Name      string  `json:"name"`
-	Email     *string `json:"email,omitempty"`
-	Role      string  `json:"role"`
-	Username  *string `json:"username,omitempty"`
-	AccountID *int64  `json:"accountId,omitempty"`
-	UserID    *int64  `json:"userId,omitempty"`
-	VolumeID  *int64  `json:"volumeId,omitempty"`
-	Exp       *int64  `json:"exp,omitempty"`
+	_         struct{} // callers must name fields
+	ID        string   `json:"id"`
+	Name      string   `json:"name"`
+	Email     *string  `json:"email,omitempty"`
+	Role      string   `json:"role"`
+	Username  *string  `json:"username,omitempty"`
+	AccountID *int64   `json:"accountId,omitempty"`
+	UserID    *int64   `json:"userId,omitempty"`
+	VolumeID  *int64   `json:"volumeId,omitempty"`
+	Exp       *int64   `json:"exp,omitempty"`
 }
 
 type DiscoverEndpoint struct {
+	_       struct{}               // callers must name fields
 	NodeID  string                 `json:"nodeId"`
 	Status  string                 `json:"status"`
 	Public  []DiscoverEndpointAddr `json:"public,omitempty"`
@@ -695,41 +744,45 @@ type DiscoverEndpoint struct {
 }
 
 type DiscoverEndpointAddr struct {
-	TCP    string  `json:"tcp"`
-	UDP    *string `json:"udp,omitempty"`
-	Family int     `json:"family"`
+	_      struct{} // callers must name fields
+	TCP    string   `json:"tcp"`
+	UDP    *string  `json:"udp,omitempty"`
+	Family int      `json:"family"`
 }
 
 type ExclusiveGrant struct {
-	SessionID         string `json:"sessionId"`
-	SessionName       string `json:"sessionName"`
-	Fork              string `json:"fork"`
-	HolderIP          string `json:"holderIp"`
-	Path              string `json:"path"`
-	ScopeInode        string `json:"scopeInode"`
-	Kind              string `json:"kind"`
-	State             string `json:"state"`
-	Role              string `json:"role"`
-	Durability        string `json:"durability"`
-	TakeOverText      string `json:"takeOverText"`
-	SinceUnixMs       int64  `json:"sinceUnixMs"`
-	HolderEpoch       uint64 `json:"holderEpoch"`
-	WindowSeconds     int32  `json:"windowSeconds"`
-	StandbyPosition   int32  `json:"standbyPosition"`
-	Live              *bool  `json:"live,omitempty"`
-	LastRenewAgeMs    *int64 `json:"lastRenewAgeMs,omitempty"`
-	LastSeenAgeMs     *int64 `json:"lastSeenAgeMs,omitempty"`
-	FencedSinceUnixMs *int64 `json:"fencedSinceUnixMs,omitempty"`
-	FailoverGraceMs   *int64 `json:"failoverGraceMs,omitempty"`
+	_                 struct{} // callers must name fields
+	SessionID         string   `json:"sessionId"`
+	SessionName       string   `json:"sessionName"`
+	Fork              string   `json:"fork"`
+	HolderIP          string   `json:"holderIp"`
+	Path              string   `json:"path"`
+	ScopeInode        string   `json:"scopeInode"`
+	Kind              string   `json:"kind"`
+	State             string   `json:"state"`
+	Role              string   `json:"role"`
+	Durability        string   `json:"durability"`
+	TakeOverText      string   `json:"takeOverText"`
+	SinceUnixMs       int64    `json:"sinceUnixMs"`
+	HolderEpoch       uint64   `json:"holderEpoch"`
+	WindowSeconds     int32    `json:"windowSeconds"`
+	StandbyPosition   int32    `json:"standbyPosition"`
+	Live              *bool    `json:"live,omitempty"`
+	LastRenewAgeMs    *int64   `json:"lastRenewAgeMs,omitempty"`
+	LastSeenAgeMs     *int64   `json:"lastSeenAgeMs,omitempty"`
+	FencedSinceUnixMs *int64   `json:"fencedSinceUnixMs,omitempty"`
+	FailoverGraceMs   *int64   `json:"failoverGraceMs,omitempty"`
 }
 
 type GCWorkerEventBucket struct {
-	BucketStart string `json:"bucketStart"`
-	Goal        string `json:"goal"`
-	Count       int64  `json:"count"`
+	_           struct{} // callers must name fields
+	BucketStart string   `json:"bucketStart"`
+	Goal        string   `json:"goal"`
+	Count       int64    `json:"count"`
 }
 
 type LicenseQuota struct {
+	_                  struct{}          // callers must name fields
 	State              LicenseQuotaState `json:"state"`
 	LiveVolume         int64             `json:"liveVolume"`
 	TotalVolume        int64             `json:"totalVolume"`
@@ -738,6 +791,7 @@ type LicenseQuota struct {
 }
 
 type LicenseRecord struct {
+	_               struct{}      // callers must name fields
 	Key             string        `json:"key"`
 	Licensee        string        `json:"licensee"`
 	Status          LicenseStatus `json:"status"`
@@ -748,6 +802,7 @@ type LicenseRecord struct {
 }
 
 type MountDetails struct {
+	_            struct{}    // callers must name fields
 	Command      *string     `json:"command,omitempty"`
 	MountPoint   *string     `json:"mountPoint,omitempty"`
 	Args         []string    `json:"args,omitempty"`
@@ -757,125 +812,141 @@ type MountDetails struct {
 }
 
 type MountFlag struct {
-	Name   string  `json:"name"`
-	Value  string  `json:"value"`
-	Source *string `json:"source,omitempty"`
+	_      struct{} // callers must name fields
+	Name   string   `json:"name"`
+	Value  string   `json:"value"`
+	Source *string  `json:"source,omitempty"`
 }
 
 type MoveVolumeFailure struct {
-	VolumeID string `json:"volumeId"`
-	Error    string `json:"error"`
+	_        struct{} // callers must name fields
+	VolumeID string   `json:"volumeId"`
+	Error    string   `json:"error"`
 }
 
 type NodeAddress struct {
-	Family    int     `json:"family"`
-	Scope     string  `json:"scope"`
-	Advertise string  `json:"advertise"`
-	Rpc       *string `json:"rpc,omitempty"`
+	_         struct{} // callers must name fields
+	Family    int      `json:"family"`
+	Scope     string   `json:"scope"`
+	Advertise string   `json:"advertise"`
+	Rpc       *string  `json:"rpc,omitempty"`
 }
 
 type NodeStatsSample struct {
-	TimestampMs           int64   `json:"timestampMs"`
-	IntervalMs            int64   `json:"intervalMs"`
-	LoadAvg1              float64 `json:"loadAvg1"`
-	LoadAvg5              float64 `json:"loadAvg5"`
-	LoadAvg15             float64 `json:"loadAvg15"`
-	MemUsage              float64 `json:"memUsage"`
-	ReadIops              float64 `json:"readIops"`
-	WriteIops             float64 `json:"writeIops"`
-	NetRxBytesPerSec      float64 `json:"netRxBytesPerSec"`
-	NetTxBytesPerSec      float64 `json:"netTxBytesPerSec"`
-	ProcessCount          int     `json:"processCount"`
-	DiskUsedBytes         *int64  `json:"diskUsedBytes,omitempty"`
-	DiskTotalBytes        *int64  `json:"diskTotalBytes,omitempty"`
-	DbLatency1mUs         float64 `json:"dbLatency1mUs,omitempty"`
-	DbLatency5mUs         float64 `json:"dbLatency5mUs,omitempty"`
-	DbLatency15mUs        float64 `json:"dbLatency15mUs,omitempty"`
-	DbQueriesPerSec       float64 `json:"dbQueriesPerSec,omitempty"`
-	DbConnsInUse          *int    `json:"dbConnsInUse,omitempty"`
-	DbConnsMax            *int    `json:"dbConnsMax,omitempty"`
-	DbConnsIdle           *int    `json:"dbConnsIdle,omitempty"`
-	DbConnsFree           *int    `json:"dbConnsFree,omitempty"`
-	DbConnsInUse1m        float64 `json:"dbConnsInUse1m,omitempty"`
-	DbConnsInUse5m        float64 `json:"dbConnsInUse5m,omitempty"`
-	DbConnsInUse15m       float64 `json:"dbConnsInUse15m,omitempty"`
-	DbPingAvgUs           float64 `json:"dbPingAvgUs,omitempty"`
-	DbPingMinUs           float64 `json:"dbPingMinUs,omitempty"`
-	DbPingMaxUs           float64 `json:"dbPingMaxUs,omitempty"`
-	DbPingStdDevUs        float64 `json:"dbPingStdDevUs,omitempty"`
-	DbDispatchOutstanding *int64  `json:"dbDispatchOutstanding,omitempty"`
-	DbDispatchLaneCap     *int    `json:"dbDispatchLaneCap,omitempty"`
+	_                     struct{} // callers must name fields
+	TimestampMs           int64    `json:"timestampMs"`
+	IntervalMs            int64    `json:"intervalMs"`
+	LoadAvg1              float64  `json:"loadAvg1"`
+	LoadAvg5              float64  `json:"loadAvg5"`
+	LoadAvg15             float64  `json:"loadAvg15"`
+	MemUsage              float64  `json:"memUsage"`
+	ReadIops              float64  `json:"readIops"`
+	WriteIops             float64  `json:"writeIops"`
+	NetRxBytesPerSec      float64  `json:"netRxBytesPerSec"`
+	NetTxBytesPerSec      float64  `json:"netTxBytesPerSec"`
+	ProcessCount          int      `json:"processCount"`
+	DiskUsedBytes         *int64   `json:"diskUsedBytes,omitempty"`
+	DiskTotalBytes        *int64   `json:"diskTotalBytes,omitempty"`
+	DbLatency1mUs         float64  `json:"dbLatency1mUs,omitempty"`
+	DbLatency5mUs         float64  `json:"dbLatency5mUs,omitempty"`
+	DbLatency15mUs        float64  `json:"dbLatency15mUs,omitempty"`
+	DbQueriesPerSec       float64  `json:"dbQueriesPerSec,omitempty"`
+	DbConnsInUse          *int     `json:"dbConnsInUse,omitempty"`
+	DbConnsMax            *int     `json:"dbConnsMax,omitempty"`
+	DbConnsIdle           *int     `json:"dbConnsIdle,omitempty"`
+	DbConnsFree           *int     `json:"dbConnsFree,omitempty"`
+	DbConnsInUse1m        float64  `json:"dbConnsInUse1m,omitempty"`
+	DbConnsInUse5m        float64  `json:"dbConnsInUse5m,omitempty"`
+	DbConnsInUse15m       float64  `json:"dbConnsInUse15m,omitempty"`
+	DbPingAvgUs           float64  `json:"dbPingAvgUs,omitempty"`
+	DbPingMinUs           float64  `json:"dbPingMinUs,omitempty"`
+	DbPingMaxUs           float64  `json:"dbPingMaxUs,omitempty"`
+	DbPingStdDevUs        float64  `json:"dbPingStdDevUs,omitempty"`
+	DbDispatchOutstanding *int64   `json:"dbDispatchOutstanding,omitempty"`
+	DbDispatchLaneCap     *int     `json:"dbDispatchLaneCap,omitempty"`
 }
 
 type Ref struct {
-	ID   int64  `json:"id"`
-	Name string `json:"name"`
+	_    struct{} // callers must name fields
+	ID   int64    `json:"id"`
+	Name string   `json:"name"`
 }
 
 type RegionVolumeMetrics struct {
-	RegionID        int64  `json:"regionId"`
-	RegionName      string `json:"regionName"`
-	VolumeCount     int64  `json:"volumeCount"`
-	TotalVolumeUsed int64  `json:"totalVolumeUsed"`
-	TotalQuotaLimit int64  `json:"totalQuotaLimit"`
+	_               struct{} // callers must name fields
+	RegionID        int64    `json:"regionId"`
+	RegionName      string   `json:"regionName"`
+	VolumeCount     int64    `json:"volumeCount"`
+	TotalVolumeUsed int64    `json:"totalVolumeUsed"`
+	TotalQuotaLimit int64    `json:"totalQuotaLimit"`
 }
 
 type RetentionPolicy struct {
-	ClientSessionDays *int32 `json:"clientSessionDays,omitempty"`
+	_                 struct{} // callers must name fields
+	ClientSessionDays *int32   `json:"clientSessionDays,omitempty"`
 }
 
 type SessionSummaryFacet struct {
-	Label string `json:"label"`
-	Count int64  `json:"count"`
+	_     struct{} // callers must name fields
+	Label string   `json:"label"`
+	Count int64    `json:"count"`
 }
 
 type SessionSummaryStatusEntry struct {
-	ClientType string `json:"clientType"`
-	Status     string `json:"status"`
-	Count      int64  `json:"count"`
+	_          struct{} // callers must name fields
+	ClientType string   `json:"clientType"`
+	Status     string   `json:"status"`
+	Count      int64    `json:"count"`
 }
 
 type UserLite struct {
-	ID       int64  `json:"id"`
-	Username string `json:"username"`
-	Name     string `json:"name"`
+	_        struct{} // callers must name fields
+	ID       int64    `json:"id"`
+	Username string   `json:"username"`
+	Name     string   `json:"name"`
 }
 
 type VolumeApiKey struct {
-	APIKey     string  `json:"apiKey"`
-	Name       *string `json:"name,omitempty"`
-	CreatedAt  *string `json:"createdAt,omitempty"`
-	LastUsedAt *string `json:"lastUsedAt,omitempty"`
+	_          struct{} // callers must name fields
+	APIKey     string   `json:"apiKey"`
+	Name       *string  `json:"name,omitempty"`
+	CreatedAt  *string  `json:"createdAt,omitempty"`
+	LastUsedAt *string  `json:"lastUsedAt,omitempty"`
 }
 
 type VolumeRef struct {
-	ID   int64   `json:"id"`
-	Name string  `json:"name"`
-	Type *string `json:"type,omitempty"`
+	_    struct{} // callers must name fields
+	ID   int64    `json:"id"`
+	Name string   `json:"name"`
+	Type *string  `json:"type,omitempty"`
 }
 
 type VolumeRetentionPolicy struct {
-	DataDays      *int32 `json:"dataDays,omitempty"`
-	GraceDays     *int32 `json:"graceDays,omitempty"`
-	ForkGraceDays *int32 `json:"forkGraceDays,omitempty"`
-	EventLogDays  *int32 `json:"eventLogDays,omitempty"`
+	_             struct{} // callers must name fields
+	DataDays      *int32   `json:"dataDays,omitempty"`
+	GraceDays     *int32   `json:"graceDays,omitempty"`
+	ForkGraceDays *int32   `json:"forkGraceDays,omitempty"`
+	EventLogDays  *int32   `json:"eventLogDays,omitempty"`
 }
 
 type VolumeSizePoint struct {
-	BucketEnd          string `json:"bucketEnd"`
-	LiveVolume         int64  `json:"liveVolume"`
-	TotalVolume        int64  `json:"totalVolume"`
-	PendingVolume      int64  `json:"pendingVolume"`
-	LiveInactiveVolume int64  `json:"liveInactiveVolume"`
+	_                  struct{} // callers must name fields
+	BucketEnd          string   `json:"bucketEnd"`
+	LiveVolume         int64    `json:"liveVolume"`
+	TotalVolume        int64    `json:"totalVolume"`
+	PendingVolume      int64    `json:"pendingVolume"`
+	LiveInactiveVolume int64    `json:"liveInactiveVolume"`
 }
 
 type VolumeVersioningPolicy struct {
-	ContentWindowSeconds *int32 `json:"contentWindowSeconds,omitempty"`
+	_                    struct{} // callers must name fields
+	ContentWindowSeconds *int32   `json:"contentWindowSeconds,omitempty"`
 }
 
 // Accounts
 
 type CreateAccountRequest struct {
+	_            struct{}       // callers must name fields
 	Name         string         `json:"name"`
 	Description  *string        `json:"description,omitempty"`
 	IconURL      *string        `json:"iconUrl,omitempty"`
@@ -883,6 +954,7 @@ type CreateAccountRequest struct {
 }
 
 type EditAccountRequest struct {
+	_            struct{}        // callers must name fields
 	Name         string          `json:"name"`
 	Description  *string         `json:"description,omitempty"`
 	IconURL      *string         `json:"iconUrl,omitempty"`
@@ -891,11 +963,13 @@ type EditAccountRequest struct {
 }
 
 type UpdateAccountQuotaRequest struct {
-	QuotaLimit     int64  `json:"quotaLimit"`
-	QuotaExcessPct *int32 `json:"quotaExcessPct,omitempty"`
+	_              struct{} // callers must name fields
+	QuotaLimit     int64    `json:"quotaLimit"`
+	QuotaExcessPct *int32   `json:"quotaExcessPct,omitempty"`
 }
 
 type AccountListOptions struct {
+	_        struct{} // callers must name fields
 	IsActive *bool
 	Page     int
 	Limit    int
@@ -904,6 +978,7 @@ type AccountListOptions struct {
 // Users
 
 type AddUserRequest struct {
+	_            struct{}       // callers must name fields
 	AccountID    int64          `json:"accountId"`
 	Username     string         `json:"username"`
 	Email        string         `json:"email"`
@@ -912,14 +987,17 @@ type AddUserRequest struct {
 }
 
 type BulkUserRequest struct {
-	IDs []int64 `json:"ids"`
+	_   struct{} // callers must name fields
+	IDs []int64  `json:"ids"`
 }
 
 type BulkUserResponse struct {
+	_     struct{}   // callers must name fields
 	Users []UserLite `json:"users"`
 }
 
 type EditUserRequest struct {
+	_            struct{}       // callers must name fields
 	Username     string         `json:"username"`
 	Email        string         `json:"email"`
 	Name         *string        `json:"name,omitempty"`
@@ -927,6 +1005,7 @@ type EditUserRequest struct {
 }
 
 type UserListOptions struct {
+	_         struct{} // callers must name fields
 	AccountID int64
 	Search    string
 	IsActive  *bool
@@ -937,16 +1016,19 @@ type UserListOptions struct {
 // Regions
 
 type CreateRegionRequest struct {
-	AccountID int64  `json:"accountId"`
-	Name      string `json:"name"`
+	_         struct{} // callers must name fields
+	AccountID int64    `json:"accountId"`
+	Name      string   `json:"name"`
 }
 
 type EditRegionRequest struct {
-	AccountID int64  `json:"accountId"`
-	Name      string `json:"name"`
+	_         struct{} // callers must name fields
+	AccountID int64    `json:"accountId"`
+	Name      string   `json:"name"`
 }
 
 type RegionListOptions struct {
+	_         struct{} // callers must name fields
 	AccountID int64
 	IsActive  *bool
 	Page      int
@@ -956,6 +1038,7 @@ type RegionListOptions struct {
 // Clusters
 
 type ClusterListOptions struct {
+	_         struct{} // callers must name fields
 	AccountID int64
 	RegionID  *int64
 	IsActive  *bool
@@ -966,23 +1049,28 @@ type ClusterListOptions struct {
 // MetadataClusters
 
 type CreateMetadataClusterRequest struct {
-	Name string `json:"name"`
+	_    struct{} // callers must name fields
+	Name string   `json:"name"`
 }
 
 type EditMetadataClusterRequest struct {
-	Name string `json:"name"`
+	_    struct{} // callers must name fields
+	Name string   `json:"name"`
 }
 
 type SetMetadataClusterReadyRequest struct {
-	Ready bool `json:"ready"`
+	_     struct{} // callers must name fields
+	Ready bool     `json:"ready"`
 }
 
 type SetReadyMetadataClusterResponse struct {
-	ID    int64 `json:"id"`
-	Ready bool  `json:"ready"`
+	_     struct{} // callers must name fields
+	ID    int64    `json:"id"`
+	Ready bool     `json:"ready"`
 }
 
 type MetadataClusterListOptions struct {
+	_        struct{} // callers must name fields
 	IsActive *bool
 	Page     int
 	Limit    int
@@ -991,123 +1079,143 @@ type MetadataClusterListOptions struct {
 // Storages
 
 type CreateStorageRequest struct {
-	AccountID    int64   `json:"accountId"`
-	RegionID     int64   `json:"regionId"`
-	Name         string  `json:"name"`
-	Description  *string `json:"description,omitempty"`
-	StorageType  string  `json:"storageType"`
-	ProviderType string  `json:"providerType"`
-	Endpoint     string  `json:"endpoint"`
-	Region       *string `json:"region,omitempty"`
-	Bucket       *string `json:"bucket,omitempty"`
-	Base         *string `json:"base,omitempty"`
-	BlockRegion  *string `json:"blockRegion,omitempty"`
-	BlockSize    *int32  `json:"blockSize,omitempty"`
-	AccessKey    *string `json:"accessKey,omitempty"`
-	SecretKey    *string `json:"secretKey,omitempty"`
+	_            struct{} // callers must name fields
+	AccountID    int64    `json:"accountId"`
+	RegionID     int64    `json:"regionId"`
+	Name         string   `json:"name"`
+	Description  *string  `json:"description,omitempty"`
+	StorageType  string   `json:"storageType"`
+	ProviderType string   `json:"providerType"`
+	Endpoint     string   `json:"endpoint"`
+	Region       *string  `json:"region,omitempty"`
+	Bucket       *string  `json:"bucket,omitempty"`
+	Base         *string  `json:"base,omitempty"`
+	BlockRegion  *string  `json:"blockRegion,omitempty"`
+	BlockSize    *int32   `json:"blockSize,omitempty"`
+	AccessKey    *string  `json:"accessKey,omitempty"`
+	SecretKey    *string  `json:"secretKey,omitempty"`
 }
 
 type EditStorageRequest struct {
-	Name         string  `json:"name"`
-	Description  *string `json:"description,omitempty"`
-	Endpoint     *string `json:"endpoint,omitempty"`
-	AccessKey    *string `json:"accessKey,omitempty"`
-	SecretKey    *string `json:"secretKey,omitempty"`
-	DirectAccess *bool   `json:"directAccess,omitempty"`
+	_            struct{} // callers must name fields
+	Name         string   `json:"name"`
+	Description  *string  `json:"description,omitempty"`
+	Endpoint     *string  `json:"endpoint,omitempty"`
+	AccessKey    *string  `json:"accessKey,omitempty"`
+	SecretKey    *string  `json:"secretKey,omitempty"`
+	DirectAccess *bool    `json:"directAccess,omitempty"`
 }
 
 type TestStorageNewBucketRequest struct {
-	Endpoint     string  `json:"endpoint"`
-	Region       *string `json:"region,omitempty"`
-	Bucket       string  `json:"bucket"`
-	AccessKey    string  `json:"accessKey"`
-	SecretKey    string  `json:"secretKey"`
-	ProviderType *string `json:"providerType,omitempty"`
+	_            struct{} // callers must name fields
+	Endpoint     string   `json:"endpoint"`
+	Region       *string  `json:"region,omitempty"`
+	Bucket       string   `json:"bucket"`
+	AccessKey    string   `json:"accessKey"`
+	SecretKey    string   `json:"secretKey"`
+	ProviderType *string  `json:"providerType,omitempty"`
 }
 
 type TestNewBucketStorageResponse struct {
-	BucketExists bool `json:"bucketExists"`
-	List         bool `json:"list"`
-	Write        bool `json:"write"`
-	Read         bool `json:"read"`
-	Delete       bool `json:"delete"`
-	Multipart    bool `json:"multipart"`
+	_            struct{} // callers must name fields
+	BucketExists bool     `json:"bucketExists"`
+	List         bool     `json:"list"`
+	Write        bool     `json:"write"`
+	Read         bool     `json:"read"`
+	Delete       bool     `json:"delete"`
+	Multipart    bool     `json:"multipart"`
 }
 
 type TestStorageBucketStorageResponse struct {
-	BucketExists bool `json:"bucketExists"`
-	List         bool `json:"list"`
-	Write        bool `json:"write"`
-	Read         bool `json:"read"`
-	Delete       bool `json:"delete"`
-	Multipart    bool `json:"multipart"`
+	_            struct{} // callers must name fields
+	BucketExists bool     `json:"bucketExists"`
+	List         bool     `json:"list"`
+	Write        bool     `json:"write"`
+	Read         bool     `json:"read"`
+	Delete       bool     `json:"delete"`
+	Multipart    bool     `json:"multipart"`
 }
 
 type ListCompatibleStorageResponse struct {
+	_        struct{}            // callers must name fields
 	Storages []CompatibleStorage `json:"storages"`
 }
 
 type MoveStorageVolumesRequest struct {
+	_         struct{} // callers must name fields
 	VolumeIDs []string `json:"volumeIds"`
 }
 
 type MoveVolumesStorageResponse struct {
+	_        struct{}            // callers must name fields
 	Moved    []string            `json:"moved"`
 	Failures []MoveVolumeFailure `json:"failures"`
 }
 
 type DrainStorageCopysetRequest struct {
-	Force *bool `json:"force,omitempty"`
+	_     struct{} // callers must name fields
+	Force *bool    `json:"force,omitempty"`
 }
 
 type DrainCopysetStorageResponse struct {
-	ID    string `json:"id"`
-	State string `json:"state"`
+	_     struct{} // callers must name fields
+	ID    string   `json:"id"`
+	State string   `json:"state"`
 }
 
 type CancelStorageDrainRequest struct {
-	Force *bool `json:"force,omitempty"`
+	_     struct{} // callers must name fields
+	Force *bool    `json:"force,omitempty"`
 }
 
 type CancelDrainStorageResponse struct {
-	ID    string `json:"id"`
-	State string `json:"state"`
+	_     struct{} // callers must name fields
+	ID    string   `json:"id"`
+	State string   `json:"state"`
 }
 
 type UpdateStorageTagsRequest struct {
+	_    struct{} // callers must name fields
 	Tags []string `json:"tags,omitempty"`
 }
 
 type RegisterStorageCopysetRequest struct {
-	Name           *string `json:"name,omitempty"`
-	FailureDomainA *string `json:"failureDomainA,omitempty"`
-	FailureDomainB *string `json:"failureDomainB,omitempty"`
+	_              struct{} // callers must name fields
+	Name           *string  `json:"name,omitempty"`
+	FailureDomainA *string  `json:"failureDomainA,omitempty"`
+	FailureDomainB *string  `json:"failureDomainB,omitempty"`
 }
 
 type RegisterStorageCopysetsBulkRequest struct {
-	Count          int32   `json:"count"`
-	FailureDomainA *string `json:"failureDomainA,omitempty"`
-	FailureDomainB *string `json:"failureDomainB,omitempty"`
+	_              struct{} // callers must name fields
+	Count          int32    `json:"count"`
+	FailureDomainA *string  `json:"failureDomainA,omitempty"`
+	FailureDomainB *string  `json:"failureDomainB,omitempty"`
 }
 
 type RegisterCopysetsBulkStorageResponse struct {
+	_        struct{}  // callers must name fields
 	Copysets []Copyset `json:"copysets"`
 }
 
 type AddStorageCopysetMemberRequest struct {
-	FailureDomain *string `json:"failureDomain,omitempty"`
+	_             struct{} // callers must name fields
+	FailureDomain *string  `json:"failureDomain,omitempty"`
 }
 
 type MarkStorageMemberLostRequest struct {
-	BlockVolumeID string `json:"blockVolumeId"`
-	Force         *bool  `json:"force,omitempty"`
+	_             struct{} // callers must name fields
+	BlockVolumeID string   `json:"blockVolumeId"`
+	Force         *bool    `json:"force,omitempty"`
 }
 
 type RemoveMemberStorageResponse struct {
-	ID string `json:"id"`
+	_  struct{} // callers must name fields
+	ID string   `json:"id"`
 }
 
 type BackfillFingerprintsStorageResponse struct {
+	_        struct{}          // callers must name fields
 	Scanned  int32             `json:"scanned"`
 	Updated  int32             `json:"updated"`
 	Failures []BackfillFailure `json:"failures"`
@@ -1115,6 +1223,7 @@ type BackfillFingerprintsStorageResponse struct {
 }
 
 type StorageListOptions struct {
+	_            struct{} // callers must name fields
 	AccountID    int64
 	Search       string
 	RegionID     *int64
@@ -1129,6 +1238,7 @@ type StorageListOptions struct {
 // Volumes
 
 type CreateVolumeRequest struct {
+	_                   struct{}               // callers must name fields
 	AccountID           int64                  `json:"accountId"`
 	StorageID           int64                  `json:"storageId"`
 	Name                string                 `json:"name"`
@@ -1145,11 +1255,13 @@ type CreateVolumeRequest struct {
 }
 
 type CreateVolumeResponse struct {
-	ID            int64   `json:"id"`
-	EncryptionKey *string `json:"encryptionKey,omitempty"`
+	_             struct{} // callers must name fields
+	ID            int64    `json:"id"`
+	EncryptionKey *string  `json:"encryptionKey,omitempty"`
 }
 
 type EditVolumeRequest struct {
+	_           struct{}               // callers must name fields
 	Description *string                `json:"description,omitempty"`
 	Retention   VolumeRetentionPolicy  `json:"retention,omitempty"`
 	Versioning  VolumeVersioningPolicy `json:"versioning,omitempty"`
@@ -1157,98 +1269,117 @@ type EditVolumeRequest struct {
 }
 
 type MoveVolumeClusterRequest struct {
-	TargetClusterID   *int64  `json:"targetClusterId,omitempty"`
-	TargetClusterUUID *string `json:"targetClusterUuid,omitempty"`
+	_                 struct{} // callers must name fields
+	TargetClusterID   *int64   `json:"targetClusterId,omitempty"`
+	TargetClusterUUID *string  `json:"targetClusterUuid,omitempty"`
 }
 
 type MoveClusterVolumeResponse struct {
-	ID              int64 `json:"id"`
-	SourceClusterID int64 `json:"sourceClusterId"`
-	TargetClusterID int64 `json:"targetClusterId"`
-	HandoverUntil   int64 `json:"handoverUntil"`
+	_               struct{} // callers must name fields
+	ID              int64    `json:"id"`
+	SourceClusterID int64    `json:"sourceClusterId"`
+	TargetClusterID int64    `json:"targetClusterId"`
+	HandoverUntil   int64    `json:"handoverUntil"`
 }
 
 type DeactivateVolumeRequest struct {
-	IsCleanupMetaEnabled    *bool `json:"isCleanupMetaEnabled,omitempty"`
-	IsCleanupStorageEnabled *bool `json:"isCleanupStorageEnabled,omitempty"`
-	IsCleanupVaultEnabled   *bool `json:"isCleanupVaultEnabled,omitempty"`
+	_                       struct{} // callers must name fields
+	IsCleanupMetaEnabled    *bool    `json:"isCleanupMetaEnabled,omitempty"`
+	IsCleanupStorageEnabled *bool    `json:"isCleanupStorageEnabled,omitempty"`
+	IsCleanupVaultEnabled   *bool    `json:"isCleanupVaultEnabled,omitempty"`
 }
 
 type GenerateVolumeAPIKeysRequest struct {
-	UserID int64   `json:"userId"`
-	Name   *string `json:"name,omitempty"`
+	_      struct{} // callers must name fields
+	UserID int64    `json:"userId"`
+	Name   *string  `json:"name,omitempty"`
 }
 
 type GenerateAPIKeysVolumeResponse struct {
+	_              struct{} // callers must name fields
 	APIKey         string   `json:"apiKey"`
 	APISecret      string   `json:"apiSecret"`
 	EvictedAPIKeys []string `json:"evictedApiKeys,omitempty"`
 }
 
 type ListAPIKeysVolumeResponse struct {
+	_    struct{}       // callers must name fields
 	Keys []VolumeApiKey `json:"keys"`
 }
 
 type RevokeVolumeAPIKeyRequest struct {
-	APIKey string `json:"apiKey"`
+	_      struct{} // callers must name fields
+	APIKey string   `json:"apiKey"`
 }
 
 type RevokeVolumeAPIKeysByUserRequest struct {
-	UserID int64 `json:"userId"`
+	_      struct{} // callers must name fields
+	UserID int64    `json:"userId"`
 }
 
 type GenerateVolumeSttKeyRequest struct {
-	UserID        *int64 `json:"userId,omitempty"`
-	ExpirySeconds int64  `json:"expirySeconds"`
+	_             struct{} // callers must name fields
+	UserID        *int64   `json:"userId,omitempty"`
+	ExpirySeconds int64    `json:"expirySeconds"`
 }
 
 type GenerateSttKeyVolumeResponse struct {
-	APIKey    string `json:"apiKey"`
-	APISecret string `json:"apiSecret"`
-	ExpiresAt string `json:"expiresAt"`
+	_         struct{} // callers must name fields
+	APIKey    string   `json:"apiKey"`
+	APISecret string   `json:"apiSecret"`
+	ExpiresAt string   `json:"expiresAt"`
 }
 
 type UpdateVolumeQuotaRequest struct {
-	QuotaLimit int64 `json:"quotaLimit"`
+	_          struct{} // callers must name fields
+	QuotaLimit int64    `json:"quotaLimit"`
 }
 
 type UpdateVolumeCopysetConfigRequest struct {
-	TargetCopysetCount int32 `json:"targetCopysetCount"`
+	_                  struct{} // callers must name fields
+	TargetCopysetCount int32    `json:"targetCopysetCount"`
 }
 
 type StatsVolumeResponse struct {
-	VolumeID           string `json:"volumeId"`
-	LiveVolume         int64  `json:"liveVolume"`
-	TotalVolume        int64  `json:"totalVolume"`
-	PendingVolume      int64  `json:"pendingVolume"`
-	LiveInactiveVolume int64  `json:"liveInactiveVolume"`
+	_                  struct{} // callers must name fields
+	VolumeID           string   `json:"volumeId"`
+	LiveVolume         int64    `json:"liveVolume"`
+	TotalVolume        int64    `json:"totalVolume"`
+	PendingVolume      int64    `json:"pendingVolume"`
+	LiveInactiveVolume int64    `json:"liveInactiveVolume"`
 }
 
 type SizeHistoryVolumeResponse struct {
+	_      struct{}          // callers must name fields
 	Points []VolumeSizePoint `json:"points"`
 }
 
 type CreateVolumeForkRequest struct {
-	Name       string  `json:"name"`
-	ParentName *string `json:"parentName,omitempty"`
-	AsOf       *int64  `json:"asOf,omitempty"`
-	VolumeType *string `json:"volumeType,omitempty"`
+	_          struct{} // callers must name fields
+	Name       string   `json:"name"`
+	ParentName *string  `json:"parentName,omitempty"`
+	AsOf       *int64   `json:"asOf,omitempty"`
+	VolumeType *string  `json:"volumeType,omitempty"`
 }
 
 type DeleteVolumeForkRequest struct {
-	Force      *bool   `json:"force,omitempty"`
-	VolumeType *string `json:"volumeType,omitempty"`
+	_          struct{} // callers must name fields
+	Force      *bool    `json:"force,omitempty"`
+	VolumeType *string  `json:"volumeType,omitempty"`
 }
 
 type DeleteForkVolumeResponse struct {
-	InactivatedFids []int32 `json:"inactivatedFids"`
+	_               struct{} // callers must name fields
+	InactivatedFids []int32  `json:"inactivatedFids"`
 }
 
 type RestoreVolumeForkRequest struct {
-	VolumeType *string `json:"volumeType,omitempty"`
+	_          struct{} // callers must name fields
+	VolumeType *string  `json:"volumeType,omitempty"`
 }
 
 type VolumeListOptions struct {
+	_                 struct{} // callers must name fields
 	AccountID         int64
 	RegionID          *int64
 	MetadataClusterID *int64
@@ -1263,6 +1394,7 @@ type VolumeListOptions struct {
 // VolumeForkTrees
 
 type VolumeForkTreeListOptions struct {
+	_      struct{} // callers must name fields
 	Path   string
 	AsOf   *int64
 	Cursor string
@@ -1274,6 +1406,7 @@ type VolumeForkTreeListOptions struct {
 // VolumeForkEntries
 
 type VolumeForkEntryListOptions struct {
+	_      struct{} // callers must name fields
 	Path   string
 	Cursor int64
 	Limit  int
@@ -1282,6 +1415,7 @@ type VolumeForkEntryListOptions struct {
 // VolumeForkSearches
 
 type VolumeForkSearchListOptions struct {
+	_      struct{} // callers must name fields
 	Q      string
 	Path   string
 	AsOf   *int64
@@ -1294,6 +1428,7 @@ type VolumeForkSearchListOptions struct {
 // AuditLogs
 
 type AuditLogListOptions struct {
+	_                 struct{} // callers must name fields
 	AccountID         int64
 	RegionID          *int64
 	MetadataClusterID *int64
@@ -1306,6 +1441,7 @@ type AuditLogListOptions struct {
 // RegionAuditLogs
 
 type RegionAuditLogListOptions struct {
+	_                 struct{} // callers must name fields
 	MetadataClusterID *int64
 	Cursor            int64
 	Limit             int
@@ -1316,6 +1452,7 @@ type RegionAuditLogListOptions struct {
 // ServiceNodes
 
 type StatsHistoryServiceNodeResponse struct {
+	_          struct{}          // callers must name fields
 	IntervalMs int64             `json:"intervalMs"`
 	Samples    []NodeStatsSample `json:"samples"`
 }
@@ -1325,6 +1462,7 @@ type StatsHistoryServiceNodeResponse struct {
 // ClientSessions
 
 type ClientSessionListOptions struct {
+	_                 struct{} // callers must name fields
 	AccountID         int64
 	RegionID          *int64
 	MetadataClusterID *int64
@@ -1345,7 +1483,8 @@ type ClientSessionListOptions struct {
 // Metrics
 
 type GenerateMetricTokenRequest struct {
-	ExpirySeconds int64 `json:"expirySeconds"`
+	_             struct{} // callers must name fields
+	ExpirySeconds int64    `json:"expirySeconds"`
 }
 
 // Dashboard
@@ -1353,16 +1492,19 @@ type GenerateMetricTokenRequest struct {
 // License
 
 type LoadLicenseRequest struct {
+	_        struct{} // callers must name fields
 	Payloads []string `json:"payloads"`
 }
 
 // Alerts
 
 type ResolveAlertResponse struct {
-	AlertID string `json:"alertId"`
+	_       struct{} // callers must name fields
+	AlertID string   `json:"alertId"`
 }
 
 type AlertListOptions struct {
+	_         struct{} // callers must name fields
 	Active    *bool
 	AccountID *int64
 	RegionID  *int64
@@ -1376,10 +1518,12 @@ type AlertListOptions struct {
 // RegionAlerts
 
 type ResolveRegionAlertResponse struct {
-	AlertID string `json:"alertId"`
+	_       struct{} // callers must name fields
+	AlertID string   `json:"alertId"`
 }
 
 type RegionAlertListOptions struct {
+	_                 struct{} // callers must name fields
 	Active            *bool
 	Severity          *int
 	Category          string
@@ -1393,6 +1537,7 @@ type RegionAlertListOptions struct {
 // GCWorkerEvents
 
 type GCWorkerEventListOptions struct {
+	_                 struct{} // callers must name fields
 	NodeID            string
 	Goal              string
 	Sid               *int64

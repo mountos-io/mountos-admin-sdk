@@ -7,13 +7,13 @@ import "testing"
 func TestCursorResponseType(t *testing.T) {
 	cases := []struct {
 		name  string
-		query []string
 		want  string
+		query []string
 	}{
-		{"int64 cursor", []string{"path: string", "cursor: int64", "limit: int=20"}, "CursorPaginatedResponse"},
-		{"string cursor", []string{"path: string", "cursor: string", "limit: int=20"}, "StringCursorPaginatedResponse"},
-		{"string field not named cursor", []string{"token: string", "cursor: int64"}, "CursorPaginatedResponse"},
-		{"no cursor field", []string{"limit: int=20"}, "CursorPaginatedResponse"},
+		{"int64 cursor", "CursorPaginatedResponse", []string{"path: string", "cursor: int64", "limit: int=20"}},
+		{"string cursor", "StringCursorPaginatedResponse", []string{"path: string", "cursor: string", "limit: int=20"}},
+		{"string field not named cursor", "CursorPaginatedResponse", []string{"token: string", "cursor: int64"}},
+		{"no cursor field", "CursorPaginatedResponse", []string{"limit: int=20"}},
 	}
 	for _, c := range cases {
 		got := cursorResponseType(Endpoint{Pagination: "cursor", Query: c.query})

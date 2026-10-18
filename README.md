@@ -39,6 +39,12 @@ appserv does **not** enforce which operations or fields a role may use (the role
 
 [SKILL.md](SKILL.md) is an agent skill covering TS/Go usage, ED25519/JWT auth, and the full resource set. It ships in the npm package (next to `api.md` and `api.yaml`) so coding agents can load accurate, version-matched guidance.
 
+## Versioning and compatibility
+
+Public structs are built by field name. In Go, every struct starts with a blank `_ struct{}` field, so a positional literal does not compile. In Rust, every public struct and enum is `#[non_exhaustive]`: build a struct with `new(required...)`, `Default` and the `with_<field>(value)` setters, and keep a wildcard arm when matching an enum. TypeScript types are structural and need no guard.
+
+A minor version can add fields and enum variants. A major version can remove or rename them.
+
 ## 0.x versions
 
 0.x versions are pre-release versions which may have breaking changes intentionally.

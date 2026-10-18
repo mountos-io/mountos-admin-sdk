@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 
 /// Client configuration.
 #[derive(Debug, Clone, Default)]
+#[non_exhaustive]
 pub struct Config {
     /// Base URL of the appserv provider API, e.g. `https://appserv.example.com`.
     pub base_url: String,
@@ -16,15 +17,54 @@ pub struct Config {
     pub dashboard_hmac_key: Option<String>,
 }
 
+impl Config {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(base_url: impl Into<String>, private_key: impl Into<String>) -> Self {
+        Self {
+            base_url: base_url.into(),
+            private_key: private_key.into(),
+            ..Default::default()
+        }
+    }
+
+    /// Sets `dashboard_user`.
+    pub fn with_dashboard_user(mut self, value: DashboardUser) -> Self {
+        self.dashboard_user = Some(value);
+        self
+    }
+
+    /// Sets `dashboard_hmac_key`.
+    pub fn with_dashboard_hmac_key(mut self, value: impl Into<String>) -> Self {
+        self.dashboard_hmac_key = Some(value.into());
+        self
+    }
+}
+
 /// Page-based pagination options.
 #[derive(Debug, Clone, Default)]
+#[non_exhaustive]
 pub struct ListOptions {
     pub page: Option<i64>,
     pub limit: Option<i64>,
 }
 
+impl ListOptions {
+    /// Sets `page`.
+    pub fn with_page(mut self, value: i64) -> Self {
+        self.page = Some(value);
+        self
+    }
+
+    /// Sets `limit`.
+    pub fn with_limit(mut self, value: i64) -> Self {
+        self.limit = Some(value);
+        self
+    }
+}
+
 /// Pagination metadata returned by page-based list endpoints.
 #[derive(Debug, Clone, Deserialize)]
+#[non_exhaustive]
 pub struct PaginationMeta {
     pub page: i64,
     pub limit: i64,
@@ -35,6 +75,7 @@ pub struct PaginationMeta {
 
 /// Page-based list response.
 #[derive(Debug, Clone, Deserialize)]
+#[non_exhaustive]
 pub struct PaginatedResponse<T> {
     pub items: Vec<T>,
     pub pagination: PaginationMeta,
@@ -42,6 +83,7 @@ pub struct PaginatedResponse<T> {
 
 /// Cursor-based list response.
 #[derive(Debug, Clone, Deserialize)]
+#[non_exhaustive]
 pub struct CursorPaginatedResponse<T> {
     pub items: Vec<T>,
     #[serde(rename = "nextCursor")]
@@ -50,6 +92,7 @@ pub struct CursorPaginatedResponse<T> {
 
 /// Cursor-based list response whose cursor is an opaque string.
 #[derive(Debug, Clone, Deserialize)]
+#[non_exhaustive]
 pub struct StringCursorPaginatedResponse<T> {
     pub items: Vec<T>,
     #[serde(rename = "nextCursor")]
@@ -58,6 +101,7 @@ pub struct StringCursorPaginatedResponse<T> {
 
 /// Identifier returned by create/edit/toggle endpoints.
 #[derive(Debug, Clone, Deserialize)]
+#[non_exhaustive]
 pub struct IdResponse {
     pub id: i64,
 }
@@ -66,6 +110,7 @@ pub struct IdResponse {
 /// value this SDK does not recognize yet, for forward compatibility with
 /// a server that has introduced a new ClientSessionStatus value.
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum ClientSessionStatus {
     Connected,
     Active,
@@ -141,6 +186,7 @@ impl<'de> Deserialize<'de> for ClientSessionStatus {
 /// value this SDK does not recognize yet, for forward compatibility with
 /// a server that has introduced a new CopysetState value.
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum CopysetState {
     Active,
     Draining,
@@ -210,6 +256,7 @@ impl<'de> Deserialize<'de> for CopysetState {
 /// value this SDK does not recognize yet, for forward compatibility with
 /// a server that has introduced a new LicenseQuotaState value.
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum LicenseQuotaState {
     Ok,
     Exceeded,
@@ -273,6 +320,7 @@ impl<'de> Deserialize<'de> for LicenseQuotaState {
 /// value this SDK does not recognize yet, for forward compatibility with
 /// a server that has introduced a new LicenseStatus value.
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum LicenseStatus {
     Valid,
     Expiring,
@@ -342,6 +390,7 @@ impl<'de> Deserialize<'de> for LicenseStatus {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct Account {
     pub id: i64,
     pub name: String,
@@ -370,6 +419,7 @@ pub struct Account {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct User {
     pub id: i64,
     #[serde(rename = "accountId")]
@@ -382,6 +432,7 @@ pub struct User {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct Region {
     pub id: i64,
     #[serde(rename = "exportId")]
@@ -402,6 +453,7 @@ pub struct Region {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct MetadataCluster {
     pub id: i64,
     #[serde(rename = "exportId")]
@@ -422,6 +474,7 @@ pub struct MetadataCluster {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct Storage {
     pub id: i64,
     pub uuid: String,
@@ -459,6 +512,7 @@ pub struct Storage {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct BlockVolume {
     pub id: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -478,6 +532,7 @@ pub struct BlockVolume {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct Copyset {
     pub id: String,
     #[serde(rename = "storageId")]
@@ -508,6 +563,7 @@ pub struct Copyset {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct PoolMember {
     pub id: String,
     pub name: String,
@@ -520,6 +576,7 @@ pub struct PoolMember {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct Volume {
     pub id: i64,
     pub account: Ref,
@@ -564,6 +621,7 @@ pub struct Volume {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct VolumeBlockPlacementConfig {
     pub id: i64,
     #[serde(rename = "targetCopysetCount")]
@@ -575,6 +633,7 @@ pub struct VolumeBlockPlacementConfig {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct VolumeBlockPlacementResizeResult {
     pub id: i64,
     #[serde(rename = "targetCopysetCount")]
@@ -594,6 +653,7 @@ pub struct VolumeBlockPlacementResizeResult {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct Fork {
     pub fid: i32,
     pub name: String,
@@ -618,6 +678,7 @@ pub struct Fork {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct ExclusiveGrantsResponse {
     #[serde(rename = "volumeId")]
     pub volume_id: i64,
@@ -628,6 +689,7 @@ pub struct ExclusiveGrantsResponse {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct ForkTreeEntry {
     pub inode: i64,
     pub name: String,
@@ -642,6 +704,7 @@ pub struct ForkTreeEntry {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct ForkEntryDetail {
     pub inode: i64,
     pub path: String,
@@ -664,6 +727,7 @@ pub struct ForkEntryDetail {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct ForkEntryVersion {
     pub generation: i64,
     pub size: i64,
@@ -675,6 +739,7 @@ pub struct ForkEntryVersion {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct ForkTreeMatch {
     pub path: String,
     pub inode: i64,
@@ -684,6 +749,7 @@ pub struct ForkTreeMatch {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct AuditLog {
     pub id: i64,
     pub title: String,
@@ -711,6 +777,7 @@ pub struct AuditLog {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct ServiceNode {
     pub id: i64,
     #[serde(rename = "regionId")]
@@ -749,6 +816,7 @@ pub struct ServiceNode {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct ClientSession {
     pub id: i64,
     pub account: Ref,
@@ -794,6 +862,7 @@ pub struct ClientSession {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct SessionSummary {
     #[serde(rename = "byStatus")]
     pub by_status: Vec<SessionSummaryStatusEntry>,
@@ -812,6 +881,7 @@ pub struct SessionSummary {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct MountReportResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub mount: Option<MountDetails>,
@@ -822,6 +892,7 @@ pub struct MountReportResponse {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct SupportBundle {
     pub session: ClientSession,
     #[serde(rename = "mountReport")]
@@ -831,6 +902,7 @@ pub struct SupportBundle {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct DiscoverMetaResponse {
     #[serde(rename = "regionId")]
     pub region_id: i64,
@@ -839,17 +911,20 @@ pub struct DiscoverMetaResponse {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct MetricsTarget {
     pub targets: Vec<String>,
     pub labels: serde_json::Value,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct MetricsTokenResponse {
     pub token: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct DashboardStats {
     #[serde(rename = "userCount")]
     pub user_count: i64,
@@ -870,6 +945,7 @@ pub struct DashboardStats {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct LicenseDetails {
     #[serde(rename = "licenseId")]
     pub license_id: String,
@@ -922,22 +998,26 @@ pub struct LicenseDetails {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct LicenseTerms {
     pub terms: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct LicenseLoadResult {
     pub loaded: i64,
     pub ignored: i64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct LicenseList {
     pub items: Vec<LicenseRecord>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct ServiceAlert {
     pub id: i64,
     #[serde(rename = "alertId")]
@@ -963,6 +1043,7 @@ pub struct ServiceAlert {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct AlertCountResponse {
     pub active: i64,
     pub recent: i64,
@@ -977,6 +1058,7 @@ pub struct AlertCountResponse {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct RegionAlert {
     pub id: i64,
     #[serde(rename = "alertId")]
@@ -1000,6 +1082,7 @@ pub struct RegionAlert {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct GCWorkerEvent {
     pub id: i64,
     #[serde(rename = "nodeId")]
@@ -1021,16 +1104,19 @@ pub struct GCWorkerEvent {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct GCWorkerEventHistogramResponse {
     pub buckets: Vec<GCWorkerEventBucket>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct GCWorkerEventGoalsResponse {
     pub goals: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct BackfillFailure {
     #[serde(rename = "shardId")]
     pub shard_id: i64,
@@ -1038,6 +1124,7 @@ pub struct BackfillFailure {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct CompatibleStorage {
     pub id: i64,
     pub uuid: String,
@@ -1050,12 +1137,14 @@ pub struct CompatibleStorage {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct CompatibleVolume {
     pub id: String,
     pub name: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct DashboardUser {
     pub id: String,
     pub name: String,
@@ -1074,7 +1163,56 @@ pub struct DashboardUser {
     pub exp: Option<i64>,
 }
 
+impl DashboardUser {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(id: impl Into<String>, name: impl Into<String>, role: impl Into<String>) -> Self {
+        Self {
+            id: id.into(),
+            name: name.into(),
+            role: role.into(),
+            ..Default::default()
+        }
+    }
+
+    /// Sets `email`.
+    pub fn with_email(mut self, value: impl Into<String>) -> Self {
+        self.email = Some(value.into());
+        self
+    }
+
+    /// Sets `username`.
+    pub fn with_username(mut self, value: impl Into<String>) -> Self {
+        self.username = Some(value.into());
+        self
+    }
+
+    /// Sets `account_id`.
+    pub fn with_account_id(mut self, value: i64) -> Self {
+        self.account_id = Some(value);
+        self
+    }
+
+    /// Sets `user_id`.
+    pub fn with_user_id(mut self, value: i64) -> Self {
+        self.user_id = Some(value);
+        self
+    }
+
+    /// Sets `volume_id`.
+    pub fn with_volume_id(mut self, value: i64) -> Self {
+        self.volume_id = Some(value);
+        self
+    }
+
+    /// Sets `exp`.
+    pub fn with_exp(mut self, value: i64) -> Self {
+        self.exp = Some(value);
+        self
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct DiscoverEndpoint {
     #[serde(rename = "nodeId")]
     pub node_id: String,
@@ -1086,6 +1224,7 @@ pub struct DiscoverEndpoint {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct DiscoverEndpointAddr {
     pub tcp: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1094,6 +1233,7 @@ pub struct DiscoverEndpointAddr {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct ExclusiveGrant {
     #[serde(rename = "sessionId")]
     pub session_id: String,
@@ -1132,6 +1272,7 @@ pub struct ExclusiveGrant {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct GCWorkerEventBucket {
     #[serde(rename = "bucketStart")]
     pub bucket_start: String,
@@ -1140,6 +1281,7 @@ pub struct GCWorkerEventBucket {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct LicenseQuota {
     pub state: LicenseQuotaState,
     #[serde(rename = "liveVolume")]
@@ -1152,6 +1294,7 @@ pub struct LicenseQuota {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct LicenseRecord {
     pub key: String,
     pub licensee: String,
@@ -1167,6 +1310,7 @@ pub struct LicenseRecord {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct MountDetails {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub command: Option<String>,
@@ -1183,6 +1327,7 @@ pub struct MountDetails {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct MountFlag {
     pub name: String,
     pub value: String,
@@ -1191,6 +1336,7 @@ pub struct MountFlag {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct MoveVolumeFailure {
     #[serde(rename = "volumeId")]
     pub volume_id: String,
@@ -1198,6 +1344,7 @@ pub struct MoveVolumeFailure {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct NodeAddress {
     pub family: i64,
     pub scope: String,
@@ -1207,6 +1354,7 @@ pub struct NodeAddress {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct NodeStatsSample {
     #[serde(rename = "timestampMs")]
     pub timestamp_ms: i64,
@@ -1271,12 +1419,14 @@ pub struct NodeStatsSample {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct Ref {
     pub id: i64,
     pub name: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct RegionVolumeMetrics {
     #[serde(rename = "regionId")]
     pub region_id: i64,
@@ -1291,18 +1441,21 @@ pub struct RegionVolumeMetrics {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct RetentionPolicy {
     #[serde(rename = "clientSessionDays", skip_serializing_if = "Option::is_none")]
     pub client_session_days: Option<i32>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct SessionSummaryFacet {
     pub label: String,
     pub count: i64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct SessionSummaryStatusEntry {
     #[serde(rename = "clientType")]
     pub client_type: String,
@@ -1311,6 +1464,7 @@ pub struct SessionSummaryStatusEntry {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct UserLite {
     pub id: i64,
     pub username: String,
@@ -1318,6 +1472,7 @@ pub struct UserLite {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct VolumeApiKey {
     #[serde(rename = "apiKey")]
     pub api_key: String,
@@ -1330,6 +1485,7 @@ pub struct VolumeApiKey {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct VolumeRef {
     pub id: i64,
     pub name: String,
@@ -1338,6 +1494,7 @@ pub struct VolumeRef {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct VolumeRetentionPolicy {
     #[serde(rename = "dataDays", skip_serializing_if = "Option::is_none")]
     pub data_days: Option<i32>,
@@ -1350,6 +1507,7 @@ pub struct VolumeRetentionPolicy {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct VolumeSizePoint {
     #[serde(rename = "bucketEnd")]
     pub bucket_end: String,
@@ -1364,6 +1522,7 @@ pub struct VolumeSizePoint {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct VolumeVersioningPolicy {
     #[serde(rename = "contentWindowSeconds", skip_serializing_if = "Option::is_none")]
     pub content_window_seconds: Option<i32>,
@@ -1371,7 +1530,8 @@ pub struct VolumeVersioningPolicy {
 
 // Accounts
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct CreateAccountRequest {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1382,7 +1542,36 @@ pub struct CreateAccountRequest {
     pub provider_info: Option<serde_json::Value>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+impl CreateAccountRequest {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            name: name.into(),
+            ..Default::default()
+        }
+    }
+
+    /// Sets `description`.
+    pub fn with_description(mut self, value: impl Into<String>) -> Self {
+        self.description = Some(value.into());
+        self
+    }
+
+    /// Sets `icon_url`.
+    pub fn with_icon_url(mut self, value: impl Into<String>) -> Self {
+        self.icon_url = Some(value.into());
+        self
+    }
+
+    /// Sets `provider_info`.
+    pub fn with_provider_info(mut self, value: serde_json::Value) -> Self {
+        self.provider_info = Some(value);
+        self
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct EditAccountRequest {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1395,7 +1584,42 @@ pub struct EditAccountRequest {
     pub retention: Option<RetentionPolicy>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+impl EditAccountRequest {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            name: name.into(),
+            ..Default::default()
+        }
+    }
+
+    /// Sets `description`.
+    pub fn with_description(mut self, value: impl Into<String>) -> Self {
+        self.description = Some(value.into());
+        self
+    }
+
+    /// Sets `icon_url`.
+    pub fn with_icon_url(mut self, value: impl Into<String>) -> Self {
+        self.icon_url = Some(value.into());
+        self
+    }
+
+    /// Sets `provider_info`.
+    pub fn with_provider_info(mut self, value: serde_json::Value) -> Self {
+        self.provider_info = Some(value);
+        self
+    }
+
+    /// Sets `retention`.
+    pub fn with_retention(mut self, value: RetentionPolicy) -> Self {
+        self.retention = Some(value);
+        self
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct UpdateAccountQuotaRequest {
     #[serde(rename = "quotaLimit")]
     pub quota_limit: i64,
@@ -1403,16 +1627,54 @@ pub struct UpdateAccountQuotaRequest {
     pub quota_excess_pct: Option<i32>,
 }
 
+impl UpdateAccountQuotaRequest {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(quota_limit: i64) -> Self {
+        Self {
+            quota_limit,
+            ..Default::default()
+        }
+    }
+
+    /// Sets `quota_excess_pct`.
+    pub fn with_quota_excess_pct(mut self, value: i32) -> Self {
+        self.quota_excess_pct = Some(value);
+        self
+    }
+}
+
 #[derive(Debug, Clone, Default)]
+#[non_exhaustive]
 pub struct AccountListOptions {
     pub is_active: Option<bool>,
     pub page: Option<i64>,
     pub limit: Option<i64>,
 }
 
+impl AccountListOptions {
+    /// Sets `is_active`.
+    pub fn with_is_active(mut self, value: bool) -> Self {
+        self.is_active = Some(value);
+        self
+    }
+
+    /// Sets `page`.
+    pub fn with_page(mut self, value: i64) -> Self {
+        self.page = Some(value);
+        self
+    }
+
+    /// Sets `limit`.
+    pub fn with_limit(mut self, value: i64) -> Self {
+        self.limit = Some(value);
+        self
+    }
+}
+
 // Users
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct AddUserRequest {
     #[serde(rename = "accountId")]
     pub account_id: i64,
@@ -1424,17 +1686,54 @@ pub struct AddUserRequest {
     pub provider_info: Option<serde_json::Value>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+impl AddUserRequest {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(account_id: i64, username: impl Into<String>, email: impl Into<String>) -> Self {
+        Self {
+            account_id,
+            username: username.into(),
+            email: email.into(),
+            ..Default::default()
+        }
+    }
+
+    /// Sets `name`.
+    pub fn with_name(mut self, value: impl Into<String>) -> Self {
+        self.name = Some(value.into());
+        self
+    }
+
+    /// Sets `provider_info`.
+    pub fn with_provider_info(mut self, value: serde_json::Value) -> Self {
+        self.provider_info = Some(value);
+        self
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct BulkUserRequest {
     pub ids: Vec<i64>,
 }
 
+impl BulkUserRequest {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(ids: Vec<i64>) -> Self {
+        Self {
+            ids,
+            ..Default::default()
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct BulkUserResponse {
     pub users: Vec<UserLite>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct EditUserRequest {
     pub username: String,
     pub email: String,
@@ -1444,7 +1743,31 @@ pub struct EditUserRequest {
     pub provider_info: Option<serde_json::Value>,
 }
 
+impl EditUserRequest {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(username: impl Into<String>, email: impl Into<String>) -> Self {
+        Self {
+            username: username.into(),
+            email: email.into(),
+            ..Default::default()
+        }
+    }
+
+    /// Sets `name`.
+    pub fn with_name(mut self, value: impl Into<String>) -> Self {
+        self.name = Some(value.into());
+        self
+    }
+
+    /// Sets `provider_info`.
+    pub fn with_provider_info(mut self, value: serde_json::Value) -> Self {
+        self.provider_info = Some(value);
+        self
+    }
+}
+
 #[derive(Debug, Clone, Default)]
+#[non_exhaustive]
 pub struct UserListOptions {
     pub account_id: i64,
     pub search: Option<String>,
@@ -1453,23 +1776,82 @@ pub struct UserListOptions {
     pub limit: Option<i64>,
 }
 
+impl UserListOptions {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(account_id: i64) -> Self {
+        Self {
+            account_id,
+            ..Default::default()
+        }
+    }
+
+    /// Sets `search`.
+    pub fn with_search(mut self, value: impl Into<String>) -> Self {
+        self.search = Some(value.into());
+        self
+    }
+
+    /// Sets `is_active`.
+    pub fn with_is_active(mut self, value: bool) -> Self {
+        self.is_active = Some(value);
+        self
+    }
+
+    /// Sets `page`.
+    pub fn with_page(mut self, value: i64) -> Self {
+        self.page = Some(value);
+        self
+    }
+
+    /// Sets `limit`.
+    pub fn with_limit(mut self, value: i64) -> Self {
+        self.limit = Some(value);
+        self
+    }
+}
+
 // Regions
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct CreateRegionRequest {
     #[serde(rename = "accountId")]
     pub account_id: i64,
     pub name: String,
 }
 
-#[derive(Debug, Clone, Serialize)]
+impl CreateRegionRequest {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(account_id: i64, name: impl Into<String>) -> Self {
+        Self {
+            account_id,
+            name: name.into(),
+            ..Default::default()
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct EditRegionRequest {
     #[serde(rename = "accountId")]
     pub account_id: i64,
     pub name: String,
 }
 
+impl EditRegionRequest {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(account_id: i64, name: impl Into<String>) -> Self {
+        Self {
+            account_id,
+            name: name.into(),
+            ..Default::default()
+        }
+    }
+}
+
 #[derive(Debug, Clone, Default)]
+#[non_exhaustive]
 pub struct RegionListOptions {
     pub account_id: i64,
     pub is_active: Option<bool>,
@@ -1477,9 +1859,38 @@ pub struct RegionListOptions {
     pub limit: Option<i64>,
 }
 
+impl RegionListOptions {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(account_id: i64) -> Self {
+        Self {
+            account_id,
+            ..Default::default()
+        }
+    }
+
+    /// Sets `is_active`.
+    pub fn with_is_active(mut self, value: bool) -> Self {
+        self.is_active = Some(value);
+        self
+    }
+
+    /// Sets `page`.
+    pub fn with_page(mut self, value: i64) -> Self {
+        self.page = Some(value);
+        self
+    }
+
+    /// Sets `limit`.
+    pub fn with_limit(mut self, value: i64) -> Self {
+        self.limit = Some(value);
+        self
+    }
+}
+
 // Clusters
 
 #[derive(Debug, Clone, Default)]
+#[non_exhaustive]
 pub struct ClusterListOptions {
     pub account_id: i64,
     pub region_id: Option<i64>,
@@ -1488,39 +1899,129 @@ pub struct ClusterListOptions {
     pub limit: Option<i64>,
 }
 
+impl ClusterListOptions {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(account_id: i64) -> Self {
+        Self {
+            account_id,
+            ..Default::default()
+        }
+    }
+
+    /// Sets `region_id`.
+    pub fn with_region_id(mut self, value: i64) -> Self {
+        self.region_id = Some(value);
+        self
+    }
+
+    /// Sets `is_active`.
+    pub fn with_is_active(mut self, value: bool) -> Self {
+        self.is_active = Some(value);
+        self
+    }
+
+    /// Sets `page`.
+    pub fn with_page(mut self, value: i64) -> Self {
+        self.page = Some(value);
+        self
+    }
+
+    /// Sets `limit`.
+    pub fn with_limit(mut self, value: i64) -> Self {
+        self.limit = Some(value);
+        self
+    }
+}
+
 // MetadataClusters
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct CreateMetadataClusterRequest {
     pub name: String,
 }
 
-#[derive(Debug, Clone, Serialize)]
+impl CreateMetadataClusterRequest {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            name: name.into(),
+            ..Default::default()
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct EditMetadataClusterRequest {
     pub name: String,
 }
 
-#[derive(Debug, Clone, Serialize)]
+impl EditMetadataClusterRequest {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            name: name.into(),
+            ..Default::default()
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct SetMetadataClusterReadyRequest {
     pub ready: bool,
 }
 
+impl SetMetadataClusterReadyRequest {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(ready: bool) -> Self {
+        Self {
+            ready,
+            ..Default::default()
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct SetReadyMetadataClusterResponse {
     pub id: i64,
     pub ready: bool,
 }
 
 #[derive(Debug, Clone, Default)]
+#[non_exhaustive]
 pub struct MetadataClusterListOptions {
     pub is_active: Option<bool>,
     pub page: Option<i64>,
     pub limit: Option<i64>,
 }
 
+impl MetadataClusterListOptions {
+    /// Sets `is_active`.
+    pub fn with_is_active(mut self, value: bool) -> Self {
+        self.is_active = Some(value);
+        self
+    }
+
+    /// Sets `page`.
+    pub fn with_page(mut self, value: i64) -> Self {
+        self.page = Some(value);
+        self
+    }
+
+    /// Sets `limit`.
+    pub fn with_limit(mut self, value: i64) -> Self {
+        self.limit = Some(value);
+        self
+    }
+}
+
 // Storages
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct CreateStorageRequest {
     #[serde(rename = "accountId")]
     pub account_id: i64,
@@ -1550,7 +2051,71 @@ pub struct CreateStorageRequest {
     pub secret_key: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+impl CreateStorageRequest {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(account_id: i64, region_id: i64, name: impl Into<String>, storage_type: impl Into<String>, provider_type: impl Into<String>, endpoint: impl Into<String>) -> Self {
+        Self {
+            account_id,
+            region_id,
+            name: name.into(),
+            storage_type: storage_type.into(),
+            provider_type: provider_type.into(),
+            endpoint: endpoint.into(),
+            ..Default::default()
+        }
+    }
+
+    /// Sets `description`.
+    pub fn with_description(mut self, value: impl Into<String>) -> Self {
+        self.description = Some(value.into());
+        self
+    }
+
+    /// Sets `region`.
+    pub fn with_region(mut self, value: impl Into<String>) -> Self {
+        self.region = Some(value.into());
+        self
+    }
+
+    /// Sets `bucket`.
+    pub fn with_bucket(mut self, value: impl Into<String>) -> Self {
+        self.bucket = Some(value.into());
+        self
+    }
+
+    /// Sets `base`.
+    pub fn with_base(mut self, value: impl Into<String>) -> Self {
+        self.base = Some(value.into());
+        self
+    }
+
+    /// Sets `block_region`.
+    pub fn with_block_region(mut self, value: impl Into<String>) -> Self {
+        self.block_region = Some(value.into());
+        self
+    }
+
+    /// Sets `block_size`.
+    pub fn with_block_size(mut self, value: i32) -> Self {
+        self.block_size = Some(value);
+        self
+    }
+
+    /// Sets `access_key`.
+    pub fn with_access_key(mut self, value: impl Into<String>) -> Self {
+        self.access_key = Some(value.into());
+        self
+    }
+
+    /// Sets `secret_key`.
+    pub fn with_secret_key(mut self, value: impl Into<String>) -> Self {
+        self.secret_key = Some(value.into());
+        self
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct EditStorageRequest {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1565,7 +2130,48 @@ pub struct EditStorageRequest {
     pub direct_access: Option<bool>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+impl EditStorageRequest {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            name: name.into(),
+            ..Default::default()
+        }
+    }
+
+    /// Sets `description`.
+    pub fn with_description(mut self, value: impl Into<String>) -> Self {
+        self.description = Some(value.into());
+        self
+    }
+
+    /// Sets `endpoint`.
+    pub fn with_endpoint(mut self, value: impl Into<String>) -> Self {
+        self.endpoint = Some(value.into());
+        self
+    }
+
+    /// Sets `access_key`.
+    pub fn with_access_key(mut self, value: impl Into<String>) -> Self {
+        self.access_key = Some(value.into());
+        self
+    }
+
+    /// Sets `secret_key`.
+    pub fn with_secret_key(mut self, value: impl Into<String>) -> Self {
+        self.secret_key = Some(value.into());
+        self
+    }
+
+    /// Sets `direct_access`.
+    pub fn with_direct_access(mut self, value: bool) -> Self {
+        self.direct_access = Some(value);
+        self
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct TestStorageNewBucketRequest {
     pub endpoint: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1579,7 +2185,33 @@ pub struct TestStorageNewBucketRequest {
     pub provider_type: Option<String>,
 }
 
+impl TestStorageNewBucketRequest {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(endpoint: impl Into<String>, bucket: impl Into<String>, access_key: impl Into<String>, secret_key: impl Into<String>) -> Self {
+        Self {
+            endpoint: endpoint.into(),
+            bucket: bucket.into(),
+            access_key: access_key.into(),
+            secret_key: secret_key.into(),
+            ..Default::default()
+        }
+    }
+
+    /// Sets `region`.
+    pub fn with_region(mut self, value: impl Into<String>) -> Self {
+        self.region = Some(value.into());
+        self
+    }
+
+    /// Sets `provider_type`.
+    pub fn with_provider_type(mut self, value: impl Into<String>) -> Self {
+        self.provider_type = Some(value.into());
+        self
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct TestNewBucketStorageResponse {
     #[serde(rename = "bucketExists")]
     pub bucket_exists: bool,
@@ -1591,6 +2223,7 @@ pub struct TestNewBucketStorageResponse {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct TestStorageBucketStorageResponse {
     #[serde(rename = "bucketExists")]
     pub bucket_exists: bool,
@@ -1602,53 +2235,96 @@ pub struct TestStorageBucketStorageResponse {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct ListCompatibleStorageResponse {
     pub storages: Vec<CompatibleStorage>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct MoveStorageVolumesRequest {
     #[serde(rename = "volumeIds")]
     pub volume_ids: Vec<String>,
 }
 
+impl MoveStorageVolumesRequest {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(volume_ids: Vec<String>) -> Self {
+        Self {
+            volume_ids,
+            ..Default::default()
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct MoveVolumesStorageResponse {
     pub moved: Vec<String>,
     pub failures: Vec<MoveVolumeFailure>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct DrainStorageCopysetRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub force: Option<bool>,
 }
 
+impl DrainStorageCopysetRequest {
+    /// Sets `force`.
+    pub fn with_force(mut self, value: bool) -> Self {
+        self.force = Some(value);
+        self
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct DrainCopysetStorageResponse {
     pub id: String,
     pub state: String,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct CancelStorageDrainRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub force: Option<bool>,
 }
 
+impl CancelStorageDrainRequest {
+    /// Sets `force`.
+    pub fn with_force(mut self, value: bool) -> Self {
+        self.force = Some(value);
+        self
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct CancelDrainStorageResponse {
     pub id: String,
     pub state: String,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct UpdateStorageTagsRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<String>>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+impl UpdateStorageTagsRequest {
+    /// Sets `tags`.
+    pub fn with_tags(mut self, value: Vec<String>) -> Self {
+        self.tags = Some(value);
+        self
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct RegisterStorageCopysetRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
@@ -1658,7 +2334,28 @@ pub struct RegisterStorageCopysetRequest {
     pub failure_domain_b: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+impl RegisterStorageCopysetRequest {
+    /// Sets `name`.
+    pub fn with_name(mut self, value: impl Into<String>) -> Self {
+        self.name = Some(value.into());
+        self
+    }
+
+    /// Sets `failure_domain_a`.
+    pub fn with_failure_domain_a(mut self, value: impl Into<String>) -> Self {
+        self.failure_domain_a = Some(value.into());
+        self
+    }
+
+    /// Sets `failure_domain_b`.
+    pub fn with_failure_domain_b(mut self, value: impl Into<String>) -> Self {
+        self.failure_domain_b = Some(value.into());
+        self
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct RegisterStorageCopysetsBulkRequest {
     pub count: i32,
     #[serde(rename = "failureDomainA", skip_serializing_if = "Option::is_none")]
@@ -1667,18 +2364,51 @@ pub struct RegisterStorageCopysetsBulkRequest {
     pub failure_domain_b: Option<String>,
 }
 
+impl RegisterStorageCopysetsBulkRequest {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(count: i32) -> Self {
+        Self {
+            count,
+            ..Default::default()
+        }
+    }
+
+    /// Sets `failure_domain_a`.
+    pub fn with_failure_domain_a(mut self, value: impl Into<String>) -> Self {
+        self.failure_domain_a = Some(value.into());
+        self
+    }
+
+    /// Sets `failure_domain_b`.
+    pub fn with_failure_domain_b(mut self, value: impl Into<String>) -> Self {
+        self.failure_domain_b = Some(value.into());
+        self
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct RegisterCopysetsBulkStorageResponse {
     pub copysets: Vec<Copyset>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct AddStorageCopysetMemberRequest {
     #[serde(rename = "failureDomain", skip_serializing_if = "Option::is_none")]
     pub failure_domain: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+impl AddStorageCopysetMemberRequest {
+    /// Sets `failure_domain`.
+    pub fn with_failure_domain(mut self, value: impl Into<String>) -> Self {
+        self.failure_domain = Some(value.into());
+        self
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct MarkStorageMemberLostRequest {
     #[serde(rename = "blockVolumeId")]
     pub block_volume_id: String,
@@ -1686,12 +2416,30 @@ pub struct MarkStorageMemberLostRequest {
     pub force: Option<bool>,
 }
 
+impl MarkStorageMemberLostRequest {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(block_volume_id: impl Into<String>) -> Self {
+        Self {
+            block_volume_id: block_volume_id.into(),
+            ..Default::default()
+        }
+    }
+
+    /// Sets `force`.
+    pub fn with_force(mut self, value: bool) -> Self {
+        self.force = Some(value);
+        self
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct RemoveMemberStorageResponse {
     pub id: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct BackfillFingerprintsStorageResponse {
     pub scanned: i32,
     pub updated: i32,
@@ -1701,6 +2449,7 @@ pub struct BackfillFingerprintsStorageResponse {
 }
 
 #[derive(Debug, Clone, Default)]
+#[non_exhaustive]
 pub struct StorageListOptions {
     pub account_id: i64,
     pub search: Option<String>,
@@ -1713,9 +2462,68 @@ pub struct StorageListOptions {
     pub limit: Option<i64>,
 }
 
+impl StorageListOptions {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(account_id: i64) -> Self {
+        Self {
+            account_id,
+            ..Default::default()
+        }
+    }
+
+    /// Sets `search`.
+    pub fn with_search(mut self, value: impl Into<String>) -> Self {
+        self.search = Some(value.into());
+        self
+    }
+
+    /// Sets `region_id`.
+    pub fn with_region_id(mut self, value: i64) -> Self {
+        self.region_id = Some(value);
+        self
+    }
+
+    /// Sets `storage_type`.
+    pub fn with_storage_type(mut self, value: impl Into<String>) -> Self {
+        self.storage_type = Some(value.into());
+        self
+    }
+
+    /// Sets `provider_type`.
+    pub fn with_provider_type(mut self, value: impl Into<String>) -> Self {
+        self.provider_type = Some(value.into());
+        self
+    }
+
+    /// Sets `is_active`.
+    pub fn with_is_active(mut self, value: bool) -> Self {
+        self.is_active = Some(value);
+        self
+    }
+
+    /// Sets `direct_access`.
+    pub fn with_direct_access(mut self, value: bool) -> Self {
+        self.direct_access = Some(value);
+        self
+    }
+
+    /// Sets `page`.
+    pub fn with_page(mut self, value: i64) -> Self {
+        self.page = Some(value);
+        self
+    }
+
+    /// Sets `limit`.
+    pub fn with_limit(mut self, value: i64) -> Self {
+        self.limit = Some(value);
+        self
+    }
+}
+
 // Volumes
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct CreateVolumeRequest {
     #[serde(rename = "accountId")]
     pub account_id: i64,
@@ -1744,14 +2552,83 @@ pub struct CreateVolumeRequest {
     pub metadata_cluster_uuid: Option<String>,
 }
 
+impl CreateVolumeRequest {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(account_id: i64, storage_id: i64, name: impl Into<String>, volume_type: impl Into<String>) -> Self {
+        Self {
+            account_id,
+            storage_id,
+            name: name.into(),
+            volume_type: volume_type.into(),
+            ..Default::default()
+        }
+    }
+
+    /// Sets `description`.
+    pub fn with_description(mut self, value: impl Into<String>) -> Self {
+        self.description = Some(value.into());
+        self
+    }
+
+    /// Sets `encryption`.
+    pub fn with_encryption(mut self, value: bool) -> Self {
+        self.encryption = Some(value);
+        self
+    }
+
+    /// Sets `encryption_key`.
+    pub fn with_encryption_key(mut self, value: impl Into<String>) -> Self {
+        self.encryption_key = Some(value.into());
+        self
+    }
+
+    /// Sets `retention`.
+    pub fn with_retention(mut self, value: VolumeRetentionPolicy) -> Self {
+        self.retention = Some(value);
+        self
+    }
+
+    /// Sets `versioning`.
+    pub fn with_versioning(mut self, value: VolumeVersioningPolicy) -> Self {
+        self.versioning = Some(value);
+        self
+    }
+
+    /// Sets `compaction`.
+    pub fn with_compaction(mut self, value: impl Into<String>) -> Self {
+        self.compaction = Some(value.into());
+        self
+    }
+
+    /// Sets `quota_limit`.
+    pub fn with_quota_limit(mut self, value: i64) -> Self {
+        self.quota_limit = Some(value);
+        self
+    }
+
+    /// Sets `metadata_cluster_id`.
+    pub fn with_metadata_cluster_id(mut self, value: i64) -> Self {
+        self.metadata_cluster_id = Some(value);
+        self
+    }
+
+    /// Sets `metadata_cluster_uuid`.
+    pub fn with_metadata_cluster_uuid(mut self, value: impl Into<String>) -> Self {
+        self.metadata_cluster_uuid = Some(value.into());
+        self
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct CreateVolumeResponse {
     pub id: i64,
     #[serde(rename = "encryptionKey", skip_serializing_if = "Option::is_none")]
     pub encryption_key: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct EditVolumeRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -1763,7 +2640,34 @@ pub struct EditVolumeRequest {
     pub compaction: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+impl EditVolumeRequest {
+    /// Sets `description`.
+    pub fn with_description(mut self, value: impl Into<String>) -> Self {
+        self.description = Some(value.into());
+        self
+    }
+
+    /// Sets `retention`.
+    pub fn with_retention(mut self, value: VolumeRetentionPolicy) -> Self {
+        self.retention = Some(value);
+        self
+    }
+
+    /// Sets `versioning`.
+    pub fn with_versioning(mut self, value: VolumeVersioningPolicy) -> Self {
+        self.versioning = Some(value);
+        self
+    }
+
+    /// Sets `compaction`.
+    pub fn with_compaction(mut self, value: impl Into<String>) -> Self {
+        self.compaction = Some(value.into());
+        self
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct MoveVolumeClusterRequest {
     #[serde(rename = "targetClusterId", skip_serializing_if = "Option::is_none")]
     pub target_cluster_id: Option<i64>,
@@ -1771,7 +2675,22 @@ pub struct MoveVolumeClusterRequest {
     pub target_cluster_uuid: Option<String>,
 }
 
+impl MoveVolumeClusterRequest {
+    /// Sets `target_cluster_id`.
+    pub fn with_target_cluster_id(mut self, value: i64) -> Self {
+        self.target_cluster_id = Some(value);
+        self
+    }
+
+    /// Sets `target_cluster_uuid`.
+    pub fn with_target_cluster_uuid(mut self, value: impl Into<String>) -> Self {
+        self.target_cluster_uuid = Some(value.into());
+        self
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct MoveClusterVolumeResponse {
     pub id: i64,
     #[serde(rename = "sourceClusterId")]
@@ -1782,7 +2701,8 @@ pub struct MoveClusterVolumeResponse {
     pub handover_until: i64,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct DeactivateVolumeRequest {
     #[serde(rename = "isCleanupMetaEnabled", skip_serializing_if = "Option::is_none")]
     pub is_cleanup_meta_enabled: Option<bool>,
@@ -1792,7 +2712,28 @@ pub struct DeactivateVolumeRequest {
     pub is_cleanup_vault_enabled: Option<bool>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+impl DeactivateVolumeRequest {
+    /// Sets `is_cleanup_meta_enabled`.
+    pub fn with_is_cleanup_meta_enabled(mut self, value: bool) -> Self {
+        self.is_cleanup_meta_enabled = Some(value);
+        self
+    }
+
+    /// Sets `is_cleanup_storage_enabled`.
+    pub fn with_is_cleanup_storage_enabled(mut self, value: bool) -> Self {
+        self.is_cleanup_storage_enabled = Some(value);
+        self
+    }
+
+    /// Sets `is_cleanup_vault_enabled`.
+    pub fn with_is_cleanup_vault_enabled(mut self, value: bool) -> Self {
+        self.is_cleanup_vault_enabled = Some(value);
+        self
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct GenerateVolumeAPIKeysRequest {
     #[serde(rename = "userId")]
     pub user_id: i64,
@@ -1800,7 +2741,24 @@ pub struct GenerateVolumeAPIKeysRequest {
     pub name: Option<String>,
 }
 
+impl GenerateVolumeAPIKeysRequest {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(user_id: i64) -> Self {
+        Self {
+            user_id,
+            ..Default::default()
+        }
+    }
+
+    /// Sets `name`.
+    pub fn with_name(mut self, value: impl Into<String>) -> Self {
+        self.name = Some(value.into());
+        self
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct GenerateAPIKeysVolumeResponse {
     #[serde(rename = "apiKey")]
     pub api_key: String,
@@ -1811,23 +2769,47 @@ pub struct GenerateAPIKeysVolumeResponse {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct ListAPIKeysVolumeResponse {
     pub keys: Vec<VolumeApiKey>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct RevokeVolumeAPIKeyRequest {
     #[serde(rename = "apiKey")]
     pub api_key: String,
 }
 
-#[derive(Debug, Clone, Serialize)]
+impl RevokeVolumeAPIKeyRequest {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(api_key: impl Into<String>) -> Self {
+        Self {
+            api_key: api_key.into(),
+            ..Default::default()
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct RevokeVolumeAPIKeysByUserRequest {
     #[serde(rename = "userId")]
     pub user_id: i64,
 }
 
-#[derive(Debug, Clone, Serialize)]
+impl RevokeVolumeAPIKeysByUserRequest {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(user_id: i64) -> Self {
+        Self {
+            user_id,
+            ..Default::default()
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct GenerateVolumeSttKeyRequest {
     #[serde(rename = "userId", skip_serializing_if = "Option::is_none")]
     pub user_id: Option<i64>,
@@ -1835,7 +2817,24 @@ pub struct GenerateVolumeSttKeyRequest {
     pub expiry_seconds: i64,
 }
 
+impl GenerateVolumeSttKeyRequest {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(expiry_seconds: i64) -> Self {
+        Self {
+            expiry_seconds,
+            ..Default::default()
+        }
+    }
+
+    /// Sets `user_id`.
+    pub fn with_user_id(mut self, value: i64) -> Self {
+        self.user_id = Some(value);
+        self
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct GenerateSttKeyVolumeResponse {
     #[serde(rename = "apiKey")]
     pub api_key: String,
@@ -1845,19 +2844,42 @@ pub struct GenerateSttKeyVolumeResponse {
     pub expires_at: String,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct UpdateVolumeQuotaRequest {
     #[serde(rename = "quotaLimit")]
     pub quota_limit: i64,
 }
 
-#[derive(Debug, Clone, Serialize)]
+impl UpdateVolumeQuotaRequest {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(quota_limit: i64) -> Self {
+        Self {
+            quota_limit,
+            ..Default::default()
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct UpdateVolumeCopysetConfigRequest {
     #[serde(rename = "targetCopysetCount")]
     pub target_copyset_count: i32,
 }
 
+impl UpdateVolumeCopysetConfigRequest {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(target_copyset_count: i32) -> Self {
+        Self {
+            target_copyset_count,
+            ..Default::default()
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct StatsVolumeResponse {
     #[serde(rename = "volumeId")]
     pub volume_id: String,
@@ -1872,11 +2894,13 @@ pub struct StatsVolumeResponse {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct SizeHistoryVolumeResponse {
     pub points: Vec<VolumeSizePoint>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct CreateVolumeForkRequest {
     pub name: String,
     #[serde(rename = "parentName", skip_serializing_if = "Option::is_none")]
@@ -1887,7 +2911,36 @@ pub struct CreateVolumeForkRequest {
     pub volume_type: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+impl CreateVolumeForkRequest {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            name: name.into(),
+            ..Default::default()
+        }
+    }
+
+    /// Sets `parent_name`.
+    pub fn with_parent_name(mut self, value: impl Into<String>) -> Self {
+        self.parent_name = Some(value.into());
+        self
+    }
+
+    /// Sets `as_of`.
+    pub fn with_as_of(mut self, value: i64) -> Self {
+        self.as_of = Some(value);
+        self
+    }
+
+    /// Sets `volume_type`.
+    pub fn with_volume_type(mut self, value: impl Into<String>) -> Self {
+        self.volume_type = Some(value.into());
+        self
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct DeleteVolumeForkRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub force: Option<bool>,
@@ -1895,19 +2948,44 @@ pub struct DeleteVolumeForkRequest {
     pub volume_type: Option<String>,
 }
 
+impl DeleteVolumeForkRequest {
+    /// Sets `force`.
+    pub fn with_force(mut self, value: bool) -> Self {
+        self.force = Some(value);
+        self
+    }
+
+    /// Sets `volume_type`.
+    pub fn with_volume_type(mut self, value: impl Into<String>) -> Self {
+        self.volume_type = Some(value.into());
+        self
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct DeleteForkVolumeResponse {
     #[serde(rename = "inactivatedFids")]
     pub inactivated_fids: Vec<i32>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct RestoreVolumeForkRequest {
     #[serde(rename = "volumeType", skip_serializing_if = "Option::is_none")]
     pub volume_type: Option<String>,
 }
 
+impl RestoreVolumeForkRequest {
+    /// Sets `volume_type`.
+    pub fn with_volume_type(mut self, value: impl Into<String>) -> Self {
+        self.volume_type = Some(value.into());
+        self
+    }
+}
+
 #[derive(Debug, Clone, Default)]
+#[non_exhaustive]
 pub struct VolumeListOptions {
     pub account_id: i64,
     pub region_id: Option<i64>,
@@ -1920,9 +2998,68 @@ pub struct VolumeListOptions {
     pub limit: Option<i64>,
 }
 
+impl VolumeListOptions {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(account_id: i64) -> Self {
+        Self {
+            account_id,
+            ..Default::default()
+        }
+    }
+
+    /// Sets `region_id`.
+    pub fn with_region_id(mut self, value: i64) -> Self {
+        self.region_id = Some(value);
+        self
+    }
+
+    /// Sets `metadata_cluster_id`.
+    pub fn with_metadata_cluster_id(mut self, value: i64) -> Self {
+        self.metadata_cluster_id = Some(value);
+        self
+    }
+
+    /// Sets `storage_id`.
+    pub fn with_storage_id(mut self, value: i64) -> Self {
+        self.storage_id = Some(value);
+        self
+    }
+
+    /// Sets `volume_type`.
+    pub fn with_volume_type(mut self, value: impl Into<String>) -> Self {
+        self.volume_type = Some(value.into());
+        self
+    }
+
+    /// Sets `locked`.
+    pub fn with_locked(mut self, value: bool) -> Self {
+        self.locked = Some(value);
+        self
+    }
+
+    /// Sets `is_active`.
+    pub fn with_is_active(mut self, value: bool) -> Self {
+        self.is_active = Some(value);
+        self
+    }
+
+    /// Sets `page`.
+    pub fn with_page(mut self, value: i64) -> Self {
+        self.page = Some(value);
+        self
+    }
+
+    /// Sets `limit`.
+    pub fn with_limit(mut self, value: i64) -> Self {
+        self.limit = Some(value);
+        self
+    }
+}
+
 // VolumeForkTrees
 
 #[derive(Debug, Clone, Default)]
+#[non_exhaustive]
 pub struct VolumeForkTreeListOptions {
     pub path: Option<String>,
     pub as_of: Option<i64>,
@@ -1932,18 +3069,78 @@ pub struct VolumeForkTreeListOptions {
     pub kind: Option<String>,
 }
 
+impl VolumeForkTreeListOptions {
+    /// Sets `path`.
+    pub fn with_path(mut self, value: impl Into<String>) -> Self {
+        self.path = Some(value.into());
+        self
+    }
+
+    /// Sets `as_of`.
+    pub fn with_as_of(mut self, value: i64) -> Self {
+        self.as_of = Some(value);
+        self
+    }
+
+    /// Sets `cursor`.
+    pub fn with_cursor(mut self, value: impl Into<String>) -> Self {
+        self.cursor = Some(value.into());
+        self
+    }
+
+    /// Sets `limit`.
+    pub fn with_limit(mut self, value: i64) -> Self {
+        self.limit = Some(value);
+        self
+    }
+
+    /// Sets `sort`.
+    pub fn with_sort(mut self, value: impl Into<String>) -> Self {
+        self.sort = Some(value.into());
+        self
+    }
+
+    /// Sets `kind`.
+    pub fn with_kind(mut self, value: impl Into<String>) -> Self {
+        self.kind = Some(value.into());
+        self
+    }
+}
+
 // VolumeForkEntries
 
 #[derive(Debug, Clone, Default)]
+#[non_exhaustive]
 pub struct VolumeForkEntryListOptions {
     pub path: Option<String>,
     pub cursor: Option<i64>,
     pub limit: Option<i64>,
 }
 
+impl VolumeForkEntryListOptions {
+    /// Sets `path`.
+    pub fn with_path(mut self, value: impl Into<String>) -> Self {
+        self.path = Some(value.into());
+        self
+    }
+
+    /// Sets `cursor`.
+    pub fn with_cursor(mut self, value: i64) -> Self {
+        self.cursor = Some(value);
+        self
+    }
+
+    /// Sets `limit`.
+    pub fn with_limit(mut self, value: i64) -> Self {
+        self.limit = Some(value);
+        self
+    }
+}
+
 // VolumeForkSearches
 
 #[derive(Debug, Clone, Default)]
+#[non_exhaustive]
 pub struct VolumeForkSearchListOptions {
     pub q: Option<String>,
     pub path: Option<String>,
@@ -1954,9 +3151,54 @@ pub struct VolumeForkSearchListOptions {
     pub kind: Option<String>,
 }
 
+impl VolumeForkSearchListOptions {
+    /// Sets `q`.
+    pub fn with_q(mut self, value: impl Into<String>) -> Self {
+        self.q = Some(value.into());
+        self
+    }
+
+    /// Sets `path`.
+    pub fn with_path(mut self, value: impl Into<String>) -> Self {
+        self.path = Some(value.into());
+        self
+    }
+
+    /// Sets `as_of`.
+    pub fn with_as_of(mut self, value: i64) -> Self {
+        self.as_of = Some(value);
+        self
+    }
+
+    /// Sets `exact`.
+    pub fn with_exact(mut self, value: bool) -> Self {
+        self.exact = Some(value);
+        self
+    }
+
+    /// Sets `cursor`.
+    pub fn with_cursor(mut self, value: i64) -> Self {
+        self.cursor = Some(value);
+        self
+    }
+
+    /// Sets `limit`.
+    pub fn with_limit(mut self, value: i64) -> Self {
+        self.limit = Some(value);
+        self
+    }
+
+    /// Sets `kind`.
+    pub fn with_kind(mut self, value: impl Into<String>) -> Self {
+        self.kind = Some(value.into());
+        self
+    }
+}
+
 // AuditLogs
 
 #[derive(Debug, Clone, Default)]
+#[non_exhaustive]
 pub struct AuditLogListOptions {
     pub account_id: i64,
     pub region_id: Option<i64>,
@@ -1967,9 +3209,56 @@ pub struct AuditLogListOptions {
     pub created_by: Option<String>,
 }
 
+impl AuditLogListOptions {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(account_id: i64) -> Self {
+        Self {
+            account_id,
+            ..Default::default()
+        }
+    }
+
+    /// Sets `region_id`.
+    pub fn with_region_id(mut self, value: i64) -> Self {
+        self.region_id = Some(value);
+        self
+    }
+
+    /// Sets `metadata_cluster_id`.
+    pub fn with_metadata_cluster_id(mut self, value: i64) -> Self {
+        self.metadata_cluster_id = Some(value);
+        self
+    }
+
+    /// Sets `cursor`.
+    pub fn with_cursor(mut self, value: i64) -> Self {
+        self.cursor = Some(value);
+        self
+    }
+
+    /// Sets `limit`.
+    pub fn with_limit(mut self, value: i64) -> Self {
+        self.limit = Some(value);
+        self
+    }
+
+    /// Sets `subject`.
+    pub fn with_subject(mut self, value: impl Into<String>) -> Self {
+        self.subject = Some(value.into());
+        self
+    }
+
+    /// Sets `created_by`.
+    pub fn with_created_by(mut self, value: impl Into<String>) -> Self {
+        self.created_by = Some(value.into());
+        self
+    }
+}
+
 // RegionAuditLogs
 
 #[derive(Debug, Clone, Default)]
+#[non_exhaustive]
 pub struct RegionAuditLogListOptions {
     pub metadata_cluster_id: Option<i64>,
     pub cursor: Option<i64>,
@@ -1978,9 +3267,42 @@ pub struct RegionAuditLogListOptions {
     pub node: Option<String>,
 }
 
+impl RegionAuditLogListOptions {
+    /// Sets `metadata_cluster_id`.
+    pub fn with_metadata_cluster_id(mut self, value: i64) -> Self {
+        self.metadata_cluster_id = Some(value);
+        self
+    }
+
+    /// Sets `cursor`.
+    pub fn with_cursor(mut self, value: i64) -> Self {
+        self.cursor = Some(value);
+        self
+    }
+
+    /// Sets `limit`.
+    pub fn with_limit(mut self, value: i64) -> Self {
+        self.limit = Some(value);
+        self
+    }
+
+    /// Sets `subject`.
+    pub fn with_subject(mut self, value: impl Into<String>) -> Self {
+        self.subject = Some(value.into());
+        self
+    }
+
+    /// Sets `node`.
+    pub fn with_node(mut self, value: impl Into<String>) -> Self {
+        self.node = Some(value.into());
+        self
+    }
+}
+
 // ServiceNodes
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct StatsHistoryServiceNodeResponse {
     #[serde(rename = "intervalMs")]
     pub interval_ms: i64,
@@ -1992,6 +3314,7 @@ pub struct StatsHistoryServiceNodeResponse {
 // ClientSessions
 
 #[derive(Debug, Clone, Default)]
+#[non_exhaustive]
 pub struct ClientSessionListOptions {
     pub account_id: i64,
     pub region_id: Option<i64>,
@@ -2008,34 +3331,140 @@ pub struct ClientSessionListOptions {
     pub limit: Option<i64>,
 }
 
+impl ClientSessionListOptions {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(account_id: i64) -> Self {
+        Self {
+            account_id,
+            ..Default::default()
+        }
+    }
+
+    /// Sets `region_id`.
+    pub fn with_region_id(mut self, value: i64) -> Self {
+        self.region_id = Some(value);
+        self
+    }
+
+    /// Sets `metadata_cluster_id`.
+    pub fn with_metadata_cluster_id(mut self, value: i64) -> Self {
+        self.metadata_cluster_id = Some(value);
+        self
+    }
+
+    /// Sets `volume_id`.
+    pub fn with_volume_id(mut self, value: i64) -> Self {
+        self.volume_id = Some(value);
+        self
+    }
+
+    /// Sets `user_id`.
+    pub fn with_user_id(mut self, value: i64) -> Self {
+        self.user_id = Some(value);
+        self
+    }
+
+    /// Sets `client_type`.
+    pub fn with_client_type(mut self, value: impl Into<String>) -> Self {
+        self.client_type = Some(value.into());
+        self
+    }
+
+    /// Sets `status`.
+    pub fn with_status(mut self, value: ClientSessionStatus) -> Self {
+        self.status = Some(value);
+        self
+    }
+
+    /// Sets `is_active`.
+    pub fn with_is_active(mut self, value: bool) -> Self {
+        self.is_active = Some(value);
+        self
+    }
+
+    /// Sets `os_name`.
+    pub fn with_os_name(mut self, value: impl Into<String>) -> Self {
+        self.os_name = Some(value.into());
+        self
+    }
+
+    /// Sets `platform`.
+    pub fn with_platform(mut self, value: impl Into<String>) -> Self {
+        self.platform = Some(value.into());
+        self
+    }
+
+    /// Sets `search`.
+    pub fn with_search(mut self, value: impl Into<String>) -> Self {
+        self.search = Some(value.into());
+        self
+    }
+
+    /// Sets `page`.
+    pub fn with_page(mut self, value: i64) -> Self {
+        self.page = Some(value);
+        self
+    }
+
+    /// Sets `limit`.
+    pub fn with_limit(mut self, value: i64) -> Self {
+        self.limit = Some(value);
+        self
+    }
+}
+
 // Discover
 
 // Metrics
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct GenerateMetricTokenRequest {
     #[serde(rename = "expirySeconds")]
     pub expiry_seconds: i64,
+}
+
+impl GenerateMetricTokenRequest {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(expiry_seconds: i64) -> Self {
+        Self {
+            expiry_seconds,
+            ..Default::default()
+        }
+    }
 }
 
 // Dashboard
 
 // License
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Default, Serialize)]
+#[non_exhaustive]
 pub struct LoadLicenseRequest {
     pub payloads: Vec<String>,
+}
+
+impl LoadLicenseRequest {
+    /// Builds the value from its required fields. Optional fields start unset.
+    pub fn new(payloads: Vec<String>) -> Self {
+        Self {
+            payloads,
+            ..Default::default()
+        }
+    }
 }
 
 // Alerts
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct ResolveAlertResponse {
     #[serde(rename = "alertId")]
     pub alert_id: String,
 }
 
 #[derive(Debug, Clone, Default)]
+#[non_exhaustive]
 pub struct AlertListOptions {
     pub active: Option<bool>,
     pub account_id: Option<i64>,
@@ -2047,15 +3476,67 @@ pub struct AlertListOptions {
     pub limit: Option<i64>,
 }
 
+impl AlertListOptions {
+    /// Sets `active`.
+    pub fn with_active(mut self, value: bool) -> Self {
+        self.active = Some(value);
+        self
+    }
+
+    /// Sets `account_id`.
+    pub fn with_account_id(mut self, value: i64) -> Self {
+        self.account_id = Some(value);
+        self
+    }
+
+    /// Sets `region_id`.
+    pub fn with_region_id(mut self, value: i64) -> Self {
+        self.region_id = Some(value);
+        self
+    }
+
+    /// Sets `severity`.
+    pub fn with_severity(mut self, value: i64) -> Self {
+        self.severity = Some(value);
+        self
+    }
+
+    /// Sets `category`.
+    pub fn with_category(mut self, value: impl Into<String>) -> Self {
+        self.category = Some(value.into());
+        self
+    }
+
+    /// Sets `since`.
+    pub fn with_since(mut self, value: impl Into<String>) -> Self {
+        self.since = Some(value.into());
+        self
+    }
+
+    /// Sets `page`.
+    pub fn with_page(mut self, value: i64) -> Self {
+        self.page = Some(value);
+        self
+    }
+
+    /// Sets `limit`.
+    pub fn with_limit(mut self, value: i64) -> Self {
+        self.limit = Some(value);
+        self
+    }
+}
+
 // RegionAlerts
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct ResolveRegionAlertResponse {
     #[serde(rename = "alertId")]
     pub alert_id: String,
 }
 
 #[derive(Debug, Clone, Default)]
+#[non_exhaustive]
 pub struct RegionAlertListOptions {
     pub active: Option<bool>,
     pub severity: Option<i64>,
@@ -2067,9 +3548,60 @@ pub struct RegionAlertListOptions {
     pub limit: Option<i64>,
 }
 
+impl RegionAlertListOptions {
+    /// Sets `active`.
+    pub fn with_active(mut self, value: bool) -> Self {
+        self.active = Some(value);
+        self
+    }
+
+    /// Sets `severity`.
+    pub fn with_severity(mut self, value: i64) -> Self {
+        self.severity = Some(value);
+        self
+    }
+
+    /// Sets `category`.
+    pub fn with_category(mut self, value: impl Into<String>) -> Self {
+        self.category = Some(value.into());
+        self
+    }
+
+    /// Sets `node_id`.
+    pub fn with_node_id(mut self, value: impl Into<String>) -> Self {
+        self.node_id = Some(value.into());
+        self
+    }
+
+    /// Sets `metadata_cluster_id`.
+    pub fn with_metadata_cluster_id(mut self, value: i64) -> Self {
+        self.metadata_cluster_id = Some(value);
+        self
+    }
+
+    /// Sets `since`.
+    pub fn with_since(mut self, value: impl Into<String>) -> Self {
+        self.since = Some(value.into());
+        self
+    }
+
+    /// Sets `page`.
+    pub fn with_page(mut self, value: i64) -> Self {
+        self.page = Some(value);
+        self
+    }
+
+    /// Sets `limit`.
+    pub fn with_limit(mut self, value: i64) -> Self {
+        self.limit = Some(value);
+        self
+    }
+}
+
 // GCWorkerEvents
 
 #[derive(Debug, Clone, Default)]
+#[non_exhaustive]
 pub struct GCWorkerEventListOptions {
     pub node_id: Option<String>,
     pub goal: Option<String>,
@@ -2078,6 +3610,50 @@ pub struct GCWorkerEventListOptions {
     pub since: Option<String>,
     pub page: Option<i64>,
     pub limit: Option<i64>,
+}
+
+impl GCWorkerEventListOptions {
+    /// Sets `node_id`.
+    pub fn with_node_id(mut self, value: impl Into<String>) -> Self {
+        self.node_id = Some(value.into());
+        self
+    }
+
+    /// Sets `goal`.
+    pub fn with_goal(mut self, value: impl Into<String>) -> Self {
+        self.goal = Some(value.into());
+        self
+    }
+
+    /// Sets `sid`.
+    pub fn with_sid(mut self, value: i64) -> Self {
+        self.sid = Some(value);
+        self
+    }
+
+    /// Sets `metadata_cluster_id`.
+    pub fn with_metadata_cluster_id(mut self, value: i64) -> Self {
+        self.metadata_cluster_id = Some(value);
+        self
+    }
+
+    /// Sets `since`.
+    pub fn with_since(mut self, value: impl Into<String>) -> Self {
+        self.since = Some(value.into());
+        self
+    }
+
+    /// Sets `page`.
+    pub fn with_page(mut self, value: i64) -> Self {
+        self.page = Some(value);
+        self
+    }
+
+    /// Sets `limit`.
+    pub fn with_limit(mut self, value: i64) -> Self {
+        self.limit = Some(value);
+        self
+    }
 }
 
 // Vault

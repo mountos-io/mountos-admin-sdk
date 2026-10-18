@@ -9,6 +9,7 @@ use crate::http::ClientInner;
 use crate::types_gen::*;
 
 /// mountOS Admin API client. Construct with [`Client::new`].
+#[non_exhaustive]
 pub struct Client {
     pub accounts: AccountsService,
     pub users: UsersService,
@@ -68,6 +69,7 @@ impl Client {
 }
 
 /// Operations on the `Accounts` resource.
+#[non_exhaustive]
 pub struct AccountsService {
     inner: Arc<ClientInner>,
 }
@@ -119,6 +121,7 @@ impl AccountsService {
 }
 
 /// Operations on the `Users` resource.
+#[non_exhaustive]
 pub struct UsersService {
     inner: Arc<ClientInner>,
 }
@@ -164,6 +167,7 @@ impl UsersService {
 }
 
 /// Operations on the `Regions` resource.
+#[non_exhaustive]
 pub struct RegionsService {
     inner: Arc<ClientInner>,
 }
@@ -202,6 +206,7 @@ impl RegionsService {
 }
 
 /// Operations on the `Clusters` resource.
+#[non_exhaustive]
 pub struct ClustersService {
     inner: Arc<ClientInner>,
 }
@@ -227,6 +232,7 @@ impl ClustersService {
 }
 
 /// Operations on the `MetadataClusters` resource.
+#[non_exhaustive]
 pub struct MetadataClustersService {
     inner: Arc<ClientInner>,
 }
@@ -274,6 +280,7 @@ impl MetadataClustersService {
 }
 
 /// Operations on the `Storages` resource.
+#[non_exhaustive]
 pub struct StoragesService {
     inner: Arc<ClientInner>,
 }
@@ -398,6 +405,7 @@ impl StoragesService {
 }
 
 /// Operations on the `Volumes` resource.
+#[non_exhaustive]
 pub struct VolumesService {
     inner: Arc<ClientInner>,
 }
@@ -545,6 +553,7 @@ impl VolumesService {
 }
 
 /// Operations on the `VolumeForkTrees` resource.
+#[non_exhaustive]
 pub struct VolumeForkTreesService {
     inner: Arc<ClientInner>,
 }
@@ -577,6 +586,7 @@ impl VolumeForkTreesService {
 }
 
 /// Operations on the `VolumeForkEntries` resource.
+#[non_exhaustive]
 pub struct VolumeForkEntriesService {
     inner: Arc<ClientInner>,
 }
@@ -614,6 +624,7 @@ impl VolumeForkEntriesService {
 }
 
 /// Operations on the `VolumeForkSearches` resource.
+#[non_exhaustive]
 pub struct VolumeForkSearchesService {
     inner: Arc<ClientInner>,
 }
@@ -649,6 +660,7 @@ impl VolumeForkSearchesService {
 }
 
 /// Operations on the `AuditLogs` resource.
+#[non_exhaustive]
 pub struct AuditLogsService {
     inner: Arc<ClientInner>,
 }
@@ -680,6 +692,7 @@ impl AuditLogsService {
 }
 
 /// Operations on the `RegionAuditLogs` resource.
+#[non_exhaustive]
 pub struct RegionAuditLogsService {
     inner: Arc<ClientInner>,
 }
@@ -709,6 +722,7 @@ impl RegionAuditLogsService {
 }
 
 /// Operations on the `ServiceNodes` resource.
+#[non_exhaustive]
 pub struct ServiceNodesService {
     inner: Arc<ClientInner>,
 }
@@ -741,6 +755,7 @@ impl ServiceNodesService {
 }
 
 /// Operations on the `Nodes` resource.
+#[non_exhaustive]
 pub struct NodesService {
     inner: Arc<ClientInner>,
 }
@@ -763,6 +778,7 @@ impl NodesService {
 }
 
 /// Operations on the `ClientSessions` resource.
+#[non_exhaustive]
 pub struct ClientSessionsService {
     inner: Arc<ClientInner>,
 }
@@ -842,6 +858,7 @@ impl ClientSessionsService {
 }
 
 /// Operations on the `Discover` resource.
+#[non_exhaustive]
 pub struct DiscoverService {
     inner: Arc<ClientInner>,
 }
@@ -859,6 +876,7 @@ impl DiscoverService {
 }
 
 /// Operations on the `Metrics` resource.
+#[non_exhaustive]
 pub struct MetricsService {
     inner: Arc<ClientInner>,
 }
@@ -870,6 +888,7 @@ impl MetricsService {
 }
 
 /// Operations on the `Dashboard` resource.
+#[non_exhaustive]
 pub struct DashboardService {
     inner: Arc<ClientInner>,
 }
@@ -883,6 +902,7 @@ impl DashboardService {
 }
 
 /// Operations on the `License` resource.
+#[non_exhaustive]
 pub struct LicenseService {
     inner: Arc<ClientInner>,
 }
@@ -906,6 +926,7 @@ impl LicenseService {
 }
 
 /// Operations on the `Alerts` resource.
+#[non_exhaustive]
 pub struct AlertsService {
     inner: Arc<ClientInner>,
 }
@@ -952,6 +973,7 @@ impl AlertsService {
 }
 
 /// Operations on the `RegionAlerts` resource.
+#[non_exhaustive]
 pub struct RegionAlertsService {
     inner: Arc<ClientInner>,
 }
@@ -1002,6 +1024,7 @@ impl RegionAlertsService {
 }
 
 /// Operations on the `GCWorkerEvents` resource.
+#[non_exhaustive]
 pub struct GCWorkerEventsService {
     inner: Arc<ClientInner>,
 }
@@ -1068,6 +1091,7 @@ impl GCWorkerEventsService {
 }
 
 /// Operations on the `Vault` resource.
+#[non_exhaustive]
 pub struct VaultService {
     inner: Arc<ClientInner>,
 }

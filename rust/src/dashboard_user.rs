@@ -36,8 +36,7 @@ pub fn sign_dashboard_user(user: &DashboardUser, hmac_secret: &str) -> Result<St
     let encoded = URL_SAFE_NO_PAD.encode(&payload);
 
     let key = derive_hmac_key(hmac_secret)?;
-    let mut mac =
-        HmacSha256::new_from_slice(&key).map_err(|e| Error::Key(e.to_string()))?;
+    let mut mac = HmacSha256::new_from_slice(&key).map_err(|e| Error::Key(e.to_string()))?;
     mac.update(encoded.as_bytes());
     let sig = URL_SAFE_NO_PAD.encode(mac.finalize().into_bytes());
 
@@ -46,8 +45,8 @@ pub fn sign_dashboard_user(user: &DashboardUser, hmac_secret: &str) -> Result<St
 
 /// Derives a dedicated HMAC key from the shared secret with domain separation.
 fn derive_hmac_key(secret: &str) -> Result<Vec<u8>, Error> {
-    let mut mac = HmacSha256::new_from_slice(secret.as_bytes())
-        .map_err(|e| Error::Key(e.to_string()))?;
+    let mut mac =
+        HmacSha256::new_from_slice(secret.as_bytes()).map_err(|e| Error::Key(e.to_string()))?;
     mac.update(b"dashboard-user");
     Ok(mac.finalize().into_bytes().to_vec())
 }

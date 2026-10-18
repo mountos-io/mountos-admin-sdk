@@ -21,11 +21,11 @@ import { createClient, type RequestFn } from '../dist/index.js'
 // keyed by "METHOD path".
 function fakeClient(responses: Record<string, unknown>) {
   const calls: Array<{ method: string; path: string; body?: unknown }> = []
-  const request: RequestFn = async (method, path, body) => {
+  const request: RequestFn = (method, path, body) => {
     calls.push({ method, path, body })
     const key = `${method} ${path}`
-    if (!(key in responses)) throw new Error(`fixture has no response for ${key}`)
-    return responses[key] as never
+    if (!(key in responses)) return Promise.reject(new Error(`fixture has no response for ${key}`))
+    return Promise.resolve(responses[key] as never)
   }
   return { client: createClient(request), calls }
 }
