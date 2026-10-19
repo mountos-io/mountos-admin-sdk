@@ -1,6 +1,6 @@
 {
   "name": "@mountos-io/admin-sdk",
-  "version": "1.28.0",
+  "version": "1.29.0",
   "description": "TypeScript SDK for mountOS, a cross-platform, forkable, time-traveling distributed filesystem over object storage. Automate accounts, users, volumes, forks, quotas, and audit logs.",
   "keywords": [
     "mountos",
