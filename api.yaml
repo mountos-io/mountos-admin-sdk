@@ -70,7 +70,7 @@ types:
     - "id: int64"
     - "name: string"
 
-  # Ref plus the volume's storage personality (general | iceberg) so session
+  # Ref plus the volume's storage personality (general | iceberg | lance) so session
   # views can badge it. Kept separate from Ref so other refs stay {id, name}.
   VolumeRef:
     - "id: int64"
@@ -313,7 +313,7 @@ types:
     - "name: string"
     - "description: string?"
     # Immutable storage personality picked at create time. One of:
-    # "general" | "iceberg" (extensible to "s3-tables", "delta", ...).
+    # "general" | "iceberg" | "lance" (extensible to "s3-tables", "delta", ...).
     # Empty/legacy values ("object", "block") fall back to general semantics.
     # Drives kind badge + client-side mount gating: iceberg volumes are
     # not mountable as a regular filesystem; engines must use the lake
@@ -1580,7 +1580,7 @@ resources:
           - "name: string!"
           - "parentName: string"
           - "asOf: int64?"
-          # volumeType: "general" (default) | "iceberg"
+          # volumeType: "general" (default) | "iceberg" | "lance"
           # General forks operate on the file/object volume; iceberg forks
           # branch the lake catalog (separate fork namespace, COW overlay
           # via lake_fork_view).
