@@ -651,7 +651,7 @@ dependencies = [
 
 [[package]]
 name = "mountos-admin-sdk"
-version = "1.29.0"
+version = "1.30.0"
 dependencies = [
  "base64",
  "ed25519-dalek",
