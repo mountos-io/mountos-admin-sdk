@@ -1,6 +1,6 @@
 import { TokenSigner } from './auth.js'
 import { MountOSError } from './errors.js'
-import { signDashboardUser } from './dashboard_user.js'
+import { requestTarget, signDashboardUser } from './dashboard_user.js'
 import { createClient, type RequestFn, type AdminClient } from './client_gen.js'
 import { assertSafeIntegers } from './safe_int.js'
 import type { Config, StandardResponse } from './types_gen.js'
@@ -14,8 +14,11 @@ export function createServerClient(config: Config): AdminClient {
   const request: RequestFn = async <T>(method: string, path: string, body?: unknown, signal?: AbortSignal): Promise<T> => {
     const token = await signer.getToken()
     const headers: Record<string, string> = { Authorization: `Bearer ${token}` }
+    const url = `${baseUrl}${path}`
     if (dashboardUser) {
-      headers['X-MountOS-Dashboard-User'] = await signDashboardUser(dashboardUser, dashboardHMACKey ?? '')
+      headers['X-MountOS-Dashboard-User'] = await signDashboardUser(
+        dashboardUser, dashboardHMACKey ?? '', method, requestTarget(url),
+      )
     }
 
     const init: RequestInit = { method, headers, signal }
@@ -25,7 +28,7 @@ export function createServerClient(config: Config): AdminClient {
       init.body = JSON.stringify(body)
     }
 
-    const res = await fetch(`${baseUrl}${path}`, init)
+    const res = await fetch(url, init)
 
     let json: StandardResponse<T>
     try {

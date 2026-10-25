@@ -44,7 +44,7 @@ func (c *Client) do(ctx context.Context, method, path string, body any) (json.Ra
 	}
 	req.Header.Set("Authorization", "Bearer "+token)
 	if c.dashboardUser != nil {
-		h, sErr := SignDashboardUser(c.dashboardUser, c.dashboardHMACKey)
+		h, sErr := SignDashboardUser(c.dashboardUser, c.dashboardHMACKey, method, req.URL.RequestURI())
 		if sErr != nil {
 			return nil, sErr
 		}
